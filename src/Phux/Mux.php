@@ -74,7 +74,7 @@ class Mux
                     continue;
                 }
             } else {
-                if ( $path === $route[2] ) {
+                if ( $path === $route[1] ) {
                     return $route;
                 } else {
                     continue;
