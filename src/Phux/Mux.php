@@ -1,6 +1,7 @@
 <?php
 namespace Phux;
 use Phux\RouteCompiler;
+use Exception;
 
 class Mux
 {
@@ -30,6 +31,36 @@ class Mux
                 $options,
             );
         }
+    }
+
+
+    /**
+     * validate controller classes and controller methods before compiling to 
+     * route cache.
+     */
+    public function validate() 
+    {
+        foreach( $this->routes as $route ) {
+            $callback = $route[2];
+            if ( is_array($callback) ) {
+                $class = $callback[0];
+                $method = $callback[1];
+                if ( ! class_exists($class, true) ) {
+                    throw new Exception("Controller {$class} does not exist.");
+                }
+                // rebless a controller (extract this to common method)
+                $controller = new $class;
+                if ( ! method_exists($controller, $method) ) {
+                    throw new Exception("Method $method not found in controller $class.");
+                }
+            }
+        }
+    }
+
+    public function compile($outFile)
+    {
+        // compile routes to php file as a cache.
+
     }
 
     public function dispatch($path) {
