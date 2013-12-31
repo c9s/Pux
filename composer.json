@@ -1,0 +1,20 @@
+{
+    "name": "corneltek\/phux",
+    "description": "Fast PHP router",
+    "authors": [
+        {
+            "name": "c9s",
+            "email": "cornelius.howl@gmail.com"
+        }
+    ],
+    "require": { },
+    "require-dev": {
+        "corneltek\/phpunit-testmore": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Phux": "src"
+        }
+    },
+    "version": "0.0.1"
+}
