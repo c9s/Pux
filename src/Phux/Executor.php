@@ -45,8 +45,6 @@ class Executor
                 : array()
                 ;
 
-        var_dump( $vars ); 
-
         $arguments = array();
         foreach( $rps as $param ) {
             $n = $param->getName();

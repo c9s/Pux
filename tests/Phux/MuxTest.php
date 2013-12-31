@@ -21,7 +21,8 @@ class MuxTest extends PHPUnit_Framework_TestCase
 
         $route = $mux->dispatch('/hello/John');
         ok($route);
-        Executor::execute($route);
+        $response = Executor::execute($route);
+        is("Hello John", $response);
     }
 }
 

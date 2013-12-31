@@ -51,7 +51,6 @@ class Mux
             }
 
         }
-        // return $route;
     }
 
     public function getRoutes() {
