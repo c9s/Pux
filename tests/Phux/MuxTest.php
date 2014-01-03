@@ -13,8 +13,27 @@ class HelloController
     }
 }
 
+class PageController {
+
+    public function page1() { return 'page1'; }
+    public function page2() { return 'page2'; }
+
+}
+
 class MuxTest extends PHPUnit_Framework_TestCase
 {
+
+    public function testSubMux()
+    {
+        $mainMux = new Mux;
+
+        $pageMux = new Mux;
+        $pageMux->add('/page1', [ 'PageController', 'page1' ]);
+        $pageMux->add('/page2', [ 'PageController', 'page2' ]);
+        $mainMux->mount('/sub', $pageMux);
+
+        $mainMux->dispatch('/sub/page1');
+    }
 
 
     public function testNormalPattern() 

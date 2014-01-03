@@ -5,7 +5,15 @@ use Exception;
 
 class Mux
 {
+
     public $routes = array();
+
+    public $subMux = array();
+
+    public function mount($pattern, $mux)
+    {
+
+    }
 
     public function add($pattern, $callback, $options = array())
     {
