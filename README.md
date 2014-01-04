@@ -91,5 +91,30 @@ strings will match the prefix.
 
 ## Benchmarks
 
+Hardware:
+
+- iMac Mid 2011
+- Processor  2.5 GHz Intel Core i5
+- Memory  12 GB 1333 MHz DDR3
+- Software  OS X 10.9.1 (13B42)
+
+Environment:
+
+- Apache 2.2
+- PHP 5.5.6
+
+### Requests per seconds
+
 <img src="https://raw.github.com/c9s/Phux/master/benchmarks/reqs.png"/>
+
+### Response Time
+
+Phux
+
+<img src="https://raw.github.com/c9s/Phux/master/benchmarks/phux.png"/>
+
+Symfony/Routing
+
+<img src="https://raw.github.com/c9s/Phux/master/benchmarks/symfony-routing.png"/>
+
 
