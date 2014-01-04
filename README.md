@@ -88,3 +88,9 @@ strings will match the full string.
 When expandSubMux is disabled, the pattern comparison strategy for 
 strings will match the prefix.
 
+
+## Benchmarks
+
+
+
+
