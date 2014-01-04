@@ -78,6 +78,17 @@ class Mux
         }
     }
 
+    public function get($pattern, $callback, $options = array()) 
+    {
+        $options['method'] = 'get';
+        $this->add($pattern, $callback, $options);
+    }
+
+    public function post($pattern, $callback, $options = array()) {
+        $options['method'] = 'post';
+        $this->add($pattern, $callback, $options);
+    }
+
     public function add($pattern, $callback, $options = array())
     {
         // compile place holder to patterns
