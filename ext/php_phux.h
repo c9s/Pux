@@ -1,9 +1,9 @@
 
 
-#ifndef PHP_ROLLER_H
-#define PHP_ROLLER_H 1
-#define PHP_ROLLER_VERSION "1.1"
-#define PHP_ROLLER_EXTNAME "phux"
+#ifndef PHP_PHUX_H
+#define PHP_PHUX_H 1
+#define PHP_PHUX_VERSION "1.1"
+#define PHP_PHUX_EXTNAME "phux"
 
 PHP_FUNCTION(phux_dispatch);
 

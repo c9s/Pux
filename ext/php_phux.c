@@ -17,22 +17,55 @@ static const zend_function_entry phux_functions[] = {
 };
 
 zend_module_entry phux_module_entry = {
-	STANDARD_MODULE_HEADER,
-    PHP_ROLLER_EXTNAME,
-	phux_functions,
+    STANDARD_MODULE_HEADER,
+    PHP_PHUX_EXTNAME,
+    phux_functions,
     NULL,
-	NULL,
-	NULL,
-	NULL,
     NULL,
-	PHP_ROLLER_VERSION,
+    NULL,
+    NULL,
+    NULL,
+    PHP_PHUX_VERSION,
     STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_ROLLER
+#ifdef COMPILE_DL_PHUX
 ZEND_GET_MODULE(phux)
 #endif
 
+#define REQ_METHOD_GET 1
+#define REQ_METHOD_POST 2
+#define REQ_METHOD_PUT 3
+#define REQ_METHOD_DELETE 4
+
+
+/**
+ * get request method type in constant value.
+ */
+int get_current_request_method() {
+    char *c_request_method;
+    zval **z_server_hash;
+    zval **z_request_method;
+
+    if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
+        Z_TYPE_PP(z_server_hash) == IS_ARRAY &&
+        zend_hash_find(Z_ARRVAL_PP(z_server_hash), "REQUEST_METHOD", sizeof("REQUEST_METHOD"), (void **) &z_request_method) == SUCCESS
+    ) {
+        c_request_method = Z_STRVAL_PP(z_request_method);
+        if ( strcmp("get", c_request_method) ) {
+            return REQ_METHOD_GET;
+        } else if ( strcmp("post", c_request_method )) {
+            return REQ_METHOD_POST;
+        } else if ( strcmp("put" , c_request_method )) {
+            return REQ_METHOD_PUT;
+        } else if ( strcmp("delete", c_request_method )) {
+            return REQ_METHOD_DELETE;
+        }
+    }
+    return 0;
+}
+
+// int zend_hash_has_key( )
 
 
 /*
@@ -40,12 +73,11 @@ ZEND_GET_MODULE(phux)
  */
 PHP_FUNCTION(phux_dispatch)
 {
-    // RETURN_STRING("Hello World", 1);
     zval *routes;
     char *path;
     int  path_len;
 
-    zval *z_subpats = NULL;	/* Array for subpatterns */
+    zval *z_subpats = NULL; /* Array for subpatterns */
 
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "as", 
@@ -58,8 +90,6 @@ PHP_FUNCTION(phux_dispatch)
         ALLOC_INIT_ZVAL( z_subpats );
     }
 
-
-
     /* get request method */
     char *c_request_method;
     int  c_request_method_len;
@@ -67,16 +97,16 @@ PHP_FUNCTION(phux_dispatch)
     zval **z_request_method;
 
 
-	if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
-		Z_TYPE_PP(z_server_hash) == IS_ARRAY &&
-		zend_hash_find(Z_ARRVAL_PP(z_server_hash), "REQUEST_METHOD", sizeof("REQUEST_METHOD"), (void **) &z_request_method) == SUCCESS
-	) {
-		c_request_method = Z_STRVAL_PP(z_request_method);
+    if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
+        Z_TYPE_PP(z_server_hash) == IS_ARRAY &&
+        zend_hash_find(Z_ARRVAL_PP(z_server_hash), "REQUEST_METHOD", sizeof("REQUEST_METHOD"), (void **) &z_request_method) == SUCCESS
+    ) {
+        c_request_method = Z_STRVAL_PP(z_request_method);
         c_request_method_len = Z_STRLEN_PP(z_request_method);
 
         // convert to lower case, for comparing string
         php_strtolower(c_request_method ,c_request_method_len);
-	}
+    }
 
     HashPosition route_pointer;
     HashTable    *routes_hash;
@@ -119,11 +149,11 @@ PHP_FUNCTION(phux_dispatch)
         if (Z_TYPE_PP(z_compiled) == IS_STRING) {
 
             /* parameters */
-            char			 *regex;			/* Regular expression */
-            int				  regex_len;
-            pcre_cache_entry *pce;				/* Compiled regular expression */
-            long			  flags = 0;		/* Match control flags */
-            long			  start_offset = 0;	/* Where the new search starts */
+            char             *regex;            /* Regular expression */
+            int               regex_len;
+            pcre_cache_entry *pce;              /* Compiled regular expression */
+            long              flags = 0;        /* Match control flags */
+            long              start_offset = 0; /* Where the new search starts */
             int               global  = 0;
 
             regex = estrndup(Z_STRVAL_PP(z_compiled), Z_STRLEN_PP(z_compiled));
@@ -168,10 +198,6 @@ PHP_FUNCTION(phux_dispatch)
             if( z_subpats != NULL )
                 subpats_hash = Z_ARRVAL_P(z_subpats);
 
-#ifdef DEBUG
-            php_printf("D: found route\n");
-#endif
-
 
 
             // create a new route with variables
@@ -185,11 +211,6 @@ PHP_FUNCTION(phux_dispatch)
             // Apply variables and default variables {{{
             // Check if variables key is defined.
             if (zend_hash_find(route_hash, "variables", sizeof("variables"), (void**) &z_variables) == SUCCESS ) {
-
-#ifdef DEBUG
-                php_printf("D: variables key found.\n");
-#endif
-
 
                 HashPosition  variables_pointer;
                 HashTable    *variables_hash;
@@ -221,9 +242,6 @@ PHP_FUNCTION(phux_dispatch)
                                     (void**) &z_var_value ) == SUCCESS 
                          )
                     {
-#ifdef DEBUG
-                        php_printf("D: assign variable %s.\n", Z_STRVAL_PP(z_var_name) );
-#endif
                         add_assoc_zval( *z_vars , Z_STRVAL_PP(z_var_name) , *z_var_value );
                     } 
                     else if ( 
@@ -231,9 +249,6 @@ PHP_FUNCTION(phux_dispatch)
                             && zend_hash_find( Z_ARRVAL_PP(z_default_array) , Z_STRVAL_PP(z_var_name), Z_STRLEN_PP(z_var_name) + 1, 
                                     (void**) &z_default_value ) != FAILURE ) 
                     {
-#ifdef DEBUG
-                        php_printf("D: assign default %s.\n", Z_STRVAL_PP(z_var_name) );
-#endif
                         add_assoc_zval( *z_vars , Z_STRVAL_PP(z_var_name) , *z_default_value );
                     }
                 }
@@ -241,18 +256,11 @@ PHP_FUNCTION(phux_dispatch)
             }
             // }}}
 
-#ifdef DEBUG
-            php_printf("D: return\n");
-#endif
             *return_value = *z_route_copy;
             zval_copy_ctor(return_value);
             return;
         }
     }
-
-#ifdef DEBUG
-    php_printf("D: return null\n");
-#endif
     RETURN_FALSE;
 }
 
