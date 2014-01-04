@@ -37,6 +37,19 @@ class Mux
         return $this->id = self::generate_id();
     }
 
+    public function appendRoute($pattern, $callback, $options = array() ) {
+        $this->routes[] = array( false, $pattern, $callback, $options );
+    }
+
+    public function appendPCRERoute($routeArgs, $callback) {
+        $this->routes[] = array( 
+            true, // PCRE
+            $routeArgs['compiled'],
+            $callback,
+            $routeArgs,
+        );
+    }
+
     public function mount($pattern, $mux, $options = array())
     {
         if ( $this->expandSubMux ) {
@@ -45,13 +58,10 @@ class Mux
                 // process for pcre
                 if ( $route[0] ) {
                     $newPattern = $pattern . $route[3]['pattern'];
-                    $routeArgs = RouteCompiler::compile($newPattern, $options);
-                    $this->routes[] = array( 
-                        true, // PCRE
-                        $routeArgs['compiled'],
-                        $route[2],
-                        $routeArgs,
-                    );
+                    $routeArgs = RouteCompiler::compile($newPattern, 
+                        array_merge_recursive($route[3], $options) );
+
+                    $this->appendPCRERoute( $routeArgs, $route[2] );
                 } else {
                     $this->routes[] = array(
                         false,
