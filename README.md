@@ -27,3 +27,30 @@ we sort long patterns in descending order before compiling the routes to cache.
 Phux uses indexed array as the data structure for storing route information so it's faster.
 
 
+Synopsis
+------------
+
+```php
+class ProductController {
+    public function listAction() {
+        return 'product list';
+    }
+    public function itemAction($id) { 
+        return "product $id";
+    }
+}
+
+$router = new Router([ 'cache_file' => 'mux.php' ]);
+
+if ( false === $router->load() ) {
+    $router->add('/product', ['ProductController','listAction']);
+    $router->add('/product/:id', ['ProductController','itemAction'] , [
+        'require' => [ ':id' => '\d+', ],
+        'default' => [ ':id' => '1', ]
+    ]);
+
+    $router->save();
+}
+$route = $router->dispatch('/product/1');
+```
+
