@@ -12,10 +12,10 @@ provides PCRE pattern matching:
 1. Plain string comparison.
 2. PCRE pattern comparison.
 
-You've already knew that PCRE pattern matching is slower than plain string comparison, although PHP PCRE caches the pattern.
+You've already knew that PCRE pattern matching is slower than plain string comparison, although PHP PCRE caches the compiled patterns.
 
-The plain string comparison is designed for these static routing paths, it does
-improve the performance while you have simple routes.
+The plain string comparison is designed for static routing paths, it
+improves the performance while you have a lot of simple routes.
 
 The PCRE pattern comparison is used when you have some dynamic routing paths,
 for example, you can put the some place holder in your routing path, and pass
