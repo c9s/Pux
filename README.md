@@ -118,11 +118,11 @@ Prefork configuration:
 
 ### Response Time
 
-Phux
+Phux (around 3ms~38ms)
 
 <img src="https://raw.github.com/c9s/Phux/master/benchmarks/phux.png"/>
 
-Symfony/Routing
+Symfony/Routing (around 9ms~146ms)
 
 <img src="https://raw.github.com/c9s/Phux/master/benchmarks/symfony-routing.png"/>
 
