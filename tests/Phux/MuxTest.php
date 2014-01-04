@@ -23,7 +23,7 @@ class PageController {
 class MuxTest extends PHPUnit_Framework_TestCase
 {
 
-    public function testSubMux()
+    public function testSubMuxExport()
     {
         $mainMux = new Mux;
 
@@ -32,7 +32,24 @@ class MuxTest extends PHPUnit_Framework_TestCase
         $pageMux->add('/page2', [ 'PageController', 'page2' ]);
         $mainMux->mount('/sub', $pageMux);
 
-        $mainMux->dispatch('/sub/page1');
+        $pageMux2 = new Mux;
+        $pageMux2->add('/bar', [ 'PageController', 'page1' ]);
+        $pageMux2->add('/zoo', [ 'PageController', 'page2' ]);
+        $mainMux->mount('/foo', $pageMux2);
+
+        foreach( ['/sub/page1', '/sub/page2', '/foo/bar', '/foo/zoo'] as $p ) {
+            $r = $mainMux->dispatch('/sub/page1');
+            ok($r, "Matched route for $p");
+        }
+
+        $code = '$newMux = ' . $mainMux->export() . ';';
+        eval($code);
+        ok($newMux);
+
+        foreach( ['/sub/page1', '/sub/page2', '/foo/bar', '/foo/zoo'] as $p ) {
+            $r = $newMux->dispatch('/sub/page1');
+            ok($r, "Matched route for $p");
+        }
     }
 
 

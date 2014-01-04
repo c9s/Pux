@@ -15,11 +15,23 @@ class Router
         $this->mux = new Mux;
     }
 
+    public function add() 
+    {
+        // $this->mux->add( func_get_args() );
+    }
+
     public function cacheInvalid() 
     {
         return true;
     }
 
 
+    public function save() {
+
+    }
+
+    public function dispatch($path) {
+
+    }
 }
 

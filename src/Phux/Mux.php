@@ -5,14 +5,30 @@ use Exception;
 
 class Mux
 {
-
     public $routes = array();
 
     public $subMux = array();
 
-    public function mount($pattern, $mux)
-    {
+    public static $id_counter = 0;
 
+    public $id;
+
+    public static function generate_id() {
+        return ++static::$id_counter;
+    }
+
+    public function getId() {
+        if ( $this->id ) {
+            return $this->id;
+        }
+        return $this->id = self::generate_id();
+    }
+
+    public function mount($pattern, $mux, $options = array())
+    {
+        $muxId = $mux->getId();
+        $this->add($pattern, $mux->getId(), $options);
+        $this->subMux[ $muxId ] = $mux;
     }
 
     public function add($pattern, $callback, $options = array())
@@ -71,7 +87,7 @@ class Mux
 
     }
 
-    public function dispatch($path) {
+    public function matchRoute($path) {
         $path = rtrim($path, '/');
         foreach( $this->routes as $route ) {
             if ( $route[0] ) {
@@ -82,18 +98,50 @@ class Mux
                     continue;
                 }
             } else {
-                if ( $path === $route[1] ) {
+                if ( strncmp($path, $route[1], strlen($route[1]) ) === 0 ) {
                     return $route;
                 } else {
                     continue;
                 }
             }
+        }
+    }
 
+    public function dispatch($path) {
+        if ( $route = $this->matchRoute($path) ) {
+            if ( is_int($route[2]) ) {
+                $subMux = $this->subMux[ $route[2] ];
+
+                // sub path and call subMux to dispatch
+                // for pcre pattern?
+                if ($route[0]) { 
+                    $matchedString = $route[3]['vars'][0];
+                    $subpath = substr($path, strlen($matchedString));
+                    return $subMux->dispatch($subpath);
+                } else {
+                    $subpath = substr($path, strlen($route[1]));
+                    return $subMux->dispatch($subpath);
+                }
+            } else {
+                return $route;
+            }
         }
     }
 
     public function getRoutes() {
         return $this->routes;
+    }
+
+    public function export() {
+        return var_export($this, true);
+    }
+
+    public static function __set_state($array) {
+        $mux = new self;
+        $mux->routes = $array['routes'];
+        $mux->subMux = $array['subMux'];
+        $mux->id = $array['id'];
+        return $mux;
     }
 
 }
