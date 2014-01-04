@@ -6,7 +6,8 @@
 #include "php_phux.h"
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
-#include "zend_exceptions.h"
+#include <zend_exceptions.h>
+
 
 #define ZEND_HASH_FETCH(hash,key,ret) \
     zend_hash_find(hash, key, sizeof(key), (void**)&ret) == SUCCESS
@@ -14,6 +15,8 @@
 // #define DEBUG 1
 
 zend_class_entry *phux_ce_mux;
+zend_class_entry *phux_ce_exception;
+
 
 const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, add, NULL, ZEND_ACC_PUBLIC)
@@ -24,6 +27,13 @@ static const zend_function_entry phux_functions[] = {
     PHP_FE(phux_match, NULL)
     PHP_FE_END
 };
+
+
+void phux_init_exception(TSRMLS_D) {
+  zend_class_entry e;
+  INIT_CLASS_ENTRY(e, "PhuxException", NULL);
+  phux_ce_exception = zend_register_internal_class_ex(&e, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+}
 
 zend_module_entry phux_module_entry = {
     STANDARD_MODULE_HEADER,
@@ -47,7 +57,7 @@ ZEND_GET_MODULE(phux)
 void phux_init_mux(TSRMLS_D) {
   zend_class_entry ce;
  
-  INIT_CLASS_ENTRY(ce, "Phux\\Mux", mux_methods);
+  INIT_CLASS_ENTRY(ce, "Phux\\MuxNew", mux_methods);
   phux_ce_mux = zend_register_internal_class(&ce TSRMLS_CC);
  
   /* fields */
@@ -58,7 +68,31 @@ void phux_init_mux(TSRMLS_D) {
 }
  
 PHP_METHOD(Mux, add) {
-  // TODO                                                                                                                                                                   
+    zval **z_pattern;
+    zval **z_callback;
+    zval **z_options;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    // $pcre = strpos($pattern,':') !== false;
+
+    char * haystack = Z_STRVAL_PP(z_pattern);
+    int    haystack_len = Z_STRLEN_PP(z_pattern);
+    char  needle_char[2] = { ':', 0 };
+    char *found = NULL;
+    found = php_memnstr(haystack,
+                        needle_char,
+                        1,
+                        haystack + haystack_len);
+
+
+    // PCRE pattern here
+    if ( found ) {
+
+    } else {
+
+    }
 }
 
 
