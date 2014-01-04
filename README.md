@@ -91,6 +91,5 @@ strings will match the prefix.
 
 ## Benchmarks
 
-
-
+<img src="https://raw.github.com/c9s/Phux/master/benchmarks/reqs.png"/>
 
