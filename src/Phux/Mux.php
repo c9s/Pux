@@ -78,6 +78,18 @@ class Mux
         }
     }
 
+    public function delete($pattern, $callback, $options = array()) 
+    {
+        $options['method'] = 'delete';
+        $this->add($pattern, $callback, $options);
+    }
+
+    public function put($pattern, $callback, $options = array()) 
+    {
+        $options['method'] = 'put';
+        $this->add($pattern, $callback, $options);
+    }
+
     public function get($pattern, $callback, $options = array()) 
     {
         $options['method'] = 'get';
