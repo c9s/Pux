@@ -179,7 +179,7 @@ class RouteCompiler
         }
 
         // save variables
-        $options['variables'] = $variables;
+        // $options['variables'] = $variables;
         $options['regex'] = $regex;
         // $options['tokens'] = $tokens;
         return $options;

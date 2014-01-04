@@ -6,6 +6,7 @@
 #include "php_phux.h"
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
+#include "zend_exceptions.h"
 
 #define ZEND_HASH_FETCH(hash,key,ret) \
     zend_hash_find(hash, key, sizeof(key), (void**)&ret) == SUCCESS
@@ -81,7 +82,6 @@ PHP_FUNCTION(phux_dispatch)
     char *path;
     int  path_len;
 
-    zval *z_subpats = NULL; /* Array for subpatterns */
 
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "as", 
@@ -90,9 +90,8 @@ PHP_FUNCTION(phux_dispatch)
         RETURN_FALSE;
     }
 
-    if( z_subpats == NULL ) {
-        ALLOC_INIT_ZVAL( z_subpats );
-    }
+    zval *z_subpats = NULL; /* Array for subpatterns */
+    ALLOC_INIT_ZVAL( z_subpats );
 
     HashPosition route_pointer;
     HashTable    *routes_array;
@@ -104,8 +103,13 @@ PHP_FUNCTION(phux_dispatch)
 
     HashTable *route_item_hash;
 
-    zval **z_is_pcre;
-    zval **z_pattern;
+    zval **z_is_pcre; // route[0]
+    zval **z_pattern; // route[1]
+    // callback @ route[2]
+    zval **z_route_options; // route[3]
+
+    char *pattern;
+    int  pattern_len;
 
     for(zend_hash_internal_pointer_reset_ex(routes_array, &route_pointer); 
             zend_hash_get_current_data_ex(routes_array, (void**) &z_route, &route_pointer) == SUCCESS; 
@@ -114,25 +118,61 @@ PHP_FUNCTION(phux_dispatch)
         // read z_route
         route_item_hash = Z_ARRVAL_PP(z_route);
 
+
         if ( zend_hash_index_find( Z_ARRVAL_PP(z_route), 0, (void**) &z_is_pcre) == FAILURE ) {
             continue;
         }
         if ( zend_hash_index_find( Z_ARRVAL_PP(z_route), 1, (void**) &z_pattern) == FAILURE ) {
             continue;
         }
+        if ( zend_hash_index_find( Z_ARRVAL_PP(z_route), 3, (void**) &z_route_options) == FAILURE ) {
+            continue;
+        }
 
         if ( Z_BVAL_PP(z_is_pcre) ) {
             // do pcre_match comparision
 
+            /* parameters */
+            pcre_cache_entry *pce;              /* Compiled regular expression */
+
+            pattern = Z_STRVAL_PP(z_pattern);
+            pattern_len = Z_STRLEN_PP(z_pattern);
+
+            /* Compile regex or get it from cache. */
+            if ((pce = pcre_get_compiled_regex_cache(pattern, pattern_len TSRMLS_CC)) == NULL) {
+                zend_throw_exception(zend_exception_get_default(TSRMLS_C), "PCRE pattern compile failed.", 0 TSRMLS_CC);
+                RETURN_FALSE;
+            }
+
+            zval *pcre_ret;
+            ALLOC_INIT_ZVAL(pcre_ret);
+            php_pcre_match_impl(pce, path, path_len, pcre_ret, z_subpats, 0, 0, 0, 0 TSRMLS_CC);
+
+            if ( ! Z_BVAL_P(pcre_ret) ) {
+                continue;
+            }
+
+            if ( z_subpats != NULL ) {
+                add_assoc_zval( *z_route_options , "vars" , z_subpats );
+            }
+            *return_value = **z_route;
+            zval_copy_ctor(return_value);
+            return;
+
+            /*
+            HashTable *subpats_hash = NULL;
+                subpats_hash = Z_ARRVAL_P(z_subpats);
+            }
+            */
         } else {
             // normal string comparison
-            char *pattern = Z_STRVAL_PP( z_pattern );
-            int   pattern_len = Z_STRLEN_PP( z_pattern );
+            pattern = Z_STRVAL_PP( z_pattern );
+            pattern_len = Z_STRLEN_PP( z_pattern );
 
             // pattern-prefix match
             if ( strncmp(pattern, path, pattern_len) == 0 ) {
                 *return_value = **z_route;
-                // zval_copy_ctor(return_value);
+                zval_copy_ctor(return_value);
                 return;
             }
         }
