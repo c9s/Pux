@@ -14,7 +14,7 @@
 // #define DEBUG 1
 
 static const zend_function_entry phux_functions[] = {
-    PHP_FE(phux_dispatch, NULL)
+    PHP_FE(phux_match, NULL)
     PHP_FE_END
 };
 
@@ -74,9 +74,9 @@ int get_current_request_method() {
 
 
 /*
- * phux_dispatch( $this->routes, $path );
+ * phux_match( $routes, $path );
  */
-PHP_FUNCTION(phux_dispatch)
+PHP_FUNCTION(phux_match)
 {
     zval *routes;
     char *path;

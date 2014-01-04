@@ -179,6 +179,11 @@ class Mux
 
     public function matchRoute($path) {
         $path = rtrim($path, '/');
+
+        if ( extension_loaded('phux') ) {
+            return phux_match($this->routes, $path);
+        }
+
         foreach( $this->routes as $route ) {
             if ( $route[0] ) {
                 if ( preg_match($route[1], $path , $regs ) ) {
