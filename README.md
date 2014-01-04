@@ -91,6 +91,8 @@ strings will match the prefix.
 
 ## Benchmarks
 
+Testing with route dispatch only. (no controller)
+
 Hardware:
 
 - iMac Mid 2011
