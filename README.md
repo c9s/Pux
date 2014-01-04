@@ -21,8 +21,9 @@ The PCRE pattern comparison is used when you have some dynamic routing paths,
 for example, you can put some place holders in your routing path, and pass
 these path arguments to your controller later.
 
-Phux sorts and compiles your route to single cache, we use longest matching so
-we sort long patterns in descending order before compiling the routes to cache.
+Phux sorts and compiles your routes to single cache file, it also uses longest
+matching so it sorts patterns by pattern length in descending order before compiling the
+routes to cache.
 
 Phux uses indexed array as the data structure for storing route information so it's faster.
 
