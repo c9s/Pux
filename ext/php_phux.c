@@ -118,7 +118,6 @@ PHP_FUNCTION(phux_dispatch)
         // read z_route
         route_item_hash = Z_ARRVAL_PP(z_route);
 
-
         if ( zend_hash_index_find( Z_ARRVAL_PP(z_route), 0, (void**) &z_is_pcre) == FAILURE ) {
             continue;
         }
@@ -152,16 +151,41 @@ PHP_FUNCTION(phux_dispatch)
                 continue;
             }
 
-            if ( z_subpats != NULL ) {
-                add_assoc_zval( *z_route_options , "vars" , z_subpats );
+            HashTable *subpats_hash = NULL;
+            subpats_hash = Z_ARRVAL_P(z_subpats);
+
+
+            if ( z_subpats == NULL ) {
+                ALLOC_INIT_ZVAL(z_subpats);
+                array_init(z_subpats);
             }
+
+            // apply "default" value to "vars"
+            /*
+            zval **z_route_default;
+            zval **z_route_subpat_val;
+            if ( zend_hash_find(z_route_options, "default", sizeof("default"), (void**) &z_route_default ) == FAILURE ) {
+                HashPosition  default_pointer;
+                HashTable    *default_hash;
+
+                variables_hash = Z_ARRVAL_PP(z_variables);
+
+                // foreach variables as var, check if url contains variable or we should apply default value
+                for(zend_hash_internal_pointer_reset_ex(variables_hash, &variables_pointer); 
+                        zend_hash_get_current_data_ex(variables_hash, (void**) &z_var_name, &variables_pointer) == SUCCESS; 
+                        zend_hash_move_forward_ex(variables_hash, &variables_pointer)) 
+                {
+                }
+                // if ( zend_hash_find(z_route_default, "default", sizeof("default"), (void**) &z_route_default ) == FAILURE ) {
+            }
+            */
+            add_assoc_zval( *z_route_options , "vars" , z_subpats );
+
             *return_value = **z_route;
             zval_copy_ctor(return_value);
             return;
 
             /*
-            HashTable *subpats_hash = NULL;
-                subpats_hash = Z_ARRVAL_P(z_subpats);
             }
             */
         } else {
