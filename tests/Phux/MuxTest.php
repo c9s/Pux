@@ -44,6 +44,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
     public function testSubMuxExport()
     {
         $mainMux = new Mux;
+        $mainMux->expandSubMux = false;
 
         $pageMux = new Mux;
         $pageMux->add('/page1', [ 'PageController', 'page1' ]);

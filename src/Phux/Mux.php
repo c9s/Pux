@@ -9,7 +9,18 @@ class Mux
 
     public $subMux = array();
 
-    public $expandSubMux = false;
+
+    /**
+     * When expandSubMux is enabled, all mounted Mux will expand the routes to the parent mux.
+     * This improves the dispatch performance when you have a lot of sub mux to dispatch.
+     *
+     * When expandSubMux is enabled, the pattern comparison strategy for 
+     * strings will match the full string.
+     *
+     * When expandSubMux is disabled, the pattern comparison strategy for 
+     * strings will match the prefix.
+     */
+    public $expandSubMux = true;
 
     public static $id_counter = 0;
 
@@ -42,10 +53,9 @@ class Mux
                         $routeArgs,
                     );
                 } else {
-                    $newPattern = $pattern . $route[1];
                     $this->routes[] = array(
                         false,
-                        $pattern,
+                        $pattern . $route[1],
                         $route[2],
                         $options,
                     );
@@ -109,8 +119,29 @@ class Mux
 
     public function compile($outFile)
     {
-        // compile routes to php file as a cache.
+        // TODO: compile patterns here
+        $this->validate();
 
+        // compile routes to php file as a cache.
+        usort($this->routes, function($a, $b) {
+            if ( $a[0] && $b[0] ) {
+                return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
+            } elseif ( $a[0] ) {
+                return 1;
+            } elseif ( $b[0] ) {
+                return -1;
+            }
+            if ( strlen($a[1]) > strlen($b[1]) ) {
+                return 1;
+            } elseif ( strlen($a[1]) == strlen($b[1]) ) {
+                return 0;
+            } else {
+                return -1;
+            }
+        });
+
+        $code = '<?php return ' . $this->export() . ';';
+        return file_put_contents($outFile, $code);
     }
 
     public function matchRoute($path) {
@@ -124,11 +155,18 @@ class Mux
                     continue;
                 }
             } else {
-                if ( strncmp($path, $route[1], strlen($route[1]) ) === 0 ) {
-                    return $route;
+                if ( $this->expandSubMux ) {
+                    if ( $path === $route[1] ) {
+                        return $route;
+                    }
                 } else {
-                    continue;
+                    if ( strncmp($path, $route[1], strlen($route[1]) ) === 0 ) {
+                        return $route;
+                    } else {
+                        continue;
+                    }
                 }
+
             }
         }
     }
@@ -172,6 +210,7 @@ class Mux
         $mux = new self;
         $mux->routes = $array['routes'];
         $mux->subMux = $array['subMux'];
+        $mux->expandSubMux = $array['expandSubMux'];
         $mux->id = $array['id'];
         return $mux;
     }

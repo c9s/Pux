@@ -216,7 +216,7 @@ class RouteCompiler
         $route = self::compilePattern($pattern, $options);
 
         // save compiled pattern
-        $route['compiled'] = sprintf("#^\n%s$#xs", $route['regex']);
+        $route['compiled'] = sprintf("#^%s$#xs", $route['regex']);
         $route['pattern'] = $pattern; // save pattern
         return $route;
     }
