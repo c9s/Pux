@@ -128,6 +128,10 @@ PHP_FUNCTION(phux_dispatch)
             continue;
         }
 
+
+        // XXX: validate request method constraint
+
+
         if ( Z_BVAL_PP(z_is_pcre) ) {
             // do pcre_match comparision
 
@@ -162,6 +166,15 @@ PHP_FUNCTION(phux_dispatch)
 
             // apply "default" value to "vars"
             /*
+                foreach( $route['variables'] as $k ) {
+                    if( isset($regs[$k]) ) {
+                        $route['vars'][ $k ] = $regs[$k];
+                    } else {
+                        $route['vars'][ $k ] = $route['default'][ $k ];
+                    }
+                }
+            */
+            /*
             zval **z_route_default;
             zval **z_route_subpat_val;
             if ( zend_hash_find(z_route_options, "default", sizeof("default"), (void**) &z_route_default ) == FAILURE ) {
@@ -184,10 +197,6 @@ PHP_FUNCTION(phux_dispatch)
             *return_value = **z_route;
             zval_copy_ctor(return_value);
             return;
-
-            /*
-            }
-            */
         } else {
             // normal string comparison
             pattern = Z_STRVAL_PP( z_pattern );
