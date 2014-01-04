@@ -14,6 +14,8 @@ class Mux
 
     public $subMux = array();
 
+    public $id;
+
 
     /**
      * When expandSubMux is enabled, all mounted Mux will expand the routes to the parent mux.
@@ -29,7 +31,6 @@ class Mux
 
     public static $id_counter = 0;
 
-    public $id;
 
     public static function generate_id() {
         return ++static::$id_counter;

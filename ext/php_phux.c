@@ -13,6 +13,13 @@
 
 // #define DEBUG 1
 
+zend_class_entry *phux_ce_mux;
+
+const zend_function_entry mux_methods[] = {
+  PHP_ME(Mux, add, NULL, ZEND_ACC_PUBLIC)
+  PHP_FE_END
+};
+
 static const zend_function_entry phux_functions[] = {
     PHP_FE(phux_match, NULL)
     PHP_FE_END
@@ -22,7 +29,7 @@ zend_module_entry phux_module_entry = {
     STANDARD_MODULE_HEADER,
     PHP_PHUX_EXTNAME,
     phux_functions,
-    NULL,
+    PHP_MINIT(phux),
     NULL,
     NULL,
     NULL,
@@ -34,6 +41,25 @@ zend_module_entry phux_module_entry = {
 #ifdef COMPILE_DL_PHUX
 ZEND_GET_MODULE(phux)
 #endif
+
+
+
+void phux_init_mux(TSRMLS_D) {
+  zend_class_entry ce;
+ 
+  INIT_CLASS_ENTRY(ce, "Phux\\Mux", mux_methods);
+  phux_ce_mux = zend_register_internal_class(&ce TSRMLS_CC);
+ 
+  /* fields */
+  zend_declare_property_null(phux_ce_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(phux_ce_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_null(phux_ce_mux, "subMux", strlen("subMux"), ZEND_ACC_PUBLIC TSRMLS_CC);
+  zend_declare_property_bool(phux_ce_mux, "expandSubMux", strlen("expandSubMux"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
+}
+ 
+PHP_METHOD(Mux, add) {
+  // TODO                                                                                                                                                                   
+}
 
 
 
@@ -216,5 +242,10 @@ PHP_FUNCTION(phux_match)
         }
     }
     RETURN_FALSE;
+}
+
+PHP_MINIT_FUNCTION(phux) {
+  phux_init_mux(TSRMLS_C);
+  return SUCCESS;
 }
 
