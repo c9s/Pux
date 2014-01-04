@@ -18,7 +18,7 @@ The plain string comparison is designed for static routing paths, it
 improves the performance while you have a lot of simple routes.
 
 The PCRE pattern comparison is used when you have some dynamic routing paths,
-for example, you can put the some place holder in your routing path, and pass
+for example, you can put some place holders in your routing path, and pass
 these path arguments to your controller later.
 
 Phux sorts and compiles your route to single cache, we use longest matching so
