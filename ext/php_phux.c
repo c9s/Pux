@@ -35,10 +35,6 @@ zend_module_entry phux_module_entry = {
 ZEND_GET_MODULE(phux)
 #endif
 
-#define REQ_METHOD_GET 1
-#define REQ_METHOD_POST 2
-#define REQ_METHOD_PUT 3
-#define REQ_METHOD_DELETE 4
 
 
 /**
@@ -56,14 +52,13 @@ int get_current_request_method() {
     ) {
         c_request_method = Z_STRVAL_PP(z_request_method);
         c_request_method_len = Z_STRLEN_PP(z_request_method);
-        php_strtolower(c_request_method ,c_request_method_len);
-        if ( strncmp("get", c_request_method , sizeof("get") ) == 0 ) {
+        if ( strncmp("GET", c_request_method , sizeof("GET") ) == 0 ) {
             return REQ_METHOD_GET;
-        } else if ( strncmp("post", c_request_method , sizeof("post") ) == 0 ) {
+        } else if ( strncmp("POST", c_request_method , sizeof("POST") ) == 0 ) {
             return REQ_METHOD_POST;
-        } else if ( strcmp("put" , c_request_method ) == 0 ) {
+        } else if ( strncmp("PUT" , c_request_method , sizeof("PUT") ) == 0 ) {
             return REQ_METHOD_PUT;
-        } else if ( strcmp("delete", c_request_method ) == 0 ) {
+        } else if ( strncmp("DELETE", c_request_method, sizeof("DELETE")  ) == 0 ) {
             return REQ_METHOD_DELETE;
         }
     }
@@ -83,12 +78,15 @@ PHP_FUNCTION(phux_match)
     int  path_len;
 
 
+
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "as", 
                     &routes, 
                     &path, &path_len ) == FAILURE) {
         RETURN_FALSE;
     }
+
+    int current_request_method = get_current_request_method();
 
     zval *z_subpats = NULL; /* Array for subpatterns */
     ALLOC_INIT_ZVAL( z_subpats );
@@ -118,18 +116,23 @@ PHP_FUNCTION(phux_match)
         // read z_route
         route_item_hash = Z_ARRVAL_PP(z_route);
 
-        if ( zend_hash_index_find( Z_ARRVAL_PP(z_route), 0, (void**) &z_is_pcre) == FAILURE ) {
+        if ( zend_hash_index_find( route_item_hash, 0, (void**) &z_is_pcre) == FAILURE ) {
             continue;
         }
-        if ( zend_hash_index_find( Z_ARRVAL_PP(z_route), 1, (void**) &z_pattern) == FAILURE ) {
+        if ( zend_hash_index_find( route_item_hash, 1, (void**) &z_pattern) == FAILURE ) {
             continue;
         }
-        if ( zend_hash_index_find( Z_ARRVAL_PP(z_route), 3, (void**) &z_route_options) == FAILURE ) {
+        if ( zend_hash_index_find( route_item_hash, 3, (void**) &z_route_options) == FAILURE ) {
             continue;
         }
 
-
-        // XXX: validate request method constraint
+        HashTable * z_route_options_hash = Z_ARRVAL_PP(z_route_options);
+        zval **z_method;
+        if ( zend_hash_find( z_route_options_hash , "method", sizeof("method"), (void**) &z_method ) == SUCCESS ) {
+            if ( Z_TYPE_PP(z_method) == IS_LONG && Z_LVAL_PP(z_method) != current_request_method ) {
+                continue;
+            }
+        }
 
 
         if ( Z_BVAL_PP(z_is_pcre) ) {
@@ -163,6 +166,8 @@ PHP_FUNCTION(phux_match)
                 ALLOC_INIT_ZVAL(z_subpats);
                 array_init(z_subpats);
             }
+
+
 
             // apply "default" value to "vars"
             /*

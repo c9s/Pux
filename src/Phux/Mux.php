@@ -3,6 +3,11 @@ namespace Phux;
 use Phux\RouteCompiler;
 use Exception;
 
+define('REQ_METHOD_GET', 1);
+define('REQ_METHOD_POST', 2);
+define('REQ_METHOD_PUT', 3);
+define('REQ_METHOD_DELETE', 4);
+
 class Mux
 {
     public $routes = array();
@@ -80,24 +85,24 @@ class Mux
 
     public function delete($pattern, $callback, $options = array()) 
     {
-        $options['method'] = 'delete';
+        $options['method'] = REQ_METHOD_DELETE;
         $this->add($pattern, $callback, $options);
     }
 
     public function put($pattern, $callback, $options = array()) 
     {
-        $options['method'] = 'put';
+        $options['method'] = REQ_METHOD_PUT;
         $this->add($pattern, $callback, $options);
     }
 
     public function get($pattern, $callback, $options = array()) 
     {
-        $options['method'] = 'get';
+        $options['method'] = REQ_METHOD_GET;
         $this->add($pattern, $callback, $options);
     }
 
     public function post($pattern, $callback, $options = array()) {
-        $options['method'] = 'post';
+        $options['method'] = REQ_METHOD_POST;
         $this->add($pattern, $callback, $options);
     }
 
@@ -178,13 +183,33 @@ class Mux
     }
 
     public function matchRoute($path) {
-        $path = rtrim($path, '/');
-
         if ( extension_loaded('phux') ) {
             return phux_match($this->routes, $path);
         }
 
+        $reqmethod = 0;
+        switch ($_SERVER['REQUEST_METHOD']) {
+        case "POST":
+            $reqmethod = REQ_METHOD_POST;
+            break;
+        case "GET":
+            $reqmethod = REQ_METHOD_GET;
+            break;
+        case "PUT":
+            $reqmethod = REQ_METHOD_PUT;
+            break;
+        case "DELETE":
+            $reqmethod = REQ_METHOD_DELETE;
+            break;
+        }
+
         foreach( $this->routes as $route ) {
+            // validate request method
+            if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod ) {
+                continue;
+            }
+
+
             if ( $route[0] ) {
                 if ( preg_match($route[1], $path , $regs ) ) {
                     $route[3]['vars'] = $regs;
@@ -198,7 +223,7 @@ class Mux
                         return $route;
                     }
                 } else {
-                    if ( strncmp($path, $route[1], strlen($route[1]) ) === 0 ) {
+                    if ( strncmp($route[1] , $path, strlen($route[1]) ) === 0 ) {
                         return $route;
                     } else {
                         continue;
@@ -210,6 +235,7 @@ class Mux
     }
 
     public function dispatch($path) {
+        $path = rtrim($path, '/');
         if ( $route = $this->matchRoute($path) ) {
             if ( is_int($route[2]) ) {
                 $subMux = $this->subMux[ $route[2] ];
@@ -218,11 +244,13 @@ class Mux
                 // for pcre pattern?
                 if ($route[0]) { 
                     $matchedString = $route[3]['vars'][0];
-                    $subpath = substr($path, strlen($matchedString));
-                    return $subMux->dispatch($subpath);
+                    return $subMux->dispatch( 
+                        substr($path, strlen($matchedString))
+                    );
                 } else {
-                    $subpath = substr($path, strlen($route[1]));
-                    return $subMux->dispatch($subpath);
+                    return $subMux->dispatch(
+                        substr($path, strlen($route[1]))
+                    );
                 }
             } else {
                 return $route;
