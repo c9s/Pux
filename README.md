@@ -100,8 +100,17 @@ Hardware:
 
 Environment:
 
-- Apache 2.2
+- Apache 2.2 + prefork worker
 - PHP 5.5.6
+
+Prefork configuration:
+
+    StartServers          2
+    MinSpareServers       3
+    MaxSpareServers       3
+    MaxClients           30
+    MaxRequestsPerChild  1000
+
 
 ### Requests per seconds
 
