@@ -105,6 +105,9 @@ PHP_FUNCTION(phux_match)
     zval **z_pattern; // route[1]
     // callback @ route[2]
     zval **z_route_options; // route[3]
+    HashTable * z_route_options_hash;
+
+    zval **z_route_method;
 
     char *pattern;
     int  pattern_len;
@@ -126,10 +129,9 @@ PHP_FUNCTION(phux_match)
             continue;
         }
 
-        HashTable * z_route_options_hash = Z_ARRVAL_PP(z_route_options);
-        zval **z_method;
-        if ( zend_hash_find( z_route_options_hash , "method", sizeof("method"), (void**) &z_method ) == SUCCESS ) {
-            if ( Z_TYPE_PP(z_method) == IS_LONG && Z_LVAL_PP(z_method) != current_request_method ) {
+        z_route_options_hash = Z_ARRVAL_PP(z_route_options);
+        if ( zend_hash_find( z_route_options_hash , "method", sizeof("method"), (void**) &z_route_method ) == SUCCESS ) {
+            if ( Z_TYPE_PP(z_route_method) == IS_LONG && Z_LVAL_PP(z_route_method) != current_request_method ) {
                 continue;
             }
         }
@@ -161,13 +163,10 @@ PHP_FUNCTION(phux_match)
             HashTable *subpats_hash = NULL;
             subpats_hash = Z_ARRVAL_P(z_subpats);
 
-
             if ( z_subpats == NULL ) {
                 ALLOC_INIT_ZVAL(z_subpats);
                 array_init(z_subpats);
             }
-
-
 
             // apply "default" value to "vars"
             /*
@@ -197,7 +196,8 @@ PHP_FUNCTION(phux_match)
                 // if ( zend_hash_find(z_route_default, "default", sizeof("default"), (void**) &z_route_default ) == FAILURE ) {
             }
             */
-            add_assoc_zval( *z_route_options , "vars" , z_subpats );
+            add_assoc_zval(*z_route_options , "vars" , z_subpats );
+            zval_copy_ctor(*z_route_options);
 
             *return_value = **z_route;
             zval_copy_ctor(return_value);

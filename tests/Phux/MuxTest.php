@@ -100,6 +100,9 @@ class MuxTest extends PHPUnit_Framework_TestCase
 
         $route = $mux->dispatch('/hello/John');
         ok($route);
+        ok($route[3]['vars'], 'vars');
+        ok($route[3]['vars']['name'], 'vars.name');
+
         $response = Executor::execute($route);
         is("Hello John", $response);
     }

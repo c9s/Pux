@@ -182,33 +182,34 @@ class Mux
         return file_put_contents($outFile, $code);
     }
 
+
+    public function getRequestMethodConstant($method) {
+        switch ($method) {
+        case "POST":
+            return REQ_METHOD_POST;
+        case "GET":
+            return REQ_METHOD_GET;
+        case "PUT":
+            return REQ_METHOD_PUT;
+        case "DELETE":
+            return REQ_METHOD_DELETE;
+        default:
+            return 0;
+        }
+    }
+
     public function matchRoute($path) {
         if ( extension_loaded('phux') ) {
             return phux_match($this->routes, $path);
         }
 
-        $reqmethod = 0;
-        switch ($_SERVER['REQUEST_METHOD']) {
-        case "POST":
-            $reqmethod = REQ_METHOD_POST;
-            break;
-        case "GET":
-            $reqmethod = REQ_METHOD_GET;
-            break;
-        case "PUT":
-            $reqmethod = REQ_METHOD_PUT;
-            break;
-        case "DELETE":
-            $reqmethod = REQ_METHOD_DELETE;
-            break;
-        }
+        $reqmethod = $this->getRequestMethodConstant(@$_SERVER['REQUEST_METHOD']);
 
         foreach( $this->routes as $route ) {
             // validate request method
             if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod ) {
                 continue;
             }
-
 
             if ( $route[0] ) {
                 if ( preg_match($route[1], $path , $regs ) ) {
