@@ -53,7 +53,10 @@ class MuxTest extends PHPUnit_Framework_TestCase
         $pageMux2 = new Mux;
         $pageMux2->add('/bar', [ 'PageController', 'page1' ]);
         $pageMux2->add('/zoo', [ 'PageController', 'page2' ]);
+        is( 2, $pageMux2->length());
+
         $mainMux->mount('/foo', $pageMux2);
+        is( 2, $mainMux->length());
 
         foreach( ['/sub/page1', '/sub/page2', '/foo/bar', '/foo/zoo'] as $p ) {
             $r = $mainMux->dispatch($p);

@@ -154,7 +154,13 @@ class Mux
         }
     }
 
-    public function getRoutes() {
+    public function length() 
+    {
+        return count($this->routes);
+    }
+
+    public function getRoutes() 
+    {
         return $this->routes;
     }
 
