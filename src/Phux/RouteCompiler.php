@@ -211,12 +211,13 @@ class RouteCompiler
      *
      * @return array compiled route info, with newly added 'compiled' key.
      */
-    static function compile(Array $route)
+    static function compile($pattern, $options = array())
     {
-        $route = self::compilePattern($route['path'], $route);
+        $route = self::compilePattern($pattern, $options);
 
         // save compiled pattern
         $route['compiled'] = sprintf("#^\n%s$#xs", $route['regex']);
+        $route['pattern'] = $pattern; // save pattern
         return $route;
     }
 }

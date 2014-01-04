@@ -9,6 +9,8 @@ class Mux
 
     public $subMux = array();
 
+    public $expandSubMux = false;
+
     public static $id_counter = 0;
 
     public $id;
@@ -26,9 +28,34 @@ class Mux
 
     public function mount($pattern, $mux, $options = array())
     {
-        $muxId = $mux->getId();
-        $this->add($pattern, $mux->getId(), $options);
-        $this->subMux[ $muxId ] = $mux;
+        if ( $this->expandSubMux ) {
+            // rewrite submux routes
+            foreach( $mux->routes as $route ) {
+                // process for pcre
+                if ( $route[0] ) {
+                    $newPattern = $pattern . $route[3]['pattern'];
+                    $routeArgs = RouteCompiler::compile($newPattern, $options);
+                    $this->routes[] = array( 
+                        true, // PCRE
+                        $routeArgs['compiled'],
+                        $route[2],
+                        $routeArgs,
+                    );
+                } else {
+                    $newPattern = $pattern . $route[1];
+                    $this->routes[] = array(
+                        false,
+                        $pattern,
+                        $route[2],
+                        $options,
+                    );
+                }
+            }
+        } else {
+            $muxId = $mux->getId();
+            $this->add($pattern, $muxId, $options);
+            $this->subMux[ $muxId ] = $mux;
+        }
     }
 
     public function add($pattern, $callback, $options = array())
@@ -36,15 +63,14 @@ class Mux
         // compile place holder to patterns
         $pcre = strpos($pattern,':') !== false;
         if ( $pcre ) {
-            $route = RouteCompiler::compilePattern($pattern, $options);
-            $route['compiled'] = sprintf("#^%s$#xs", $route['regex']);
+            $routeArgs = RouteCompiler::compile($pattern, $options);
 
             // generate a pcre pattern route
             return $this->routes[] = array( 
                 true, // PCRE
-                $route['compiled'],
+                $routeArgs['compiled'],
                 $callback,
-                $route,
+                $routeArgs,
             );
         } else {
             // generate a simple string route.

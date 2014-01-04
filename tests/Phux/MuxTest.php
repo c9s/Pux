@@ -23,6 +23,24 @@ class PageController {
 class MuxTest extends PHPUnit_Framework_TestCase
 {
 
+    public function testSubMuxExpand() 
+    {
+        $mainMux = new Mux;
+        $mainMux->expandSubMux = true;
+
+        $pageMux = new Mux;
+        $pageMux->add('/page1', [ 'PageController', 'page1' ]);
+        $pageMux->add('/page2', [ 'PageController', 'page2' ]);
+        // $pageMux->add('/post/:id', [ 'PageController', 'page2' ]);
+
+        $mainMux->mount('/sub', $pageMux);
+
+        foreach( ['/sub/page1', '/sub/page2'] as $p ) {
+            $r = $mainMux->dispatch($p);
+            ok($r, "Matched route for $p");
+        }
+    }
+
     public function testSubMuxExport()
     {
         $mainMux = new Mux;
@@ -38,7 +56,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
         $mainMux->mount('/foo', $pageMux2);
 
         foreach( ['/sub/page1', '/sub/page2', '/foo/bar', '/foo/zoo'] as $p ) {
-            $r = $mainMux->dispatch('/sub/page1');
+            $r = $mainMux->dispatch($p);
             ok($r, "Matched route for $p");
         }
 
@@ -47,7 +65,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
         ok($newMux);
 
         foreach( ['/sub/page1', '/sub/page2', '/foo/bar', '/foo/zoo'] as $p ) {
-            $r = $newMux->dispatch('/sub/page1');
+            $r = $newMux->dispatch($p);
             ok($r, "Matched route for $p");
         }
     }
