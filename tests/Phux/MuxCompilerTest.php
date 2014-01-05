@@ -1,5 +1,5 @@
 <?php
-use Phux\RouteCompiler;
+use Phux\MuxCompiler;
 use Phux\Mux;
 
 class FooController
@@ -7,9 +7,9 @@ class FooController
     public function index() {  }
 }
 
-class RouteCompilerTest extends PHPUnit_Framework_TestCase
+class MuxCompilerTest extends PHPUnit_Framework_TestCase
 {
-    public function testRouteCompiler()
+    public function testMuxCompiler()
     {
         $mux = new Mux;
         $mux->add('/hello/:name', [ 'FooController', 'index' ]);
@@ -19,7 +19,7 @@ class RouteCompilerTest extends PHPUnit_Framework_TestCase
         $mux2->add('/bye/:name', [ 'FooController', 'index' ]);
         $mux2->compile("tests/bye_mux.php");
 
-        $compiler = new RouteCompiler;
+        $compiler = new MuxCompiler;
         ok( $compiler->load("tests/hello_mux.php") );
         ok( $compiler->load("tests/bye_mux.php") );
 
