@@ -27,6 +27,7 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, getId, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, add, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, compile, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, dispatch, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, length, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, appendRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, appendPCRERoute, NULL, ZEND_ACC_PUBLIC)
@@ -179,6 +180,60 @@ PHP_METHOD(Mux, compile) {
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
 
+}
+
+PHP_METHOD(Mux, dispatch) {
+    char *path;
+    int  path_len;
+    zval *z_path;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &z_path) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    char  trim_char[2] = { '\\', 0 };
+
+
+    zval *z_trimed_path;
+    zval *z_return_route;
+
+    ALLOC_INIT_ZVAL(z_trimed_path);
+    ALLOC_INIT_ZVAL(z_return_route);
+
+
+    path = Z_STRVAL_P(z_path);
+    path_len = Z_STRLEN_P(z_path);
+    php_trim(path, path_len, trim_char, 1, z_trimed_path, 2 TSRMLS_CC); // mode 2 == rtrim
+
+    zval * this_object = getThis();
+
+
+    zend_function *fe; // method entry
+    zend_hash_find( &Z_OBJCE_P(this_object)->function_table, "matchroute",    sizeof("matchroute"),    (void **) &fe);
+    zend_call_method( &this_object, Z_OBJCE_P(this_object), &fe, "matchroute", strlen("matchroute"), &z_return_route, 1, z_trimed_path, NULL TSRMLS_CC );
+
+
+    if ( Z_TYPE_P(z_return_route) == IS_NULL ) {
+        RETURN_NULL();
+    }
+
+    *return_value = *z_return_route;
+    zval_copy_ctor(return_value);
+    return;
+
+    /*
+    zval *z_route;
+    zval *z_routes;
+    z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+
+    z_route = php_phux_match(z_routes, path, path_len);
+    if ( z_route != NULL ) {
+        *return_value = *z_route;
+        zval_copy_ctor(z_route);
+        return;
+    }
+    RETURN_NULL();
+    */
 }
 
 PHP_METHOD(Mux, matchRoute) {

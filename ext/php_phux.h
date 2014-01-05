@@ -23,6 +23,7 @@ PHP_METHOD(Mux, appendRoute);
 PHP_METHOD(Mux, appendPCRERoute);
 PHP_METHOD(Mux, getRoutes);
 PHP_METHOD(Mux, matchRoute);
+PHP_METHOD(Mux, dispatch);
 
 // static method
 PHP_METHOD(Mux, generate_id);
