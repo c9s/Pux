@@ -1,0 +1,78 @@
+<?php
+namespace Phux;
+use Phux\Mux;
+
+class RouteCompiler
+{
+    public $mux;
+
+    public $idCounter;
+
+    public function __construct() {
+        $this->idCounter = 0;
+        $this->mux = new Mux;
+    }
+
+    public function get() {
+        return $this->mux;
+    }
+
+    public function set($mux) {
+        $this->mux = $mux;
+    }
+
+    public function merge($mux) {
+        $routes = $mux->getRoutes();
+        $this->validateRouteCallback($routes);
+        foreach( $routes as $route ) {
+            if ( is_int($route[2]) ) {
+                // rewrite submux id
+                $submux = $mux->getSubMux( $route[2] );
+                $newId = ++$this->idCounter;
+                $route[2] = $newId;
+                $this->mux->subMux[ $newId ] = $submux;
+            }
+            $this->mux->routes[] = $route;
+        }
+    }
+
+    /**
+     * @param string $routeFile routeFile, return the Mux
+     */
+    public function load($muxFile) {
+        $mux = require $muxFile;
+        $this->merge($mux);
+    }
+
+    /**
+     * validate controller classes and controller methods before compiling to 
+     * route cache.
+     */
+    public function validateRouteCallback($routes) 
+    {
+        foreach( $routes as $route ) {
+            $callback = $route[2];
+            if ( is_array($callback) ) {
+                $class = $callback[0];
+                $method = $callback[1];
+                if ( ! class_exists($class, true) ) {
+                    throw new Exception("Controller {$class} does not exist.");
+                }
+                // rebless a controller (extract this to common method)
+                $controller = new $class;
+                if ( ! method_exists($controller, $method) ) {
+                    throw new Exception("Method $method not found in controller $class.");
+                }
+            }
+        }
+    }
+
+    /**
+     * Compile merged routes to file.
+     */
+    public function compile($outFile) {
+        $code = $this->mux->export();
+        return file_put_contents($outFile, "<?php return " . $code . "; /* version */" );
+    }
+}
+
