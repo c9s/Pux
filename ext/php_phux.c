@@ -42,6 +42,7 @@ const zend_function_entry mux_methods[] = {
 
 static const zend_function_entry phux_functions[] = {
     PHP_FE(phux_match, NULL)
+    PHP_FE(phux_sort_routes, NULL)
     PHP_FE_END
 };
 
@@ -479,15 +480,52 @@ PHP_METHOD(Mux, compile) {
 
     zval *z_sort_callback = NULL;
     MAKE_STD_ZVAL(z_sort_callback);
-    array_init(z_sort_callback);
-    add_index_stringl( z_sort_callback , 0 , "Phux\\Mux" , strlen("Phux\\Mux") , 1);
-    add_index_stringl( z_sort_callback , 1 , "sort_routes" , strlen("sort_routes") , 1);
+    ZVAL_STRING( z_sort_callback, "phux_sort_routes" , 1 );
 
+    // XXX: sort and write to file.
     Z_SET_ISREF_P(z_routes);
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
 
-    // XXX: sort and write to file.
+
+    // $code = '<?php return ' . $this->export() . ';';
+
+    // get export method function entry
+    zval *this_object = getThis();
+    zend_function *fe_export;
+    if ( zend_hash_find( &Z_OBJCE_P(this_object)->function_table, "export",    sizeof("export"),    (void **) &fe_export) == FAILURE ) {
+        zend_error(E_ERROR, "export method not found");
+    }
+
+    // call export method
+    zval *compiled_code;
+    ALLOC_INIT_ZVAL(compiled_code);
+    zend_call_method( &this_object, Z_OBJCE_P(this_object) , &fe_export, "export", strlen("export"), &compiled_code, 0, NULL, NULL TSRMLS_CC );
+
+    if ( Z_TYPE_P(compiled_code) == IS_NULL ) {
+        zend_error(E_ERROR, "Can not compile routes.");
+    }
+
+
+    int  buf_len = Z_STRLEN_P(compiled_code) + strlen("<?php return ;") + 1;
+    char *buf = emalloc(buf_len * sizeof(char));
+    strncat(buf, "<?php return ", strlen("<?php return ") );
+    strncat(buf, Z_STRVAL_P(compiled_code), Z_STRLEN_P(compiled_code));
+    strncat(buf, ";", 1);
+    strncat(buf, "\0", 1);
+    efree(buf);
+
+    zval *z_code = NULL;
+    MAKE_STD_ZVAL(z_code);
+    ZVAL_STRINGL(z_code, buf, buf_len, 0);
+
+    zval *z_filename = NULL;
+    MAKE_STD_ZVAL(z_filename);
+    ZVAL_STRINGL(z_filename, filename, filename_len, 0);
+
+    // zval *retval;
+    // ALLOC_INIT_ZVAL(retval);
+    zend_call_method( NULL, NULL, NULL, "file_put_contents", strlen("file_put_contents"), &return_value, 2, z_filename, z_code TSRMLS_CC );
 }
 
 PHP_METHOD(Mux, dispatch) {
@@ -890,6 +928,74 @@ zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
 }
 
 
+PHP_FUNCTION(phux_sort_routes)
+{
+    zval *a;
+    zval *b;
+
+    /* parse parameters */
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz", 
+                    &a, 
+                    &b ) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    zval **a_pcre;
+    zval **a_pattern;
+    zval **a_compiled_pattern;
+    zval **a_options;
+
+    zval **b_pcre;
+    zval **b_pattern;
+    zval **b_compiled_pattern;
+    zval **b_options;
+
+
+    zend_hash_index_find( Z_ARRVAL_P(a) , 0, (void**)&a_pcre);
+    zend_hash_index_find( Z_ARRVAL_P(b) , 0, (void**)&b_pcre);
+
+    zend_hash_index_find( Z_ARRVAL_P(a) , 1, (void**)&a_pattern);
+    zend_hash_index_find( Z_ARRVAL_P(b) , 1, (void**)&b_pattern);
+
+    zend_hash_index_find( Z_ARRVAL_P(a) , 3, (void**)&a_options);
+    zend_hash_index_find( Z_ARRVAL_P(b) , 3, (void**)&b_options);
+    
+
+    // return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
+    if ( Z_BVAL_P(a) && Z_BVAL_P(b) ) {
+        zend_hash_find( Z_ARRVAL_PP(a_options) , "compiled", strlen("compiled"), (void**)&a_compiled_pattern);
+        zend_hash_find( Z_ARRVAL_PP(b_options) , "compiled", strlen("compiled"), (void**)&b_compiled_pattern);
+
+        int a_len = Z_STRLEN_PP(a_compiled_pattern);
+        int b_len = Z_STRLEN_PP(b_compiled_pattern);
+        if ( a == b ) {
+            RETURN_LONG(0);
+        } else if ( a > b ) {
+            RETURN_LONG(1);
+        } else {
+            RETURN_LONG(-1);
+        }
+    }
+    else if ( Z_BVAL_P(a) ) {
+        RETURN_LONG(1);
+    }
+    else if ( Z_BVAL_P(b) ) {
+        RETURN_LONG(-1);
+    }
+
+    int a_len = Z_STRLEN_PP(a_pattern);
+    int b_len = Z_STRLEN_PP(b_pattern);
+
+    if ( a_len == b_len ) {
+        RETURN_LONG(0);
+    }
+    else if ( a_len > b_len ) {
+        RETURN_LONG(1);
+    }
+    else {
+        RETURN_LONG(-1);
+    }
+}
 
 
 /*

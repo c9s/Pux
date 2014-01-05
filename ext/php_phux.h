@@ -42,6 +42,7 @@
 
 
 PHP_FUNCTION(phux_match);
+PHP_FUNCTION(phux_sort_routes);
 
 void phux_init_mux(TSRMLS_D);
  
