@@ -3,11 +3,15 @@
 #endif
 #include "php.h"
 #include "string.h"
-#include "php_phux.h"
+#include "main/php_main.h"
+#include "Zend/zend_API.h"
+#include "zend_exceptions.h"
+#include "zend_interfaces.h"
+#include "zend_object_handlers.h"
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
-#include <zend_exceptions.h>
 
+#include "php_phux.h"
 
 #define ZEND_HASH_FETCH(hash,key,ret) \
     zend_hash_find(hash, key, sizeof(key), (void**)&ret) == SUCCESS
@@ -71,6 +75,7 @@ PHP_METHOD(Mux, add) {
     zval **z_pattern;
     zval **z_callback;
     zval **z_options;
+    zend_class_entry **ce = NULL;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
         RETURN_FALSE;
     }
@@ -87,12 +92,50 @@ PHP_METHOD(Mux, add) {
                         haystack + haystack_len);
 
 
+
+    zval *z_route_compiler_class = NULL;
+    MAKE_STD_ZVAL(z_route_compiler_class);
+    ZVAL_STRING(z_route_compiler_class, "Phux\\RouteCompiler", 1);
+
+    if ( zend_lookup_class( Z_STRVAL_P(z_route_compiler_class), Z_STRLEN_P(z_route_compiler_class) , &ce TSRMLS_CC) == FAILURE ) {
+        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RouteCompiler does not exist.", 0 TSRMLS_CC);
+    }
+
+
     // PCRE pattern here
     if ( found ) {
 
+        /*
+    zval *retval_ptr = NULL;
+    ALLOC_INIT_ZVAL(retval_ptr);
+    zend_call_method( NULL, *ce, NULL, 
+        "compile", 
+        strlen("compile"), 
+        &retval_ptr, 2, z_pattern, *z_options TSRMLS_CC );
+            */
+
+        /*
+         *
+        *return_value = *retval_ptr;
+        zval_copy_ctor(return_value);
+        return;
+        */
+
+        /*
+        zend_call_method_with_2_params(
+                &object, Z_OBJCE_P(object), &intern->fptr_offset_set, "offsetSet", NULL, offset, value);
+        
+
+        zend_call_method( NULL, *ce, NULL, 
+            "compile", 
+            strlen("compile"), 
+            &retval_ptr, 1, p1, 
+            NULL TSRMLS_CC ) == FAILURE
+            */
     } else {
 
     }
+
 }
 
 
@@ -105,6 +148,7 @@ int get_current_request_method() {
     int  c_request_method_len;
     zval **z_server_hash;
     zval **z_request_method;
+
 
     if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
         Z_TYPE_PP(z_server_hash) == IS_ARRAY &&
@@ -147,6 +191,7 @@ PHP_FUNCTION(phux_match)
     }
 
     int current_request_method = get_current_request_method();
+
 
     zval *z_subpats = NULL; /* Array for subpatterns */
     ALLOC_INIT_ZVAL( z_subpats );
