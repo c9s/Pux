@@ -14,9 +14,12 @@ PHP_FUNCTION(phux_match);
 
 void phux_init_mux(TSRMLS_D);
  
+PHP_METHOD(Mux, __construct);
 PHP_METHOD(Mux, add);
+PHP_METHOD(Mux, length);
 PHP_METHOD(Mux, appendRoute);
 PHP_METHOD(Mux, appendPCRERoute);
+PHP_METHOD(Mux, getRoutes);
 
 PHP_MINIT_FUNCTION(phux);
 
