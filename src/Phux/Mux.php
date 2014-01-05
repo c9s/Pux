@@ -156,28 +156,31 @@ class Mux
         }
     }
 
+    static public function sort_routes($a, $b) {
+        if ( $a[0] && $b[0] ) {
+            return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
+        } elseif ( $a[0] ) {
+            return 1;
+        } elseif ( $b[0] ) {
+            return -1;
+        }
+        if ( strlen($a[1]) > strlen($b[1]) ) {
+            return 1;
+        } elseif ( strlen($a[1]) == strlen($b[1]) ) {
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+
+
     public function compile($outFile)
     {
         // TODO: compile patterns here
         $this->validate();
 
         // compile routes to php file as a cache.
-        usort($this->routes, function($a, $b) {
-            if ( $a[0] && $b[0] ) {
-                return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
-            } elseif ( $a[0] ) {
-                return 1;
-            } elseif ( $b[0] ) {
-                return -1;
-            }
-            if ( strlen($a[1]) > strlen($b[1]) ) {
-                return 1;
-            } elseif ( strlen($a[1]) == strlen($b[1]) ) {
-                return 0;
-            } else {
-                return -1;
-            }
-        });
+        usort($this->routes, [ 'Phux\\Mux' , 'sort_routes' ]);
 
         $code = '<?php return ' . $this->export() . ';';
         return file_put_contents($outFile, $code);

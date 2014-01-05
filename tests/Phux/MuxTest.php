@@ -98,6 +98,8 @@ class MuxTest extends PHPUnit_Framework_TestCase
         $result = $mux->add('/hello/:name', [ 'HelloController', 'index' ]);
         ok($result);
 
+        $mux->compile("_cache.php");
+
         $route = $mux->dispatch('/hello/John');
         ok($route);
         ok($route[3]['vars'], 'vars');
@@ -105,6 +107,10 @@ class MuxTest extends PHPUnit_Framework_TestCase
 
         $response = Executor::execute($route);
         is("Hello John", $response);
+
+        if ( file_exists("_cache.php") ) {
+            unlink("_cache.php");
+        }
     }
 }
 
