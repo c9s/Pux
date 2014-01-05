@@ -17,6 +17,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     {
         return array(
             'phux_match',
+            'phux_sort_routes',
         );
     }
 

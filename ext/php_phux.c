@@ -538,18 +538,20 @@ PHP_METHOD(Mux, compile) {
     ALLOC_INIT_ZVAL(compiled_code);
     zend_call_method( &this_object, Z_OBJCE_P(this_object) , &fe_export, "export", strlen("export"), &compiled_code, 0, NULL, NULL TSRMLS_CC );
 
+
     if ( Z_TYPE_P(compiled_code) == IS_NULL ) {
         zend_error(E_ERROR, "Can not compile routes.");
     }
 
 
-    int  buf_len = Z_STRLEN_P(compiled_code) + strlen("<?php return ;") + 1;
+    int  buf_len = Z_STRLEN_P(compiled_code) + strlen("<?php return ;") + 500;
     char *buf = emalloc(buf_len * sizeof(char));
-    strncat(buf, "<?php return ", strlen("<?php return ") );
+
+    strncat(buf, "<?php return ", sizeof("<?php return ") );
     strncat(buf, Z_STRVAL_P(compiled_code), Z_STRLEN_P(compiled_code));
     strncat(buf, ";", 1);
     strncat(buf, "\0", 1);
-    efree(buf);
+
 
     zval *z_code = NULL;
     MAKE_STD_ZVAL(z_code);
@@ -558,6 +560,7 @@ PHP_METHOD(Mux, compile) {
     zval *z_filename = NULL;
     MAKE_STD_ZVAL(z_filename);
     ZVAL_STRINGL(z_filename, filename, filename_len, 0);
+
 
     zval *retval;
     ALLOC_INIT_ZVAL(retval);
