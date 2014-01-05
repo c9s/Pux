@@ -33,6 +33,8 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, appendPCRERoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, matchRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getRoutes, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, export, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, __set_state, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
   PHP_ME(Mux, generate_id, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
   PHP_FE_END
 };
@@ -69,25 +71,14 @@ ZEND_GET_MODULE(phux)
 
 
 void phux_init_mux(TSRMLS_D) {
-  zend_class_entry ce;
- 
-  INIT_CLASS_ENTRY(ce, "Phux\\MuxNew", mux_methods);
-  phux_ce_mux = zend_register_internal_class(&ce TSRMLS_CC);
- 
-  /* fields */
-  zend_declare_property_null(phux_ce_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
-
-  /*
-  zval *z_routes;
-  MAKE_STD_ZVAL(z_routes);
-  array_init(z_routes);
-  zend_declare_property_ex(phux_ce_mux, "routes", strlen("routes"), z_routes, ZEND_ACC_PUBLIC, NULL, 0 TSRMLS_CC);
-  */
-  zend_declare_property_null(phux_ce_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
-  zend_declare_property_null(phux_ce_mux, "subMux", strlen("subMux"), ZEND_ACC_PUBLIC TSRMLS_CC);
-  zend_declare_property_bool(phux_ce_mux, "expandSubMux", strlen("expandSubMux"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
-
-  zend_declare_property_long(phux_ce_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce, "Phux\\MuxNew", mux_methods);
+    phux_ce_mux = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_declare_property_null(phux_ce_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(phux_ce_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(phux_ce_mux, "subMux", strlen("subMux"), ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_bool(phux_ce_mux, "expandSubMux", strlen("expandSubMux"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_long(phux_ce_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
 }
 
 PHP_METHOD(Mux, __construct) {
@@ -110,11 +101,66 @@ PHP_METHOD(Mux, generate_id) {
     RETURN_LONG(counter);
 }
 
+PHP_METHOD(Mux, __set_state) {
+    zval *z_array;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &z_array) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    HashTable *z_array_hash;
+
+    z_array_hash = Z_ARRVAL_P(z_array);
+
+    zval **z_id;
+    zval **z_routes;
+    zval **z_submux;
+    zval **z_expandSubMux;
+
+    zend_hash_find(z_array_hash, "id", sizeof("id"), (void**)&z_id);
+    zend_hash_find(z_array_hash, "routes", sizeof("routes"), (void**)&z_routes);
+    zend_hash_find(z_array_hash, "subMux", sizeof("subMux"), (void**)&z_submux);
+    zend_hash_find(z_array_hash, "expandSubMux", sizeof("expandSubMux"), (void**)&z_expandSubMux);
+
+
+    zval *new_object;
+    ALLOC_INIT_ZVAL(new_object);
+    object_init_ex(new_object, phux_ce_mux);
+    CALL_METHOD(Mux, __construct, new_object, new_object);
+
+    zend_update_property_long(phux_ce_mux, new_object, "id", sizeof("id")-1, Z_LVAL_PP(z_id) TSRMLS_CC);
+    zend_update_property(phux_ce_mux, new_object, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
+    zend_update_property(phux_ce_mux, new_object, "subMux", sizeof("subMux")-1, *z_submux TSRMLS_CC);
+    zend_update_property(phux_ce_mux, new_object, "expandSubMux", sizeof("expandSubMux")-1, *z_expandSubMux TSRMLS_CC);
+
+    *return_value = *new_object;
+    zval_copy_ctor(return_value);
+}
+
+
+
+
 PHP_METHOD(Mux, getRoutes) {
     zval *z_routes;
-
     z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     *return_value = *z_routes;
+    zval_copy_ctor(return_value);
+}
+
+PHP_METHOD(Mux, export) {
+    zval *this_object = getThis();
+
+    zval *should_return;
+    MAKE_STD_ZVAL(should_return);
+    ZVAL_BOOL(should_return, 1);
+
+
+    zval *retval_ptr;
+    ALLOC_INIT_ZVAL(retval_ptr);
+
+    // return var_export($this, true);
+    zend_call_method( NULL, NULL, NULL, "var_export", strlen("var_export"), &retval_ptr, 2, this_object, should_return TSRMLS_CC );
+
+    *return_value = *retval_ptr;
     zval_copy_ctor(return_value);
 }
 
@@ -180,6 +226,7 @@ PHP_METHOD(Mux, compile) {
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
 
+    // XXX: sort and write to file.
 }
 
 PHP_METHOD(Mux, dispatch) {
@@ -220,20 +267,6 @@ PHP_METHOD(Mux, dispatch) {
     *return_value = *z_return_route;
     zval_copy_ctor(return_value);
     return;
-
-    /*
-    zval *z_route;
-    zval *z_routes;
-    z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
-
-    z_route = php_phux_match(z_routes, path, path_len);
-    if ( z_route != NULL ) {
-        *return_value = *z_route;
-        zval_copy_ctor(z_route);
-        return;
-    }
-    RETURN_NULL();
-    */
 }
 
 PHP_METHOD(Mux, matchRoute) {
