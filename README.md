@@ -1,6 +1,6 @@
 Phux
 =============
-High Performance PHP Router.
+Phux is a High Performance PHP Router.
 
 Phux tries not to consume computation time to build all routes dynamically (like Symfony/Routing). Instead,
 Phux compiles your routes to plain PHP array for caching, the compiled routes can be loaded from cache very fast.
