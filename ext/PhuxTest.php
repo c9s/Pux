@@ -1,7 +1,7 @@
 <?php
 require 'PHPUnit/Framework/ExtensionTestCase.php';
 require 'PHPUnit/TestMore.php';
-require '../src/Phux/RoutePatternCompiler.php';
+require '../src/Phux/PatternCompiler.php';
 
 class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
 {

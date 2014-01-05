@@ -1,6 +1,6 @@
 <?php
 // require '../vendor/autoload.php';
-require '../src/Phux/RoutePatternCompiler.php';
+require '../src/Phux/PatternCompiler.php';
 require '../src/Phux/Mux.php';
 require '../src/Phux/Router.php';
 use Phux\Router;
