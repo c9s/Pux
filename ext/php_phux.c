@@ -83,7 +83,7 @@ ZEND_GET_MODULE(phux)
 
 void phux_init_mux(TSRMLS_D) {
     zend_class_entry ce;
-    INIT_CLASS_ENTRY(ce, "Phux\\MuxNew", mux_methods);
+    INIT_CLASS_ENTRY(ce, "Phux\\Mux", mux_methods);
     phux_ce_mux = zend_register_internal_class(&ce TSRMLS_CC);
     zend_declare_property_null(phux_ce_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(phux_ce_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
