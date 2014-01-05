@@ -195,6 +195,16 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         is( "/product", $route[1] );
     }
 
+    public function testMuxPcreDispatch() {
+        $mux = new \Phux\MuxNew;
+        ok($mux);
+        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
+        $mux->add('/product', [ 'ProductController','listAction' ]);
+        $route = $mux->dispatch('/product/10');
+        ok($route,"found route");
+        ok($route[0], "is a pcre route");
+    }
+
     public function testMuxCompile() {
         $mux = new \Phux\MuxNew;
         ok($mux);

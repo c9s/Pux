@@ -27,6 +27,7 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, getId, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, add, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, compile, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, sort, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, dispatch, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, length, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, mount, NULL, ZEND_ACC_PUBLIC)
@@ -462,6 +463,22 @@ PHP_METHOD(Mux, length) {
     RETURN_LONG(length);
 }
 
+PHP_METHOD(Mux, sort) {
+    zval *z_routes;
+    z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+
+    zval *retval_ptr = NULL;
+    ALLOC_INIT_ZVAL(retval_ptr);
+
+    zval *z_sort_callback = NULL;
+    MAKE_STD_ZVAL(z_sort_callback);
+    ZVAL_STRING( z_sort_callback, "phux_sort_routes" , 1 );
+
+    Z_SET_ISREF_P(z_routes);
+    zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
+            z_routes, z_sort_callback TSRMLS_CC );
+}
+
 PHP_METHOD(Mux, compile) {
     char *filename;
     int  filename_len;
@@ -475,6 +492,7 @@ PHP_METHOD(Mux, compile) {
     z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
 
+    // duplicated code to sort method
     zval *retval_ptr = NULL;
     ALLOC_INIT_ZVAL(retval_ptr);
 
@@ -482,7 +500,6 @@ PHP_METHOD(Mux, compile) {
     MAKE_STD_ZVAL(z_sort_callback);
     ZVAL_STRING( z_sort_callback, "phux_sort_routes" , 1 );
 
-    // XXX: sort and write to file.
     Z_SET_ISREF_P(z_routes);
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );

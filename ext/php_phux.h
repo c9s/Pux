@@ -51,6 +51,7 @@ PHP_METHOD(Mux, getId);
 PHP_METHOD(Mux, add);
 PHP_METHOD(Mux, length);
 PHP_METHOD(Mux, compile);
+PHP_METHOD(Mux, sort);
 PHP_METHOD(Mux, appendRoute);
 PHP_METHOD(Mux, appendPCRERoute);
 PHP_METHOD(Mux, getRoutes);
