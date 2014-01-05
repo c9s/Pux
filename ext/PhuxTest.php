@@ -189,7 +189,19 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok($mux);
         $submux = new \Phux\Mux;
         $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
+        $submux->add('/foo', [ 'HelloController','indexAction' ]);
         $mux->mount( '/sub' , $submux);
+
+        $submux2 = $mux->getSubMux($submux->getId());
+        ok($submux2);
+
+        $r = $mux->dispatch('/sub/hello/John');
+        ok($r);
+        ok($r[0], 'pcre route');
+
+        $r = $mux->dispatch('/sub/foo');
+        ok($r);
+        ok(! $r[0], 'non pcre route');
     }
 
     public function testMuxMount() {

@@ -35,6 +35,7 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, appendPCRERoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, matchRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getRoutes, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, getSubMux, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, export, NULL, ZEND_ACC_PUBLIC)
 
   PHP_ME(Mux, get, NULL, ZEND_ACC_PUBLIC)
@@ -427,6 +428,22 @@ PHP_METHOD(Mux, mount) {
     }
 }
 
+PHP_METHOD(Mux, getSubMux) {
+    long submux_id = 0;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &submux_id ) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    zval *z_submux_array;
+    zval **z_submux;
+    z_submux_array = zend_read_property(phux_ce_mux, getThis(), "subMux", sizeof("subMux")-1, 1 TSRMLS_CC);
+
+    zend_hash_index_find( Z_ARRVAL_P(z_submux_array),  submux_id , (void**) &z_submux);
+
+    *return_value = **z_submux;
+    zval_copy_ctor(return_value);
+}
+
 PHP_METHOD(Mux, getRoutes) {
     zval *z_routes;
     z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
@@ -605,14 +622,82 @@ PHP_METHOD(Mux, dispatch) {
     }
 
 
+    zval **z_pcre;
+    zval **z_pattern;
     zval **z_callback;
+    zval **z_options;
+    zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 0 , (void**) &z_pcre );
+    zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 1 , (void**) &z_pattern );
     zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 2 , (void**) &z_callback );
+    zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 3 , (void**) &z_options );
+
     if ( Z_TYPE_PP(z_callback) == IS_LONG ) {
+        // dispatch to submux
         zval **z_submux;
         zval *z_submux_array;
         z_submux_array = zend_read_property(phux_ce_mux, getThis(), "subMux", sizeof("subMux")-1, 1 TSRMLS_CC);
         zend_hash_index_find( Z_ARRVAL_P(z_submux_array),  Z_LVAL_PP(z_callback) , (void**) &z_submux);
-        // TODO: dispatch to submux
+
+        if ( Z_TYPE_PP(z_submux) == IS_NULL ) {
+            zend_error(E_ERROR, "submux not found.");
+            RETURN_FALSE;
+        }
+
+        //  $matchedString = $route[3]['vars'][0];
+        //  return $subMux->dispatch(substr($path, strlen($matchedString))
+        if ( Z_BVAL_PP(z_pcre) ) {
+            zval **z_route_vars;
+            zval **z_route_vars_0;
+
+            zval *z_path;
+            zval *z_route_vars_0_len;
+            zval *z_substr;
+            if ( zend_hash_find( Z_ARRVAL_PP(z_options) , "vars", strlen("vars") , (void**) &z_route_vars ) == FAILURE ) {
+                zend_error(E_ERROR, "require route vars");
+            }
+            if ( zend_hash_index_find( Z_ARRVAL_PP(z_options) , 0 , (void**) &z_route_vars_0 ) == FAILURE ) {
+                zend_error(E_ERROR, "require route vars[0]");
+            }
+
+            MAKE_STD_ZVAL(z_path);
+            ZVAL_STRINGL(z_path, path ,path_len, 1);
+
+            MAKE_STD_ZVAL(z_route_vars_0_len);
+            ZVAL_LONG(z_route_vars_0_len, Z_STRLEN_PP(z_route_vars_0) );
+
+            ALLOC_INIT_ZVAL(z_substr);
+            zend_call_method( NULL, NULL, NULL, "substr", strlen("substr"), &z_substr, 2, z_path, z_route_vars_0_len TSRMLS_CC );
+
+            zval * retval = call_mux_method( *z_submux, "dispatch" , sizeof("dispatch"), 1 , z_substr, NULL, NULL TSRMLS_CC);
+            *return_value = *retval;
+            zval_copy_ctor(return_value);
+            return;
+
+        } else {
+            zval *z_path;
+            zval *z_pattern_len;
+            zval *z_substr;
+
+            MAKE_STD_ZVAL(z_path);
+            ZVAL_STRINGL(z_path, path ,path_len, 1);
+
+            MAKE_STD_ZVAL(z_pattern_len);
+            ZVAL_LONG(z_pattern_len, Z_STRLEN_PP(z_pattern));
+
+            ALLOC_INIT_ZVAL(z_substr);
+            zend_call_method( NULL, NULL, NULL, "substr", strlen("substr"), &z_substr, 2, z_path, z_pattern_len TSRMLS_CC );
+
+            zval * retval = call_mux_method( *z_submux, "dispatch" , sizeof("dispatch"), 1 , z_substr, NULL, NULL TSRMLS_CC);
+            *return_value = *retval;
+            zval_copy_ctor(return_value);
+            return;
+
+            //     return $subMux->dispatch(
+            //         substr($path, strlen($route[1]))
+            //     );
+
+        }
+
     }
 
     *return_value = *z_return_route;

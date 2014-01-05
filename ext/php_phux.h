@@ -51,6 +51,7 @@ PHP_METHOD(Mux, appendPCRERoute);
 PHP_METHOD(Mux, getRoutes);
 PHP_METHOD(Mux, matchRoute);
 PHP_METHOD(Mux, dispatch);
+PHP_METHOD(Mux, getSubMux);
 PHP_METHOD(Mux, export);
 PHP_METHOD(Mux, mount);
 
