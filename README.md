@@ -155,9 +155,13 @@ Prefork configuration:
 
 ### Response Time
 
-Phux (around 3ms~38ms)
+Phux - PURE PHP (around 3ms~38ms)
 
 <img src="https://raw.github.com/c9s/Phux/master/benchmarks/phux.png"/>
+
+Phux - with extension 
+
+<https://gist.github.com/c9s/8273098>
 
 Symfony/Routing (around 9ms~146ms)
 
