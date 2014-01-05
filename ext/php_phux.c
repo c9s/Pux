@@ -116,7 +116,29 @@ PHP_METHOD(Mux, compile) {
 
     zend_class_entry **ce = NULL;
     zval *z_routes;
+
     z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+
+
+    /*
+    if ( zend_lookup_class( Z_STRVAL_P(z_route_compiler_class), Z_STRLEN_P(z_route_compiler_class) , &ce TSRMLS_CC) == FAILURE ) {
+        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RouteCompiler does not exist.", 0 TSRMLS_CC);
+    }
+    */
+
+    zval *retval_ptr = NULL;
+    ALLOC_INIT_ZVAL(retval_ptr);
+
+    zval *z_sort_callback = NULL;
+    MAKE_STD_ZVAL(z_sort_callback);
+    array_init(z_sort_callback);
+    add_index_stringl( z_sort_callback , 0 , "Phux\\Mux" , strlen("Phux\\Mux") , 1);
+    add_index_stringl( z_sort_callback , 1 , "sort_routes" , strlen("sort_routes") , 1);
+
+    Z_SET_ISREF_P(z_routes);
+    zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
+            z_routes, z_sort_callback TSRMLS_CC );
+
 }
 
 PHP_METHOD(Mux, appendRoute) {
@@ -127,6 +149,10 @@ PHP_METHOD(Mux, appendRoute) {
     zend_class_entry **ce = NULL;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa|a", &pattern, &pattern_len, &z_callback, &z_options) == FAILURE) {
         RETURN_FALSE;
+    }
+
+    if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        array_init(z_options);
     }
 
     zval *z_routes;
@@ -153,6 +179,10 @@ PHP_METHOD(Mux, appendPCRERoute) {
     zend_class_entry **ce = NULL;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa|a", &pattern, &pattern_len, &z_callback, &z_options) == FAILURE) {
         RETURN_FALSE;
+    }
+
+    if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        array_init(z_options);
     }
 
     zval *z_pattern = NULL;
@@ -185,8 +215,8 @@ PHP_METHOD(Mux, add) {
     char *pattern;
     int  pattern_len;
 
-    zval *z_callback;
-    zval *z_options;
+    zval *z_callback = NULL;
+    zval *z_options = NULL;
     zend_class_entry **ce = NULL;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa|a", &pattern, &pattern_len, &z_callback, &z_options) == FAILURE) {
         RETURN_FALSE;
@@ -205,6 +235,14 @@ PHP_METHOD(Mux, add) {
     ZVAL_STRINGL(z_pattern, pattern, pattern_len, 1);
 
     zval *z_routes;
+
+    if ( z_options == NULL ) {
+        MAKE_STD_ZVAL(z_options);
+        array_init(z_options);
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        // make it as an array
+        array_init(z_options);
+    }
 
     z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
@@ -231,15 +269,22 @@ PHP_METHOD(Mux, add) {
         MAKE_STD_ZVAL(z_new_routes);
         array_init(z_new_routes);
 
+
         add_index_bool(z_new_routes, 0 , 0); // pcre flag == false
         add_index_stringl( z_new_routes, 1 , pattern , pattern_len, 1);
+
+        Z_ADDREF_P(z_callback);
+        Z_ADDREF_P(z_options);
+        // zval_copy_ctor(z_options);
+
         add_index_zval( z_new_routes, 2 , z_callback);
         add_index_zval( z_new_routes, 3 , z_options);
-
         add_next_index_zval(z_routes, z_new_routes);
+
+        // zval_copy_ctor(z_routes);
+        // zval_copy_ctor(z_callback);
+        // zval_copy_ctor(z_options);
     }
-    zval_copy_ctor(z_callback);
-    zval_copy_ctor(z_options);
 }
 
 
