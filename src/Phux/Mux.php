@@ -1,6 +1,6 @@
 <?php
 namespace Phux;
-use Phux\RouteCompiler;
+use Phux\RoutePatternCompiler;
 use Exception;
 
 define('REQ_METHOD_GET', 1);
@@ -64,7 +64,7 @@ class Mux
                 // process for pcre
                 if ( $route[0] ) {
                     $newPattern = $pattern . $route[3]['pattern'];
-                    $routeArgs = RouteCompiler::compile($newPattern, 
+                    $routeArgs = RoutePatternCompiler::compile($newPattern, 
                         array_merge_recursive($route[3], $options) );
 
                     $this->appendPCRERoute( $routeArgs, $route[2] );
@@ -112,7 +112,7 @@ class Mux
         // compile place holder to patterns
         $pcre = strpos($pattern,':') !== false;
         if ( $pcre ) {
-            $routeArgs = RouteCompiler::compile($pattern, $options);
+            $routeArgs = RoutePatternCompiler::compile($pattern, $options);
 
             // generate a pcre pattern route
             return $this->routes[] = array( 

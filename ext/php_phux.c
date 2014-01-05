@@ -337,12 +337,12 @@ PHP_METHOD(Mux, mount) {
                 ZVAL_STRINGL(z_new_pattern, new_pattern, new_pattern_len, 1);
 
 
-                // $routeArgs = RouteCompiler::compile($newPattern, 
+                // $routeArgs = RoutePatternCompiler::compile($newPattern, 
                 //     array_merge_recursive($route[3], $options) );
 
                 zend_class_entry **ce_route_compiler = NULL;
-                if ( zend_lookup_class( "Phux\\RouteCompiler", sizeof("Phux\\RouteCompiler") , &ce_route_compiler TSRMLS_CC) == FAILURE ) {
-                    zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RouteCompiler does not exist.", 0 TSRMLS_CC);
+                if ( zend_lookup_class( "Phux\\RoutePatternCompiler", sizeof("Phux\\RoutePatternCompiler") , &ce_route_compiler TSRMLS_CC) == FAILURE ) {
+                    zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RoutePatternCompiler does not exist.", 0 TSRMLS_CC);
                 }
 
                 // TODO: merge options
@@ -703,10 +703,10 @@ PHP_METHOD(Mux, appendPCRERoute) {
 
     zval *z_route_compiler_class = NULL;
     MAKE_STD_ZVAL(z_route_compiler_class);
-    ZVAL_STRING(z_route_compiler_class, "Phux\\RouteCompiler", 1);
+    ZVAL_STRING(z_route_compiler_class, "Phux\\RoutePatternCompiler", 1);
 
     if ( zend_lookup_class( Z_STRVAL_P(z_route_compiler_class), Z_STRLEN_P(z_route_compiler_class) , &ce TSRMLS_CC) == FAILURE ) {
-        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RouteCompiler does not exist.", 0 TSRMLS_CC);
+        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RoutePatternCompiler does not exist.", 0 TSRMLS_CC);
     }
 
     zval *retval_ptr = NULL;
@@ -768,10 +768,10 @@ PHP_METHOD(Mux, add) {
     if ( found ) {
         zval *z_route_compiler_class = NULL;
         MAKE_STD_ZVAL(z_route_compiler_class);
-        ZVAL_STRING(z_route_compiler_class, "Phux\\RouteCompiler", 1);
+        ZVAL_STRING(z_route_compiler_class, "Phux\\RoutePatternCompiler", 1);
 
         if ( zend_lookup_class( Z_STRVAL_P(z_route_compiler_class), Z_STRLEN_P(z_route_compiler_class) , &ce TSRMLS_CC) == FAILURE ) {
-            zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RouteCompiler does not exist.", 0 TSRMLS_CC);
+            zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RoutePatternCompiler does not exist.", 0 TSRMLS_CC);
         }
 
         zval *z_compiled_route = NULL;

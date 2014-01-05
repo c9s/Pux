@@ -10,7 +10,7 @@ use Exception;
  *   /blog/item/:id(.:format)
  *
  */
-class RouteCompiler
+class RoutePatternCompiler
 {
 
 
