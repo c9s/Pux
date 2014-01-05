@@ -523,9 +523,12 @@ PHP_METHOD(Mux, compile) {
     MAKE_STD_ZVAL(z_filename);
     ZVAL_STRINGL(z_filename, filename, filename_len, 0);
 
-    // zval *retval;
-    // ALLOC_INIT_ZVAL(retval);
-    zend_call_method( NULL, NULL, NULL, "file_put_contents", strlen("file_put_contents"), &return_value, 2, z_filename, z_code TSRMLS_CC );
+    zval *retval;
+    ALLOC_INIT_ZVAL(retval);
+    zend_call_method( NULL, NULL, NULL, "file_put_contents", strlen("file_put_contents"), &retval, 2, z_filename, z_code TSRMLS_CC );
+
+    *return_value = *retval;
+    zval_copy_ctor(return_value);
 }
 
 PHP_METHOD(Mux, dispatch) {

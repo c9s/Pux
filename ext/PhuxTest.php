@@ -196,13 +196,12 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
     public function testMuxCompile() {
-        return;
         $mux = new \Phux\MuxNew;
         ok($mux);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
         $mux->add('/product', [ 'ProductController','listAction' ]);
         $ret = $mux->compile("_cache.php");
-        ok($ret);
+        ok($ret, "compile successfully");
     }
 
 
