@@ -30,6 +30,7 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, length, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, appendRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, appendPCRERoute, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, matchRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getRoutes, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, generate_id, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
   PHP_FE_END
@@ -178,6 +179,15 @@ PHP_METHOD(Mux, compile) {
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
 
+}
+
+PHP_METHOD(Mux, matchRoute) {
+    char *path;
+    int  path_len;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len) == FAILURE) {
+        RETURN_FALSE;
+    }
+    // TODO:
 }
 
 PHP_METHOD(Mux, appendRoute) {
@@ -354,6 +364,137 @@ int get_current_request_method(TSRMLS_D) {
 
 // int zend_hash_has_key( )
 
+zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
+
+    zval *z_subpats = NULL; /* Array for subpatterns */
+    int current_request_method;
+
+    current_request_method = get_current_request_method(TSRMLS_CC);
+
+    HashPosition route_pointer;
+    HashTable    *routes_array;
+
+    ALLOC_INIT_ZVAL( z_subpats );
+    routes_array = Z_ARRVAL_P(z_routes);
+
+    // for iterating routes
+    zval **z_route;
+
+    HashTable *route_item_hash;
+
+    zval **z_is_pcre; // route[0]
+    zval **z_pattern; // route[1]
+    // callback @ route[2]
+    zval **z_route_options; // route[3]
+    HashTable * z_route_options_hash;
+
+    zval **z_route_method;
+
+    char *pattern;
+    int  pattern_len;
+
+    for(zend_hash_internal_pointer_reset_ex(routes_array, &route_pointer); 
+            zend_hash_get_current_data_ex(routes_array, (void**) &z_route, &route_pointer) == SUCCESS; 
+            zend_hash_move_forward_ex(routes_array, &route_pointer)) 
+    {
+        // read z_route
+        route_item_hash = Z_ARRVAL_PP(z_route);
+
+        if ( zend_hash_index_find( route_item_hash, 0, (void**) &z_is_pcre) == FAILURE ) {
+            continue;
+        }
+        if ( zend_hash_index_find( route_item_hash, 1, (void**) &z_pattern) == FAILURE ) {
+            continue;
+        }
+        if ( zend_hash_index_find( route_item_hash, 3, (void**) &z_route_options) == FAILURE ) {
+            continue;
+        }
+
+        z_route_options_hash = Z_ARRVAL_PP(z_route_options);
+        if ( zend_hash_find( z_route_options_hash , "method", sizeof("method"), (void**) &z_route_method ) == SUCCESS ) {
+            if ( Z_TYPE_PP(z_route_method) == IS_LONG && Z_LVAL_PP(z_route_method) != current_request_method ) {
+                continue;
+            }
+        }
+
+
+        if ( Z_BVAL_PP(z_is_pcre) ) {
+            // do pcre_match comparision
+
+            /* parameters */
+            pcre_cache_entry *pce;              /* Compiled regular expression */
+
+            pattern = Z_STRVAL_PP(z_pattern);
+            pattern_len = Z_STRLEN_PP(z_pattern);
+
+            /* Compile regex or get it from cache. */
+            if ((pce = pcre_get_compiled_regex_cache(pattern, pattern_len TSRMLS_CC)) == NULL) {
+                zend_throw_exception(zend_exception_get_default(TSRMLS_C), "PCRE pattern compile failed.", 0 TSRMLS_CC);
+            }
+
+            zval *pcre_ret;
+            ALLOC_INIT_ZVAL(pcre_ret);
+            php_pcre_match_impl(pce, path, path_len, pcre_ret, z_subpats, 0, 0, 0, 0 TSRMLS_CC);
+
+            if ( ! Z_BVAL_P(pcre_ret) ) {
+                continue;
+            }
+
+            HashTable *subpats_hash = NULL;
+            subpats_hash = Z_ARRVAL_P(z_subpats);
+
+            if ( z_subpats == NULL ) {
+                ALLOC_INIT_ZVAL(z_subpats);
+                array_init(z_subpats);
+            }
+
+            // apply "default" value to "vars"
+            /*
+                foreach( $route['variables'] as $k ) {
+                    if( isset($regs[$k]) ) {
+                        $route['vars'][ $k ] = $regs[$k];
+                    } else {
+                        $route['vars'][ $k ] = $route['default'][ $k ];
+                    }
+                }
+            */
+            /*
+            zval **z_route_default;
+            zval **z_route_subpat_val;
+            if ( zend_hash_find(z_route_options, "default", sizeof("default"), (void**) &z_route_default ) == FAILURE ) {
+                HashPosition  default_pointer;
+                HashTable    *default_hash;
+
+                variables_hash = Z_ARRVAL_PP(z_variables);
+
+                // foreach variables as var, check if url contains variable or we should apply default value
+                for(zend_hash_internal_pointer_reset_ex(variables_hash, &variables_pointer); 
+                        zend_hash_get_current_data_ex(variables_hash, (void**) &z_var_name, &variables_pointer) == SUCCESS; 
+                        zend_hash_move_forward_ex(variables_hash, &variables_pointer)) 
+                {
+                }
+                // if ( zend_hash_find(z_route_default, "default", sizeof("default"), (void**) &z_route_default ) == FAILURE ) {
+            }
+            */
+            add_assoc_zval(*z_route_options , "vars" , z_subpats );
+            zval_copy_ctor(*z_route_options);
+            return *z_route;
+        } else {
+            // normal string comparison
+            pattern = Z_STRVAL_PP( z_pattern );
+            pattern_len = Z_STRLEN_PP( z_pattern );
+
+            // pattern-prefix match
+            if ( strncmp(pattern, path, pattern_len) == 0 ) {
+                return *z_route;
+            }
+        }
+    }
+    return NULL;
+}
+
+
+
 
 /*
  * phux_match( $routes, $path );
@@ -364,8 +505,6 @@ PHP_FUNCTION(phux_match)
     char *path;
     int  path_len;
 
-
-
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "as", 
                     &routes, 
@@ -374,7 +513,6 @@ PHP_FUNCTION(phux_match)
     }
 
     int current_request_method = get_current_request_method(TSRMLS_CC);
-
 
     zval *z_subpats = NULL; /* Array for subpatterns */
     ALLOC_INIT_ZVAL( z_subpats );

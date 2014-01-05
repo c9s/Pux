@@ -22,11 +22,14 @@ PHP_METHOD(Mux, compile);
 PHP_METHOD(Mux, appendRoute);
 PHP_METHOD(Mux, appendPCRERoute);
 PHP_METHOD(Mux, getRoutes);
+PHP_METHOD(Mux, matchRoute);
 
 // static method
 PHP_METHOD(Mux, generate_id);
 
 PHP_MINIT_FUNCTION(phux);
+
+zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
 
 extern zend_module_entry phux_module_entry;
 #define phpext_phux_ptr &phux_module_entry
