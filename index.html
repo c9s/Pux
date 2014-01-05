@@ -31,7 +31,7 @@
         <h1>
 <a name="phux" class="anchor" href="#phux"><span class="octicon octicon-link"></span></a>Phux</h1>
 
-<p>High Performance PHP Router.</p>
+<p>Phux is a High Performance PHP Router.</p>
 
 <p>Phux tries not to consume computation time to build all routes dynamically (like Symfony/Routing). Instead,
 Phux compiles your routes to plain PHP array for caching, the compiled routes can be loaded from cache very fast.</p>
@@ -41,12 +41,7 @@ Phux compiles your routes to plain PHP array for caching, the compiled routes ca
 <h2>
 <a name="muxcompiler" class="anchor" href="#muxcompiler"><span class="octicon octicon-link"></span></a>MuxCompiler</h2>
 
-<p>Phux provides a command-line tool for you to compile your route definitions.</p>
-
-<pre><code>phux compile -o hello_mux.php hello_routes.php
-</code></pre>
-
-<p>In your route definition file, you simply return the Mux object at the end of file:</p>
+<p>In your route definition file <code>hello_routes.php</code>, you simply return the Mux object at the end of file:</p>
 
 <div class="highlight highlight-php"><pre><span class="o">&lt;?</span><span class="nx">php</span>
 <span class="c1">// load your composer autoload if it's needed</span>
@@ -56,6 +51,11 @@ Phux compiles your routes to plain PHP array for caching, the compiled routes ca
 <span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'/hello'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'HelloController'</span><span class="p">,</span><span class="s1">'helloAction'</span><span class="p">]);</span>
 <span class="k">return</span> <span class="nv">$mux</span><span class="p">;</span>
 </pre></div>
+
+<p>Phux provides a command-line tool for you to compile your route definitions.</p>
+
+<pre><code>phux compile -o hello_mux.php hello_routes.php
+</code></pre>
 
 <p>In your application, you may load the compiled mux (router) through only one line:</p>
 
