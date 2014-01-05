@@ -34,6 +34,7 @@ class RouteCompiler
             }
             $this->mux->routes[] = $route;
         }
+        return true;
     }
 
     static public function sort_routes($a, $b) {
@@ -58,7 +59,7 @@ class RouteCompiler
      */
     public function load($muxFile) {
         $mux = require $muxFile;
-        $this->merge($mux);
+        return $this->merge($mux);
     }
 
     /**
