@@ -61,12 +61,10 @@ routes to cache.
 Phux uses indexed array as the data structure for storing route information so it's faster.
 
 
-
-
-
-
 Synopsis
 ------------
+
+The routing usage is dead simple:
 
 ```php
 class ProductController {
@@ -77,19 +75,13 @@ class ProductController {
         return "product $id";
     }
 }
-
-$router = new Router([ 'cache_file' => 'mux.php' ]);
-
-if ( false === $router->load() ) {
-    $router->add('/product', ['ProductController','listAction']);
-    $router->add('/product/:id', ['ProductController','itemAction'] , [
-        'require' => [ ':id' => '\d+', ],
-        'default' => [ ':id' => '1', ]
-    ]);
-
-    $router->save();
-}
-$route = $router->dispatch('/product/1');
+$mux = new Phux\Mux;
+$mux->add('/product', ['ProductController','listAction']);
+$mux->add('/product/:id', ['ProductController','itemAction'] , [
+    'require' => [ ':id' => '\d+', ],
+    'default' => [ ':id' => '1', ]
+]);
+$route = $mux->dispatch('/product/1');
 ```
 
 Mux
