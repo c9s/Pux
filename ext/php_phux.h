@@ -5,11 +5,6 @@
 #define PHP_PHUX_VERSION "1.1"
 #define PHP_PHUX_EXTNAME "phux"
 
-#define REQ_METHOD_GET 1
-#define REQ_METHOD_POST 2
-#define REQ_METHOD_PUT 3
-#define REQ_METHOD_DELETE 4
-
 #define PUSH_PARAM(arg) zend_vm_stack_push(arg TSRMLS_CC)
 #define POP_PARAM() (void)zend_vm_stack_pop(TSRMLS_C)
 #define PUSH_EO_PARAM()
@@ -40,9 +35,6 @@
   CALL_METHOD_HELPER(classname, name, retval, thisptr, 3, param3);     \
   POP_PARAM(); POP_PARAM();
 
-
-PHP_FUNCTION(phux_match);
-PHP_FUNCTION(phux_sort_routes);
 
 void phux_init_mux(TSRMLS_D);
  
