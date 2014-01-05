@@ -43,18 +43,26 @@ class MuxCompiler
 
     static public function sort_routes($a, $b) {
         if ( $a[0] && $b[0] ) {
-            return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
+            $a_len = strlen($a[3]['compiled']);
+            $b_len = strlen($b[3]['compiled']);
+            if ( $a_len == $b_len ) {
+                return 0;
+            } elseif ( $a_len > $b_len ) {
+                return -1;
+            } else {
+                return 1;
+            }
         } elseif ( $a[0] ) {
-            return 1;
-        } elseif ( $b[0] ) {
             return -1;
+        } elseif ( $b[0] ) {
+            return 1;
         }
         if ( strlen($a[1]) > strlen($b[1]) ) {
-            return 1;
+            return -1;
         } elseif ( strlen($a[1]) == strlen($b[1]) ) {
             return 0;
         } else {
-            return -1;
+            return 1;
         }
     }
 
