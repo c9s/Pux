@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Phux by c9s</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Phux</h1>
+        <p>High Performance PHP Router.</p>
+
+        <p class="view"><a href="https://github.com/c9s/Phux">View the Project on GitHub <small>c9s/Phux</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/c9s/Phux/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/c9s/Phux/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/c9s/Phux">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="phux" class="anchor" href="#phux"><span class="octicon octicon-link"></span></a>Phux</h1>
+
+<p>High Performance PHP Router.</p>
+
+<p>Phux tries not to consume computation time to build all routes dynamically (like Symfony/Routing). Instead,
+Phux compiles your routes to plain PHP array for caching, the compiled routes can be loaded from cache very fast.</p>
+
+<p>With Phux PHP Extension support, you may load and dispatch the routes 2x faster than pure PHP Phux.</p>
+
+<h2>
+<a name="muxcompiler" class="anchor" href="#muxcompiler"><span class="octicon octicon-link"></span></a>MuxCompiler</h2>
+
+<p>Phux provides a command-line tool for you to compile your route definitions.</p>
+
+<pre><code>phux compile -o hello_mux.php hello_routes.php
+</code></pre>
+
+<p>In your route definition file, you simply return the Mux object at the end of file:</p>
+
+<div class="highlight highlight-php"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// load your composer autoload if it's needed</span>
+<span class="c1">// require '../vendor/autoload.php';</span>
+<span class="k">use</span> <span class="nx">Phux\Mux</span><span class="p">;</span>
+<span class="nv">$mux</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Mux</span><span class="p">;</span>
+<span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'/hello'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'HelloController'</span><span class="p">,</span><span class="s1">'helloAction'</span><span class="p">]);</span>
+<span class="k">return</span> <span class="nv">$mux</span><span class="p">;</span>
+</pre></div>
+
+<p>In your application, you may load the compiled mux (router) through only one line:</p>
+
+<div class="highlight highlight-php"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="nv">$mux</span> <span class="o">=</span> <span class="k">require</span> <span class="s2">"hello_mux.php"</span><span class="p">;</span>
+<span class="nv">$route</span> <span class="o">=</span> <span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">'/hello'</span><span class="p">);</span>
+</pre></div>
+
+<p>This can be very very fast if you have phux extension installed.</p>
+
+<h2>
+<a name="dispatching-strategy" class="anchor" href="#dispatching-strategy"><span class="octicon octicon-link"></span></a>Dispatching Strategy</h2>
+
+<p>There are two route dispatching strategies in Phux while Symfony/Routing only
+provides PCRE pattern matching:</p>
+
+<ol>
+<li>Plain string comparison.</li>
+<li>PCRE pattern comparison.</li>
+</ol><p>You've already knew that PCRE pattern matching is slower than plain string comparison, although PHP PCRE caches the compiled patterns.</p>
+
+<p>The plain string comparison is designed for static routing paths, it
+improves the performance while you have a lot of simple routes.</p>
+
+<p>The PCRE pattern comparison is used when you have some dynamic routing paths,
+for example, you can put some place holders in your routing path, and pass
+these path arguments to your controller later.</p>
+
+<p>Phux sorts and compiles your routes to single cache file, it also uses longest
+matching so it sorts patterns by pattern length in descending order before compiling the
+routes to cache.</p>
+
+<p>Phux uses indexed array as the data structure for storing route information so it's faster.</p>
+
+<h2>
+<a name="synopsis" class="anchor" href="#synopsis"><span class="octicon octicon-link"></span></a>Synopsis</h2>
+
+<p>The routing usage is dead simple:</p>
+
+<div class="highlight highlight-php"><pre><span class="k">class</span> <span class="nc">ProductController</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">listAction</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">'product list'</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">itemAction</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span> <span class="p">{</span> 
+        <span class="k">return</span> <span class="s2">"product </span><span class="si">$id</span><span class="s2">"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="nv">$mux</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Phux\Mux</span><span class="p">;</span>
+<span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="s1">'/product'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'ProductController'</span><span class="p">,</span><span class="s1">'listAction'</span><span class="p">]);</span>
+<span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="s1">'/product/:id'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'ProductController'</span><span class="p">,</span><span class="s1">'itemAction'</span><span class="p">]</span> <span class="p">,</span> <span class="p">[</span>
+    <span class="s1">'require'</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="s1">':id'</span> <span class="o">=&gt;</span> <span class="s1">'\d+'</span><span class="p">,</span> <span class="p">],</span>
+    <span class="s1">'default'</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="s1">':id'</span> <span class="o">=&gt;</span> <span class="s1">'1'</span><span class="p">,</span> <span class="p">]</span>
+<span class="p">]);</span>
+<span class="nv">$route</span> <span class="o">=</span> <span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">'/product/1'</span><span class="p">);</span>
+</pre></div>
+
+<h2>
+<a name="mux" class="anchor" href="#mux"><span class="octicon octicon-link"></span></a>Mux</h2>
+
+<p>Mux is where you define your routes, and you can mount multiple mux to a parent one.</p>
+
+<div class="highlight highlight-php"><pre><span class="nv">$mainMux</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Mux</span><span class="p">;</span>
+<span class="nv">$mainMux</span><span class="o">-&gt;</span><span class="na">expandSubMux</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+
+<span class="nv">$pageMux</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Mux</span><span class="p">;</span>
+<span class="nv">$pageMux</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="s1">'/page1'</span><span class="p">,</span> <span class="p">[</span> <span class="s1">'PageController'</span><span class="p">,</span> <span class="s1">'page1'</span> <span class="p">]);</span>
+<span class="nv">$pageMux</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="s1">'/page2'</span><span class="p">,</span> <span class="p">[</span> <span class="s1">'PageController'</span><span class="p">,</span> <span class="s1">'page2'</span> <span class="p">]);</span>
+
+<span class="nv">$mainMux</span><span class="o">-&gt;</span><span class="na">mount</span><span class="p">(</span><span class="s1">'/sub'</span><span class="p">,</span> <span class="nv">$pageMux</span><span class="p">);</span>
+
+<span class="k">foreach</span><span class="p">(</span> <span class="p">[</span><span class="s1">'/sub/page1'</span><span class="p">,</span> <span class="s1">'/sub/page2'</span><span class="p">]</span> <span class="k">as</span> <span class="nv">$p</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$r</span> <span class="o">=</span> <span class="nv">$mainMux</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$p</span><span class="p">);</span>
+    <span class="nx">ok</span><span class="p">(</span><span class="nv">$r</span><span class="p">,</span> <span class="s2">"Matched route for </span><span class="si">$p</span><span class="s2">"</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>The <code>expandSubMux</code> option means whether to expand/merge submux routes to the parent mux.</p>
+
+<p>When expandSubMux is enabled, it improves dispatch performance when you
+have a lot of sub mux to dispatch.</p>
+
+<h3>
+<a name="different-string-comparison-strategies" class="anchor" href="#different-string-comparison-strategies"><span class="octicon octicon-link"></span></a>Different String Comparison Strategies</h3>
+
+<p>When expandSubMux is enabled, the pattern comparison strategy for 
+strings will match the full string.</p>
+
+<p>When expandSubMux is disabled, the pattern comparison strategy for 
+strings will match the prefix.</p>
+
+<h2>
+<a name="benchmarks" class="anchor" href="#benchmarks"><span class="octicon octicon-link"></span></a>Benchmarks</h2>
+
+<p>Testing with route dispatch only. (no controller)</p>
+
+<p>Hardware:</p>
+
+<ul>
+<li>iMac Mid 2011</li>
+<li>Processor  2.5 GHz Intel Core i5</li>
+<li>Memory  12 GB 1333 MHz DDR3</li>
+<li>Software  OS X 10.9.1 (13B42)</li>
+</ul><p>Environment:</p>
+
+<ul>
+<li>Apache 2.2 + prefork worker</li>
+<li>PHP 5.5.6</li>
+</ul><p>Prefork configuration:</p>
+
+<pre><code>StartServers          2
+MinSpareServers       3
+MaxSpareServers       3
+MaxClients           30
+MaxRequestsPerChild  1000
+</code></pre>
+
+<h3>
+<a name="requests-per-seconds" class="anchor" href="#requests-per-seconds"><span class="octicon octicon-link"></span></a>Requests per seconds</h3>
+
+<p><img src="https://raw.github.com/c9s/Phux/master/benchmarks/reqs.png"></p>
+
+<h3>
+<a name="response-time" class="anchor" href="#response-time"><span class="octicon octicon-link"></span></a>Response Time</h3>
+
+<p>Phux - PURE PHP (around 3ms~38ms)</p>
+
+<p><img src="https://raw.github.com/c9s/Phux/master/benchmarks/phux.png"></p>
+
+<p>Phux - with extension </p>
+
+<p><a href="https://gist.github.com/c9s/8273098">https://gist.github.com/c9s/8273098</a></p>
+
+<p>Symfony/Routing (around 9ms~146ms)</p>
+
+<p><img src="https://raw.github.com/c9s/Phux/master/benchmarks/symfony-routing.png"></p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/c9s">c9s</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-2196512-14");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
