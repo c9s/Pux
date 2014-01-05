@@ -8,6 +8,8 @@ class MuxCompiler
 
     public $idCounter;
 
+    public $callbackValidation = false;
+
     public function __construct() {
         $this->idCounter = 0;
         $this->mux = new Mux;
@@ -23,7 +25,9 @@ class MuxCompiler
 
     public function merge($mux) {
         $routes = $mux->getRoutes();
-        $this->validateRouteCallback($routes);
+        if ( $this->callbackValidation ) {
+            $this->validateRouteCallback($routes);
+        }
         foreach( $routes as $route ) {
             if ( is_int($route[2]) ) {
                 // rewrite submux id
