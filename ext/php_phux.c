@@ -512,12 +512,11 @@ PHP_FUNCTION(phux_match)
         RETURN_FALSE;
     }
 
-    zval *z_route2;
-    z_route2 = php_phux_match(z_routes, path, path_len);
-
-    if ( z_route2 != NULL ) {
-        *return_value = *z_route2;
-        zval_copy_ctor(z_route2);
+    zval *z_route;
+    z_route = php_phux_match(z_routes, path, path_len);
+    if ( z_route != NULL ) {
+        *return_value = *z_route;
+        zval_copy_ctor(z_route);
         return;
     }
     RETURN_NULL();
