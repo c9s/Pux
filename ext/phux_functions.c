@@ -8,7 +8,7 @@
 #include "zend_object_handlers.h"
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
-#include "php_functions.h"
+#include "phux_functions.h"
 
 /*
  * phux_match( $routes, $path );
