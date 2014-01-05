@@ -163,10 +163,6 @@ PHP_METHOD(Mux, mount) {
         zval **z_route;
 
         // iterate mux
-
-        char *pattern;
-        int  pattern_len;
-
         for(zend_hash_internal_pointer_reset_ex(routes_array, &route_pointer); 
                 zend_hash_get_current_data_ex(routes_array, (void**) &z_route, &route_pointer) == SUCCESS; 
                 zend_hash_move_forward_ex(routes_array, &route_pointer)) 
@@ -177,12 +173,51 @@ PHP_METHOD(Mux, mount) {
 
 
             zval **z_is_pcre; // route[0]
+            zval **z_route_pattern;
+            zval **z_route_options;
+            zval **z_route_original_pattern; // for PCRE pattern
+
             if ( zend_hash_index_find( route_item_hash, 0, (void**) &z_is_pcre) == FAILURE ) {
+                continue;
+            }
+            if ( zend_hash_index_find( route_item_hash, 1, (void**) &z_route_pattern) == FAILURE ) {
+                continue;
+            }
+            if ( zend_hash_index_find( route_item_hash, 3, (void**) &z_route_options) == FAILURE ) {
                 continue;
             }
 
             if ( Z_BVAL_PP(z_is_pcre) ) {
+                // $newPattern = $pattern . $route[3]['pattern'];
 
+                if ( zend_hash_find( Z_ARRVAL_PP(z_route_options), "pattern", sizeof("pattern"), (void**) &z_route_original_pattern) == FAILURE ) {
+                    continue;
+                }
+
+                char new_pattern[60] = { 0 };
+                int  new_pattern_len;
+                strncat( new_pattern, pattern , pattern_len );
+                strncat( new_pattern, Z_STRVAL_PP(z_route_original_pattern) , Z_STRLEN_PP(z_route_original_pattern) );
+
+                new_pattern_len = pattern_len + Z_STRLEN_PP(z_route_original_pattern);
+
+                zval *z_new_pattern = NULL;
+                MAKE_STD_ZVAL(z_new_pattern);
+                ZVAL_STRINGL(z_new_pattern, new_pattern, new_pattern_len, 1);
+
+
+                // $routeArgs = RouteCompiler::compile($newPattern, 
+                //     array_merge_recursive($route[3], $options) );
+                // $this->appendPCRERoute( $routeArgs, $route[2] );
+
+                zend_class_entry **ce_route_compiler = NULL;
+                if ( zend_lookup_class( "Phux\\RouteCompiler", strlen("Phux\\RouteCompiler") , &ce_route_compiler TSRMLS_CC) == FAILURE ) {
+                    zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RouteCompiler does not exist.", 0 TSRMLS_CC);
+                }
+
+                zval *z_compiled_route = NULL;
+                ALLOC_INIT_ZVAL(z_compiled_route);
+                zend_call_method( NULL, *ce_route_compiler, NULL, "compile", strlen("compile"), &z_compiled_route, 1, z_new_pattern, NULL TSRMLS_CC );
 
             } else {
 
@@ -261,12 +296,6 @@ PHP_METHOD(Mux, compile) {
 
     z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
-
-    /*
-    if ( zend_lookup_class( Z_STRVAL_P(z_route_compiler_class), Z_STRLEN_P(z_route_compiler_class) , &ce TSRMLS_CC) == FAILURE ) {
-        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RouteCompiler does not exist.", 0 TSRMLS_CC);
-    }
-    */
 
     zval *retval_ptr = NULL;
     ALLOC_INIT_ZVAL(retval_ptr);
@@ -418,6 +447,7 @@ PHP_METHOD(Mux, appendPCRERoute) {
     zval *retval_ptr = NULL;
     ALLOC_INIT_ZVAL(retval_ptr);
     zend_call_method( NULL, *ce, NULL, "compile", strlen("compile"), &retval_ptr, 1, z_pattern, NULL TSRMLS_CC );
+
 
     if ( retval_ptr == NULL || Z_TYPE_P(retval_ptr) == IS_NULL ) {
         zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Can not compile route pattern", 0 TSRMLS_CC);

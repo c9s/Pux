@@ -162,7 +162,10 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     public function testMuxEmptyMount() {
         $mux = new \Phux\MuxNew;
         ok($mux);
-        $mux->mount( '/sub' , new \Phux\MuxNew );
+
+        $subMux = new \Phux\MuxNew;
+        $subMux->add('/hello/:name', [ 'HelloController','indexAction' ]);
+        $mux->mount( '/sub' , $subMux);
     }
 
     public function testMuxDispatch() {
