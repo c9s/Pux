@@ -219,7 +219,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         // var_dump( $mux->routes );
 
         
-        // $mux->mount( '/sub' , $subMux);
+        $mux->mount( '/sub' , $subMux);
     }
 
     public function testMuxDispatch() {
