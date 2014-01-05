@@ -208,16 +208,21 @@ PHP_METHOD(Mux, mount) {
 
                 // $routeArgs = RouteCompiler::compile($newPattern, 
                 //     array_merge_recursive($route[3], $options) );
-                // $this->appendPCRERoute( $routeArgs, $route[2] );
 
                 zend_class_entry **ce_route_compiler = NULL;
                 if ( zend_lookup_class( "Phux\\RouteCompiler", strlen("Phux\\RouteCompiler") , &ce_route_compiler TSRMLS_CC) == FAILURE ) {
                     zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RouteCompiler does not exist.", 0 TSRMLS_CC);
                 }
 
+                // TODO: merge options
                 zval *z_compiled_route = NULL;
                 ALLOC_INIT_ZVAL(z_compiled_route);
-                zend_call_method( NULL, *ce_route_compiler, NULL, "compile", strlen("compile"), &z_compiled_route, 1, z_new_pattern, NULL TSRMLS_CC );
+                zend_call_method( NULL, *ce_route_compiler, NULL, "compile", strlen("compile"), &z_compiled_route, 2, z_new_pattern, *z_route_options TSRMLS_CC );
+
+
+
+
+
 
             } else {
 
@@ -501,14 +506,27 @@ PHP_METHOD(Mux, add) {
             zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RouteCompiler does not exist.", 0 TSRMLS_CC);
         }
 
-        zval *retval_ptr = NULL;
-        ALLOC_INIT_ZVAL(retval_ptr);
-        zend_call_method( NULL, *ce, NULL, "compile", strlen("compile"), &retval_ptr, 1, z_pattern, NULL TSRMLS_CC );
+        zval *z_compiled_route = NULL;
+        ALLOC_INIT_ZVAL(z_compiled_route);
+        zend_call_method( NULL, *ce, NULL, "compile", strlen("compile"), &z_compiled_route, 1, z_pattern, NULL TSRMLS_CC );
 
-        if ( retval_ptr == NULL || Z_TYPE_P(retval_ptr) == IS_NULL ) {
+        if ( z_compiled_route == NULL || Z_TYPE_P(z_compiled_route) == IS_NULL ) {
             zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Can not compile route pattern", 0 TSRMLS_CC);
         }
-        add_next_index_zval(z_routes, retval_ptr);
+
+        zval **z_compiled_route_pattern;
+        zend_hash_find( Z_ARRVAL_P(z_compiled_route) , "compiled", sizeof("compiled"), (void**)&z_compiled_route_pattern);
+
+        zval *z_new_routes;
+        MAKE_STD_ZVAL(z_new_routes);
+        array_init(z_new_routes);
+
+        add_index_bool(z_new_routes, 0 , 1); // pcre flag == false
+        add_index_zval(z_new_routes, 1, *z_compiled_route_pattern);
+        add_index_zval( z_new_routes, 2 , z_callback);
+        add_index_zval(z_new_routes, 3, z_options);
+        add_next_index_zval(z_routes, z_new_routes);
+
     } else {
         Z_ADDREF_P(z_callback);
         Z_ADDREF_P(z_options); // reference it so it will not be recycled.
