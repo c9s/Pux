@@ -205,12 +205,21 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok(! $r[0], 'non pcre route');
     }
 
-    public function testMuxMount() {
+    public function testMuxMountPcreRoutes() {
         $mux = new \Phux\Mux;
         ok($mux);
+        is(0, $mux->length());
+
         $subMux = new \Phux\Mux;
         $subMux->add('/hello/:name', [ 'HelloController','indexAction' ]);
-        $mux->mount( '/sub' , $subMux);
+        ok($subMux);
+        ok($routes = $subMux->getRoutes());
+        is(1, $subMux->length());
+        is(0, $mux->length());
+        // var_dump( $mux->routes );
+
+        
+        // $mux->mount( '/sub' , $subMux);
     }
 
     public function testMuxDispatch() {
