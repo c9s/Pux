@@ -139,9 +139,59 @@ PHP_METHOD(Mux, __set_state) {
 
 
 PHP_METHOD(Mux, mount) {
+    char *pattern;
+    int  pattern_len;
+
+    zval *z_mux = NULL;
+    zval *z_options = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz|a", &pattern, &pattern_len, &z_mux, &z_options) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    zend_class_entry **ce = NULL;
+
+    zval *z_expandSubMux = zend_read_property(phux_ce_mux, getThis(), "expandSubMux", sizeof("expandSubMux")-1, 1 TSRMLS_CC);
+    if ( Z_BVAL_P(z_expandSubMux) ) {
+
+        // fetch routes from $mux
+        //
+        zval *z_mux_routes = zend_read_property(phux_ce_mux, z_mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+
+        HashPosition route_pointer;
+        HashTable    *routes_array;
+        routes_array = Z_ARRVAL_P(z_mux_routes);
+        zval **z_route;
+
+        // iterate mux
+
+        char *pattern;
+        int  pattern_len;
+
+        for(zend_hash_internal_pointer_reset_ex(routes_array, &route_pointer); 
+                zend_hash_get_current_data_ex(routes_array, (void**) &z_route, &route_pointer) == SUCCESS; 
+                zend_hash_move_forward_ex(routes_array, &route_pointer)) 
+        {
+            // read z_route
+            HashTable *route_item_hash;
+            route_item_hash = Z_ARRVAL_PP(z_route);
 
 
+            zval **z_is_pcre; // route[0]
+            if ( zend_hash_index_find( route_item_hash, 0, (void**) &z_is_pcre) == FAILURE ) {
+                continue;
+            }
 
+            if ( Z_BVAL_PP(z_is_pcre) ) {
+
+
+            } else {
+
+            }
+        }
+    } else {
+        // TODO: mount submux here
+
+    }
 }
 
 PHP_METHOD(Mux, getRoutes) {

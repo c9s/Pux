@@ -159,6 +159,12 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         is( 2,  $newMux->length() ); 
     }
 
+    public function testMuxEmptyMount() {
+        $mux = new \Phux\MuxNew;
+        ok($mux);
+        $mux->mount( '/sub' , new \Phux\MuxNew );
+    }
+
     public function testMuxDispatch() {
         $mux = new \Phux\MuxNew;
         ok($mux);
@@ -170,8 +176,6 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok( is_string($route[1]) );
         is( "/product", $route[1] );
     }
-
-
 
     public function testMuxCompile() {
         return;
