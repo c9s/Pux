@@ -29,6 +29,7 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, compile, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, dispatch, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, length, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, mount, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, appendRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, appendPCRERoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, matchRoute, NULL, ZEND_ACC_PUBLIC)
@@ -137,7 +138,11 @@ PHP_METHOD(Mux, __set_state) {
 }
 
 
+PHP_METHOD(Mux, mount) {
 
+
+
+}
 
 PHP_METHOD(Mux, getRoutes) {
     zval *z_routes;
@@ -259,9 +264,19 @@ PHP_METHOD(Mux, dispatch) {
     zend_hash_find( &Z_OBJCE_P(this_object)->function_table, "matchroute",    sizeof("matchroute"),    (void **) &fe);
     zend_call_method( &this_object, Z_OBJCE_P(this_object), &fe, "matchroute", strlen("matchroute"), &z_return_route, 1, z_trimed_path, NULL TSRMLS_CC );
 
-
     if ( Z_TYPE_P(z_return_route) == IS_NULL ) {
         RETURN_NULL();
+    }
+
+
+    zval **z_callback;
+    zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 2 , (void**) &z_callback );
+    if ( Z_TYPE_PP(z_callback) == IS_LONG ) {
+        zval **z_submux;
+        zval *z_submux_array;
+        z_submux_array = zend_read_property(phux_ce_mux, getThis(), "subMux", sizeof("subMux")-1, 1 TSRMLS_CC);
+        zend_hash_index_find( Z_ARRVAL_P(z_submux_array),  Z_LVAL_PP(z_callback) , (void**) &z_submux);
+        // TODO: dispatch to submux
     }
 
     *return_value = *z_return_route;
