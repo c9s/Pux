@@ -101,6 +101,12 @@ PHP_METHOD(Mux, add) {
     MAKE_STD_ZVAL(z_pattern);
     ZVAL_STRINGL(z_pattern, pattern, pattern_len, 1);
 
+    zval *z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    if (Z_TYPE_P(z_routes) == IS_NULL) {
+        // MAKE_STD_ZVAL(z_routes);
+        array_init(z_routes);
+    }
+
     // PCRE pattern here
     if ( found ) {
         zval *z_route_compiler_class = NULL;
@@ -118,19 +124,19 @@ PHP_METHOD(Mux, add) {
         if ( retval_ptr == NULL || Z_TYPE_P(retval_ptr) == IS_NULL ) {
             zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Can not compile route pattern", 0 TSRMLS_CC);
         }
-
-        zval *z_new_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
-        if ( z_new_routes != NULL ) {
-            if (Z_TYPE_P(z_new_routes) == IS_NULL) {
-                // MAKE_STD_ZVAL(z_routes);
-                array_init(z_new_routes);
-            }
-            add_next_index_zval(z_new_routes, retval_ptr);
-        }
+        add_next_index_zval(z_routes, retval_ptr);
     } else {
+        zval *z_new_routes;
+        MAKE_STD_ZVAL(z_new_routes);
+        array_init(z_new_routes);
 
+        add_index_bool(z_new_routes, 0 , 0); // pcre flag == false
+        add_index_stringl( z_new_routes, 1 , pattern , pattern_len, 1);
+        add_index_zval( z_new_routes, 2 , z_callback);
+        add_index_zval( z_new_routes, 3 , z_options);
     }
-
+    zval_copy_ctor(z_callback);
+    zval_copy_ctor(z_options);
 }
 
 
