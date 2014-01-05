@@ -287,7 +287,7 @@ PHP_METHOD(Mux, add) {
 /**
  * get request method type in constant value.
  */
-int get_current_request_method() {
+int get_current_request_method(TSRMLS_D) {
     char *c_request_method;
     int  c_request_method_len;
     zval **z_server_hash;
@@ -334,7 +334,7 @@ PHP_FUNCTION(phux_match)
         RETURN_FALSE;
     }
 
-    int current_request_method = get_current_request_method();
+    int current_request_method = get_current_request_method(TSRMLS_CC);
 
 
     zval *z_subpats = NULL; /* Array for subpatterns */
