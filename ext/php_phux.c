@@ -187,7 +187,20 @@ PHP_METHOD(Mux, matchRoute) {
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len) == FAILURE) {
         RETURN_FALSE;
     }
-    // TODO:
+
+    zval *z_route;
+    zval *z_routes;
+
+    z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+
+
+    z_route = php_phux_match(z_routes, path, path_len);
+    if ( z_route != NULL ) {
+        *return_value = *z_route;
+        zval_copy_ctor(z_route);
+        return;
+    }
+    RETURN_NULL();
 }
 
 PHP_METHOD(Mux, appendRoute) {
