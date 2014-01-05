@@ -198,11 +198,10 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
 
         $r = $mux->dispatch('/sub/hello/John');
         ok($r);
-        ok($r[0], 'pcre route');
+        $this->assertPcreRoute($r, '/hello/:name');
 
         $r = $mux->dispatch('/sub/foo');
-        ok($r);
-        ok(! $r[0], 'non pcre route');
+        $this->assertNonPcreRoute($r, '/foo');
     }
 
     public function testMuxMountPcreRoutes() {
@@ -216,9 +215,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok($routes = $subMux->getRoutes());
         is(1, $subMux->length());
         is(0, $mux->length());
-        // var_dump( $mux->routes );
 
-        
         $mux->mount( '/sub' , $subMux);
     }
 
@@ -278,14 +275,14 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     public function assertNonPcreRoute($route, $path = null) {
         $this->assertFalse($route[0], "Should be Non PCRE Route, Got: {$route[1]}");
         if ( $path ) {
-            $this->assertSame($route[1], $path, "Should be $path, Got {$route[1]}");
+            $this->assertSame($path, $route[1], "Should be $path, Got {$route[1]}");
         }
     }
 
     public function assertPcreRoute($route, $path = null) {
         $this->assertTrue($route[0], "Should be PCRE Route, Got: {$route[1]}" );
         if ( $path ) {
-            $this->assertSame($route[3]['pattern'], $path, "Should be $path, Got {$route[1]}");
+            $this->assertSame($path, $route[3]['pattern'], "Should be $path, Got {$route[1]}");
         }
     }
 

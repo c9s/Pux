@@ -355,6 +355,7 @@ PHP_METHOD(Mux, mount) {
                 ZVAL_STRINGL(z_new_pattern, new_pattern, new_pattern_len, 1);
 
 
+
                 // $routeArgs = PatternCompiler::compile($newPattern, 
                 //     array_merge_recursive($route[3], $options) );
 
@@ -373,6 +374,8 @@ PHP_METHOD(Mux, mount) {
                 if ( zend_hash_find( Z_ARRVAL_P(z_compiled_route) , "compiled", sizeof("compiled"), (void**)&z_compiled_route_pattern) == FAILURE ) {
                     zend_error( E_ERROR, "compiled pattern not found: %s", new_pattern);
                 }
+
+                zend_hash_update( Z_ARRVAL_P(z_compiled_route), "pattern", sizeof("pattern"), z_new_pattern, sizeof(zval *), NULL);
 
                 // create new route and append to mux->routes
                 add_index_bool(z_new_routes, 0 , 1); // pcre flag == false
