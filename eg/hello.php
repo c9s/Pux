@@ -1,29 +1,6 @@
 <?php
-require '../src/Phux/Mux.php';
-require '../src/Phux/Router.php';
-use Phux\Router;
+// require '../src/Phux/Mux.php';
 use Phux\Mux;
-
-/*
-    return [
-        '/' => [
-            [ '{pattern}', {callback}, {options} ],
-            [ '{pattern}', {callback}, {options} ],
-            [ '{pattern}', {callback}, {options} ],
-            [ '{pattern}', {callback}, {options} ],
-            [ '{pattern}', {callback}, {options} ],
-            [ '{pattern}', {callback}, {options} ],
-
-            // dispatch this pattern to submux1
-            [ '{pattern}', 'submux1', {options} ],
-        ],
-        'submux1' => [
-            // pattern for sub path.
-            [ '{pattern}', {callback}, {options} ],
-
-        ],
-    ];
- */
 
 class HelloController {
     public function helloAction() {
@@ -31,11 +8,5 @@ class HelloController {
     }
 }
 
-$router = new Router([ 'cache_file' => '_hello_mux.php' ]);
-
-if ( false === $router->load() ) {
-    // dispatch /page to hello action
-    $router->add('/hello', ['HelloController','helloAction']);
-    $router->save();
-}
-$r = $router->dispatch('/hello');
+$mux = require 'hello_mux.php';
+$r = $mux->dispatch('/hello');
