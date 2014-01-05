@@ -1,12 +1,43 @@
 Phux
 =============
-The Fast PHP router.
-
+High Performance PHP Router.
 
 Phux tries not to consume computation time to build all routes dynamically (like Symfony/Routing). Instead,
 Phux compiles your routes to plain PHP array for caching, the compiled routes can be loaded from cache very fast.
 
-There are two route dispatching strategy in Phux while Symfony/Routing only
+With Phux PHP Extension support, you may load and dispatch the routes 2x faster than pure PHP Phux.
+
+MuxCompiler
+--------------------
+
+Phux provides a command-line tool for you to compile your route definitions.
+
+    phux compile -o hello_mux.php hello_routes.php
+
+In your route definition file, you simply return the Mux object at the end of file:
+
+```php
+<?php
+// load your composer autoload if it's needed
+// require '../vendor/autoload.php';
+use Phux\Mux;
+$mux = new Mux;
+$mux->get('/hello', ['HelloController','helloAction']);
+return $mux;
+```
+
+In your application, you may load the compiled mux (router) through only one line:
+
+    <?php
+    $mux = require "hello_mux.php";
+    $route = $mux->dispatch('/hello');
+
+This can be very very fast if you have phux extension installed.
+
+Dispatching Strategy
+--------------------
+
+There are two route dispatching strategies in Phux while Symfony/Routing only
 provides PCRE pattern matching:
 
 1. Plain string comparison.
@@ -26,6 +57,10 @@ matching so it sorts patterns by pattern length in descending order before compi
 routes to cache.
 
 Phux uses indexed array as the data structure for storing route information so it's faster.
+
+
+
+
 
 
 Synopsis
