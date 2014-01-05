@@ -527,6 +527,7 @@ PHP_METHOD(Mux, compile) {
 
     z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
+    Z_SET_ISREF_P(z_routes);
 
     // duplicated code to sort method
     zval *retval_ptr = NULL;
@@ -536,9 +537,14 @@ PHP_METHOD(Mux, compile) {
     MAKE_STD_ZVAL(z_sort_callback);
     ZVAL_STRING( z_sort_callback, "phux_sort_routes" , 1 );
 
-    Z_SET_ISREF_P(z_routes);
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
+
+    if ( Z_BVAL_P(retval_ptr) == 0 ) {
+        zend_error(E_ERROR,"route sort failed.");
+    }
+
+    // zend_update_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
 
 
     // $code = '<?php return ' . $this->export() . ';';
@@ -561,18 +567,17 @@ PHP_METHOD(Mux, compile) {
     }
 
 
-    int  buf_len = Z_STRLEN_P(compiled_code) + strlen("<?php return ;") + 500;
-    char *buf = emalloc(buf_len * sizeof(char));
+    int  buf_len = Z_STRLEN_P(compiled_code) + sizeof("<?php return ;") + 3;
+    char *buf = (char* ) ecalloc(buf_len, sizeof(char));
 
     strncat(buf, "<?php return ", sizeof("<?php return ") );
     strncat(buf, Z_STRVAL_P(compiled_code), Z_STRLEN_P(compiled_code));
     strncat(buf, ";", 1);
-    strncat(buf, "\0", 1);
-
+    // strncat(buf, "\0", 1);
 
     zval *z_code = NULL;
     MAKE_STD_ZVAL(z_code);
-    ZVAL_STRINGL(z_code, buf, buf_len, 0);
+    ZVAL_STRING(z_code, buf, 0);
 
     zval *z_filename = NULL;
     MAKE_STD_ZVAL(z_filename);
@@ -859,9 +864,9 @@ PHP_METHOD(Mux, add) {
             zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\PatternCompiler does not exist.", 0 TSRMLS_CC);
         }
 
-        zval *z_compiled_route = NULL;
+        zval *z_compiled_route = NULL; // will be an array
         ALLOC_INIT_ZVAL(z_compiled_route);
-        zend_call_method( NULL, *ce, NULL, "compile", strlen("compile"), &z_compiled_route, 1, z_pattern, NULL TSRMLS_CC );
+        zend_call_method( NULL, *ce, NULL, "compile", strlen("compile"), &z_compiled_route, 2, z_pattern, z_options TSRMLS_CC );
 
         if ( z_compiled_route == NULL || Z_TYPE_P(z_compiled_route) == IS_NULL ) {
             zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Can not compile route pattern", 0 TSRMLS_CC);
@@ -876,8 +881,8 @@ PHP_METHOD(Mux, add) {
 
         add_index_bool(z_new_routes, 0 , 1); // pcre flag == false
         add_index_zval(z_new_routes, 1, *z_compiled_route_pattern);
-        add_index_zval( z_new_routes, 2 , z_callback);
-        add_index_zval(z_new_routes, 3, z_options);
+        add_index_zval(z_new_routes, 2 , z_callback);
+        add_index_zval(z_new_routes, 3, z_compiled_route);
         add_next_index_zval(z_routes, z_new_routes);
 
     } else {

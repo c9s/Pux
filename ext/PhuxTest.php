@@ -2,6 +2,7 @@
 require 'PHPUnit/Framework/ExtensionTestCase.php';
 require 'PHPUnit/TestMore.php';
 require '../src/Phux/PatternCompiler.php';
+require '../src/Phux/MuxCompiler.php';
 
 class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
 {
@@ -239,10 +240,45 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok($mux);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
         $mux->add('/product', [ 'ProductController','listAction' ]);
-        $ret = $mux->compile("_cache.php");
+        $mux->add('/foo', [ 'ProductController','fooAction' ]);
+        $mux->add('/bar', [ 'ProductController','barAction' ]);
+        $mux->add('/', [ 'ProductController','indexAction' ]);
+
+        $ret = $mux->compile("_test_mux.php");
         ok($ret, "compile successfully");
+
+        $newMux = require "_test_mux.php";
+        ok($newMux);
+
+        ok( $r = $newMux->dispatch("/foo") );
+        $this->assertNonPcreRoute($r, "/foo");
+
+        ok( $r = $newMux->dispatch("/product") );
+        $this->assertNonPcreRoute($r, "/product");
+
+        ok( $r = $newMux->dispatch('/') );
+        $this->assertNonPcreRoute($r, '/');
+
+        ok( $r = $newMux->dispatch('/bar') );
+        $this->assertNonPcreRoute($r, '/bar');
+
+        ok( $r = $newMux->dispatch('/product/10') );
+        $this->assertPcreRoute($r, '/product/:id');
     }
 
+    public function assertNonPcreRoute($route, $path = null) {
+        $this->assertFalse($route[0], "Should be Non PCRE Route, Got: {$route[1]}");
+        if ( $path ) {
+            $this->assertSame($route[1], $path, "Should be $path, Got {$route[1]}");
+        }
+    }
+
+    public function assertPcreRoute($route, $path = null) {
+        $this->assertTrue($route[0], "Should be PCRE Route, Got: {$route[1]}" );
+        if ( $path ) {
+            $this->assertSame($route[3]['pattern'], $path, "Should be $path, Got {$route[1]}");
+        }
+    }
 
 }
 

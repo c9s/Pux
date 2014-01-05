@@ -70,7 +70,7 @@ PHP_FUNCTION(phux_sort_routes)
     
 
     // return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
-    if ( Z_BVAL_P(a) && Z_BVAL_P(b) ) {
+    if ( Z_BVAL_PP(a_pcre) && Z_BVAL_PP(b_pcre) ) {
         zend_hash_find( Z_ARRVAL_PP(a_options) , "compiled", strlen("compiled"), (void**)&a_compiled_pattern);
         zend_hash_find( Z_ARRVAL_PP(b_options) , "compiled", strlen("compiled"), (void**)&b_compiled_pattern);
 
@@ -79,16 +79,16 @@ PHP_FUNCTION(phux_sort_routes)
         if ( a == b ) {
             RETURN_LONG(0);
         } else if ( a > b ) {
-            RETURN_LONG(1);
-        } else {
             RETURN_LONG(-1);
+        } else {
+            RETURN_LONG(1);
         }
     }
-    else if ( Z_BVAL_P(a) ) {
-        RETURN_LONG(1);
-    }
-    else if ( Z_BVAL_P(b) ) {
+    else if ( Z_BVAL_PP(a_pcre) ) {
         RETURN_LONG(-1);
+    }
+    else if ( Z_BVAL_PP(b_pcre) ) {
+        RETURN_LONG(1);
     }
 
     int a_len = Z_STRLEN_PP(a_pattern);
@@ -98,10 +98,10 @@ PHP_FUNCTION(phux_sort_routes)
         RETURN_LONG(0);
     }
     else if ( a_len > b_len ) {
-        RETURN_LONG(1);
+        RETURN_LONG(-1);
     }
     else {
-        RETURN_LONG(-1);
+        RETURN_LONG(1);
     }
 }
 
@@ -220,6 +220,7 @@ zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
             */
             add_assoc_zval(*z_route_options , "vars" , z_subpats );
             zval_copy_ctor(*z_route_options);
+            zval_copy_ctor(*z_route);
             return *z_route;
         } else {
             // normal string comparison
