@@ -53,6 +53,12 @@ PHP_METHOD(Mux, matchRoute);
 PHP_METHOD(Mux, dispatch);
 PHP_METHOD(Mux, export);
 PHP_METHOD(Mux, mount);
+
+PHP_METHOD(Mux, get);
+PHP_METHOD(Mux, post);
+PHP_METHOD(Mux, put);
+PHP_METHOD(Mux, delete);
+
 PHP_METHOD(Mux, __set_state);
 
 // static method

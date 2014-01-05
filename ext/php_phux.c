@@ -36,6 +36,12 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, matchRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getRoutes, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, export, NULL, ZEND_ACC_PUBLIC)
+
+  PHP_ME(Mux, get, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, post, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, put, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, delete, NULL, ZEND_ACC_PUBLIC)
+
   PHP_ME(Mux, __set_state, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
   PHP_ME(Mux, generate_id, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
   PHP_FE_END
@@ -142,6 +148,104 @@ PHP_METHOD(Mux, __set_state) {
 }
 
 
+zval * call_mux_method( zval * object , char * method_name , int method_name_len , int param_count, zval* arg1, zval* arg2, zval* arg3 TSRMLS_DC)
+{
+    zend_function *fe;
+    if ( zend_hash_find( &Z_OBJCE_P(object)->function_table, method_name, method_name_len, (void **) &fe) == FAILURE ) {
+        zend_error(E_ERROR, "%s method not found", method_name);
+    }
+    // call export method
+    zval *retval;
+    ALLOC_INIT_ZVAL(retval);
+    zend_call_method_with_3_params( &object, phux_ce_mux, &fe, method_name, method_name_len, &retval, param_count, arg1, arg2, arg3 TSRMLS_CC );
+    return retval;
+}
+
+
+PHP_METHOD(Mux, get) {
+    zval *z_pattern = NULL, *z_callback = NULL, *z_options = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
+        RETURN_FALSE;
+    }
+    if ( z_options == NULL ) {
+        MAKE_STD_ZVAL(z_options);
+        array_init(z_options);
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        array_init(z_options);
+    }
+
+    // $options['method'] = REQ_METHOD_GET;
+    add_assoc_long(z_options, "method", REQ_METHOD_GET);
+
+    // $this->add($pattern, $callback, $options);
+    zval * retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
+    *return_value = *retval;
+    zval_copy_ctor(return_value);
+}
+
+
+
+
+PHP_METHOD(Mux, post) {
+    zval *z_pattern = NULL, *z_callback = NULL, *z_options = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
+        RETURN_FALSE;
+    }
+    if ( z_options == NULL ) {
+        MAKE_STD_ZVAL(z_options);
+        array_init(z_options);
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        array_init(z_options);
+    }
+
+    add_assoc_long(z_options, "method", REQ_METHOD_POST);
+
+    // $this->add($pattern, $callback, $options);
+    zval * retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
+    *return_value = *retval;
+    zval_copy_ctor(return_value);
+}
+
+PHP_METHOD(Mux, put) {
+    zval *z_pattern = NULL, *z_callback = NULL, *z_options = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
+        RETURN_FALSE;
+    }
+    if ( z_options == NULL ) {
+        MAKE_STD_ZVAL(z_options);
+        array_init(z_options);
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        array_init(z_options);
+    }
+
+    add_assoc_long(z_options, "method", REQ_METHOD_PUT);
+
+    // $this->add($pattern, $callback, $options);
+    zval * retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
+    *return_value = *retval;
+    zval_copy_ctor(return_value);
+}
+
+PHP_METHOD(Mux, delete) {
+    zval *z_pattern = NULL, *z_callback = NULL, *z_options = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
+        RETURN_FALSE;
+    }
+    if ( z_options == NULL ) {
+        MAKE_STD_ZVAL(z_options);
+        array_init(z_options);
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        array_init(z_options);
+    }
+
+    add_assoc_long(z_options, "method", REQ_METHOD_DELETE);
+
+    // $this->add($pattern, $callback, $options);
+    zval * retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
+    *return_value = *retval;
+    zval_copy_ctor(return_value);
+}
+
 PHP_METHOD(Mux, mount) {
     char *pattern;
     int  pattern_len;
@@ -237,14 +341,14 @@ PHP_METHOD(Mux, mount) {
                 //     array_merge_recursive($route[3], $options) );
 
                 zend_class_entry **ce_route_compiler = NULL;
-                if ( zend_lookup_class( "Phux\\RouteCompiler", strlen("Phux\\RouteCompiler") , &ce_route_compiler TSRMLS_CC) == FAILURE ) {
+                if ( zend_lookup_class( "Phux\\RouteCompiler", sizeof("Phux\\RouteCompiler") , &ce_route_compiler TSRMLS_CC) == FAILURE ) {
                     zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\RouteCompiler does not exist.", 0 TSRMLS_CC);
                 }
 
                 // TODO: merge options
                 zval *z_compiled_route = NULL;
                 ALLOC_INIT_ZVAL(z_compiled_route);
-                zend_call_method( NULL, *ce_route_compiler, NULL, "compile", strlen("compile"), &z_compiled_route, 2, z_new_pattern, *z_route_options TSRMLS_CC );
+                zend_call_method( NULL, *ce_route_compiler, NULL, "compile", sizeof("compile"), &z_compiled_route, 2, z_new_pattern, *z_route_options TSRMLS_CC );
 
 
                 zval **z_compiled_route_pattern;
@@ -298,6 +402,8 @@ PHP_METHOD(Mux, mount) {
         // $muxId = $mux->getId();
         // $this->add($pattern, $muxId, $options);
         // $this->subMux[ $muxId ] = $mux;
+        // zval *z_mux_id = call_mux_method(z_mux, "getid", sizeof("getid") ,  );
+
         zval *z_mux_id = NULL;
         ALLOC_INIT_ZVAL(z_mux_id);
         zend_call_method( &z_mux, Z_OBJCE_P(z_mux), &fe_getid, "getid", strlen("getid"), &z_mux_id, 0, NULL, NULL TSRMLS_CC );
@@ -612,6 +718,16 @@ PHP_METHOD(Mux, appendPCRERoute) {
 }
 
 
+char * find_place_holder(char *pattern, int pattern_len) {
+    char  needle_char[2] = { ':', 0 };
+    char *found = NULL;
+    found = php_memnstr(pattern,
+                        needle_char,
+                        1,
+                        pattern + pattern_len);
+    return found;
+}
+
 PHP_METHOD(Mux, add) {
     char *pattern;
     int  pattern_len;
@@ -624,12 +740,7 @@ PHP_METHOD(Mux, add) {
     }
 
     // $pcre = strpos($pattern,':') !== false;
-    char  needle_char[2] = { ':', 0 };
-    char *found = NULL;
-    found = php_memnstr(pattern,
-                        needle_char,
-                        1,
-                        pattern + pattern_len);
+    char *found = find_place_holder(pattern, pattern_len);
 
     zval *z_pattern = NULL;
     MAKE_STD_ZVAL(z_pattern);
@@ -640,8 +751,7 @@ PHP_METHOD(Mux, add) {
     if ( z_options == NULL ) {
         MAKE_STD_ZVAL(z_options);
         array_init(z_options);
-    }
-    if ( Z_TYPE_P(z_options) == IS_NULL ) {
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
         // make it as an array
         array_init(z_options);
     }

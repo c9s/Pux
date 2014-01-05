@@ -143,6 +143,23 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         is( 2, $mux->length() );
     }
 
+    public function testMuxGetMethod() {
+        $mux = new \Phux\MuxNew;
+        ok($mux);
+        $mux->get('/news', [ 'NewsController','listAction' ]);
+        $mux->get('/news_item', [ 'NewsController','itemAction' ], []);
+
+        $routes = $mux->getRoutes();
+        ok($routes);
+        count_ok(2, $routes);
+        is( 2, $mux->length() );
+
+        $_SERVER['REQUEST_METHOD'] = "GET";
+        ok( $mux->dispatch('/news_item') );
+        ok( $mux->dispatch('/news') );
+    }
+
+
     public function testMuxExport() {
         $mux = new \Phux\MuxNew;
         ok($mux);
