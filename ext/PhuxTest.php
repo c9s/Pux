@@ -201,7 +201,8 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok($mux);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
         $mux->add('/product', [ 'ProductController','listAction' ]);
-        $mux->compile("_cache.php");
+        $ret = $mux->compile("_cache.php");
+        ok($ret);
     }
 
 
