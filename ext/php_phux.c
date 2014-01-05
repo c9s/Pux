@@ -265,25 +265,20 @@ PHP_METHOD(Mux, add) {
         }
         add_next_index_zval(z_routes, retval_ptr);
     } else {
+        Z_ADDREF_P(z_callback);
+        Z_ADDREF_P(z_options); // reference it so it will not be recycled.
+
         zval *z_new_routes;
         MAKE_STD_ZVAL(z_new_routes);
         array_init(z_new_routes);
 
 
+        /* make the array: [ pcreFlag, pattern, callback, options ] */
         add_index_bool(z_new_routes, 0 , 0); // pcre flag == false
         add_index_stringl( z_new_routes, 1 , pattern , pattern_len, 1);
-
-        Z_ADDREF_P(z_callback);
-        Z_ADDREF_P(z_options);
-        // zval_copy_ctor(z_options);
-
         add_index_zval( z_new_routes, 2 , z_callback);
         add_index_zval( z_new_routes, 3 , z_options);
         add_next_index_zval(z_routes, z_new_routes);
-
-        // zval_copy_ctor(z_routes);
-        // zval_copy_ctor(z_callback);
-        // zval_copy_ctor(z_options);
     }
 }
 
