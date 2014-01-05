@@ -89,9 +89,11 @@ void phux_init_mux(TSRMLS_D) {
 }
 
 PHP_METHOD(Mux, __construct) {
-    zval *z_routes;
+    zval *z_routes = NULL , *z_submux = NULL;
     z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    z_submux = zend_read_property(phux_ce_mux, getThis(), "subMux", sizeof("subMux")-1, 1 TSRMLS_CC);
     array_init(z_routes);
+    array_init(z_submux);
 }
 
 PHP_METHOD(Mux, generate_id) {
@@ -108,6 +110,7 @@ PHP_METHOD(Mux, generate_id) {
 
 PHP_METHOD(Mux, getRoutes) {
     zval *z_routes;
+
     z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     *return_value = *z_routes;
     zval_copy_ctor(return_value);
@@ -131,13 +134,6 @@ PHP_METHOD(Mux, getId) {
     counter = Z_LVAL_P(retval_ptr);
     zend_update_property_long(phux_ce_mux, getThis(), "id" , sizeof("id") - 1, counter TSRMLS_CC);
     RETURN_LONG(counter);
-    /*
-    zval *z_sort_callback = NULL;
-    MAKE_STD_ZVAL(z_sort_callback);
-    array_init(z_sort_callback);
-    add_index_stringl( z_sort_callback , 0 , "Phux\\Mux" , strlen("Phux\\Mux") , 1);
-    add_index_stringl( z_sort_callback , 1 , "sort_routes" , strlen("sort_routes") , 1);
-    */
 }
 
 PHP_METHOD(Mux, length) {
