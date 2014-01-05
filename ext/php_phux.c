@@ -24,12 +24,14 @@ zend_class_entry *phux_ce_exception;
 
 const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, __construct, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, getId, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, add, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, compile, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, length, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, appendRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, appendPCRERoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getRoutes, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, generate_id, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
   PHP_FE_END
 };
 
@@ -82,6 +84,8 @@ void phux_init_mux(TSRMLS_D) {
   zend_declare_property_null(phux_ce_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
   zend_declare_property_null(phux_ce_mux, "subMux", strlen("subMux"), ZEND_ACC_PUBLIC TSRMLS_CC);
   zend_declare_property_bool(phux_ce_mux, "expandSubMux", strlen("expandSubMux"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
+
+  zend_declare_property_long(phux_ce_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
 }
 
 PHP_METHOD(Mux, __construct) {
@@ -90,11 +94,50 @@ PHP_METHOD(Mux, __construct) {
     array_init(z_routes);
 }
 
+PHP_METHOD(Mux, generate_id) {
+    zval * z_counter = NULL;
+    long counter = 0;
+    z_counter = zend_read_static_property(phux_ce_mux, "id_counter", strlen("id_counter") , 0 TSRMLS_CC);
+    if ( z_counter != NULL ) {
+        counter = Z_LVAL_P(z_counter);
+    }
+    counter++;
+    Z_LVAL_P(z_counter) = counter;
+    RETURN_LONG(counter);
+}
+
 PHP_METHOD(Mux, getRoutes) {
     zval *z_routes;
     z_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     *return_value = *z_routes;
     zval_copy_ctor(return_value);
+}
+
+PHP_METHOD(Mux, getId) {
+    zval *z_id;
+    zval *z_counter;
+    long counter = 0;
+
+    z_id = zend_read_property(phux_ce_mux, getThis(), "id", sizeof("id")-1, 1 TSRMLS_CC);
+
+    if ( z_id != NULL && Z_TYPE_P(z_id) != IS_NULL ) {
+        RETURN_LONG( Z_LVAL_P(z_id) );
+    }
+
+    zval *retval_ptr = NULL;
+    ALLOC_INIT_ZVAL(retval_ptr);
+    zend_call_method( NULL, phux_ce_mux, NULL, "generate_id", strlen("generate_id"), &retval_ptr, 0, NULL, NULL TSRMLS_CC );
+
+    counter = Z_LVAL_P(retval_ptr);
+    zend_update_property_long(phux_ce_mux, getThis(), "id" , sizeof("id") - 1, counter TSRMLS_CC);
+    RETURN_LONG(counter);
+    /*
+    zval *z_sort_callback = NULL;
+    MAKE_STD_ZVAL(z_sort_callback);
+    array_init(z_sort_callback);
+    add_index_stringl( z_sort_callback , 0 , "Phux\\Mux" , strlen("Phux\\Mux") , 1);
+    add_index_stringl( z_sort_callback , 1 , "sort_routes" , strlen("sort_routes") , 1);
+    */
 }
 
 PHP_METHOD(Mux, length) {
