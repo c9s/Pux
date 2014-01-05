@@ -10,11 +10,7 @@ With Phux PHP Extension support, you may load and dispatch the routes 2x faster 
 MuxCompiler
 --------------------
 
-Phux provides a command-line tool for you to compile your route definitions.
-
-    phux compile -o hello_mux.php hello_routes.php
-
-In your route definition file, you simply return the Mux object at the end of file:
+In your route definition file `hello_routes.php`, you simply return the Mux object at the end of file:
 
 ```php
 <?php
@@ -25,6 +21,10 @@ $mux = new Mux;
 $mux->get('/hello', ['HelloController','helloAction']);
 return $mux;
 ```
+
+Phux provides a command-line tool for you to compile your route definitions.
+
+    phux compile -o hello_mux.php hello_routes.php
 
 In your application, you may load the compiled mux (router) through only one line:
 
