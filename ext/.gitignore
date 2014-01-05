@@ -1,0 +1,9 @@
+*.log
+Makefile
+*-sh
+build
+modules
+missing
+*.lo
+*.la
+config.*
