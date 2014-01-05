@@ -36,6 +36,23 @@ class RouteCompiler
         }
     }
 
+    static public function sort_routes($a, $b) {
+        if ( $a[0] && $b[0] ) {
+            return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
+        } elseif ( $a[0] ) {
+            return 1;
+        } elseif ( $b[0] ) {
+            return -1;
+        }
+        if ( strlen($a[1]) > strlen($b[1]) ) {
+            return 1;
+        } elseif ( strlen($a[1]) == strlen($b[1]) ) {
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+
     /**
      * @param string $routeFile routeFile, return the Mux
      */
@@ -71,6 +88,9 @@ class RouteCompiler
      * Compile merged routes to file.
      */
     public function compile($outFile) {
+        // compile routes to php file as a cache.
+        usort($this->mux->routes, [ 'Phux\\RouteCompiler' , 'sort_routes' ]);
+
         $code = $this->mux->export();
         return file_put_contents($outFile, "<?php return " . $code . "; /* version */" );
     }

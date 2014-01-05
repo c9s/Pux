@@ -132,30 +132,6 @@ class Mux
         }
     }
 
-
-    /**
-     * validate controller classes and controller methods before compiling to 
-     * route cache.
-     */
-    public function validate() 
-    {
-        foreach( $this->routes as $route ) {
-            $callback = $route[2];
-            if ( is_array($callback) ) {
-                $class = $callback[0];
-                $method = $callback[1];
-                if ( ! class_exists($class, true) ) {
-                    throw new Exception("Controller {$class} does not exist.");
-                }
-                // rebless a controller (extract this to common method)
-                $controller = new $class;
-                if ( ! method_exists($controller, $method) ) {
-                    throw new Exception("Method $method not found in controller $class.");
-                }
-            }
-        }
-    }
-
     static public function sort_routes($a, $b) {
         if ( $a[0] && $b[0] ) {
             return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
@@ -176,14 +152,18 @@ class Mux
 
     public function compile($outFile)
     {
-        // TODO: compile patterns here
-        $this->validate();
-
         // compile routes to php file as a cache.
         usort($this->routes, [ 'Phux\\Mux' , 'sort_routes' ]);
 
         $code = '<?php return ' . $this->export() . ';';
         return file_put_contents($outFile, $code);
+    }
+
+    public function getSubMux($id)
+    {
+        if ( isset($this->subMux[ $id ] ) ) {
+            return $this->subMux[ $id ];
+        }
     }
 
 
