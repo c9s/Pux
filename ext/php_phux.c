@@ -375,7 +375,7 @@ PHP_METHOD(Mux, mount) {
                     zend_error( E_ERROR, "compiled pattern not found: %s", new_pattern);
                 }
 
-                zend_hash_update( Z_ARRVAL_P(z_compiled_route), "pattern", sizeof("pattern"), z_new_pattern, sizeof(zval *), NULL);
+                zend_hash_update( Z_ARRVAL_P(z_compiled_route), "pattern", sizeof("pattern"), &z_new_pattern, sizeof(zval *), NULL);
 
                 // create new route and append to mux->routes
                 add_index_bool(z_new_routes, 0 , 1); // pcre flag == false

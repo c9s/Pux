@@ -217,6 +217,10 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         is(0, $mux->length());
 
         $mux->mount( '/sub' , $subMux);
+
+        $r = $mux->dispatch('/sub/hello/John');
+        ok($r);
+        $this->assertPcreRoute($r, '/sub/hello/:name');
     }
 
     public function testMuxDispatch() {
