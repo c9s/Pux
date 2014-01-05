@@ -80,8 +80,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
         $mux = new Mux;
         ok($mux);
 
-        $result = $mux->add('/hello/show', [ 'HelloController', 'show' ]);
-        ok($result, 'Route added');
+        $mux->add('/hello/show', [ 'HelloController', 'show' ]);
 
         $route = $mux->dispatch('/hello/show');
         ok($route, 'Found route');
@@ -95,8 +94,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
         $mux = new Mux;
         ok($mux);
 
-        $result = $mux->add('/hello/:name', [ 'HelloController', 'index' ]);
-        ok($result);
+        $mux->add('/hello/:name', [ 'HelloController', 'index' ]);
 
         $mux->compile("_cache.php");
 
