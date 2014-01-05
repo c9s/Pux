@@ -1,7 +1,7 @@
 #ifndef PHP_PHUX_H
 #define PHP_PHUX_H 1
 
-#define PHP_PHUX_VERSION "1.0"
+#define PHP_PHUX_VERSION "1.0.0"
 #define PHP_PHUX_EXTNAME "phux"
 
 #define ZEND_HASH_FETCH(hash,key,ret) \
