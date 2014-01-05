@@ -1,6 +1,4 @@
-#!/usr/bin/env php
 <?php
-require 'vendor/autoload.php';
 $console = new Phux\Console;
 try {
     $console->run( $argv );
@@ -8,4 +6,3 @@ try {
     echo $e->getMessage(), "\n";
     exit(-1);
 }
-

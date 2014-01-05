@@ -1,0 +1,12 @@
+#!/bin/bash
+onion compile \
+    --lib src \
+    --lib vendor/corneltek/cliframework/src \
+    --lib vendor/corneltek/getoptionkit/src \
+    --lib vendor/corneltek/universal/src \
+    --classloader \
+    --bootstrap scripts/phux-emb.php \
+    --executable \
+    --output phux.phar
+mv phux.phar phux
+chmod +x phux
