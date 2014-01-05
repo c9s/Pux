@@ -1,9 +1,11 @@
-
-
 #ifndef PHP_PHUX_H
 #define PHP_PHUX_H 1
-#define PHP_PHUX_VERSION "1.1"
+
+#define PHP_PHUX_VERSION "1.0"
 #define PHP_PHUX_EXTNAME "phux"
+
+#define ZEND_HASH_FETCH(hash,key,ret) \
+    zend_hash_find(hash, key, sizeof(key), (void**)&ret) == SUCCESS
 
 #define PUSH_PARAM(arg) zend_vm_stack_push(arg TSRMLS_CC)
 #define POP_PARAM() (void)zend_vm_stack_pop(TSRMLS_C)

@@ -15,8 +15,6 @@
 #include "ct_helper.h"
 #include "phux_functions.h"
 
-#define ZEND_HASH_FETCH(hash,key,ret) \
-    zend_hash_find(hash, key, sizeof(key), (void**)&ret) == SUCCESS
 
 // #define DEBUG 1
 
