@@ -66,11 +66,18 @@ void phux_init_mux(TSRMLS_D) {
  
   /* fields */
   zend_declare_property_null(phux_ce_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
+
+  /*
+  zval *z_routes;
+  MAKE_STD_ZVAL(z_routes);
+  array_init(z_routes);
+  zend_declare_property_ex(phux_ce_mux, "routes", strlen("routes"), z_routes, ZEND_ACC_PUBLIC, NULL, 0 TSRMLS_CC);
+  */
   zend_declare_property_null(phux_ce_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
   zend_declare_property_null(phux_ce_mux, "subMux", strlen("subMux"), ZEND_ACC_PUBLIC TSRMLS_CC);
   zend_declare_property_bool(phux_ce_mux, "expandSubMux", strlen("expandSubMux"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
- 
+
 PHP_METHOD(Mux, add) {
     char *pattern;
     int  pattern_len;
@@ -94,9 +101,6 @@ PHP_METHOD(Mux, add) {
     MAKE_STD_ZVAL(z_pattern);
     ZVAL_STRINGL(z_pattern, pattern, pattern_len, 1);
 
-
-
-
     // PCRE pattern here
     if ( found ) {
         zval *z_route_compiler_class = NULL;
@@ -111,24 +115,18 @@ PHP_METHOD(Mux, add) {
         ALLOC_INIT_ZVAL(retval_ptr);
         zend_call_method( NULL, *ce, NULL, "compile", strlen("compile"), &retval_ptr, 1, z_pattern, NULL TSRMLS_CC );
 
-        /*
-         *
-        *return_value = *retval_ptr;
-        zval_copy_ctor(return_value);
-        return;
-        */
+        if ( retval_ptr == NULL || Z_TYPE_P(retval_ptr) == IS_NULL ) {
+            zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Can not compile route pattern", 0 TSRMLS_CC);
+        }
 
-        /*
-        zend_call_method_with_2_params(
-                &object, Z_OBJCE_P(object), &intern->fptr_offset_set, "offsetSet", NULL, offset, value);
-        
-
-        zend_call_method( NULL, *ce, NULL, 
-            "compile", 
-            strlen("compile"), 
-            &retval_ptr, 1, p1, 
-            NULL TSRMLS_CC ) == FAILURE
-            */
+        zval *z_new_routes = zend_read_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+        if ( z_new_routes != NULL ) {
+            if (Z_TYPE_P(z_new_routes) == IS_NULL) {
+                // MAKE_STD_ZVAL(z_routes);
+                array_init(z_new_routes);
+            }
+            add_next_index_zval(z_new_routes, retval_ptr);
+        }
     } else {
 
     }
