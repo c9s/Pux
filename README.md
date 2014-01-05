@@ -28,9 +28,11 @@ return $mux;
 
 In your application, you may load the compiled mux (router) through only one line:
 
-    <?php
-    $mux = require "hello_mux.php";
-    $route = $mux->dispatch('/hello');
+```php
+<?php
+$mux = require "hello_mux.php";
+$route = $mux->dispatch('/hello');
+```
 
 This can be very very fast if you have phux extension installed.
 
