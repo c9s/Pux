@@ -108,7 +108,6 @@ PHP_FUNCTION(phux_sort_routes)
 // int zend_hash_has_key( )
 zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
 
-    zval *z_subpats = NULL; /* Array for subpatterns */
     int current_request_method;
 
     current_request_method = get_current_request_method(TSRMLS_CC);
@@ -116,7 +115,6 @@ zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
     HashPosition route_pointer;
     HashTable    *routes_array;
 
-    ALLOC_INIT_ZVAL( z_subpats );
     routes_array = Z_ARRVAL_P(z_routes);
 
     // for iterating routes
@@ -174,6 +172,9 @@ zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
                 zend_throw_exception(zend_exception_get_default(TSRMLS_C), "PCRE pattern compile failed.", 0 TSRMLS_CC);
             }
 
+            zval *z_subpats = NULL; /* Array for subpatterns */
+            ALLOC_INIT_ZVAL( z_subpats );
+
             zval *pcre_ret;
             ALLOC_INIT_ZVAL(pcre_ret);
             php_pcre_match_impl(pce, path, path_len, pcre_ret, z_subpats, 0, 0, 0, 0 TSRMLS_CC);
@@ -185,12 +186,13 @@ zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
             HashTable *subpats_hash = NULL;
             subpats_hash = Z_ARRVAL_P(z_subpats);
 
-            if ( z_subpats == NULL ) {
+            if ( Z_TYPE_P(z_subpats) == IS_NULL ) {
                 ALLOC_INIT_ZVAL(z_subpats);
                 array_init(z_subpats);
             }
 
-            // apply "default" value to "vars"
+            // zval_copy_ctor(pcre_ret);
+            // Apply "default" value to "vars"
             /*
                 foreach( $route['variables'] as $k ) {
                     if( isset($regs[$k]) ) {
@@ -246,7 +248,6 @@ int get_current_request_method(TSRMLS_D) {
     int  c_request_method_len;
     zval **z_server_hash;
     zval **z_request_method;
-
 
     if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
         Z_TYPE_PP(z_server_hash) == IS_ARRAY &&

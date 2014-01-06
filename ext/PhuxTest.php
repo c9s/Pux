@@ -3,6 +3,7 @@ require 'PHPUnit/Framework/ExtensionTestCase.php';
 require 'PHPUnit/TestMore.php';
 require '../src/Phux/PatternCompiler.php';
 require '../src/Phux/MuxCompiler.php';
+use Phux\Mux;
 
 class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
 {
@@ -20,6 +21,16 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
             'phux_match',
             'phux_sort_routes',
         );
+    }
+
+    public function testMuxRouteRouteDefine() {
+        $mux = new Mux;
+        $mux->add('/', ['IndexController', 'indexAction']);
+    }
+
+    public function testMuxRoutePCRERouteDefine() {
+        $mux = new Mux;
+        $mux->add('/hello/:name', ['IndexController', 'indexAction']);
     }
 
     public function testMethodDispatch() {
