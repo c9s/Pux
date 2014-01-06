@@ -1,8 +1,8 @@
-#ifndef PHP_PHUX_H
-#define PHP_PHUX_H 1
+#ifndef PHP_PUX_H
+#define PHP_PUX_H 1
 
-#define PHP_PHUX_VERSION "1.1.1"
-#define PHP_PHUX_EXTNAME "pux"
+#define PHP_PUX_VERSION "1.1.1"
+#define PHP_PUX_EXTNAME "pux"
 
 #define ZEND_HASH_FETCH(hash,key,ret) \
     zend_hash_find(hash, key, sizeof(key), (void**)&ret) == SUCCESS

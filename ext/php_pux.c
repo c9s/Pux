@@ -1,6 +1,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
 #include "php.h"
 #include "string.h"
 #include "main/php_main.h"
@@ -65,18 +66,18 @@ void pux_init_exception(TSRMLS_D) {
 
 zend_module_entry pux_module_entry = {
     STANDARD_MODULE_HEADER,
-    PHP_PHUX_EXTNAME,
+    PHP_PUX_EXTNAME,
     pux_functions,
     PHP_MINIT(pux),
     NULL,
     NULL,
     NULL,
     NULL,
-    PHP_PHUX_VERSION,
+    PHP_PUX_VERSION,
     STANDARD_MODULE_PROPERTIES
 };
 
-#ifdef COMPILE_DL_PHUX
+#ifdef COMPILE_DL_PUX
 ZEND_GET_MODULE(pux)
 #endif
 

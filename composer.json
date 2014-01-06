@@ -7,9 +7,6 @@
             "email": "cornelius.howl@gmail.com"
         }
     ],
-    "require": [
-
-    ],
     "require-dev": {
         "corneltek\/phpunit-testmore": "dev-master",
         "corneltek\/cliframework": "dev-master",
