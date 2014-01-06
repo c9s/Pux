@@ -865,12 +865,10 @@ PHP_METHOD(Mux, appendPCRERoute) {
 
 char * find_place_holder(char *pattern, int pattern_len) {
     char  needle_char[2] = { ':', 0 };
-    char *found = NULL;
-    found = php_memnstr(pattern,
+    return php_memnstr(pattern,
                         needle_char,
                         1,
                         pattern + pattern_len);
-    return found;
 }
 
 PHP_METHOD(Mux, add) {
