@@ -18,25 +18,25 @@
         <h1>Phux</h1>
         <p>High Performance PHP Router.</p>
 
-        <p class="view"><a href="https://github.com/c9s/Phux">View the Project on GitHub <small>c9s/Phux</small></a></p>
+        <p class="view"><a href="https://github.com/c9s/Pux">View the Project on GitHub <small>c9s/Pux</small></a></p>
 
 
         <ul>
-          <li><a href="https://github.com/c9s/Phux/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/c9s/Phux/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/c9s/Phux">View On <strong>GitHub</strong></a></li>
+          <li><a href="https://github.com/c9s/Pux/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/c9s/Pux/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/c9s/Pux">View On <strong>GitHub</strong></a></li>
         </ul>
       </header>
       <section>
         <h1>
-<a name="phux" class="anchor" href="#phux"><span class="octicon octicon-link"></span></a>Phux</h1>
+<a name="pux" class="anchor" href="#pux"><span class="octicon octicon-link"></span></a>Pux</h1>
 
-<p>Phux is a High Performance PHP Router.</p>
+<p>Pux is a High Performance PHP Router.</p>
 
-<p>Phux tries not to consume computation time to build all routes dynamically (like Symfony/Routing). Instead,
-Phux compiles your routes to plain PHP array for caching, the compiled routes can be loaded from cache very fast.</p>
+<p>Pux tries not to consume computation time to build all routes dynamically (like Symfony/Routing). Instead,
+Pux compiles your routes to plain PHP array for caching, the compiled routes can be loaded from cache very fast.</p>
 
-<p>With Phux PHP Extension support, you may load and dispatch the routes 2x faster than pure PHP Phux.</p>
+<p>With Pux PHP Extension support, you may load and dispatch the routes 2x faster than pure PHP Pux.</p>
 
 <h2>
 <a name="muxcompiler" class="anchor" href="#muxcompiler"><span class="octicon octicon-link"></span></a>MuxCompiler</h2>
@@ -46,15 +46,15 @@ Phux compiles your routes to plain PHP array for caching, the compiled routes ca
 <div class="highlight highlight-php"><pre><span class="o">&lt;?</span><span class="nx">php</span>
 <span class="c1">// load your composer autoload if it's needed</span>
 <span class="c1">// require '../vendor/autoload.php';</span>
-<span class="k">use</span> <span class="nx">Phux\Mux</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Pux\Mux</span><span class="p">;</span>
 <span class="nv">$mux</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Mux</span><span class="p">;</span>
 <span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'/hello'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'HelloController'</span><span class="p">,</span><span class="s1">'helloAction'</span><span class="p">]);</span>
 <span class="k">return</span> <span class="nv">$mux</span><span class="p">;</span>
 </pre></div>
 
-<p>Phux provides a command-line tool for you to compile your route definitions.</p>
+<p>Pux provides a command-line tool for you to compile your route definitions.</p>
 
-<pre><code>phux compile -o hello_mux.php hello_routes.php
+<pre><code>pux compile -o hello_mux.php hello_routes.php
 </code></pre>
 
 <p>In your application, you may load the compiled mux (router) through only one line:</p>
@@ -64,12 +64,12 @@ Phux compiles your routes to plain PHP array for caching, the compiled routes ca
 <span class="nv">$route</span> <span class="o">=</span> <span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">'/hello'</span><span class="p">);</span>
 </pre></div>
 
-<p>This can be very very fast if you have phux extension installed.</p>
+<p>This can be very very fast if you have pux extension installed.</p>
 
 <h2>
 <a name="dispatching-strategy" class="anchor" href="#dispatching-strategy"><span class="octicon octicon-link"></span></a>Dispatching Strategy</h2>
 
-<p>There are two route dispatching strategies in Phux while Symfony/Routing only
+<p>There are two route dispatching strategies in Pux while Symfony/Routing only
 provides PCRE pattern matching:</p>
 
 <ol>
@@ -84,11 +84,11 @@ improves the performance while you have a lot of simple routes.</p>
 for example, you can put some place holders in your routing path, and pass
 these path arguments to your controller later.</p>
 
-<p>Phux sorts and compiles your routes to single cache file, it also uses longest
+<p>Pux sorts and compiles your routes to single cache file, it also uses longest
 matching so it sorts patterns by pattern length in descending order before compiling the
 routes to cache.</p>
 
-<p>Phux uses indexed array as the data structure for storing route information so it's faster.</p>
+<p>Pux uses indexed array as the data structure for storing route information so it's faster.</p>
 
 <h2>
 <a name="synopsis" class="anchor" href="#synopsis"><span class="octicon octicon-link"></span></a>Synopsis</h2>
@@ -103,7 +103,7 @@ routes to cache.</p>
         <span class="k">return</span> <span class="s2">"product </span><span class="si">$id</span><span class="s2">"</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="p">}</span>
-<span class="nv">$mux</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Phux\Mux</span><span class="p">;</span>
+<span class="nv">$mux</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pux\Mux</span><span class="p">;</span>
 <span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="s1">'/product'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'ProductController'</span><span class="p">,</span><span class="s1">'listAction'</span><span class="p">]);</span>
 <span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="s1">'/product/:id'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'ProductController'</span><span class="p">,</span><span class="s1">'itemAction'</span><span class="p">]</span> <span class="p">,</span> <span class="p">[</span>
     <span class="s1">'require'</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="s1">':id'</span> <span class="o">=&gt;</span> <span class="s1">'\d+'</span><span class="p">,</span> <span class="p">],</span>
@@ -175,22 +175,22 @@ MaxRequestsPerChild  1000
 <h3>
 <a name="requests-per-seconds" class="anchor" href="#requests-per-seconds"><span class="octicon octicon-link"></span></a>Requests per seconds</h3>
 
-<p><img src="https://raw.github.com/c9s/Phux/master/benchmarks/reqs.png"></p>
+<p><img src="https://raw.github.com/c9s/Pux/master/benchmarks/reqs.png"></p>
 
 <h3>
 <a name="response-time" class="anchor" href="#response-time"><span class="octicon octicon-link"></span></a>Response Time</h3>
 
-<p>Phux - PURE PHP (around 3ms~38ms)</p>
+<p>Pux - PURE PHP (around 3ms~38ms)</p>
 
-<p><img src="https://raw.github.com/c9s/Phux/master/benchmarks/phux.png"></p>
+<p><img src="https://raw.github.com/c9s/Pux/master/benchmarks/pux.png"></p>
 
-<p>Phux - with extension </p>
+<p>Pux - with extension </p>
 
 <p><a href="https://gist.github.com/c9s/8273098">https://gist.github.com/c9s/8273098</a></p>
 
 <p>Symfony/Routing (around 9ms~146ms)</p>
 
-<p><img src="https://raw.github.com/c9s/Phux/master/benchmarks/symfony-routing.png"></p>
+<p><img src="https://raw.github.com/c9s/Pux/master/benchmarks/symfony-routing.png"></p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/c9s">c9s</a></p>
