@@ -5,6 +5,7 @@
 #include "string.h"
 #include "main/php_main.h"
 #include "Zend/zend_API.h"
+#include "Zend/zend_variables.h"
 #include "zend_exceptions.h"
 #include "zend_interfaces.h"
 #include "zend_object_handlers.h"
@@ -149,9 +150,7 @@ PHP_METHOD(Mux, __set_state) {
     zend_update_property(Z_OBJCE_P(new_object), new_object, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
     zend_update_property(Z_OBJCE_P(new_object), new_object, "subMux", sizeof("subMux")-1, *z_submux TSRMLS_CC);
     zend_update_property(Z_OBJCE_P(new_object), new_object, "expandSubMux", sizeof("expandSubMux")-1, *z_expandSubMux TSRMLS_CC);
-
     *return_value = *new_object;
-    zval_copy_ctor(return_value);
 }
 
 
@@ -715,9 +714,14 @@ PHP_METHOD(Mux, dispatch) {
             ALLOC_INIT_ZVAL(z_substr);
             zend_call_method( NULL, NULL, NULL, "substr", strlen("substr"), &z_substr, 2, z_path, z_pattern_len TSRMLS_CC );
 
+
             zval * retval = call_mux_method( *z_submux, "dispatch" , sizeof("dispatch"), 1 , z_substr, NULL, NULL TSRMLS_CC);
             *return_value = *retval;
             zval_copy_ctor(return_value);
+
+            // zval_ptr_dtor(&z_path);
+            // zval_ptr_dtor(&z_pattern_len);
+            // zval_ptr_dtor(&z_substr);
             return;
 
             //     return $subMux->dispatch(
@@ -725,11 +729,9 @@ PHP_METHOD(Mux, dispatch) {
             //     );
 
         }
-
     }
-
     *return_value = *z_return_route;
-    zval_copy_ctor(return_value);
+    // zval_copy_ctor(return_value);
     return;
 }
 

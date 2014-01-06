@@ -219,8 +219,8 @@ zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
             }
             */
             add_assoc_zval(*z_route_options , "vars" , z_subpats );
-            zval_copy_ctor(*z_route_options);
-            zval_copy_ctor(*z_route);
+            // zval_copy_ctor(*z_route_options);
+            // zval_copy_ctor(*z_route);
             return *z_route;
         } else {
             // normal string comparison
@@ -232,6 +232,7 @@ zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
                 return *z_route;
             }
         }
+        // zval_ptr_dtor(&*z_pattern);
     }
     return NULL;
 }
