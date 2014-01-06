@@ -1,5 +1,5 @@
 <?php
-namespace Phux;
+namespace Pux;
 use Exception;
 
 /**

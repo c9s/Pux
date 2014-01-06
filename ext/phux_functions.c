@@ -8,12 +8,12 @@
 #include "zend_object_handlers.h"
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
-#include "phux_functions.h"
+#include "pux_functions.h"
 
 /*
- * phux_match( $routes, $path );
+ * pux_match( $routes, $path );
  */
-PHP_FUNCTION(phux_match)
+PHP_FUNCTION(pux_match)
 {
     zval *z_routes;
     char *path;
@@ -27,7 +27,7 @@ PHP_FUNCTION(phux_match)
     }
 
     zval *z_route;
-    z_route = php_phux_match(z_routes, path, path_len);
+    z_route = php_pux_match(z_routes, path, path_len);
     if ( z_route != NULL ) {
         *return_value = *z_route;
         zval_copy_ctor(z_route);
@@ -36,7 +36,7 @@ PHP_FUNCTION(phux_match)
     RETURN_NULL();
 }
 
-PHP_FUNCTION(phux_sort_routes)
+PHP_FUNCTION(pux_sort_routes)
 {
     zval *a;
     zval *b;
@@ -106,7 +106,7 @@ PHP_FUNCTION(phux_sort_routes)
 }
 
 // int zend_hash_has_key( )
-zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
+zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
 
     int current_request_method;
 

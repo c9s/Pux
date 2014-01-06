@@ -1,6 +1,6 @@
 <?php
-// require '../src/Phux/Mux.php';
-use Phux\Mux;
+// require '../src/Pux/Mux.php';
+use Pux\Mux;
 
 class HelloController {
     public function helloAction() {

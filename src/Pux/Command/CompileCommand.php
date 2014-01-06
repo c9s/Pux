@@ -1,7 +1,7 @@
 <?php
-namespace Phux\Command;
-use Phux\MuxCompiler;
-use Phux\Mux;
+namespace Pux\Command;
+use Pux\MuxCompiler;
+use Pux\Mux;
 use CLIFramework\Command;
 
 class CompileCommand extends Command

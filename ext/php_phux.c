@@ -12,15 +12,15 @@
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
 
-#include "php_phux.h"
+#include "php_pux.h"
 #include "ct_helper.h"
-#include "phux_functions.h"
+#include "pux_functions.h"
 
 
 // #define DEBUG 1
 
-zend_class_entry *phux_ce_mux;
-zend_class_entry *phux_ce_exception;
+zend_class_entry *pux_ce_mux;
+zend_class_entry *pux_ce_exception;
 
 
 const zend_function_entry mux_methods[] = {
@@ -50,24 +50,24 @@ const zend_function_entry mux_methods[] = {
   PHP_FE_END
 };
 
-static const zend_function_entry phux_functions[] = {
-    PHP_FE(phux_match, NULL)
-    PHP_FE(phux_sort_routes, NULL)
+static const zend_function_entry pux_functions[] = {
+    PHP_FE(pux_match, NULL)
+    PHP_FE(pux_sort_routes, NULL)
     PHP_FE_END
 };
 
 
-void phux_init_exception(TSRMLS_D) {
+void pux_init_exception(TSRMLS_D) {
   zend_class_entry e;
-  INIT_CLASS_ENTRY(e, "PhuxException", NULL);
-  phux_ce_exception = zend_register_internal_class_ex(&e, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+  INIT_CLASS_ENTRY(e, "PuxException", NULL);
+  pux_ce_exception = zend_register_internal_class_ex(&e, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
 }
 
-zend_module_entry phux_module_entry = {
+zend_module_entry pux_module_entry = {
     STANDARD_MODULE_HEADER,
     PHP_PHUX_EXTNAME,
-    phux_functions,
-    PHP_MINIT(phux),
+    pux_functions,
+    PHP_MINIT(pux),
     NULL,
     NULL,
     NULL,
@@ -77,22 +77,22 @@ zend_module_entry phux_module_entry = {
 };
 
 #ifdef COMPILE_DL_PHUX
-ZEND_GET_MODULE(phux)
+ZEND_GET_MODULE(pux)
 #endif
 
 
 
 
 
-void phux_init_mux(TSRMLS_D) {
+void pux_init_mux(TSRMLS_D) {
     zend_class_entry ce;
-    INIT_CLASS_ENTRY(ce, "Phux\\Mux", mux_methods);
-    phux_ce_mux = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_declare_property_null(phux_ce_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(phux_ce_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(phux_ce_mux, "subMux", strlen("subMux"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_bool(phux_ce_mux, "expandSubMux", strlen("expandSubMux"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_long(phux_ce_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
+    INIT_CLASS_ENTRY(ce, "Pux\\Mux", mux_methods);
+    pux_ce_mux = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_declare_property_null(pux_ce_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(pux_ce_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(pux_ce_mux, "subMux", strlen("subMux"), ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_bool(pux_ce_mux, "expandSubMux", strlen("expandSubMux"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_long(pux_ce_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
 }
 
 PHP_METHOD(Mux, __construct) {
@@ -111,7 +111,7 @@ PHP_METHOD(Mux, __construct) {
 PHP_METHOD(Mux, generate_id) {
     zval * z_counter = NULL;
     long counter = 0;
-    z_counter = zend_read_static_property(phux_ce_mux, "id_counter", strlen("id_counter") , 0 TSRMLS_CC);
+    z_counter = zend_read_static_property(pux_ce_mux, "id_counter", strlen("id_counter") , 0 TSRMLS_CC);
     if ( z_counter != NULL ) {
         counter = Z_LVAL_P(z_counter);
     }
@@ -143,7 +143,7 @@ PHP_METHOD(Mux, __set_state) {
 
     zval *new_object;
     ALLOC_INIT_ZVAL(new_object);
-    object_init_ex(new_object, phux_ce_mux);
+    object_init_ex(new_object, pux_ce_mux);
     CALL_METHOD(Mux, __construct, new_object, new_object);
 
     zend_update_property_long( Z_OBJCE_P(new_object), new_object, "id", sizeof("id")-1, Z_LVAL_PP(z_id) TSRMLS_CC);
@@ -279,8 +279,8 @@ PHP_METHOD(Mux, mount) {
 
     // prepare pattern compiler class entry
     zend_class_entry **ce_pattern_compiler = NULL;
-    if ( zend_lookup_class( "Phux\\PatternCompiler", strlen("Phux\\PatternCompiler") , &ce_pattern_compiler TSRMLS_CC) == FAILURE ) {
-        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\PatternCompiler does not exist.", 0 TSRMLS_CC);
+    if ( zend_lookup_class( "Pux\\PatternCompiler", strlen("Pux\\PatternCompiler") , &ce_pattern_compiler TSRMLS_CC) == FAILURE ) {
+        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Pux\\PatternCompiler does not exist.", 0 TSRMLS_CC);
     }
 
     zval *z_routes;
@@ -545,7 +545,7 @@ PHP_METHOD(Mux, sort) {
 
     zval *z_sort_callback = NULL;
     ALLOC_INIT_ZVAL(z_sort_callback);
-    ZVAL_STRING( z_sort_callback, "phux_sort_routes" , 1 );
+    ZVAL_STRING( z_sort_callback, "pux_sort_routes" , 1 );
 
     Z_SET_ISREF_P(z_routes);
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
@@ -575,7 +575,7 @@ PHP_METHOD(Mux, compile) {
 
     zval *z_sort_callback = NULL;
     ALLOC_INIT_ZVAL(z_sort_callback);
-    ZVAL_STRING( z_sort_callback, "phux_sort_routes" , 1 );
+    ZVAL_STRING( z_sort_callback, "pux_sort_routes" , 1 );
 
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
@@ -586,7 +586,7 @@ PHP_METHOD(Mux, compile) {
     zval_ptr_dtor(&z_sort_callback); // recycle sort callback zval
     zval_ptr_dtor(&retval_ptr); // recycle sort callback zval
 
-    // zend_update_property(phux_ce_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
+    // zend_update_property(pux_ce_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
 
 
     // $code = '<?php return ' . $this->export() . ';';
@@ -775,7 +775,7 @@ PHP_METHOD(Mux, matchRoute) {
 
     z_routes = zend_read_property( Z_OBJCE_P(this_ptr) , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
-    z_route = php_phux_match(z_routes, path, path_len);
+    z_route = php_pux_match(z_routes, path, path_len);
     if ( z_route != NULL ) {
         *return_value = *z_route;
         zval_copy_ctor(z_route);
@@ -846,10 +846,10 @@ PHP_METHOD(Mux, appendPCRERoute) {
 
     zval *z_pattern_compiler_class = NULL;
     ALLOC_INIT_ZVAL(z_pattern_compiler_class);
-    ZVAL_STRING(z_pattern_compiler_class, "Phux\\PatternCompiler", 1);
+    ZVAL_STRING(z_pattern_compiler_class, "Pux\\PatternCompiler", 1);
 
     if ( zend_lookup_class( Z_STRVAL_P(z_pattern_compiler_class), Z_STRLEN_P(z_pattern_compiler_class) , &ce TSRMLS_CC) == FAILURE ) {
-        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\PatternCompiler does not exist.", 0 TSRMLS_CC);
+        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Pux\\PatternCompiler does not exist.", 0 TSRMLS_CC);
     }
 
     zval *retval_ptr = NULL;
@@ -906,8 +906,8 @@ PHP_METHOD(Mux, add) {
 
     // PCRE pattern here
     if ( found ) {
-        if ( zend_lookup_class( "Phux\\PatternCompiler", strlen("Phux\\PatternCompiler") , &ce TSRMLS_CC) == FAILURE ) {
-            zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Phux\\PatternCompiler does not exist.", 0 TSRMLS_CC);
+        if ( zend_lookup_class( "Pux\\PatternCompiler", strlen("Pux\\PatternCompiler") , &ce TSRMLS_CC) == FAILURE ) {
+            zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Pux\\PatternCompiler does not exist.", 0 TSRMLS_CC);
         }
 
         zval *z_compiled_route = NULL; // will be an array
@@ -958,8 +958,8 @@ PHP_METHOD(Mux, add) {
 
 
 
-PHP_MINIT_FUNCTION(phux) {
-  phux_init_mux(TSRMLS_C);
+PHP_MINIT_FUNCTION(pux) {
+  pux_init_mux(TSRMLS_C);
   return SUCCESS;
 }
 

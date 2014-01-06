@@ -1,5 +1,5 @@
 <?php
-$console = new Phux\Console;
+$console = new Pux\Console;
 try {
     $console->run( $argv );
 } catch ( Exception $e ) {

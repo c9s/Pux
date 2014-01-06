@@ -1,4 +1,4 @@
-ab -g out.dat -n 2000 -c 10 http://localhost/work/php/phux/eg/hello.php                
+ab -g out.dat -n 2000 -c 10 http://localhost/work/php/pux/eg/hello.php                
 This is ApacheBench, Version 2.3 <$Revision: 655654 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
@@ -21,7 +21,7 @@ Server Software:        Apache/2.2.26
 Server Hostname:        localhost
 Server Port:            80
 
-Document Path:          /work/php/phux/eg/hello.php
+Document Path:          /work/php/pux/eg/hello.php
 Document Length:        0 bytes
 
 Concurrency Level:      10

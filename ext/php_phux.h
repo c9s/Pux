@@ -2,7 +2,7 @@
 #define PHP_PHUX_H 1
 
 #define PHP_PHUX_VERSION "1.1.1"
-#define PHP_PHUX_EXTNAME "phux"
+#define PHP_PHUX_EXTNAME "pux"
 
 #define ZEND_HASH_FETCH(hash,key,ret) \
     zend_hash_find(hash, key, sizeof(key), (void**)&ret) == SUCCESS
@@ -38,7 +38,7 @@
   POP_PARAM(); POP_PARAM();
 
 
-void phux_init_mux(TSRMLS_D);
+void pux_init_mux(TSRMLS_D);
  
 PHP_METHOD(Mux, __construct);
 PHP_METHOD(Mux, getId);
@@ -65,11 +65,11 @@ PHP_METHOD(Mux, __set_state);
 // static method
 PHP_METHOD(Mux, generate_id);
 
-PHP_MINIT_FUNCTION(phux);
+PHP_MINIT_FUNCTION(pux);
 
-zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
+zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
 
-extern zend_module_entry phux_module_entry;
-#define phpext_phux_ptr &phux_module_entry
+extern zend_module_entry pux_module_entry;
+#define phpext_pux_ptr &pux_module_entry
 
 #endif

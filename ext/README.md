@@ -8,5 +8,5 @@
 
 # Test
 
-    extunit --phpunit PhuxTest.php
+    extunit --phpunit PuxTest.php
 

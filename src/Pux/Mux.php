@@ -1,6 +1,6 @@
 <?php
-namespace Phux;
-use Phux\PatternCompiler;
+namespace Pux;
+use Pux\PatternCompiler;
 use Exception;
 
 define('REQ_METHOD_GET', 1);
@@ -153,7 +153,7 @@ class Mux
     public function compile($outFile)
     {
         // compile routes to php file as a cache.
-        usort($this->routes, [ 'Phux\\Mux' , 'sort_routes' ]);
+        usort($this->routes, [ 'Pux\\Mux' , 'sort_routes' ]);
 
         $code = '<?php return ' . $this->export() . ';';
         return file_put_contents($outFile, $code);
@@ -183,8 +183,8 @@ class Mux
     }
 
     public function matchRoute($path) {
-        if ( extension_loaded('phux') ) {
-            return phux_match($this->routes, $path);
+        if ( extension_loaded('pux') ) {
+            return pux_match($this->routes, $path);
         }
 
         $reqmethod = $this->getRequestMethodConstant(@$_SERVER['REQUEST_METHOD']);

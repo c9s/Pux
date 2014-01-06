@@ -11,8 +11,8 @@
     >
 
     <testsuites>
-        <testsuite name="PhuxTest" extension="phux">
-            <directory>PhuxTest.php</directory>
+        <testsuite name="PuxTest" extension="pux">
+            <directory>PuxTest.php</directory>
         </testsuite>
     </testsuites>
 </phpunit>

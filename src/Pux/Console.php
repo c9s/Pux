@@ -1,5 +1,5 @@
 <?php
-namespace Phux;
+namespace Pux;
 use CLIFramework\Application;
 
 class Console extends Application
@@ -15,6 +15,6 @@ class Console extends Application
 
     public function brief()
     {
-        return 'Phux - High Performance PHP Router.';
+        return 'Pux - High Performance PHP Router.';
     }
 }

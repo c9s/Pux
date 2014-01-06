@@ -1,6 +1,6 @@
 <?php
-use Phux\Mux;
-use Phux\Executor;
+use Pux\Mux;
+use Pux\Executor;
 
 class HelloController
 {

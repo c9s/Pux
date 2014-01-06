@@ -5,8 +5,8 @@ onion compile \
     --lib vendor/corneltek/getoptionkit/src \
     --lib vendor/corneltek/universal/src \
     --classloader \
-    --bootstrap scripts/phux-emb.php \
+    --bootstrap scripts/pux-emb.php \
     --executable \
-    --output phux.phar
-mv phux.phar phux
-chmod +x phux
+    --output pux.phar
+mv pux.phar pux
+chmod +x pux

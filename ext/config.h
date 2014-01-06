@@ -1,7 +1,7 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
-/* Whether to build phux as dynamic module */
+/* Whether to build pux as dynamic module */
 #define COMPILE_DL_PHUX 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */

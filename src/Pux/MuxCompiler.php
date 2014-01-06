@@ -1,6 +1,6 @@
 <?php
-namespace Phux;
-use Phux\Mux;
+namespace Pux;
+use Pux\Mux;
 
 class MuxCompiler
 {
@@ -102,7 +102,7 @@ class MuxCompiler
      */
     public function compile($outFile) {
         // compile routes to php file as a cache.
-        usort($this->mux->routes, [ 'Phux\\MuxCompiler' , 'sort_routes' ]);
+        usort($this->mux->routes, [ 'Pux\\MuxCompiler' , 'sort_routes' ]);
 
         $code = $this->mux->export();
         return file_put_contents($outFile, "<?php return " . $code . "; /* version */" );

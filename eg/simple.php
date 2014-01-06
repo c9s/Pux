@@ -1,7 +1,7 @@
 <?php
 require '../vendor/autoload.php';
-use Phux\Router;
-use Phux\Mux;
+use Pux\Router;
+use Pux\Mux;
 
 
 

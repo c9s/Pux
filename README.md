@@ -1,11 +1,11 @@
-Phux
+Pux
 =============
-Phux is a High Performance PHP Router.
+Pux is a High Performance PHP Router.
 
-Phux tries not to consume computation time to build all routes dynamically (like Symfony/Routing). Instead,
-Phux compiles your routes to plain PHP array for caching, the compiled routes can be loaded from cache very fast.
+Pux tries not to consume computation time to build all routes dynamically (like Symfony/Routing). Instead,
+Pux compiles your routes to plain PHP array for caching, the compiled routes can be loaded from cache very fast.
 
-With Phux PHP Extension support, you may load and dispatch the routes 2x faster than pure PHP Phux.
+With Pux PHP Extension support, you may load and dispatch the routes 2x faster than pure PHP Pux.
 
 MuxCompiler
 --------------------
@@ -16,15 +16,15 @@ In your route definition file `hello_routes.php`, you simply return the Mux obje
 <?php
 // load your composer autoload if it's needed
 // require '../vendor/autoload.php';
-use Phux\Mux;
+use Pux\Mux;
 $mux = new Mux;
 $mux->get('/hello', ['HelloController','helloAction']);
 return $mux;
 ```
 
-Phux provides a command-line tool for you to compile your route definitions.
+Pux provides a command-line tool for you to compile your route definitions.
 
-    phux compile -o hello_mux.php hello_routes.php
+    pux compile -o hello_mux.php hello_routes.php
 
 In your application, you may load the compiled mux (router) through only one line:
 
@@ -34,12 +34,12 @@ $mux = require "hello_mux.php";
 $route = $mux->dispatch('/hello');
 ```
 
-This can be very very fast if you have phux extension installed.
+This can be very very fast if you have pux extension installed.
 
 Dispatching Strategy
 --------------------
 
-There are two route dispatching strategies in Phux while Symfony/Routing only
+There are two route dispatching strategies in Pux while Symfony/Routing only
 provides PCRE pattern matching:
 
 1. Plain string comparison.
@@ -54,11 +54,11 @@ The PCRE pattern comparison is used when you have some dynamic routing paths,
 for example, you can put some place holders in your routing path, and pass
 these path arguments to your controller later.
 
-Phux sorts and compiles your routes to single cache file, it also uses longest
+Pux sorts and compiles your routes to single cache file, it also uses longest
 matching so it sorts patterns by pattern length in descending order before compiling the
 routes to cache.
 
-Phux uses indexed array as the data structure for storing route information so it's faster.
+Pux uses indexed array as the data structure for storing route information so it's faster.
 
 
 Synopsis
@@ -75,7 +75,7 @@ class ProductController {
         return "product $id";
     }
 }
-$mux = new Phux\Mux;
+$mux = new Pux\Mux;
 $mux->add('/product', ['ProductController','listAction']);
 $mux->add('/product/:id', ['ProductController','itemAction'] , [
     'require' => [ ':id' => '\d+', ],
@@ -145,20 +145,20 @@ Prefork configuration:
 
 ### Requests per seconds
 
-<img src="https://raw.github.com/c9s/Phux/master/benchmarks/reqs.png"/>
+<img src="https://raw.github.com/c9s/Pux/master/benchmarks/reqs.png"/>
 
 ### Response Time
 
-Phux - PURE PHP (around 3ms~38ms)
+Pux - PURE PHP (around 3ms~38ms)
 
-<img src="https://raw.github.com/c9s/Phux/master/benchmarks/phux.png"/>
+<img src="https://raw.github.com/c9s/Pux/master/benchmarks/pux.png"/>
 
-Phux - with extension 
+Pux - with extension 
 
 <https://gist.github.com/c9s/8273098>
 
 Symfony/Routing (around 9ms~146ms)
 
-<img src="https://raw.github.com/c9s/Phux/master/benchmarks/symfony-routing.png"/>
+<img src="https://raw.github.com/c9s/Pux/master/benchmarks/symfony-routing.png"/>
 
 

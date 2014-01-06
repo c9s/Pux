@@ -17,10 +17,10 @@
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
 
-zval * php_phux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
+zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
 int get_current_request_method(TSRMLS_D);
 
-PHP_FUNCTION(phux_match);
-PHP_FUNCTION(phux_sort_routes);
+PHP_FUNCTION(pux_match);
+PHP_FUNCTION(pux_sort_routes);
 
 #endif

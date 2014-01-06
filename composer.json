@@ -1,5 +1,5 @@
 {
-    "name": "corneltek\/phux",
+    "name": "corneltek\/pux",
     "description": "Fast PHP router",
     "authors": [
         {
@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Phux": "src"
+            "Pux": "src"
         }
     },
     "version": "1.1.1"

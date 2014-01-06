@@ -1,25 +1,25 @@
 <?php
 require 'PHPUnit/Framework/ExtensionTestCase.php';
 require 'PHPUnit/TestMore.php';
-require '../src/Phux/PatternCompiler.php';
-require '../src/Phux/MuxCompiler.php';
-use Phux\Mux;
+require '../src/Pux/PatternCompiler.php';
+require '../src/Pux/MuxCompiler.php';
+use Pux\Mux;
 
-class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
+class PuxTest extends PHPUnit_Framework_ExtensionTestCase
 {
 
     public $repeat = 10;
 
     public function getExtensionName()
     {
-        return 'phux';
+        return 'pux';
     }
 
     public function getFunctions()
     {
         return array(
-            'phux_match',
-            'phux_sort_routes',
+            'pux_match',
+            'pux_sort_routes',
         );
     }
 
@@ -51,7 +51,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
         );
         $_SERVER['REQUEST_METHOD'] = "POST";
 
-        $r = phux_match($routes, '/product/10');
+        $r = pux_match($routes, '/product/10');
         ok($r, "Found route");
         ok( $r[3] , "Got route options" );
         ok( $r[3]['vars'] , "Got route vars" );
@@ -74,7 +74,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
                 ),
             ),
         );
-        $r = phux_match($routes, '/product/10');
+        $r = pux_match($routes, '/product/10');
         ok($r, "Found route");
         ok( $r[3] , "Got route options" );
         ok( $r[3]['vars'] , "Got route vars" );
@@ -87,34 +87,34 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
             array( false, '/product/item', ['ProductController', 'itemAction'], [] ),
             array( false, '/product', ['ProductController', 'listAction'], [] ),
         );
-        $r = phux_match($routes, '/product');
+        $r = pux_match($routes, '/product');
         ok($r, "Found route");
 
-        $r = phux_match($routes, '/product/item');
+        $r = pux_match($routes, '/product/item');
         ok($r, "Found route");
     }
 
     public function testMuxClass() {
-        ok( class_exists('Phux\\Mux') );
+        ok( class_exists('Pux\\Mux') );
     }
 
 
     public function testMuxStaticIdGenerator() {
-        $id = \Phux\Mux::generate_id();
+        $id = \Pux\Mux::generate_id();
         ok($id, "got mux ID $id");
         ok(is_numeric($id), "got mux ID $id" );
         ok(is_integer($id), "got mux ID $id");
     }
 
     public function testMuxGetId() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         $id = $mux->getId();
         ok( is_integer($id) );
         is( $id , $mux->getId() );
     }
 
     public function testMuxRouteFound() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product', [ 'ProductController','listAction' ]);
         $route = $mux->matchRoute("/product");
@@ -123,7 +123,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
 
 
     public function testMuxAddSimpleRoute() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product', [ 'ProductController','listAction' ]);
 
@@ -144,7 +144,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
     public function testMuxAddPCRERoute() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
         $mux->add('/product', [ 'ProductController','listAction' ]);
@@ -156,7 +156,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
     public function testMuxGetMethod() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         ok($mux);
         $mux->get('/news', [ 'NewsController','listAction' ]);
         $mux->get('/news_item', [ 'NewsController','itemAction' ], []);
@@ -173,7 +173,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
 
 
     public function testMuxExport() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
         $mux->add('/product', [ 'ProductController','listAction' ]);
@@ -189,17 +189,17 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
     public function testMuxMountEmpty() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         ok($mux);
-        $subMux = new \Phux\Mux;
+        $subMux = new \Pux\Mux;
         $mux->mount( '/sub' , $subMux);
     }
 
     public function testMuxMountNoExpand() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         $mux->expandSubMux = false;
         ok($mux);
-        $submux = new \Phux\Mux;
+        $submux = new \Pux\Mux;
         $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
         $submux->add('/foo', [ 'HelloController','indexAction' ]);
         $mux->mount( '/sub' , $submux);
@@ -216,11 +216,11 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
     public function testMuxMountPcreRoutes() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         ok($mux);
         is(0, $mux->length());
 
-        $subMux = new \Phux\Mux;
+        $subMux = new \Pux\Mux;
         $subMux->add('/hello/:name', [ 'HelloController','indexAction' ]);
         ok($subMux);
         ok($routes = $subMux->getRoutes());
@@ -235,7 +235,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
     public function testMuxDispatch() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
         $mux->add('/product', [ 'ProductController','listAction' ]);
@@ -247,7 +247,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
     public function testMuxPcreDispatch() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
         $mux->add('/product', [ 'ProductController','listAction' ]);
@@ -257,7 +257,7 @@ class PhuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
     public function testMuxCompile() {
-        $mux = new \Phux\Mux;
+        $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
         $mux->add('/product', [ 'ProductController','listAction' ]);

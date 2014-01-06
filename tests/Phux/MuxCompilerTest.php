@@ -1,6 +1,6 @@
 <?php
-use Phux\MuxCompiler;
-use Phux\Mux;
+use Pux\MuxCompiler;
+use Pux\Mux;
 
 class FooController
 {

@@ -1,10 +1,10 @@
 <?php
 // require '../vendor/autoload.php';
-require '../src/Phux/PatternCompiler.php';
-require '../src/Phux/Mux.php';
-require '../src/Phux/MuxCompiler.php';
-use Phux\MuxCompiler;
-use Phux\Mux;
+require '../src/Pux/PatternCompiler.php';
+require '../src/Pux/Mux.php';
+require '../src/Pux/MuxCompiler.php';
+use Pux\MuxCompiler;
+use Pux\Mux;
 
 class HelloController {
     public function helloAction() {
