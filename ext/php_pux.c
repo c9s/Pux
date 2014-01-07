@@ -647,19 +647,21 @@ PHP_METHOD(Mux, dispatch) {
     zval *z_trimed_path;
     zval *z_return_route;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &z_path) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len) == FAILURE) {
         RETURN_FALSE;
+    }
+
+    if ( path_len == 0 ) {
+        zend_error(E_ERROR, "Dispatch path required. empty path given.");
     }
 
 
     ALLOC_INIT_ZVAL(z_trimed_path);
     ALLOC_INIT_ZVAL(z_return_route);
+    ALLOC_INIT_ZVAL(z_path);
+    ZVAL_STRINGL(z_path, path, path_len, 1);
 
-
-    path = Z_STRVAL_P(z_path);
-    path_len = Z_STRLEN_P(z_path);
     php_trim(path, path_len, trim_char, 1, z_trimed_path, 2 TSRMLS_CC); // mode 2 == rtrim
-
 
     zend_function *fe; // method entry
     zend_hash_find( &Z_OBJCE_P(this_ptr)->function_table, "matchroute",    sizeof("matchroute"),    (void **) &fe);

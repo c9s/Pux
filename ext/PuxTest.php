@@ -3,7 +3,29 @@ require 'PHPUnit/Framework/ExtensionTestCase.php';
 require 'PHPUnit/TestMore.php';
 require '../src/Pux/PatternCompiler.php';
 require '../src/Pux/MuxCompiler.php';
+require '../src/Pux/Executor.php';
 use Pux\Mux;
+use Pux\Executor;
+
+class HelloController
+{
+
+    public function helloAction($name) {
+        return "hello $name";
+    }
+
+}
+
+class ProductController
+{
+    public function indexAction() { return 'index'; }
+    public function fooAction() { return 'foo'; }
+    public function barAction() { return 'bar'; }
+
+    public function itemAction($id)  { 
+        return "product item $id";
+    }
+}
 
 class PuxTest extends PHPUnit_Framework_ExtensionTestCase
 {
@@ -21,6 +43,11 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
             'pux_match',
             'pux_sort_routes',
         );
+    }
+
+    public function testExtensionLoaded() 
+    {
+        ok( extension_loaded('pux') );
     }
 
     public function testMuxRouteRouteDefine() {
@@ -256,6 +283,41 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok($route[0], "is a pcre route");
     }
 
+    public function testEmptyPathDispatch() 
+    {
+        $mux = new \Pux\Mux;
+        ok($mux);
+        $mux->dispatch(null);
+    }
+
+    public function testExecutor() {
+        $mux = new \Pux\Mux;
+        ok($mux);
+        $mux->add('/hello/:name', [ 'HelloController','helloAction' ], [
+            'require' => [ 'name' => '\w+' ]
+        ]);
+        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
+        $mux->add('/product', [ 'ProductController','listAction' ]);
+        $mux->add('/foo', [ 'ProductController','fooAction' ]);
+        $mux->add('/bar', [ 'ProductController','barAction' ]);
+        $mux->add('/', [ 'ProductController','indexAction' ]);
+
+        ok( $r = $mux->dispatch('/') );
+        is('index',Executor::execute($r));
+
+        ok( $r = $mux->dispatch('/foo') );
+        is('foo', Executor::execute($r));
+
+        ok( $r = $mux->dispatch('/bar') );
+        is('bar', Executor::execute($r));
+
+        ok( $r = $mux->dispatch('/product/3') );
+        is('product item 3', Executor::execute($r));
+
+        ok( $r = $mux->dispatch('/hello/john') );
+        is('hello john', Executor::execute($r));
+    }
+
     public function testMuxCompile() {
         $mux = new \Pux\Mux;
         ok($mux);
@@ -300,6 +362,8 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
             $this->assertSame($path, $route[3]['pattern'], "Should be $path, Got {$route[1]}");
         }
     }
+
+
 
 }
 
