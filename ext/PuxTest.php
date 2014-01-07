@@ -283,11 +283,20 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok($route[0], "is a pcre route");
     }
 
+
+    /**
+     * @expectedException PHPUnit_Framework_Error
+     */
     public function testEmptyPathDispatch() 
     {
         $mux = new \Pux\Mux;
         ok($mux);
-        $mux->dispatch(null);
+        try {
+            $mux->dispatch(null);
+        } catch (Exception $e) {
+            return;
+        }
+        $this->fail('Expecting error.');
     }
 
     public function testExecutor() {

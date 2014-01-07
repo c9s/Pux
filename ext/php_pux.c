@@ -159,7 +159,7 @@ zval * call_mux_method(zval * object , char * method_name , int method_name_len,
 {
     zend_function *fe;
     if ( zend_hash_find( &Z_OBJCE_P(object)->function_table, method_name, method_name_len, (void **) &fe) == FAILURE ) {
-        zend_error(E_ERROR, "%s method not found", method_name);
+        php_error(E_ERROR, "%s method not found", method_name);
     }
     // call export method
     zval *retval;
@@ -347,7 +347,7 @@ PHP_METHOD(Mux, mount) {
                 // $newPattern = $pattern . $route[3]['pattern'];
 
                 if ( zend_hash_find( Z_ARRVAL_PP(z_route_options), "pattern", sizeof("pattern"), (void**) &z_route_original_pattern) == FAILURE ) {
-                    zend_error( E_ERROR, "Can not compile pattern, original pattern not found");
+                    php_error( E_ERROR, "Can not compile pattern, original pattern not found");
                 }
 
                 char new_pattern[120] = { 0 };
@@ -373,13 +373,13 @@ PHP_METHOD(Mux, mount) {
 
 
                 if ( z_compiled_route == NULL || Z_TYPE_P(z_compiled_route) == IS_NULL ) {
-                    zend_error( E_ERROR, "Can not compile pattern: %s", new_pattern);
+                    php_error( E_ERROR, "Can not compile pattern: %s", new_pattern);
                 }
 
 
                 zval **z_compiled_route_pattern;
                 if ( zend_hash_find( Z_ARRVAL_P(z_compiled_route) , "compiled", sizeof("compiled"), (void**)&z_compiled_route_pattern) == FAILURE ) {
-                    zend_error( E_ERROR, "compiled pattern not found: %s", new_pattern);
+                    php_error( E_ERROR, "compiled pattern not found: %s", new_pattern);
                 }
 
                 zend_hash_update( Z_ARRVAL_P(z_compiled_route), "pattern", sizeof("pattern"), &z_new_pattern, sizeof(zval *), NULL);
@@ -423,11 +423,11 @@ PHP_METHOD(Mux, mount) {
         zend_function *fe_add   = NULL; // method entry
 
         if ( zend_hash_find( &Z_OBJCE_P(z_mux)->function_table, "getid", sizeof("getid"), (void **) &fe_getid) == FAILURE ) {
-            zend_error(E_ERROR, "Cannot call method Mux::getid()");
+            php_error(E_ERROR, "Cannot call method Mux::getid()");
             RETURN_FALSE;
         }
         if ( zend_hash_find( &Z_OBJCE_P(this_obj)->function_table, "add", sizeof("add"),    (void **) &fe_add) == FAILURE ) {
-            zend_error(E_ERROR, "Cannot call method Mux::add()");
+            php_error(E_ERROR, "Cannot call method Mux::add()");
             RETURN_FALSE;
         }
 
@@ -441,7 +441,7 @@ PHP_METHOD(Mux, mount) {
         zend_call_method( &z_mux, Z_OBJCE_P(z_mux), &fe_getid, "getid", strlen("getid"), &z_mux_id, 0, NULL, NULL TSRMLS_CC );
 
         if ( Z_TYPE_P(z_mux_id) == IS_NULL ) {
-            zend_error(E_ERROR, "Mux id is required. got NULL.");
+            php_error(E_ERROR, "Mux id is required. got NULL.");
         }
 
         // create pattern
@@ -582,7 +582,7 @@ PHP_METHOD(Mux, compile) {
             z_routes, z_sort_callback TSRMLS_CC );
 
     if ( Z_BVAL_P(retval_ptr) == 0 ) {
-        zend_error(E_ERROR,"route sort failed.");
+        php_error(E_ERROR,"route sort failed.");
     }
     zval_ptr_dtor(&z_sort_callback); // recycle sort callback zval
     zval_ptr_dtor(&retval_ptr); // recycle sort callback zval
@@ -595,7 +595,7 @@ PHP_METHOD(Mux, compile) {
     // get export method function entry
     zend_function *fe_export;
     if ( zend_hash_find( &Z_OBJCE_P(this_ptr)->function_table, "export",    sizeof("export"),    (void **) &fe_export) == FAILURE ) {
-        zend_error(E_ERROR, "export method not found");
+        php_error(E_ERROR, "export method not found");
     }
 
     // call export method
@@ -605,7 +605,7 @@ PHP_METHOD(Mux, compile) {
 
 
     if ( Z_TYPE_P(compiled_code) == IS_NULL ) {
-        zend_error(E_ERROR, "Can not compile routes.");
+        php_error(E_ERROR, "Can not compile routes.");
     }
 
 
@@ -652,7 +652,7 @@ PHP_METHOD(Mux, dispatch) {
     }
 
     if ( path_len == 0 ) {
-        zend_error(E_ERROR, "Dispatch path required. empty path given.");
+        php_error(E_ERROR, "Dispatch path required. empty path given.");
     }
 
     ALLOC_INIT_ZVAL(z_trimed_path);
@@ -688,7 +688,7 @@ PHP_METHOD(Mux, dispatch) {
         zend_hash_index_find( Z_ARRVAL_P(z_submux_array),  Z_LVAL_PP(z_callback) , (void**) &z_submux);
 
         if ( Z_TYPE_PP(z_submux) == IS_NULL ) {
-            zend_error(E_ERROR, "submux not found.");
+            php_error(E_ERROR, "submux not found.");
             RETURN_FALSE;
         }
 
@@ -702,10 +702,10 @@ PHP_METHOD(Mux, dispatch) {
             zval *z_route_vars_0_len;
             zval *z_substr;
             if ( zend_hash_find( Z_ARRVAL_PP(z_options) , "vars", strlen("vars") , (void**) &z_route_vars ) == FAILURE ) {
-                zend_error(E_ERROR, "require route vars");
+                php_error(E_ERROR, "require route vars");
             }
             if ( zend_hash_index_find( Z_ARRVAL_PP(z_options) , 0 , (void**) &z_route_vars_0 ) == FAILURE ) {
-                zend_error(E_ERROR, "require route vars[0]");
+                php_error(E_ERROR, "require route vars[0]");
             }
 
             ALLOC_INIT_ZVAL(z_path);
