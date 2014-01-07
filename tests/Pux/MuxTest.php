@@ -88,6 +88,17 @@ class MuxTest extends PHPUnit_Framework_TestCase
         is("response", $response);
     }
 
+    public function testRequirementPattern() 
+    {
+        $mux = new Mux;
+        ok($mux);
+        $mux->add('/hello/:name', [ 'HelloController', 'index' ], [
+            'require' => [ 'name' => '\w+' ],
+        ]);
+        $route = $mux->dispatch('/hello/john');
+        ok($route);
+    }
+
 
     public function testPCREPattern()
     {

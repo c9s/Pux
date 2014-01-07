@@ -78,8 +78,8 @@ class ProductController {
 $mux = new Pux\Mux;
 $mux->add('/product', ['ProductController','listAction']);
 $mux->add('/product/:id', ['ProductController','itemAction'] , [
-    'require' => [ ':id' => '\d+', ],
-    'default' => [ ':id' => '1', ]
+    'require' => [ 'id' => '\d+', ],
+    'default' => [ 'id' => '1', ]
 ]);
 $route = $mux->dispatch('/product/1');
 ```
