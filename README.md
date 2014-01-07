@@ -67,6 +67,8 @@ Synopsis
 The routing usage is dead simple:
 
 ```php
+use Pux\Executor;
+
 class ProductController {
     public function listAction() {
         return 'product list';
@@ -82,6 +84,7 @@ $mux->add('/product/:id', ['ProductController','itemAction'] , [
     'default' => [ 'id' => '1', ]
 ]);
 $route = $mux->dispatch('/product/1');
+Executor::execute($route);
 ```
 
 Mux
