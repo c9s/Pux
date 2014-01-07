@@ -284,6 +284,7 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
 
+    /*
     public function testEmptyPathDispatch() 
     {
         $mux = new \Pux\Mux;
@@ -295,7 +296,6 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         }
         $this->fail('Expecting error.');
     }
-    /*
      */
 
     public function testExecutor() {
