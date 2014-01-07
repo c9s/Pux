@@ -319,8 +319,10 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok( $r = $mux->dispatch('/bar') );
         is('bar', Executor::execute($r));
 
-        ok( $r = $mux->dispatch('/product/3') );
-        is('product item 3', Executor::execute($r));
+        for ( $i = 0 ; $i < 1000 ; $i++ ) {
+            ok( $r = $mux->dispatch('/product/23') );
+            is('product item 23', Executor::execute($r));
+        }
 
         ok( $r = $mux->dispatch('/hello/john') );
         is('hello john', Executor::execute($r));
