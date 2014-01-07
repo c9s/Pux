@@ -127,8 +127,8 @@ routes to cache.</p>
 <span class="nv">$mux</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pux\Mux</span><span class="p">;</span>
 <span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="s1">'/product'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'ProductController'</span><span class="p">,</span><span class="s1">'listAction'</span><span class="p">]);</span>
 <span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="s1">'/product/:id'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'ProductController'</span><span class="p">,</span><span class="s1">'itemAction'</span><span class="p">]</span> <span class="p">,</span> <span class="p">[</span>
-    <span class="s1">'require'</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="s1">':id'</span> <span class="o">=&gt;</span> <span class="s1">'\d+'</span><span class="p">,</span> <span class="p">],</span>
-    <span class="s1">'default'</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="s1">':id'</span> <span class="o">=&gt;</span> <span class="s1">'1'</span><span class="p">,</span> <span class="p">]</span>
+    <span class="s1">'require'</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="s1">'\d+'</span><span class="p">,</span> <span class="p">],</span>
+    <span class="s1">'default'</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="s1">'1'</span><span class="p">,</span> <span class="p">]</span>
 <span class="p">]);</span>
 <span class="nv">$route</span> <span class="o">=</span> <span class="nv">$mux</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">'/product/1'</span><span class="p">);</span>
 </pre></div>
