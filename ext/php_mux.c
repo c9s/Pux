@@ -127,7 +127,6 @@ PHP_METHOD(Mux, __set_state) {
     }
 
     HashTable *z_array_hash;
-
     z_array_hash = Z_ARRVAL_P(z_array);
 
     zval **z_id;
@@ -140,17 +139,18 @@ PHP_METHOD(Mux, __set_state) {
     zend_hash_find(z_array_hash, "subMux", sizeof("subMux"), (void**)&z_submux);
     zend_hash_find(z_array_hash, "expandSubMux", sizeof("expandSubMux"), (void**)&z_expandSubMux);
 
-
     zval *new_object;
     ALLOC_INIT_ZVAL(new_object);
     object_init_ex(new_object, pux_ce_mux);
     CALL_METHOD(Mux, __construct, new_object, new_object);
 
-    zend_update_property_long( Z_OBJCE_P(new_object), new_object, "id", sizeof("id")-1, Z_LVAL_PP(z_id) TSRMLS_CC);
+    // zend_update_property_long( Z_OBJCE_P(new_object), new_object, "id", sizeof("id")-1, Z_LVAL_PP(z_id) TSRMLS_CC);
+    zend_update_property(Z_OBJCE_P(new_object), new_object, "id", sizeof("id")-1, *z_id TSRMLS_CC);
     zend_update_property(Z_OBJCE_P(new_object), new_object, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
     zend_update_property(Z_OBJCE_P(new_object), new_object, "subMux", sizeof("subMux")-1, *z_submux TSRMLS_CC);
     zend_update_property(Z_OBJCE_P(new_object), new_object, "expandSubMux", sizeof("expandSubMux")-1, *z_expandSubMux TSRMLS_CC);
     *return_value = *new_object;
+    zval_ptr_dtor(&z_array);
 }
 
 
@@ -891,8 +891,7 @@ PHP_METHOD(Mux, add) {
         array_init(z_options);
     }
 
-    z_routes = zend_read_property( Z_OBJCE_P(getThis()), getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
-
+    z_routes = zend_read_property(pux_ce_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
     // PCRE pattern here
     if ( found ) {
@@ -913,8 +912,6 @@ PHP_METHOD(Mux, add) {
 
         // Z_ADDREF_P(z_compiled_route);
         // Z_ADDREF_PP(z_compiled_route_pattern);
-        //zval_ptr_dtor(&z_options);
-        //zval_ptr_dtor(&z_pattern);
         Z_ADDREF_P(z_callback);
 
         zval *z_new_routes;
@@ -924,7 +921,6 @@ PHP_METHOD(Mux, add) {
         add_index_bool(z_new_routes, 0 , 1); // pcre flag == false
         add_index_zval(z_new_routes, 1, *z_compiled_route_pattern);
         add_index_zval(z_new_routes, 2 , z_callback);
-        // add_index_zval(z_new_routes, 3, z_options);
         add_index_zval(z_new_routes, 3, z_compiled_route);
         add_next_index_zval(z_routes, z_new_routes);
         zval_ptr_dtor(&z_pattern);
