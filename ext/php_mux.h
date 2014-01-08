@@ -23,6 +23,7 @@ zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry 
 
 
 PHP_METHOD(Mux, __construct);
+// PHP_METHOD(Mux, __destruct);
 PHP_METHOD(Mux, getId);
 PHP_METHOD(Mux, add);
 PHP_METHOD(Mux, length);
