@@ -448,10 +448,9 @@ PHP_METHOD(Mux, mount) {
         // zval *z_mux_id = call_mux_method(z_mux, "getid", sizeof("getid") ,  );
 
         zval *z_mux_id = NULL;
-        ALLOC_INIT_ZVAL(z_mux_id);
-        zend_call_method( &z_mux, Z_OBJCE_P(z_mux), &fe_getid, "getid", strlen("getid"), &z_mux_id, 0, NULL, NULL TSRMLS_CC );
+        zend_call_method( &z_mux, ce_pux_mux, &fe_getid, "getid", strlen("getid"), &z_mux_id, 0, NULL, NULL TSRMLS_CC );
 
-        if ( Z_TYPE_P(z_mux_id) == IS_NULL ) {
+        if ( z_mux_id == NULL || Z_TYPE_P(z_mux_id) == IS_NULL ) {
             php_error(E_ERROR, "Mux id is required. got NULL.");
         }
 
@@ -461,15 +460,12 @@ PHP_METHOD(Mux, mount) {
         ZVAL_STRINGL(z_pattern, pattern, pattern_len, 1); // duplicate
 
         zval *z_retval = NULL;
-        ALLOC_INIT_ZVAL(z_retval);
         zend_call_method_with_3_params( &this_ptr, ce_pux_mux, &fe_add, "add",
                 strlen("add"), &z_retval, 3, z_pattern, z_mux_id, z_options TSRMLS_CC);
-        // zend_call_method( &this_obj, Z_OBJCE_P(this_obj), &fe_add, "add", strlen("add"), &z_retval, 2, z_pattern, z_mux_id TSRMLS_CC);
         zval *z_submux_array = zend_read_property( ce_pux_mux, this_ptr , "submux", sizeof("submux") - 1, 1 TSRMLS_CC);
         add_index_zval( z_submux_array, Z_LVAL_P(z_mux_id) , z_mux);
 
         // release zvals
-        // zval_ptr_dtor(&z_retval);
         zval_ptr_dtor(&z_mux_id);
         // zval_ptr_dtor(&z_pattern);
     }
@@ -508,14 +504,15 @@ PHP_METHOD(Mux, export) {
 
 
     zval *retval_ptr = NULL;
-    ALLOC_INIT_ZVAL(retval_ptr);
 
     // return var_export($this, true);
     zend_call_method( NULL, NULL, NULL, "var_export", strlen("var_export"), &retval_ptr, 2, this_ptr, should_return TSRMLS_CC );
-
-    *return_value = *retval_ptr;
-    zval_copy_ctor(return_value);
     zval_ptr_dtor(&should_return);
+
+    if (retval_ptr) {
+        *return_value = *retval_ptr;
+        zval_copy_ctor(return_value);
+    }
     // zval_ptr_dtor(&retval_ptr);
 }
 
@@ -530,13 +527,13 @@ PHP_METHOD(Mux, getId) {
     }
 
     zval *retval_ptr = NULL;
-    ALLOC_INIT_ZVAL(retval_ptr);
-    zend_call_method( NULL, Z_OBJCE_P(this_ptr) , NULL, "generate_id", strlen("generate_id"), &retval_ptr, 0, NULL, NULL TSRMLS_CC );
+    zend_call_method( NULL, ce_pux_mux, NULL, "generate_id", strlen("generate_id"), &retval_ptr, 0, NULL, NULL TSRMLS_CC );
 
-    counter = Z_LVAL_P(retval_ptr);
-    zend_update_property_long(Z_OBJCE_P(this_ptr), this_ptr, "id" , sizeof("id") - 1, counter TSRMLS_CC);
-
-    zval_ptr_dtor(&retval_ptr);
+    if ( retval_ptr ) {
+        counter = Z_LVAL_P(retval_ptr);
+        zend_update_property_long(Z_OBJCE_P(this_ptr), this_ptr, "id" , sizeof("id") - 1, counter TSRMLS_CC);
+        zval_ptr_dtor(&retval_ptr);
+    }
     RETURN_LONG(counter);
 }
 
@@ -554,7 +551,6 @@ PHP_METHOD(Mux, sort) {
     z_routes = zend_read_property(Z_OBJCE_P(this_ptr) , this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
     zval *retval_ptr = NULL;
-    ALLOC_INIT_ZVAL(retval_ptr);
 
     zval *z_sort_callback = NULL;
     ALLOC_INIT_ZVAL(z_sort_callback);
@@ -563,9 +559,10 @@ PHP_METHOD(Mux, sort) {
     Z_SET_ISREF_P(z_routes);
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
-
-    zval_ptr_dtor(&retval_ptr);
     zval_ptr_dtor(&z_sort_callback);
+    if (retval_ptr) {
+        zval_ptr_dtor(&retval_ptr);
+    }
 }
 
 PHP_METHOD(Mux, compile) {
@@ -582,21 +579,17 @@ PHP_METHOD(Mux, compile) {
 
     // duplicated code to sort method
     zval *z_retval = NULL;
-    ALLOC_INIT_ZVAL(z_retval);
-
     zval *z_sort_callback = NULL;
     ALLOC_INIT_ZVAL(z_sort_callback);
     ZVAL_STRING( z_sort_callback, "pux_sort_routes" , 1 );
 
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &z_retval, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
-
-    if ( Z_BVAL_P(z_retval) == 0 ) {
-        php_error(E_ERROR,"route sort failed.");
-    }
     zval_ptr_dtor(&z_sort_callback); // recycle sort callback zval
-    zval_ptr_dtor(&z_retval); // recycle sort callback zval
-
+    if ( z_retval ) {
+        zval_ptr_dtor(&z_retval); // recycle sort callback zval
+    }
+    // php_error(E_ERROR,"route sort failed.");
     // zend_update_property(ce_pux_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
 
 
