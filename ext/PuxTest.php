@@ -323,12 +323,15 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
             $r = $mux->dispatch('/product/23');
             Executor::execute($r);
         };
-        $cb();
+        for ( $i = 0 ; $i < 100 ; $i++ ) {
+            call_user_func($cb);
+        }
 
-        for ( $i = 0 ; $i < 1000 ; $i++ ) {
+        for ( $i = 0 ; $i < 100 ; $i++ ) {
             ok( $r = $mux->dispatch('/product/23') );
             is('product item 23', Executor::execute($r));
         }
+
 
         ok( $r = $mux->dispatch('/hello/john') );
         is('hello john', Executor::execute($r));

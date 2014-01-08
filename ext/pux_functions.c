@@ -11,7 +11,7 @@
 #include "pux_functions.h"
 
 /*
- * pux_match( $routes, $path );
+ * pux_match(array $routes, string $path);
  */
 PHP_FUNCTION(pux_match)
 {
@@ -27,10 +27,11 @@ PHP_FUNCTION(pux_match)
     }
 
     zval *z_route;
-    z_route = php_pux_match(z_routes, path, path_len);
+    z_route = php_pux_match(z_routes, path, path_len TSRMLS_CC);
     if ( z_route != NULL ) {
         *return_value = *z_route;
-        zval_copy_ctor(z_route);
+        zval_copy_ctor(return_value);
+        zval_ptr_dtor(&z_route);
         return;
     }
     RETURN_NULL();
