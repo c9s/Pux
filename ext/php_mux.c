@@ -15,7 +15,7 @@
 #include "pux_functions.h"
 #include "php_mux.h"
 
-zend_class_entry *pux_ce_mux;
+zend_class_entry *ce_pux_mux;
 
 const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
@@ -47,12 +47,12 @@ const zend_function_entry mux_methods[] = {
 void pux_init_mux(TSRMLS_D) {
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce, "Pux\\Mux", mux_methods);
-    pux_ce_mux = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_declare_property_null(pux_ce_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(pux_ce_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(pux_ce_mux, "submux", strlen("submux"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_bool(pux_ce_mux, "expandSubMux", strlen("expandSubMux"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_long(pux_ce_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
+    ce_pux_mux = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_declare_property_null(ce_pux_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(ce_pux_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(ce_pux_mux, "submux", strlen("submux"), ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_bool(ce_pux_mux, "expandSubMux", strlen("expandSubMux"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_long(ce_pux_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
 }
 
 zend_class_entry ** get_pattern_compiler_ce(TSRMLS_DC) {
@@ -112,7 +112,7 @@ PHP_METHOD(Mux, __construct) {
 PHP_METHOD(Mux, generate_id) {
     zval * z_counter = NULL;
     long counter = 0;
-    z_counter = zend_read_static_property(pux_ce_mux, "id_counter", strlen("id_counter") , 0 TSRMLS_CC);
+    z_counter = zend_read_static_property(ce_pux_mux, "id_counter", strlen("id_counter") , 0 TSRMLS_CC);
     if ( z_counter != NULL ) {
         counter = Z_LVAL_P(z_counter);
     }
@@ -142,14 +142,14 @@ PHP_METHOD(Mux, __set_state) {
 
     zval *new_object;
     ALLOC_INIT_ZVAL(new_object);
-    object_init_ex(new_object, pux_ce_mux);
+    object_init_ex(new_object, ce_pux_mux);
     CALL_METHOD(Mux, __construct, new_object, new_object);
 
     // zend_update_property_long( Z_OBJCE_P(new_object), new_object, "id", sizeof("id")-1, Z_LVAL_PP(z_id) TSRMLS_CC);
-    zend_update_property(pux_ce_mux, new_object, "id", sizeof("id")-1, *z_id TSRMLS_CC);
-    zend_update_property(pux_ce_mux, new_object, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
-    zend_update_property(pux_ce_mux, new_object, "submux", sizeof("submux")-1, *z_submux TSRMLS_CC);
-    zend_update_property(pux_ce_mux, new_object, "expandSubMux", sizeof("expandSubMux")-1, *z_expandSubMux TSRMLS_CC);
+    zend_update_property(ce_pux_mux, new_object, "id", sizeof("id")-1, *z_id TSRMLS_CC);
+    zend_update_property(ce_pux_mux, new_object, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
+    zend_update_property(ce_pux_mux, new_object, "submux", sizeof("submux")-1, *z_submux TSRMLS_CC);
+    zend_update_property(ce_pux_mux, new_object, "expandSubMux", sizeof("expandSubMux")-1, *z_expandSubMux TSRMLS_CC);
     *return_value = *new_object;
     zval_ptr_dtor(&z_array);
 }
@@ -561,7 +561,7 @@ PHP_METHOD(Mux, compile) {
     }
 
     zval *z_routes;
-    z_routes = zend_read_property(pux_ce_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    z_routes = zend_read_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
     Z_SET_ISREF_P(z_routes);
 
@@ -582,7 +582,7 @@ PHP_METHOD(Mux, compile) {
     zval_ptr_dtor(&z_sort_callback); // recycle sort callback zval
     zval_ptr_dtor(&z_retval); // recycle sort callback zval
 
-    // zend_update_property(pux_ce_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
+    // zend_update_property(ce_pux_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
 
 
     // $code = '<?php return ' . $this->export() . ';';
@@ -682,7 +682,7 @@ PHP_METHOD(Mux, dispatch) {
     if ( Z_TYPE_PP(z_callback) == IS_LONG ) {
         zval *z_submux_array = NULL;
         zval **z_submux = NULL;
-        z_submux_array = zend_read_property( pux_ce_mux, this_ptr, "submux", sizeof("submux")-1, 1 TSRMLS_CC);
+        z_submux_array = zend_read_property( ce_pux_mux, this_ptr, "submux", sizeof("submux")-1, 1 TSRMLS_CC);
 
         if ( z_submux_array == NULL ) {
             zend_throw_exception(ce_pux_exception, "submux property is null", 0 TSRMLS_CC);
@@ -908,7 +908,7 @@ PHP_METHOD(Mux, add) {
         array_init(z_options);
     }
 
-    z_routes = zend_read_property(pux_ce_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    z_routes = zend_read_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
     // PCRE pattern here
     if ( found ) {
