@@ -1,7 +1,7 @@
 #ifndef PHP_PUX_H
 #define PHP_PUX_H 1
 
-#define PHP_PUX_VERSION "1.1.1"
+#define PHP_PUX_VERSION "1.1.2"
 #define PHP_PUX_EXTNAME "pux"
 
 #define ZEND_HASH_FETCH(hash,key,ret) \
