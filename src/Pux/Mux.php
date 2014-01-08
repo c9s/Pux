@@ -12,7 +12,7 @@ class Mux
 {
     public $routes = array();
 
-    public $subMux = array();
+    public $submux = array();
 
     public $id;
 
@@ -80,7 +80,7 @@ class Mux
         } else {
             $muxId = $mux->getId();
             $this->add($pattern, $muxId, $options);
-            $this->subMux[ $muxId ] = $mux;
+            $this->submux[ $muxId ] = $mux;
         }
     }
 
@@ -161,8 +161,8 @@ class Mux
 
     public function getSubMux($id)
     {
-        if ( isset($this->subMux[ $id ] ) ) {
-            return $this->subMux[ $id ];
+        if ( isset($this->submux[ $id ] ) ) {
+            return $this->submux[ $id ];
         }
     }
 
@@ -223,17 +223,17 @@ class Mux
         $path = rtrim($path, '/');
         if ( $route = $this->matchRoute($path) ) {
             if ( is_int($route[2]) ) {
-                $subMux = $this->subMux[ $route[2] ];
+                $submux = $this->submux[ $route[2] ];
 
-                // sub path and call subMux to dispatch
+                // sub path and call submux to dispatch
                 // for pcre pattern?
                 if ($route[0]) { 
                     $matchedString = $route[3]['vars'][0];
-                    return $subMux->dispatch( 
+                    return $submux->dispatch( 
                         substr($path, strlen($matchedString))
                     );
                 } else {
-                    return $subMux->dispatch(
+                    return $submux->dispatch(
                         substr($path, strlen($route[1]))
                     );
                 }
@@ -260,7 +260,7 @@ class Mux
     public static function __set_state($array) {
         $mux = new self;
         $mux->routes = $array['routes'];
-        $mux->subMux = $array['subMux'];
+        $mux->submux = $array['submux'];
         $mux->expandSubMux = $array['expandSubMux'];
         $mux->id = $array['id'];
         return $mux;

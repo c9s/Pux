@@ -15,7 +15,7 @@
       ),
     ),
   ),
-   'subMux' => 
+   'submux' => 
   array (
   ),
    'id' => NULL,

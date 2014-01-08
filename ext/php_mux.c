@@ -430,7 +430,7 @@ PHP_METHOD(Mux, mount) {
 
         // $muxId = $mux->getId();
         // $this->add($pattern, $muxId, $options);
-        // $this->subMux[ $muxId ] = $mux;
+        // $this->submux[ $muxId ] = $mux;
         // zval *z_mux_id = call_mux_method(z_mux, "getid", sizeof("getid") ,  );
 
         zval *z_mux_id = NULL;
@@ -705,7 +705,7 @@ PHP_METHOD(Mux, dispatch) {
         // php_var_dump(z_submux, 1 TSRMLS_CC);
 
         //  $matchedString = $route[3]['vars'][0];
-        //  return $subMux->dispatch(substr($path, strlen($matchedString))
+        //  return $submux->dispatch(substr($path, strlen($matchedString))
         if ( Z_BVAL_PP(z_pcre) ) {
             zval **z_route_vars = NULL;
             zval **z_route_vars_0 = NULL;
@@ -763,7 +763,7 @@ PHP_METHOD(Mux, dispatch) {
             ALLOC_INIT_ZVAL(z_substr);
             zend_call_method( NULL, NULL, NULL, "substr", strlen("substr"), &z_substr, 2, z_path, z_pattern_len TSRMLS_CC );
 
-            //     return $subMux->dispatch(
+            //     return $submux->dispatch(
             //         substr($path, strlen($route[1]))
             //     );
 

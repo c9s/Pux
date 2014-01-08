@@ -224,8 +224,8 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
     public function testMuxMountEmpty() {
         $mux = new \Pux\Mux;
         ok($mux);
-        $subMux = new \Pux\Mux;
-        $mux->mount( '/sub' , $subMux);
+        $submux = new \Pux\Mux;
+        $mux->mount( '/sub' , $submux);
     }
 
     public function testMuxMountNoExpand() {
@@ -264,14 +264,14 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok($mux);
         is(0, $mux->length());
 
-        $subMux = new \Pux\Mux;
-        $subMux->add('/hello/:name', [ 'HelloController','indexAction' ]);
-        ok($subMux);
-        ok($routes = $subMux->getRoutes());
-        is(1, $subMux->length());
+        $submux = new \Pux\Mux;
+        $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
+        ok($submux);
+        ok($routes = $submux->getRoutes());
+        is(1, $submux->length());
         is(0, $mux->length());
 
-        $mux->mount( '/sub' , $subMux);
+        $mux->mount( '/sub' , $submux);
 
         $r = $mux->dispatch('/sub/hello/John');
         ok($r);

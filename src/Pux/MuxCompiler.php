@@ -34,7 +34,7 @@ class MuxCompiler
                 $submux = $mux->getSubMux( $route[2] );
                 $newId = ++$this->idCounter;
                 $route[2] = $newId;
-                $this->mux->subMux[ $newId ] = $submux;
+                $this->mux->submux[ $newId ] = $submux;
             }
             $this->mux->routes[] = $route;
         }
