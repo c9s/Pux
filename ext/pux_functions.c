@@ -174,23 +174,24 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
             }
 
             zval *z_subpats = NULL; /* Array for subpatterns */
-            ALLOC_INIT_ZVAL( z_subpats );
-
-            zval *pcre_ret;
+            zval *pcre_ret = NULL;
+            ALLOC_INIT_ZVAL(z_subpats);
             ALLOC_INIT_ZVAL(pcre_ret);
             php_pcre_match_impl(pce, path, path_len, pcre_ret, z_subpats, 0, 0, 0, 0 TSRMLS_CC);
 
-            if ( ! Z_BVAL_P(pcre_ret) ) {
+            if ( pcre_ret == NULL || ! Z_BVAL_P(pcre_ret) ) {
                 continue;
             }
 
-            HashTable *subpats_hash = NULL;
-            subpats_hash = Z_ARRVAL_P(z_subpats);
 
-            if ( Z_TYPE_P(z_subpats) == IS_NULL ) {
+            if ( z_subpats == NULL ) {
                 ALLOC_INIT_ZVAL(z_subpats);
                 array_init(z_subpats);
+            } else if ( Z_TYPE_P(z_subpats) == IS_NULL ) {
+                array_init(z_subpats);
             }
+
+            HashTable *subpats_hash = Z_ARRVAL_P(z_subpats);
 
             // zval_copy_ctor(pcre_ret);
             // Apply "default" value to "vars"
