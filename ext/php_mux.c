@@ -674,9 +674,10 @@ PHP_METHOD(Mux, dispatch) {
     zend_hash_find( &Z_OBJCE_P(this_ptr)->function_table, "matchroute",    sizeof("matchroute"),    (void **) &fe);
     zend_call_method( &this_ptr, ce_pux_mux, &fe, "matchroute", strlen("matchroute"), &z_return_route, 1, z_trimed_path, NULL TSRMLS_CC );
 
-    if ( z_return_route == NULL || Z_TYPE_P(z_return_route) == IS_NULL ) {
-        // zval_ptr_dtor(&z_trimed_path);
-        // zval_ptr_dtor(&z_path);
+    if ( Z_TYPE_P(z_return_route) == IS_NULL ) {
+        zval_ptr_dtor(&z_trimed_path);
+        zval_ptr_dtor(&z_path);
+        zval_ptr_dtor(&z_return_route);
         RETURN_NULL();
     }
 
