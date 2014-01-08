@@ -135,10 +135,24 @@ PHP_METHOD(Mux, __set_state) {
     zval **z_submux;
     zval **z_expandSubMux;
 
-    zend_hash_find(z_array_hash, "id", sizeof("id"), (void**)&z_id);
-    zend_hash_find(z_array_hash, "routes", sizeof("routes"), (void**)&z_routes);
-    zend_hash_find(z_array_hash, "submux", sizeof("submux"), (void**)&z_submux);
-    zend_hash_find(z_array_hash, "expandSubMux", sizeof("expandSubMux"), (void**)&z_expandSubMux);
+    if ( zend_hash_find(z_array_hash, "id", sizeof("id"), (void**)&z_id) == FAILURE ) {
+        zend_throw_exception(ce_pux_exception, "mux->id load failed.", 0 TSRMLS_CC);
+        RETURN_FALSE;
+    }
+    if ( zend_hash_find(z_array_hash, "routes", sizeof("routes"), (void**)&z_routes) == FAILURE ) {
+        zend_throw_exception(ce_pux_exception, "mux->routes load failed.", 0 TSRMLS_CC);
+        RETURN_FALSE;
+    }
+
+    if ( zend_hash_find(z_array_hash, "submux", sizeof("submux"), (void**)&z_submux) == FAILURE ) {
+        zend_throw_exception(ce_pux_exception, "mux->submux load failed.", 0 TSRMLS_CC);
+        RETURN_FALSE;
+    }
+
+    if ( zend_hash_find(z_array_hash, "expandSubMux", sizeof("expandSubMux"), (void**)&z_expandSubMux) == FAILURE ) {
+        ALLOC_INIT_ZVAL(*z_expandSubMux);
+        ZVAL_BOOL(*z_expandSubMux, 1);
+    }
 
     zval *new_object;
     ALLOC_INIT_ZVAL(new_object);
@@ -151,7 +165,8 @@ PHP_METHOD(Mux, __set_state) {
     zend_update_property(ce_pux_mux, new_object, "submux", sizeof("submux")-1, *z_submux TSRMLS_CC);
     zend_update_property(ce_pux_mux, new_object, "expandSubMux", sizeof("expandSubMux")-1, *z_expandSubMux TSRMLS_CC);
     *return_value = *new_object;
-    // zval_ptr_dtor(&z_array);
+    zval_copy_ctor(return_value);
+    zval_ptr_dtor(&z_array);
 }
 
 
