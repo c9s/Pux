@@ -216,6 +216,14 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
 
+    public function testSort() {
+        $mux = new \Pux\Mux;
+        ok($mux);
+        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
+        $mux->add('/product', [ 'ProductController','listAction' ]);
+        $mux->sort();
+    }
+
     public function testMuxExport() {
         $mux = new \Pux\Mux;
         ok($mux);

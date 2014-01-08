@@ -227,7 +227,6 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
  */
 int get_current_request_method(TSRMLS_D) {
     char *c_request_method;
-    int  c_request_method_len;
     zval **z_server_hash;
     zval **z_request_method;
 
@@ -236,7 +235,6 @@ int get_current_request_method(TSRMLS_D) {
         zend_hash_find(Z_ARRVAL_PP(z_server_hash), "REQUEST_METHOD", sizeof("REQUEST_METHOD"), (void **) &z_request_method) == SUCCESS
     ) {
         c_request_method = Z_STRVAL_PP(z_request_method);
-        c_request_method_len = Z_STRLEN_PP(z_request_method);
         if ( strncmp("GET", c_request_method , sizeof("GET") ) == 0 ) {
             return REQ_METHOD_GET;
         } else if ( strncmp("POST", c_request_method , sizeof("POST") ) == 0 ) {

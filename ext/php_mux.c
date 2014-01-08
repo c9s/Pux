@@ -305,18 +305,15 @@ PHP_METHOD(Mux, mount) {
     zval *z_routes;
     zval *z_expandSubMux;
     zval *z_mux_routes;
-    zend_class_entry *obj_ce;
 
-    obj_ce = Z_OBJCE_P(this_ptr);
-
-    z_routes = zend_read_property( obj_ce, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
-    z_expandSubMux = zend_read_property( obj_ce, getThis(), "expandSubMux", sizeof("expandSubMux")-1, 1 TSRMLS_CC);
+    z_routes = zend_read_property( ce_pux_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    z_expandSubMux = zend_read_property( ce_pux_mux, getThis(), "expandSubMux", sizeof("expandSubMux")-1, 1 TSRMLS_CC);
 
 
     if ( Z_BVAL_P(z_expandSubMux) ) {
         // fetch routes from $mux
         //
-        z_mux_routes = zend_read_property( Z_OBJCE_P(z_mux), z_mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+        z_mux_routes = zend_read_property( ce_pux_mux, z_mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
         HashPosition route_pointer;
         HashTable    *mux_routes_hash;
@@ -512,7 +509,7 @@ PHP_METHOD(Mux, export) {
 
     *return_value = *retval_ptr;
     zval_copy_ctor(return_value);
-    // zval_ptr_dtor(&should_return);
+    zval_ptr_dtor(&should_return);
     // zval_ptr_dtor(&retval_ptr);
 }
 
@@ -541,8 +538,7 @@ PHP_METHOD(Mux, length) {
     zval *z_routes;
     z_routes = zend_read_property(Z_OBJCE_P(this_ptr), this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
-    long length = 0;
-    length = zend_hash_num_elements( Z_ARRVAL_P(z_routes) );
+    long length = zend_hash_num_elements( Z_ARRVAL_P(z_routes) );
 
     RETURN_LONG(length);
 }
@@ -562,8 +558,8 @@ PHP_METHOD(Mux, sort) {
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
 
-    // zval_ptr_dtor(&retval_ptr);
-    // zval_ptr_dtor(&z_sort_callback);
+    zval_ptr_dtor(&retval_ptr);
+    zval_ptr_dtor(&z_sort_callback);
 }
 
 PHP_METHOD(Mux, compile) {
@@ -752,7 +748,10 @@ PHP_METHOD(Mux, dispatch) {
             zend_call_method( NULL, NULL, NULL, "substr", strlen("substr"), &z_substr, 2, z_path, z_route_vars_0_len TSRMLS_CC );
 
             retval = call_mux_method( *z_submux, "dispatch" , sizeof("dispatch"), 1 , z_substr, NULL, NULL TSRMLS_CC);
-            if ( retval == NULL ) {
+            if ( retval == NULL || Z_TYPE_P(retval) == IS_NULL ) {
+                zval_ptr_dtor(&z_path);
+                zval_ptr_dtor(&z_route_vars_0_len);
+                zval_ptr_dtor(&z_substr);
                 RETURN_FALSE;
             }
             *return_value = *retval;
