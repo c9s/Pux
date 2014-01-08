@@ -145,10 +145,10 @@ PHP_METHOD(Mux, __set_state) {
     CALL_METHOD(Mux, __construct, new_object, new_object);
 
     // zend_update_property_long( Z_OBJCE_P(new_object), new_object, "id", sizeof("id")-1, Z_LVAL_PP(z_id) TSRMLS_CC);
-    zend_update_property(Z_OBJCE_P(new_object), new_object, "id", sizeof("id")-1, *z_id TSRMLS_CC);
-    zend_update_property(Z_OBJCE_P(new_object), new_object, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
-    zend_update_property(Z_OBJCE_P(new_object), new_object, "subMux", sizeof("subMux")-1, *z_submux TSRMLS_CC);
-    zend_update_property(Z_OBJCE_P(new_object), new_object, "expandSubMux", sizeof("expandSubMux")-1, *z_expandSubMux TSRMLS_CC);
+    zend_update_property(pux_ce_mux, new_object, "id", sizeof("id")-1, *z_id TSRMLS_CC);
+    zend_update_property(pux_ce_mux, new_object, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
+    zend_update_property(pux_ce_mux, new_object, "subMux", sizeof("subMux")-1, *z_submux TSRMLS_CC);
+    zend_update_property(pux_ce_mux, new_object, "expandSubMux", sizeof("expandSubMux")-1, *z_expandSubMux TSRMLS_CC);
     *return_value = *new_object;
     zval_ptr_dtor(&z_array);
 }
