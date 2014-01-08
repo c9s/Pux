@@ -80,7 +80,6 @@ zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry 
     }
 
     zval *z_compiled_route = NULL; // will be an array
-    ALLOC_INIT_ZVAL(z_compiled_route);
     zend_call_method( NULL, *ce_pattern_compiler, NULL, "compile", strlen("compile"), &z_compiled_route, 2, z_pattern, z_options TSRMLS_CC );
 
     if ( z_compiled_route == NULL ) {
@@ -502,18 +501,14 @@ PHP_METHOD(Mux, export) {
     ALLOC_INIT_ZVAL(should_return);
     ZVAL_BOOL(should_return, 1);
 
-
-    zval *retval_ptr = NULL;
-
-    // return var_export($this, true);
-    zend_call_method( NULL, NULL, NULL, "var_export", strlen("var_export"), &retval_ptr, 2, this_ptr, should_return TSRMLS_CC );
+    zval *rv = NULL;
+    zend_call_method( NULL, NULL, NULL, "var_export", strlen("var_export"), &rv, 2, this_ptr, should_return TSRMLS_CC );
     zval_ptr_dtor(&should_return);
 
-    if (retval_ptr) {
-        *return_value = *retval_ptr;
+    if (rv) {
+        *return_value = *rv;
         zval_copy_ctor(return_value);
     }
-    // zval_ptr_dtor(&retval_ptr);
 }
 
 PHP_METHOD(Mux, getId) {
@@ -526,13 +521,13 @@ PHP_METHOD(Mux, getId) {
         RETURN_LONG( Z_LVAL_P(z_id) );
     }
 
-    zval *retval_ptr = NULL;
-    zend_call_method( NULL, ce_pux_mux, NULL, "generate_id", strlen("generate_id"), &retval_ptr, 0, NULL, NULL TSRMLS_CC );
+    zval *rv = NULL;
+    zend_call_method( NULL, ce_pux_mux, NULL, "generate_id", strlen("generate_id"), &rv, 0, NULL, NULL TSRMLS_CC );
 
-    if ( retval_ptr ) {
-        counter = Z_LVAL_P(retval_ptr);
+    if ( rv ) {
+        counter = Z_LVAL_P(rv);
         zend_update_property_long(Z_OBJCE_P(this_ptr), this_ptr, "id" , sizeof("id") - 1, counter TSRMLS_CC);
-        zval_ptr_dtor(&retval_ptr);
+        zval_ptr_dtor(&rv);
     }
     RETURN_LONG(counter);
 }
@@ -578,16 +573,16 @@ PHP_METHOD(Mux, compile) {
     Z_SET_ISREF_P(z_routes);
 
     // duplicated code to sort method
-    zval *z_retval = NULL;
+    zval *rv = NULL;
     zval *z_sort_callback = NULL;
     ALLOC_INIT_ZVAL(z_sort_callback);
     ZVAL_STRING( z_sort_callback, "pux_sort_routes" , 1 );
 
-    zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &z_retval, 2, 
+    zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &rv, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
     zval_ptr_dtor(&z_sort_callback); // recycle sort callback zval
-    if ( z_retval ) {
-        zval_ptr_dtor(&z_retval); // recycle sort callback zval
+    if ( rv ) {
+        zval_ptr_dtor(&rv); // recycle sort callback zval
     }
     // php_error(E_ERROR,"route sort failed.");
     // zend_update_property(ce_pux_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
@@ -602,7 +597,7 @@ PHP_METHOD(Mux, compile) {
     }
 
     // call export method
-    zval *compiled_code;
+    zval *compiled_code = NULL;
     zend_call_method( &this_ptr, Z_OBJCE_P(this_ptr) , &fe_export, "export", strlen("export"), &compiled_code, 0, NULL, NULL TSRMLS_CC );
 
     if ( compiled_code == NULL || Z_TYPE_P(compiled_code) == IS_NULL ) {
@@ -623,20 +618,18 @@ PHP_METHOD(Mux, compile) {
     zval *retval = NULL;
     ALLOC_INIT_ZVAL(z_code);
     ALLOC_INIT_ZVAL(z_filename);
-    ALLOC_INIT_ZVAL(retval);
     ZVAL_STRING(z_code, buf, 0);
     ZVAL_STRINGL(z_filename, filename, filename_len, 0);
 
-
     zend_call_method( NULL, NULL, NULL, "file_put_contents", strlen("file_put_contents"), &retval, 2, z_filename, z_code TSRMLS_CC );
-
-    *return_value = *retval;
-    zval_copy_ctor(return_value);
-
-    zval_ptr_dtor(&compiled_code);
-    zval_ptr_dtor(&z_code);
     zval_ptr_dtor(&z_filename);
-    zval_ptr_dtor(&retval);
+    zval_ptr_dtor(&z_code);
+    zval_ptr_dtor(&compiled_code);
+
+    if (retval) {
+        *return_value = *retval;
+        zval_copy_ctor(return_value);
+    }
 }
 
 PHP_METHOD(Mux, dispatch) {
@@ -728,13 +721,6 @@ PHP_METHOD(Mux, dispatch) {
                 RETURN_FALSE;
             }
 
-            if ( z_route_vars == NULL ) {
-                ALLOC_INIT_ZVAL(*z_route_vars);
-                array_init(*z_route_vars);
-            } else if ( Z_TYPE_PP(z_route_vars) == IS_NULL ) {
-                array_init(*z_route_vars); // initilize an empty array
-            }
-
             ALLOC_INIT_ZVAL(z_path);
             ALLOC_INIT_ZVAL(z_route_vars_0_len);
 
@@ -751,11 +737,11 @@ PHP_METHOD(Mux, dispatch) {
             retval = call_mux_method( *z_submux, "dispatch" , sizeof("dispatch"), 1 , z_substr, NULL, NULL TSRMLS_CC);
             zval_ptr_dtor(&z_substr);
 
-            if ( retval == NULL || Z_TYPE_P(retval) == IS_NULL ) {
-                RETURN_FALSE;
+            if (retval) {
+                *return_value = *retval;
+                zval_copy_ctor(return_value);
             }
-            *return_value = *retval;
-            zval_copy_ctor(return_value);
+            RETURN_FALSE;
             return;
 
         } else {
@@ -792,9 +778,10 @@ PHP_METHOD(Mux, dispatch) {
     }
 
 
-    *return_value = *z_return_route;
-    zval_copy_ctor(return_value);
-
+    if ( z_return_route ) {
+        *return_value = *z_return_route;
+        zval_copy_ctor(return_value);
+    }
     zval_ptr_dtor(&z_path);
     zval_ptr_dtor(&z_trimed_path);
     zval_ptr_dtor(&z_return_route);
@@ -884,15 +871,14 @@ PHP_METHOD(Mux, appendPCRERoute) {
         RETURN_FALSE;
     }
 
-    zval *retval_ptr = NULL;
-    ALLOC_INIT_ZVAL(retval_ptr);
-    zend_call_method( NULL, *ce_pattern_compiler, NULL, "compile", strlen("compile"), &retval_ptr, 1, z_pattern, NULL TSRMLS_CC );
+    zval *rv = NULL;
+    zend_call_method( NULL, *ce_pattern_compiler, NULL, "compile", strlen("compile"), &rv, 1, z_pattern, NULL TSRMLS_CC );
 
-    if ( retval_ptr == NULL || Z_TYPE_P(retval_ptr) == IS_NULL ) {
+    if ( rv == NULL || Z_TYPE_P(rv) == IS_NULL ) {
         zend_throw_exception(ce_pux_exception, "Can not compile route pattern", 0 TSRMLS_CC);
         RETURN_FALSE;
     }
-    add_next_index_zval(z_routes, retval_ptr);
+    add_next_index_zval(z_routes, rv);
 }
 
 
@@ -911,7 +897,7 @@ PHP_METHOD(Mux, add) {
     char *found = find_place_holder(pattern, pattern_len);
 
 
-    zval *z_routes;
+    zval *z_routes = NULL;
 
     if ( z_options == NULL ) {
         ALLOC_INIT_ZVAL(z_options);
