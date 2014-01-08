@@ -230,6 +230,16 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
         $submux->add('/foo', [ 'HelloController','indexAction' ]);
         $mux->mount( '/sub' , $submux);
+    }
+
+    public function testMuxMountNoExpandAndDispatch() {
+        $mux = new \Pux\Mux;
+        $mux->expandSubMux = false;
+        ok($mux);
+        $submux = new \Pux\Mux;
+        $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
+        $submux->add('/foo', [ 'HelloController','indexAction' ]);
+        $mux->mount( '/sub' , $submux);
 
         $submux2 = $mux->getSubMux($submux->getId());
         ok($submux2);
