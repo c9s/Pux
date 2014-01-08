@@ -504,7 +504,6 @@ PHP_METHOD(Mux, export) {
 
 PHP_METHOD(Mux, getId) {
     zval *z_id;
-    zval *z_counter;
     long counter = 0;
 
     z_id = zend_read_property( Z_OBJCE_P(this_ptr) , getThis(), "id", sizeof("id")-1, 1 TSRMLS_CC);
@@ -560,29 +559,27 @@ PHP_METHOD(Mux, compile) {
         RETURN_FALSE;
     }
 
-    zend_class_entry **ce = NULL;
     zval *z_routes;
-
-    z_routes = zend_read_property( Z_OBJCE_P(this_ptr) , this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    z_routes = zend_read_property(pux_ce_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
     Z_SET_ISREF_P(z_routes);
 
     // duplicated code to sort method
-    zval *retval_ptr = NULL;
-    ALLOC_INIT_ZVAL(retval_ptr);
+    zval *z_retval = NULL;
+    ALLOC_INIT_ZVAL(z_retval);
 
     zval *z_sort_callback = NULL;
     ALLOC_INIT_ZVAL(z_sort_callback);
     ZVAL_STRING( z_sort_callback, "pux_sort_routes" , 1 );
 
-    zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
+    zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &z_retval, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
 
-    if ( Z_BVAL_P(retval_ptr) == 0 ) {
+    if ( Z_BVAL_P(z_retval) == 0 ) {
         php_error(E_ERROR,"route sort failed.");
     }
     zval_ptr_dtor(&z_sort_callback); // recycle sort callback zval
-    zval_ptr_dtor(&retval_ptr); // recycle sort callback zval
+    zval_ptr_dtor(&z_retval); // recycle sort callback zval
 
     // zend_update_property(pux_ce_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
 
@@ -591,7 +588,7 @@ PHP_METHOD(Mux, compile) {
 
     // get export method function entry
     zend_function *fe_export;
-    if ( zend_hash_find( &Z_OBJCE_P(this_ptr)->function_table, "export",    sizeof("export"),    (void **) &fe_export) == FAILURE ) {
+    if ( zend_hash_find( &Z_OBJCE_P(this_ptr)->function_table, "export", sizeof("export"),  (void **) &fe_export) == FAILURE ) {
         php_error(E_ERROR, "export method not found");
     }
 
@@ -601,7 +598,7 @@ PHP_METHOD(Mux, compile) {
     zend_call_method( &this_ptr, Z_OBJCE_P(this_ptr) , &fe_export, "export", strlen("export"), &compiled_code, 0, NULL, NULL TSRMLS_CC );
 
 
-    if ( Z_TYPE_P(compiled_code) == IS_NULL ) {
+    if ( compiled_code == NULL || Z_TYPE_P(compiled_code) == IS_NULL ) {
         php_error(E_ERROR, "Can not compile routes.");
     }
 
@@ -816,7 +813,6 @@ PHP_METHOD(Mux, appendRoute) {
     int  pattern_len;
     zval *z_callback;
     zval *z_options;
-    zend_class_entry **ce = NULL;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa|a", &pattern, &pattern_len, &z_callback, &z_options) == FAILURE) {
         RETURN_FALSE;
     }
@@ -850,7 +846,6 @@ PHP_METHOD(Mux, appendPCRERoute) {
     int  pattern_len;
     zval *z_callback;
     zval *z_options;
-    zend_class_entry **ce = NULL;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa|a", &pattern, &pattern_len, &z_callback, &z_options) == FAILURE) {
         RETURN_FALSE;
     }
@@ -858,8 +853,7 @@ PHP_METHOD(Mux, appendPCRERoute) {
     if ( z_options == NULL ) {
         ALLOC_INIT_ZVAL(z_options);
         array_init(z_options);
-    }
-    if ( Z_TYPE_P(z_options) == IS_NULL ) {
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
         array_init(z_options);
     }
 

@@ -14,7 +14,7 @@
 #include "php_pux.h"
 #include "pux_functions.h"
 
-static zend_class_entry *pux_ce_mux;
+extern zend_class_entry *pux_ce_mux;
 
 void pux_init_mux(TSRMLS_D);
 

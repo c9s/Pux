@@ -77,9 +77,9 @@ PHP_FUNCTION(pux_sort_routes)
 
         int a_len = Z_STRLEN_PP(a_compiled_pattern);
         int b_len = Z_STRLEN_PP(b_compiled_pattern);
-        if ( a == b ) {
+        if ( a_len == b_len ) {
             RETURN_LONG(0);
-        } else if ( a > b ) {
+        } else if ( a_len > b_len ) {
             RETURN_LONG(-1);
         } else {
             RETURN_LONG(1);
@@ -183,8 +183,6 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
             } else if ( Z_TYPE_P(z_subpats) == IS_NULL ) {
                 array_init(z_subpats);
             }
-
-            HashTable *subpats_hash = Z_ARRVAL_P(z_subpats);
 
             zval_ptr_dtor(&pcre_ret);
             // zval_copy_ctor(pcre_ret);
