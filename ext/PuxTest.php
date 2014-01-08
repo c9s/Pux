@@ -60,6 +60,12 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         $mux->add('/hello/:name', ['IndexController', 'indexAction']);
     }
 
+    public function testMuxId() {
+        $mux = new Mux;
+        $mux->add('/hello/:name', ['IndexController', 'indexAction']);
+        ok($mux->getId());
+    }
+
     public function testMethodDispatch() {
         $routes = array(
             array(
@@ -247,6 +253,7 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         $r = $mux->dispatch('/sub/hello/John');
         ok($r);
         $this->assertPcreRoute($r, '/hello/:name');
+        return;
 
         $r = $mux->dispatch('/sub/foo');
         $this->assertNonPcreRoute($r, '/foo');
