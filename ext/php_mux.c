@@ -15,6 +15,7 @@
 #include "pux_functions.h"
 #include "php_mux.h"
 
+zend_class_entry *pux_ce_mux;
 
 const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)

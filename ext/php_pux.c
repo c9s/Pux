@@ -18,6 +18,8 @@
 #include "pux_functions.h"
 #include "php_mux.h"
 
+zend_class_entry *ce_pux_exception;
+
 // #define DEBUG 1
 static const zend_function_entry pux_functions[] = {
     PHP_FE(pux_match, NULL)

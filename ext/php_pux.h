@@ -56,7 +56,7 @@ zval * call_mux_method(zval * object , char * method_name , int method_name_len,
 
 zend_class_entry ** get_pattern_compiler_ce(TSRMLS_DC);
 
-static zend_class_entry *ce_pux_exception;
+extern zend_class_entry *ce_pux_exception;
 
 extern zend_module_entry pux_module_entry;
 
