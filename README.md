@@ -137,6 +137,32 @@ Environment:
 - Apache 2.2 + prefork worker
 - PHP 5.5.6
 
+
+### Pure PHP Dispatch
+
+    n=10000
+    Runing pux extension (dispatch) - . 89431.933031126/s
+    Runing symfony/routing (dispatch) - . 2217.4281875493/s
+    
+                                    Rate   Mem pux extension (dispatch) symfony/routing (dispatch)
+      pux extension (dispatch)  89.43K/s    0B                       --                        -2%
+    symfony/routing (dispatch)   2.22K/s  524K                    4033%                         --
+    
+    
+    ================================== Bar Chart ==================================
+    
+        pux extension (dispatch)  89.43K/s | ████████████████████████████████████████████████████████████  |
+      symfony/routing (dispatch)   2.22K/s | █                                                             |
+    
+    
+    ============================== System Information ==============================
+    
+    PHP Version: 5.5.6
+    CPU Brand String: Intel(R) Core(TM) i5-3427U CPU @ 1.80GHz
+
+### Through Apache
+
+
 Prefork configuration:
 
     StartServers          2
