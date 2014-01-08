@@ -31,7 +31,7 @@ PHP_FUNCTION(pux_match)
     if ( z_route != NULL ) {
         *return_value = *z_route;
         zval_copy_ctor(return_value);
-        zval_ptr_dtor(&z_route);
+        // zval_ptr_dtor(&z_route);
         return;
     }
     RETURN_NULL();
@@ -184,7 +184,7 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
                 array_init(z_subpats);
             }
 
-            zval_ptr_dtor(&pcre_ret);
+            // zval_ptr_dtor(&pcre_ret);
             // zval_copy_ctor(pcre_ret);
             // Apply "default" value to "vars"
             /*

@@ -151,7 +151,7 @@ PHP_METHOD(Mux, __set_state) {
     zend_update_property(ce_pux_mux, new_object, "submux", sizeof("submux")-1, *z_submux TSRMLS_CC);
     zend_update_property(ce_pux_mux, new_object, "expandSubMux", sizeof("expandSubMux")-1, *z_expandSubMux TSRMLS_CC);
     *return_value = *new_object;
-    zval_ptr_dtor(&z_array);
+    // zval_ptr_dtor(&z_array);
 }
 
 
@@ -188,7 +188,7 @@ PHP_METHOD(Mux, get) {
     zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
     *return_value = *z_retval;
     zval_copy_ctor(return_value);
-    zval_ptr_dtor(&z_retval);
+    // zval_ptr_dtor(&z_retval);
 }
 
 
@@ -212,7 +212,7 @@ PHP_METHOD(Mux, post) {
     zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
     *return_value = *z_retval;
     zval_copy_ctor(return_value);
-    zval_ptr_dtor(&z_retval);
+    // zval_ptr_dtor(&z_retval);
 }
 
 PHP_METHOD(Mux, put) {
@@ -233,7 +233,7 @@ PHP_METHOD(Mux, put) {
     zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
     *return_value = *z_retval;
     zval_copy_ctor(return_value);
-    zval_ptr_dtor(&z_retval);
+    // zval_ptr_dtor(&z_retval);
 }
 
 PHP_METHOD(Mux, delete) {
@@ -254,7 +254,7 @@ PHP_METHOD(Mux, delete) {
     zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
     *return_value = *z_retval;
     zval_copy_ctor(return_value);
-    zval_ptr_dtor(&z_retval);
+    // zval_ptr_dtor(&z_retval);
 }
 
 
@@ -456,9 +456,9 @@ PHP_METHOD(Mux, mount) {
         add_index_zval( z_submux_array, Z_LVAL_P(z_mux_id) , z_mux);
 
         // release zvals
-        zval_ptr_dtor(&z_retval);
-        zval_ptr_dtor(&z_mux_id);
-        zval_ptr_dtor(&z_pattern);
+        // zval_ptr_dtor(&z_retval);
+        // zval_ptr_dtor(&z_mux_id);
+        // zval_ptr_dtor(&z_pattern);
     }
 }
 
@@ -499,8 +499,8 @@ PHP_METHOD(Mux, export) {
 
     *return_value = *retval_ptr;
     zval_copy_ctor(return_value);
-    zval_ptr_dtor(&should_return);
-    zval_ptr_dtor(&retval_ptr);
+    // zval_ptr_dtor(&should_return);
+    // zval_ptr_dtor(&retval_ptr);
 }
 
 PHP_METHOD(Mux, getId) {
@@ -520,7 +520,7 @@ PHP_METHOD(Mux, getId) {
     counter = Z_LVAL_P(retval_ptr);
     zend_update_property_long(Z_OBJCE_P(this_ptr), this_ptr, "id" , sizeof("id") - 1, counter TSRMLS_CC);
 
-    zval_ptr_dtor(&retval_ptr);
+    // zval_ptr_dtor(&retval_ptr);
     RETURN_LONG(counter);
 }
 
@@ -549,8 +549,8 @@ PHP_METHOD(Mux, sort) {
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
 
-    zval_ptr_dtor(&retval_ptr);
-    zval_ptr_dtor(&z_sort_callback);
+    // zval_ptr_dtor(&retval_ptr);
+    // zval_ptr_dtor(&z_sort_callback);
 }
 
 PHP_METHOD(Mux, compile) {
@@ -769,10 +769,9 @@ PHP_METHOD(Mux, dispatch) {
             *return_value = *z_retval;
             zval_copy_ctor(return_value);
 
-            zval_ptr_dtor(&z_retval);
             zval_ptr_dtor(&z_path);
             zval_ptr_dtor(&z_pattern_len);
-            zval_ptr_dtor(&z_substr);
+            // zval_ptr_dtor(&z_substr);
             return;
 
         }
@@ -940,7 +939,7 @@ PHP_METHOD(Mux, add) {
         add_index_zval(z_new_routes, 2 , z_callback);
         add_index_zval(z_new_routes, 3, z_compiled_route);
         add_next_index_zval(z_routes, z_new_routes);
-        zval_ptr_dtor(&z_pattern);
+        // zval_ptr_dtor(&z_pattern);
 
     } else {
         Z_ADDREF_P(z_options); // reference it so it will not be recycled.
