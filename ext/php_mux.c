@@ -880,9 +880,6 @@ PHP_METHOD(Mux, add) {
     // $pcre = strpos($pattern,':') !== false;
     char *found = find_place_holder(pattern, pattern_len);
 
-    zval *z_pattern = NULL;
-    ALLOC_INIT_ZVAL(z_pattern);
-    ZVAL_STRINGL(z_pattern, pattern, pattern_len, 1);
 
     zval *z_routes;
 
@@ -899,6 +896,10 @@ PHP_METHOD(Mux, add) {
 
     // PCRE pattern here
     if ( found ) {
+        zval *z_pattern = NULL;
+        ALLOC_INIT_ZVAL(z_pattern);
+        ZVAL_STRINGL(z_pattern, pattern, pattern_len, 1);
+
         zval *z_compiled_route = compile_route_pattern(z_pattern, z_options, NULL TSRMLS_CC);
         if ( z_compiled_route == NULL ) {
             RETURN_FALSE;
@@ -914,7 +915,6 @@ PHP_METHOD(Mux, add) {
         // Z_ADDREF_PP(z_compiled_route_pattern);
         //zval_ptr_dtor(&z_options);
         //zval_ptr_dtor(&z_pattern);
-        Z_ADDREF_P(z_options); // reference it so it will not be recycled.
         Z_ADDREF_P(z_callback);
 
         zval *z_new_routes;
@@ -927,8 +927,7 @@ PHP_METHOD(Mux, add) {
         // add_index_zval(z_new_routes, 3, z_options);
         add_index_zval(z_new_routes, 3, z_compiled_route);
         add_next_index_zval(z_routes, z_new_routes);
-
-
+        zval_ptr_dtor(&z_pattern);
 
     } else {
         Z_ADDREF_P(z_options); // reference it so it will not be recycled.
@@ -938,15 +937,12 @@ PHP_METHOD(Mux, add) {
         ALLOC_INIT_ZVAL(z_new_routes);
         array_init(z_new_routes);
 
-
         /* make the array: [ pcreFlag, pattern, callback, options ] */
         add_index_bool(z_new_routes, 0 , 0); // pcre flag == false
-        add_index_stringl( z_new_routes, 1 , pattern , pattern_len, 1);
+        add_index_stringl( z_new_routes, 1 , pattern, pattern_len , 1 );
         add_index_zval( z_new_routes, 2 , z_callback);
         add_index_zval( z_new_routes, 3 , z_options);
         add_next_index_zval(z_routes, z_new_routes);
-        //zval_ptr_dtor(&z_pattern);
-
     }
 }
 
