@@ -896,8 +896,6 @@ PHP_METHOD(Mux, add) {
 
     z_routes = zend_read_property( Z_OBJCE_P(getThis()), getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
-    Z_ADDREF_P(z_callback);
-    Z_ADDREF_P(z_options); // reference it so it will not be recycled.
 
     // PCRE pattern here
     if ( found ) {
@@ -914,7 +912,10 @@ PHP_METHOD(Mux, add) {
 
         // Z_ADDREF_P(z_compiled_route);
         // Z_ADDREF_PP(z_compiled_route_pattern);
-        // zval_copy_ctor(z_compiled_route);
+        //zval_ptr_dtor(&z_options);
+        //zval_ptr_dtor(&z_pattern);
+        Z_ADDREF_P(z_options); // reference it so it will not be recycled.
+        Z_ADDREF_P(z_callback);
 
         zval *z_new_routes;
         ALLOC_INIT_ZVAL(z_new_routes);
@@ -930,6 +931,8 @@ PHP_METHOD(Mux, add) {
 
 
     } else {
+        Z_ADDREF_P(z_options); // reference it so it will not be recycled.
+        Z_ADDREF_P(z_callback);
 
         zval *z_new_routes;
         ALLOC_INIT_ZVAL(z_new_routes);
@@ -942,6 +945,8 @@ PHP_METHOD(Mux, add) {
         add_index_zval( z_new_routes, 2 , z_callback);
         add_index_zval( z_new_routes, 3 , z_options);
         add_next_index_zval(z_routes, z_new_routes);
+        //zval_ptr_dtor(&z_pattern);
+
     }
 }
 
