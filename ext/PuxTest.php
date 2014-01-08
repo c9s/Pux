@@ -139,18 +139,29 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok(is_integer($id), "got mux ID $id");
     }
 
-    public function testMuxGetId() {
+    public function testMuxGetId() 
+    {
         $mux = new \Pux\Mux;
         $id = $mux->getId();
         ok( is_integer($id) );
         is( $id , $mux->getId() );
     }
 
-    public function testMuxRouteFound() {
+    public function testMuxStringMatchRouteFound() 
+    {
         $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product', [ 'ProductController','listAction' ]);
         $route = $mux->matchRoute("/product");
+        ok($route);
+    }
+
+    public function testMuxPcreMatchRouteFound() 
+    {
+        $mux = new \Pux\Mux;
+        ok($mux);
+        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
+        $route = $mux->matchRoute("/product/30");
         ok($route);
     }
 
@@ -238,22 +249,29 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         $mux->mount( '/sub' , $submux);
     }
 
-    public function testMuxMountNoExpandAndDispatch() {
+    public function testMuxMountNoExpandAndDispatchToSubMux() 
+    {
         $mux = new \Pux\Mux;
         $mux->expandSubMux = false;
         ok($mux);
+
         $submux = new \Pux\Mux;
         $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
         $submux->add('/foo', [ 'HelloController','indexAction' ]);
         $mux->mount( '/sub' , $submux);
 
+        ok($submux, 'submux');
+        ok($submux->getRoutes(), 'submux routes');
+
+        ok($mux->getRoutes(), 'mux routes');
+
         $submux2 = $mux->getSubMux($submux->getId());
-        ok($submux2);
+        ok($submux2, 'submux2');
+        ok($submux2->getRoutes(), 'submux2 routes');
 
         $r = $mux->dispatch('/sub/hello/John');
         ok($r);
         $this->assertPcreRoute($r, '/hello/:name');
-        return;
 
         $r = $mux->dispatch('/sub/foo');
         $this->assertNonPcreRoute($r, '/foo');
