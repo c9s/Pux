@@ -687,11 +687,10 @@ PHP_METHOD(Mux, dispatch) {
     zval **z_callback;
     zval **z_options;
 
-    HashTable *hash_return_route = Z_ARRVAL_P(z_return_route);
-    zend_hash_index_find( hash_return_route , 0 , (void**) &z_pcre );
-    zend_hash_index_find( hash_return_route , 1 , (void**) &z_pattern );
-    zend_hash_index_find( hash_return_route , 2 , (void**) &z_callback );
-    zend_hash_index_find( hash_return_route , 3 , (void**) &z_options );
+    zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 0 , (void**) &z_pcre );
+    zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 1 , (void**) &z_pattern );
+    zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 2 , (void**) &z_callback );
+    zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 3 , (void**) &z_options );
 
     // dispatch to submux if the callback is an ID.
     if ( Z_TYPE_PP(z_callback) == IS_LONG ) {
