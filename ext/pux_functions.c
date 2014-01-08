@@ -113,15 +113,15 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
 
     current_request_method = get_current_request_method(TSRMLS_CC);
 
-    HashPosition route_pointer;
+    HashPosition z_routes_pointer;
     HashTable    *z_routes_hash;
 
     z_routes_hash = Z_ARRVAL_P(z_routes);
 
     // for iterating routes
-    zval **z_route;
+    zval **z_route_pp;
 
-    HashTable *route_item_hash;
+    HashTable *z_route_item_hash;
 
     zval **z_is_pcre_pp; // route[0]
     zval **z_pattern_pp; // route[1]
@@ -131,20 +131,20 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
 
     zval **z_route_method;
 
-    for(zend_hash_internal_pointer_reset_ex(z_routes_hash, &route_pointer); 
-            zend_hash_get_current_data_ex(z_routes_hash, (void**) &z_route, &route_pointer) == SUCCESS; 
-            zend_hash_move_forward_ex(z_routes_hash, &route_pointer)) 
+    for(zend_hash_internal_pointer_reset_ex(z_routes_hash, &z_routes_pointer); 
+            zend_hash_get_current_data_ex(z_routes_hash, (void**) &z_route_pp, &z_routes_pointer) == SUCCESS; 
+            zend_hash_move_forward_ex(z_routes_hash, &z_routes_pointer)) 
     {
         // read z_route
-        route_item_hash = Z_ARRVAL_PP(z_route);
+        z_route_item_hash = Z_ARRVAL_PP(z_route_pp);
 
-        if ( zend_hash_index_find( route_item_hash, 0, (void**) &z_is_pcre_pp) == FAILURE ) {
+        if ( zend_hash_index_find( z_route_item_hash, 0, (void**) &z_is_pcre_pp) == FAILURE ) {
             continue;
         }
-        if ( zend_hash_index_find( route_item_hash, 1, (void**) &z_pattern_pp) == FAILURE ) {
+        if ( zend_hash_index_find( z_route_item_hash, 1, (void**) &z_pattern_pp) == FAILURE ) {
             continue;
         }
-        if ( zend_hash_index_find( route_item_hash, 3, (void**) &z_route_options_pp) == FAILURE ) {
+        if ( zend_hash_index_find( z_route_item_hash, 3, (void**) &z_route_options_pp) == FAILURE ) {
             continue;
         }
 
@@ -219,13 +219,13 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
             Z_ADDREF_P(z_subpats);
             add_assoc_zval(*z_route_options_pp , "vars" , z_subpats);
             // zval_copy_ctor(*z_route_options_pp);
-            // zval_copy_ctor(*z_route);
-            return *z_route;
+            // zval_copy_ctor(*z_route_pp);
+            return *z_route_pp;
         } else {
             // normal string comparison
             // pattern-prefix match
             if ( strncmp(Z_STRVAL_PP( z_pattern_pp ), path, Z_STRLEN_PP( z_pattern_pp )) == 0 ) {
-                return *z_route;
+                return *z_route_pp;
             }
         }
     }
