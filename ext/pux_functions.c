@@ -184,8 +184,7 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
                 array_init(z_subpats);
             }
 
-            // zval_ptr_dtor(&pcre_ret);
-            // zval_copy_ctor(pcre_ret);
+            zval_ptr_dtor(&pcre_ret);
             // Apply "default" value to "vars"
             /*
                 foreach( $route['variables'] as $k ) {
@@ -227,7 +226,7 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
             }
         }
     }
-    // zval_ptr_dtor(&*z_pattern_pp);
+    // zval_ptr_dtor(z_pattern_pp);
     return NULL;
 }
 

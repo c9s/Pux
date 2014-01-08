@@ -277,7 +277,7 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         $this->assertNonPcreRoute($r, '/foo');
     }
 
-    public function testMuxMountPcreRoutes() {
+    public function testSubmuxPcreRouteNotFound() {
         $mux = new \Pux\Mux;
         ok($mux);
         is(0, $mux->length());
@@ -288,9 +288,25 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok($routes = $submux->getRoutes());
         is(1, $submux->length());
         is(0, $mux->length());
-
         $mux->mount( '/sub' , $submux);
 
+        ok( ! $mux->dispatch('/sub/foo') );
+        ok( ! $mux->dispatch('/sub/hello') );
+        ok( ! $mux->dispatch('/foo') );
+    }
+
+    public function testSubmuxPcreRouteFound() {
+        $mux = new \Pux\Mux;
+        ok($mux);
+        is(0, $mux->length());
+
+        $submux = new \Pux\Mux;
+        $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
+        ok($submux);
+        ok($routes = $submux->getRoutes());
+        is(1, $submux->length());
+        is(0, $mux->length());
+        $mux->mount( '/sub' , $submux);
         $r = $mux->dispatch('/sub/hello/John');
         ok($r);
         $this->assertPcreRoute($r, '/sub/hello/:name');
