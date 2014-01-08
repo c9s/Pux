@@ -28,7 +28,7 @@ static const zend_function_entry pux_functions[] = {
 void pux_init_exception(TSRMLS_D) {
   zend_class_entry e;
   INIT_CLASS_ENTRY(e, "PuxException", NULL);
-  pux_ce_exception = zend_register_internal_class_ex(&e, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+  ce_pux_exception = zend_register_internal_class_ex(&e, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
 }
 
 zend_module_entry pux_module_entry = {

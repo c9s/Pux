@@ -18,6 +18,9 @@ static zend_class_entry *pux_ce_mux;
 
 void pux_init_mux(TSRMLS_D);
 
+zend_class_entry ** get_pattern_compiler_ce(TSRMLS_DC);
+zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry **ce_pattern_compiler TSRMLS_DC);
+
 
 PHP_METHOD(Mux, __construct);
 PHP_METHOD(Mux, getId);
@@ -43,6 +46,7 @@ PHP_METHOD(Mux, __set_state);
 
 // static method
 PHP_METHOD(Mux, generate_id);
+
 
 
 #endif

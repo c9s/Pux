@@ -98,3 +98,12 @@ ZEND_API zval* zend_call_method_with_3_params(zval **object_pp, zend_class_entry
 }
 /* }}} */
 
+
+char * find_place_holder(char *pattern, int pattern_len) {
+    char  needle_char[2] = { ':', 0 };
+    return php_memnstr(pattern,
+                        needle_char,
+                        1,
+                        pattern + pattern_len);
+}
+
