@@ -1,6 +1,17 @@
 #ifndef PHP_PUX_H
 #define PHP_PUX_H 1
 
+#include "php.h"
+#include "string.h"
+#include "main/php_main.h"
+#include "Zend/zend_API.h"
+#include "Zend/zend_variables.h"
+#include "zend_exceptions.h"
+#include "zend_interfaces.h"
+#include "zend_object_handlers.h"
+#include "ext/pcre/php_pcre.h"
+#include "ext/standard/php_string.h"
+
 #define PHP_PUX_VERSION "1.1.2"
 #define PHP_PUX_EXTNAME "pux"
 
@@ -37,34 +48,6 @@
   CALL_METHOD_HELPER(classname, name, retval, thisptr, 3, param3);     \
   POP_PARAM(); POP_PARAM();
 
-
-void pux_init_mux(TSRMLS_D);
- 
-PHP_METHOD(Mux, __construct);
-PHP_METHOD(Mux, getId);
-PHP_METHOD(Mux, add);
-PHP_METHOD(Mux, length);
-PHP_METHOD(Mux, compile);
-PHP_METHOD(Mux, sort);
-PHP_METHOD(Mux, appendRoute);
-PHP_METHOD(Mux, appendPCRERoute);
-PHP_METHOD(Mux, getRoutes);
-PHP_METHOD(Mux, matchRoute);
-PHP_METHOD(Mux, dispatch);
-PHP_METHOD(Mux, getSubMux);
-PHP_METHOD(Mux, export);
-PHP_METHOD(Mux, mount);
-
-PHP_METHOD(Mux, get);
-PHP_METHOD(Mux, post);
-PHP_METHOD(Mux, put);
-PHP_METHOD(Mux, delete);
-
-PHP_METHOD(Mux, __set_state);
-
-// static method
-PHP_METHOD(Mux, generate_id);
-
 PHP_MINIT_FUNCTION(pux);
 
 zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
@@ -73,7 +56,12 @@ zval * call_mux_method(zval * object , char * method_name , int method_name_len,
 
 zend_class_entry ** get_pattern_compiler_ce(TSRMLS_DC);
 
+static zend_class_entry *pux_ce_exception;
+
 extern zend_module_entry pux_module_entry;
+
+void pux_init_exception(TSRMLS_D);
+
 #define phpext_pux_ptr &pux_module_entry
 
 #endif
