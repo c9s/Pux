@@ -60,11 +60,11 @@ void pux_init_mux(TSRMLS_D) {
 zend_class_entry ** get_pattern_compiler_ce(TSRMLS_DC) {
     zend_class_entry **ce_pattern_compiler = NULL;
     if ( zend_lookup_class( "Pux\\PatternCompiler", strlen("Pux\\PatternCompiler") , &ce_pattern_compiler TSRMLS_CC) == FAILURE ) {
-        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Pux\\PatternCompiler does not exist.", 0 TSRMLS_CC);
+        php_error(E_ERROR, "Class Pux\\PatternCompiler not found.");
         return NULL;
     }
     if ( ce_pattern_compiler == NULL || *ce_pattern_compiler == NULL ) {
-        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Class Pux\\PatternCompiler does not exist.", 0 TSRMLS_CC);
+        php_error(E_ERROR, "Class Pux\\PatternCompiler not found.");
         return NULL;
     }
     return ce_pattern_compiler;
