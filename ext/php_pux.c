@@ -15,13 +15,13 @@
 
 #include "php_pux.h"
 #include "ct_helper.h"
-#include "pux_functions.h"
+#include "php_functions.h"
 #include "php_mux.h"
 
 zend_class_entry *ce_pux_exception;
 
 // #define DEBUG 1
-static const zend_function_entry pux_functions[] = {
+static const zend_function_entry php_functions[] = {
     PHP_FE(pux_match, NULL)
     PHP_FE(pux_sort_routes, NULL)
     PHP_FE_END
@@ -36,7 +36,7 @@ void pux_init_exception(TSRMLS_D) {
 zend_module_entry pux_module_entry = {
     STANDARD_MODULE_HEADER,
     PHP_PUX_EXTNAME,
-    pux_functions,
+    php_functions,
     PHP_MINIT(pux),
     NULL,
     NULL,

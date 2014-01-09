@@ -12,7 +12,7 @@
 
 #include "php_pux.h"
 #include "ct_helper.h"
-#include "pux_functions.h"
+#include "php_functions.h"
 #include "php_mux.h"
 
 zend_class_entry *ce_pux_mux;
@@ -926,9 +926,6 @@ PHP_METHOD(Mux, add) {
             zend_throw_exception(ce_pux_exception, "Unable to find compiled pattern.", 0 TSRMLS_CC);
             RETURN_FALSE;
         }
-
-        // Z_ADDREF_P(z_compiled_route);
-        // Z_ADDREF_PP(z_compiled_route_pattern);
         Z_ADDREF_P(z_callback);
 
         zval *z_new_routes;
@@ -940,7 +937,6 @@ PHP_METHOD(Mux, add) {
         add_index_zval(z_new_routes, 2 , z_callback);
         add_index_zval(z_new_routes, 3, z_compiled_route);
         add_next_index_zval(z_routes, z_new_routes);
-        // zval_ptr_dtor(&z_pattern);
 
     } else {
         Z_ADDREF_P(z_options); // reference it so it will not be recycled.

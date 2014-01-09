@@ -12,7 +12,7 @@
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
 #include "php_pux.h"
-#include "pux_functions.h"
+#include "php_functions.h"
 
 extern zend_class_entry *ce_pux_mux;
 
