@@ -146,18 +146,18 @@ Environment:
 With one static route:
 
     n=10000
-    Runing pux extension (dispatch) - . 195985.44000075/s
-    Runing symfony/routing (dispatch) - . 2452.7544207636/s
+    Runing pux extension (dispatch) - . 97487.768426386/s
+    Runing symfony/routing (dispatch) - . 2456.3512428418/s
     
                                     Rate   Mem pux extension (dispatch) symfony/routing (dispatch)
-      pux extension (dispatch) 195.99K/s    0B                       --                        -1%
-    symfony/routing (dispatch)   2.45K/s  524K                    7990%                         --
+      pux extension (dispatch)  97.49K/s    0B                       --                        -2%
+    symfony/routing (dispatch)   2.46K/s  524K                    3968%                         --
     
     
     ================================== Bar Chart ==================================
     
-        pux extension (dispatch) 195.99K/s | ████████████████████████████████████████████████████████████  |
-      symfony/routing (dispatch)   2.45K/s |                                                               |
+        pux extension (dispatch)  97.49K/s | ████████████████████████████████████████████████████████████  |
+      symfony/routing (dispatch)   2.46K/s | █                                                             |
     
     
     ============================== System Information ==============================
