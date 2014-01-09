@@ -143,19 +143,45 @@ Environment:
 
 ### Pure PHP Dispatch
 
+With one static route:
+
     n=10000
-    Runing pux extension (dispatch) - . 89431.933031126/s
-    Runing symfony/routing (dispatch) - . 2217.4281875493/s
+    Runing pux extension (dispatch) - . 195985.44000075/s
+    Runing symfony/routing (dispatch) - . 2452.7544207636/s
     
                                     Rate   Mem pux extension (dispatch) symfony/routing (dispatch)
-      pux extension (dispatch)  89.43K/s    0B                       --                        -2%
-    symfony/routing (dispatch)   2.22K/s  524K                    4033%                         --
+      pux extension (dispatch) 195.99K/s    0B                       --                        -1%
+    symfony/routing (dispatch)   2.45K/s  524K                    7990%                         --
     
     
     ================================== Bar Chart ==================================
     
-        pux extension (dispatch)  89.43K/s | ████████████████████████████████████████████████████████████  |
-      symfony/routing (dispatch)   2.22K/s | █                                                             |
+        pux extension (dispatch) 195.99K/s | ████████████████████████████████████████████████████████████  |
+      symfony/routing (dispatch)   2.45K/s |                                                               |
+    
+    
+    ============================== System Information ==============================
+    
+    PHP Version: 5.5.6
+    CPU Brand String: Intel(R) Core(TM) i5-3427U CPU @ 1.80GHz
+    
+    With XDebug Extension.
+
+With one pcre route:
+
+    n=5000
+    Runing pux extension (dispatch) - . 68264.888935184/s
+    Runing symfony/routing (dispatch) - . 2245.5539220463/s
+    
+                                    Rate   Mem pux extension (dispatch) symfony/routing (dispatch)
+      pux extension (dispatch)  68.26K/s    3M                       --                        -3%
+    symfony/routing (dispatch)   2.25K/s  786K                    3040%                         --
+    
+    
+    ================================== Bar Chart ==================================
+    
+        pux extension (dispatch)  68.26K/s | ████████████████████████████████████████████████████████████  |
+      symfony/routing (dispatch)   2.25K/s | █                                                             |
     
     
     ============================== System Information ==============================
