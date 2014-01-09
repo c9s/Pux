@@ -126,7 +126,9 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
     // callback @ route[2]
     zval **z_route_options_pp; // route[3]
 
-    zval **z_route_method;
+    zval **z_route_method = NULL;
+    zval **z_route_secure = NULL;
+    zval **z_route_domain = NULL;
 
     pcre_cache_entry *pce;              /* Compiled regular expression */
 
@@ -151,6 +153,13 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
             }
         }
 
+        if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "secure", sizeof("secure"), (void**) &z_route_secure ) == SUCCESS ) {
+            // check HTTPS flag
+        }
+
+        if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "domain", sizeof("domain"), (void**) &z_route_domain ) == SUCCESS ) {
+            // check HTTP_HOST from $_SERVER
+        }
 
         if ( Z_BVAL_PP(z_is_pcre_pp) ) {
             /* Compile regex or get it from cache. */
