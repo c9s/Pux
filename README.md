@@ -93,7 +93,7 @@ Mux is where you define your routes, and you can mount multiple mux to a parent 
 
 ```php
 $mainMux = new Mux;
-$mainMux->expandSubMux = true;
+$mainMux->expand = true;
 
 $pageMux = new Mux;
 $pageMux->add('/page1', [ 'PageController', 'page1' ]);
@@ -107,17 +107,17 @@ foreach( ['/sub/page1', '/sub/page2'] as $p ) {
 }
 ```
 
-The `expandSubMux` option means whether to expand/merge submux routes to the parent mux.
+The `expand` option means whether to expand/merge submux routes to the parent mux.
 
-When expandSubMux is enabled, it improves dispatch performance when you
+When expand is enabled, it improves dispatch performance when you
 have a lot of sub mux to dispatch.
 
 ### Different String Comparison Strategies
 
-When expandSubMux is enabled, the pattern comparison strategy for 
+When expand is enabled, the pattern comparison strategy for 
 strings will match the full string.
 
-When expandSubMux is disabled, the pattern comparison strategy for 
+When expand is disabled, the pattern comparison strategy for 
 strings will match the prefix.
 
 

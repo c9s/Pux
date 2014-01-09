@@ -18,16 +18,16 @@ class Mux
 
 
     /**
-     * When expandSubMux is enabled, all mounted Mux will expand the routes to the parent mux.
+     * When expand is enabled, all mounted Mux will expand the routes to the parent mux.
      * This improves the dispatch performance when you have a lot of sub mux to dispatch.
      *
-     * When expandSubMux is enabled, the pattern comparison strategy for 
+     * When expand is enabled, the pattern comparison strategy for 
      * strings will match the full string.
      *
-     * When expandSubMux is disabled, the pattern comparison strategy for 
+     * When expand is disabled, the pattern comparison strategy for 
      * strings will match the prefix.
      */
-    public $expandSubMux = true;
+    public $expand = true;
 
     public static $id_counter = 0;
 
@@ -58,7 +58,7 @@ class Mux
 
     public function mount($pattern, $mux, $options = array())
     {
-        if ( $this->expandSubMux ) {
+        if ( $this->expand ) {
             // rewrite submux routes
             foreach( $mux->routes as $route ) {
                 // process for pcre
@@ -203,7 +203,7 @@ class Mux
                     continue;
                 }
             } else {
-                if ( $this->expandSubMux ) {
+                if ( $this->expand ) {
                     if ( $path === $route[1] ) {
                         return $route;
                     }
@@ -261,7 +261,7 @@ class Mux
         $mux = new self;
         $mux->routes = $array['routes'];
         $mux->submux = $array['submux'];
-        $mux->expandSubMux = $array['expandSubMux'];
+        $mux->expand = $array['expand'];
         $mux->id = $array['id'];
         return $mux;
     }

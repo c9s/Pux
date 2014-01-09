@@ -249,7 +249,7 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
 
     public function testMuxMountNoExpand() {
         $mux = new \Pux\Mux;
-        $mux->expandSubMux = false;
+        $mux->expand = false;
         ok($mux, "got mux");
         $submux = new \Pux\Mux;
         $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
@@ -260,7 +260,7 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
     public function testMuxMountNoExpandAndDispatchToSubMux() 
     {
         $mux = new \Pux\Mux;
-        $mux->expandSubMux = false;
+        $mux->expand = false;
         ok($mux);
 
         $submux = new \Pux\Mux;

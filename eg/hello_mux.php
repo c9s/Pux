@@ -19,5 +19,5 @@
   array (
   ),
    'id' => NULL,
-   'expandSubMux' => true,
+   'expand' => true,
 )); /* version */

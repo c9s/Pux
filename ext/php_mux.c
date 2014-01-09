@@ -51,7 +51,7 @@ void pux_init_mux(TSRMLS_D) {
     zend_declare_property_null(ce_pux_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(ce_pux_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(ce_pux_mux, "submux", strlen("submux"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_bool(ce_pux_mux, "expandSubMux", strlen("expandSubMux"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_bool(ce_pux_mux, "expand", strlen("expand"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_long(ce_pux_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
 }
 
@@ -134,7 +134,7 @@ PHP_METHOD(Mux, __set_state) {
     zval **z_id;
     zval **z_routes;
     zval **z_submux;
-    zval **z_expandSubMux;
+    zval **z_expand;
 
     if ( zend_hash_find(z_array_hash, "id", sizeof("id"), (void**)&z_id) == FAILURE ) {
         zend_throw_exception(ce_pux_exception, "mux->id load failed.", 0 TSRMLS_CC);
@@ -150,9 +150,9 @@ PHP_METHOD(Mux, __set_state) {
         RETURN_FALSE;
     }
 
-    if ( zend_hash_find(z_array_hash, "expandSubMux", sizeof("expandSubMux"), (void**)&z_expandSubMux) == FAILURE ) {
-        ALLOC_INIT_ZVAL(*z_expandSubMux);
-        ZVAL_BOOL(*z_expandSubMux, 1);
+    if ( zend_hash_find(z_array_hash, "expand", sizeof("expand"), (void**)&z_expand) == FAILURE ) {
+        ALLOC_INIT_ZVAL(*z_expand);
+        ZVAL_BOOL(*z_expand, 1);
     }
 
     zval *new_object;
@@ -164,7 +164,7 @@ PHP_METHOD(Mux, __set_state) {
     zend_update_property(ce_pux_mux, new_object, "id", sizeof("id")-1, *z_id TSRMLS_CC);
     zend_update_property(ce_pux_mux, new_object, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
     zend_update_property(ce_pux_mux, new_object, "submux", sizeof("submux")-1, *z_submux TSRMLS_CC);
-    zend_update_property(ce_pux_mux, new_object, "expandSubMux", sizeof("expandSubMux")-1, *z_expandSubMux TSRMLS_CC);
+    zend_update_property(ce_pux_mux, new_object, "expand", sizeof("expand")-1, *z_expand TSRMLS_CC);
     *return_value = *new_object;
     zval_copy_ctor(return_value);
     zval_ptr_dtor(&z_array);
@@ -308,14 +308,14 @@ PHP_METHOD(Mux, mount) {
     }
 
     zval *z_routes;
-    zval *z_expandSubMux;
+    zval *z_expand;
     zval *z_mux_routes;
 
     z_routes = zend_read_property( ce_pux_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
-    z_expandSubMux = zend_read_property( ce_pux_mux, getThis(), "expandSubMux", sizeof("expandSubMux")-1, 1 TSRMLS_CC);
+    z_expand = zend_read_property( ce_pux_mux, getThis(), "expand", sizeof("expand")-1, 1 TSRMLS_CC);
 
 
-    if ( Z_BVAL_P(z_expandSubMux) ) {
+    if ( Z_BVAL_P(z_expand) ) {
         // fetch routes from $mux
         //
         z_mux_routes = zend_read_property( ce_pux_mux, z_mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
