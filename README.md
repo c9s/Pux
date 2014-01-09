@@ -141,7 +141,7 @@ Environment:
 - PHP 5.5.6
 
 
-### Pure PHP Dispatch
+### Dispatch Speed
 
 With one static route:
 
