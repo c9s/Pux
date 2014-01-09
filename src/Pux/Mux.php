@@ -187,12 +187,10 @@ class Mux
     }
 
     public function match($path) {
-        if ( extension_loaded('pux') ) {
-            return pux_match($this->routes, $path);
+        if ( isset($this->staticRoutes[$path]) ) {
+            return $this->staticRoutes[$path];
         }
-
         $reqmethod = $this->getRequestMethodConstant(@$_SERVER['REQUEST_METHOD']);
-
         foreach( $this->routes as $route ) {
             // validate request method
             if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod ) {
