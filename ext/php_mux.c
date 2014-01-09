@@ -145,33 +145,32 @@ PHP_METHOD(Mux, __set_state) {
     }
 
     if ( zend_hash_find(Z_ARRVAL_P(z_array), "routes", sizeof("routes"), (void**)&z_routes) == FAILURE ) {
-        ALLOC_INIT_ZVAL(*z_routes);
-        array_init(*z_routes);
+        zval *a = NULL;
+        ALLOC_ZVAL(a);
+        array_init(a);
+        z_routes = &a;
     }
 
     if ( zend_hash_find(Z_ARRVAL_P(z_array), "staticRoutes", sizeof("staticRoutes"), (void**)&z_static_routes) == FAILURE ) {
-        ALLOC_INIT_ZVAL(*z_static_routes);
-        array_init(*z_static_routes);
+        // php_error(E_ERROR, "empty staticRoutes");
+        zval *a = NULL;
+        ALLOC_ZVAL(a);
+        array_init(a);
+        z_static_routes = &a;
     }
 
     if ( zend_hash_find(Z_ARRVAL_P(z_array), "submux", sizeof("submux"), (void**)&z_submux) == FAILURE ) {
-        ALLOC_INIT_ZVAL(*z_submux);
-        array_init(*z_submux);
+        zval *a = NULL;
+        ALLOC_ZVAL(a);
+        array_init(a);
+        z_submux = &a;
     }
 
     if ( zend_hash_find(Z_ARRVAL_P(z_array), "expand", sizeof("expand"), (void**)&z_expand) == FAILURE ) {
-        ALLOC_INIT_ZVAL(*z_expand);
-        ZVAL_BOOL(*z_expand, 1);
-    }
-
-    if ( Z_TYPE_PP(z_routes) == IS_NULL ) {
-        array_init(*z_routes);
-    }
-    if ( Z_TYPE_PP(z_static_routes) == IS_NULL ) {
-        array_init(*z_static_routes);
-    }
-    if ( Z_TYPE_PP(z_submux) == IS_NULL ) {
-        array_init(*z_submux);
+        zval *a = NULL;
+        ALLOC_INIT_ZVAL(a);
+        ZVAL_BOOL(a, 0);
+        z_expand = &a;
     }
 
     zval *new_object;

@@ -441,7 +441,29 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         }
     }
 
-
+    public function testNullStaticRoutes() {
+        $mux = Mux::__set_state(array(
+            'id' => NULL,
+            'routes' =>
+            array (
+                0 =>
+                    array (
+                        0 => false,
+                        1 => '/hello',
+                        2 =>
+                        array (
+                            0 => 'HelloController',
+                            1 => 'helloAction',
+                        ),
+                        3 => array (),
+                ),
+            ),
+            'submux' => array(),
+            // 'staticRoutes' => array(),
+            // 'expand' => true,
+        ));
+        ok($mux);
+    }
 
 }
 
