@@ -12,6 +12,8 @@ class Mux
 {
     public $routes = array();
 
+    public $staticRoutes = array();
+
     public $submux = array();
 
     public $id;
@@ -122,13 +124,15 @@ class Mux
                 $routeArgs,
             );
         } else {
-            // generate a simple string route.
-            return $this->routes[] = array(
+            $route = array(
                 false,
                 $pattern,
                 $callback,
                 $options,
             );
+            $this->staticRoutes[$pattern] = $route;
+            // generate a simple string route.
+            return $this->routes[] = $route;
         }
     }
 
