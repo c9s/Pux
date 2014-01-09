@@ -52,6 +52,7 @@ void pux_init_mux(TSRMLS_D) {
     zend_declare_property_null(ce_pux_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(ce_pux_mux, "submux", strlen("submux"), ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_bool(ce_pux_mux, "expand", strlen("expand"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(ce_pux_mux, "staticRoutes", strlen("staticRoutes"), ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_long(ce_pux_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
 }
 
@@ -131,23 +132,24 @@ PHP_METHOD(Mux, __set_state) {
     HashTable *z_array_hash;
     z_array_hash = Z_ARRVAL_P(z_array);
 
-    zval **z_id;
-    zval **z_routes;
-    zval **z_submux;
-    zval **z_expand;
+    zval **z_id = NULL;
+    zval **z_routes = NULL;
+    zval **z_submux = NULL;
+    zval **z_expand = NULL;
 
     if ( zend_hash_find(z_array_hash, "id", sizeof("id"), (void**)&z_id) == FAILURE ) {
         zend_throw_exception(ce_pux_exception, "mux->id load failed.", 0 TSRMLS_CC);
         RETURN_FALSE;
     }
+
     if ( zend_hash_find(z_array_hash, "routes", sizeof("routes"), (void**)&z_routes) == FAILURE ) {
-        zend_throw_exception(ce_pux_exception, "mux->routes load failed.", 0 TSRMLS_CC);
-        RETURN_FALSE;
+        ALLOC_INIT_ZVAL(*z_routes);
+        array_init(*z_routes);
     }
 
     if ( zend_hash_find(z_array_hash, "submux", sizeof("submux"), (void**)&z_submux) == FAILURE ) {
-        zend_throw_exception(ce_pux_exception, "mux->submux load failed.", 0 TSRMLS_CC);
-        RETURN_FALSE;
+        ALLOC_INIT_ZVAL(*z_submux);
+        array_init(*z_submux);
     }
 
     if ( zend_hash_find(z_array_hash, "expand", sizeof("expand"), (void**)&z_expand) == FAILURE ) {
