@@ -29,7 +29,7 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, mount, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, appendRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, appendPCRERoute, NULL, ZEND_ACC_PUBLIC)
-  PHP_ME(Mux, matchRoute, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, match, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getRoutes, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getSubMux, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, export, NULL, ZEND_ACC_PUBLIC)
@@ -788,7 +788,7 @@ PHP_METHOD(Mux, dispatch) {
     return;
 }
 
-PHP_METHOD(Mux, matchRoute) {
+PHP_METHOD(Mux, match) {
     char *path;
     int  path_len;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len) == FAILURE) {

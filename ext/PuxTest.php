@@ -152,7 +152,7 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product', [ 'ProductController','listAction' ]);
-        $route = $mux->matchRoute("/product");
+        $route = $mux->match("/product");
         ok($route);
     }
 
@@ -161,7 +161,7 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
-        $route = $mux->matchRoute("/product/30");
+        $route = $mux->match("/product/30");
         ok($route);
     }
 

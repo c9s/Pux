@@ -182,7 +182,7 @@ class Mux
         }
     }
 
-    public function matchRoute($path) {
+    public function match($path) {
         if ( extension_loaded('pux') ) {
             return pux_match($this->routes, $path);
         }
@@ -221,7 +221,7 @@ class Mux
 
     public function dispatch($path) {
         $path = rtrim($path, '/');
-        if ( $route = $this->matchRoute($path) ) {
+        if ( $route = $this->match($path) ) {
             if ( is_int($route[2]) ) {
                 $submux = $this->submux[ $route[2] ];
 
