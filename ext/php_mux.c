@@ -99,15 +99,18 @@ zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry 
 
 
 PHP_METHOD(Mux, __construct) {
-    zval *z_routes = NULL , *z_submux = NULL;
+    zval *z_routes = NULL , *z_submux = NULL, *z_static_routes = NULL;
 
     ALLOC_INIT_ZVAL(z_routes);
+    ALLOC_INIT_ZVAL(z_static_routes);
     ALLOC_INIT_ZVAL(z_submux);
 
     array_init(z_routes);
+    array_init(z_static_routes);
     array_init(z_submux);
 
     zend_update_property( ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
+    zend_update_property( ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, z_static_routes TSRMLS_CC);
     zend_update_property( ce_pux_mux, this_ptr, "submux", sizeof("submux")-1, z_submux TSRMLS_CC);
 }
 
@@ -906,8 +909,6 @@ PHP_METHOD(Mux, add) {
     char *found = find_place_holder(pattern, pattern_len);
 
 
-    zval *z_routes = NULL;
-
     if ( z_options == NULL ) {
         ALLOC_INIT_ZVAL(z_options);
         array_init(z_options);
@@ -916,7 +917,7 @@ PHP_METHOD(Mux, add) {
         array_init(z_options);
     }
 
-    z_routes = zend_read_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    zval * z_routes = zend_read_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
     // PCRE pattern here
     if ( found ) {
@@ -962,6 +963,11 @@ PHP_METHOD(Mux, add) {
         add_index_zval( z_new_routes, 2 , z_callback);
         add_index_zval( z_new_routes, 3 , z_options);
         add_next_index_zval(z_routes, z_new_routes);
+
+        zval * z_static_routes = zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
+        if ( z_static_routes ) {
+            add_assoc_zval(z_static_routes, pattern, z_new_routes);
+        }
     }
 }
 
