@@ -9,6 +9,143 @@ Pux compiles your routes to plain PHP array for caching, the compiled routes can
 
 With Pux PHP Extension support, you may load and dispatch the routes 1.5~2x faster than pure PHP Pux.
 
+Routing Path Format
+---------------------
+
+    /post
+    /post/:id                  => matches /post/33
+    /post/:id(/:title)         => matches /post/33, /post/33/post%20title
+    /post/:id(\.:format)       => matches /post/33, /post/33.json .. /post/33.xml
+
+Installation
+--------------------
+You can install Pux with composer by defining the following requirement in your composer.json:
+
+    {
+        "require": {
+            "corneltek/pux": "~1.1"
+        }
+    }
+
+To install pux extension to boost the performance:
+
+    git clone https://github.com/c9s/Pux.git
+    cd Pux/ext
+    phpize
+    ./configure
+    make && make install
+
+Then setup your php.ini config to load pux extension:
+
+    extension=pux.so
+
+
+Synopsis
+------------
+
+The routing usage is dead simple:
+
+```php
+require 'vendor/autoload.php'; // use PCRE patterns you need Pux\PatternCompiler class.
+use Pux\Executor;
+
+class ProductController {
+    public function listAction() {
+        return 'product list';
+    }
+    public function itemAction($id) { 
+        return "product $id";
+    }
+}
+$mux = new Pux\Mux;
+$mux->add('/product', ['ProductController','listAction']);
+$mux->add('/product/:id', ['ProductController','itemAction'] , [
+    'require' => [ 'id' => '\d+', ],
+    'default' => [ 'id' => '1', ]
+]);
+$route = $mux->dispatch('/product/1');
+Executor::execute($route);
+```
+
+
+Examples
+--------------------
+
+### Basic Example
+
+```php
+require 'vendor/autoload.php';
+use Pux\Mux;
+use Pux\Executor;
+$mux = new Mux;
+$mux->get('/get', ['HelloController','helloAction']);
+$mux->post('/post', ['HelloController','helloAction']);
+$mux->put('/put', ['HelloController','helloAction']);
+$route = $mux->dispatch( $_SERVER['PATH_INFO'] );
+echo Executor::execute($route);
+```
+
+### Through Compiled Mux
+
+Define your routing definition in `routes.php`:
+
+```php
+require 'vendor/autoload.php';
+use Pux\Mux;
+$mux = new Mux;
+$mux->get('/get', ['HelloController','helloAction']);
+return $mux;
+```
+
+Run pux command to compile your routing definition:
+
+```sh
+pux compile -o mux.php routes.php
+```
+
+Load the mux object from your application code:
+
+```php
+require 'vendor/autoload.php';
+$mux = require 'mux.php';
+$route = $mux->dispatch( $_SERVER['PATH_INFO'] );
+echo Executor::execute($route);
+```
+
+Mux
+-----
+Mux is where you define your routes, and you can mount multiple mux to a parent one.
+
+```php
+$mainMux = new Mux;
+$mainMux->expand = true;
+
+$pageMux = new Mux;
+$pageMux->add('/page1', [ 'PageController', 'page1' ]);
+$pageMux->add('/page2', [ 'PageController', 'page2' ]);
+
+$mainMux->mount('/sub', $pageMux);
+
+foreach( ['/sub/page1', '/sub/page2'] as $p ) {
+    $r = $mainMux->dispatch($p);
+    ok($r, "Matched route for $p");
+}
+```
+
+The `expand` option means whether to expand/merge submux routes to the parent mux.
+
+When expand is enabled, it improves dispatch performance when you
+have a lot of sub mux to dispatch.
+
+### Different String Comparison Strategies
+
+When expand is enabled, the pattern comparison strategy for 
+strings will match the full string.
+
+When expand is disabled, the pattern comparison strategy for 
+strings will match the prefix.
+
+
 
 MuxCompiler
 --------------------
@@ -20,6 +157,7 @@ In your route definition file `hello_routes.php`, you simply return the Mux obje
 // load your composer autoload if it's needed
 // require '../vendor/autoload.php';
 use Pux\Mux;
+use Pux\Executor;
 $mux = new Mux;
 $mux->get('/hello', ['HelloController','helloAction']);
 return $mux;
@@ -63,65 +201,6 @@ routes to cache.
 
 Pux uses indexed array as the data structure for storing route information so it's faster.
 
-
-Synopsis
-------------
-
-The routing usage is dead simple:
-
-```php
-use Pux\Executor;
-
-class ProductController {
-    public function listAction() {
-        return 'product list';
-    }
-    public function itemAction($id) { 
-        return "product $id";
-    }
-}
-$mux = new Pux\Mux;
-$mux->add('/product', ['ProductController','listAction']);
-$mux->add('/product/:id', ['ProductController','itemAction'] , [
-    'require' => [ 'id' => '\d+', ],
-    'default' => [ 'id' => '1', ]
-]);
-$route = $mux->dispatch('/product/1');
-Executor::execute($route);
-```
-
-Mux
------
-Mux is where you define your routes, and you can mount multiple mux to a parent one.
-
-```php
-$mainMux = new Mux;
-$mainMux->expand = true;
-
-$pageMux = new Mux;
-$pageMux->add('/page1', [ 'PageController', 'page1' ]);
-$pageMux->add('/page2', [ 'PageController', 'page2' ]);
-
-$mainMux->mount('/sub', $pageMux);
-
-foreach( ['/sub/page1', '/sub/page2'] as $p ) {
-    $r = $mainMux->dispatch($p);
-    ok($r, "Matched route for $p");
-}
-```
-
-The `expand` option means whether to expand/merge submux routes to the parent mux.
-
-When expand is enabled, it improves dispatch performance when you
-have a lot of sub mux to dispatch.
-
-### Different String Comparison Strategies
-
-When expand is enabled, the pattern comparison strategy for 
-strings will match the full string.
-
-When expand is disabled, the pattern comparison strategy for 
-strings will match the prefix.
 
 
 ## Benchmarks
