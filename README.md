@@ -23,7 +23,7 @@ You can install Pux with composer by defining the following requirement in your 
 
     {
         "require": {
-            "corneltek/pux": "~1.1"
+            "corneltek/pux": "~1.2"
         }
     }
 
