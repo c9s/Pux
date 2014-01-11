@@ -9,6 +9,16 @@ Pux compiles your routes to plain PHP array for caching, the compiled routes can
 
 With Pux PHP Extension support, you may load and dispatch the routes 1.5~2x faster than pure PHP Pux.
 
+
+Features
+--------------------
+
+- Request method condition support.
+- High performance of dispatching routes.
+- Low memory footprint (only 6KB with simple routes and extension installed) .
+- PCRE pattern path support. (Sinatra-style)
+- Zero dependency.
+
 Routing Path Format
 ---------------------
 
