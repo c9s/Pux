@@ -18,6 +18,7 @@
 #include "php_functions.h"
 #include "php_mux.h"
 #include "php_expandable_mux.h"
+#include "php_controller.h"
 
 zend_class_entry *ce_pux_exception;
 
@@ -54,6 +55,7 @@ ZEND_GET_MODULE(pux)
 PHP_MINIT_FUNCTION(pux) {
   pux_init_mux(TSRMLS_C);
   pux_init_expandable_mux(TSRMLS_C);
+  pux_init_controller(TSRMLS_C);
   return SUCCESS;
 }
 

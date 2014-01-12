@@ -13,12 +13,14 @@
 #include "php_pux.h"
 #include "ct_helper.h"
 #include "php_functions.h"
+#include "php_expandable_mux.h"
 #include "php_controller.h"
 
 zend_class_entry *ce_pux_controller;
 
 const zend_function_entry controller_methods[] = {
   PHP_ME(Controller, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+  PHP_ME(Controller, expand, NULL, ZEND_ACC_PUBLIC)
   // PHP_ME(Controller, __destruct,  NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR) 
   PHP_FE_END
 };
@@ -27,6 +29,7 @@ void pux_init_controller(TSRMLS_D) {
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce, "Pux\\Controller", controller_methods);
     ce_pux_controller = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_class_implements(ce_pux_controller TSRMLS_CC, 1, ce_pux_expandable_mux);
 }
 
 PHP_METHOD(Controller, __construct) {
@@ -47,5 +50,8 @@ PHP_METHOD(Controller, __construct) {
     zend_update_property( ce_pux_controller, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, z_static_routes TSRMLS_CC);
     zend_update_property( ce_pux_controller, this_ptr, "subcontroller", sizeof("subcontroller")-1, z_subcontroller TSRMLS_CC);
     */
+}
+
+PHP_METHOD(Controller, expand) {
 }
 
