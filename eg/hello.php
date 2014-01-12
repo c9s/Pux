@@ -1,10 +1,7 @@
 <?php
 // require '../src/Pux/Mux.php';
-
-var_dump( $_SERVER ); 
-
+// var_dump( $_SERVER ); 
 use Pux\Mux;
-
 class HelloController {
     public function helloAction() {
         return 'hello';
