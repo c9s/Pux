@@ -27,7 +27,7 @@ class ProductController
     }
 }
 
-class PuxTest extends PHPUnit_Framework_ExtensionTestCase
+class MuxTest extends PHPUnit_Framework_ExtensionTestCase
 {
 
     public $repeat = 10;
