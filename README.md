@@ -1,6 +1,6 @@
 Pux
 =============
-Pux is an extreme High Performance PHP Router.
+Pux is a high performance PHP router.
 
 Pux is 48.5x faster than symfony router in static route dispatching, 31x faster in regular expression dispatching. (with pux extension installed)
 
