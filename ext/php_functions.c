@@ -107,7 +107,7 @@ PHP_FUNCTION(pux_sort_routes)
 }
 
 
-int validate_request_method(zval **z_route_options_pp, int current_request_method)
+int validate_request_method(zval **z_route_options_pp, int current_request_method TSRMLS_DC)
 {
     zval **z_route_method = NULL;
     if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "method", sizeof("method"), (void**) &z_route_method ) == SUCCESS ) {
@@ -118,7 +118,8 @@ int validate_request_method(zval **z_route_options_pp, int current_request_metho
     return 1;
 }
 
-int validate_https(zval **z_route_options_pp, int https) {
+int validate_https(zval **z_route_options_pp, int https TSRMLS_DC) 
+{
     zval **z_route_secure = NULL;
     if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "secure", sizeof("secure"), (void**) &z_route_secure ) == SUCCESS ) {
         // check HTTPS flag
@@ -129,7 +130,8 @@ int validate_https(zval **z_route_options_pp, int https) {
     return 1;
 }
 
-int validate_domain(zval **z_route_options_pp, zval * http_host) {
+int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC) 
+{
     zval **z_route_domain = NULL;
     if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "domain", sizeof("domain"), (void**) &z_route_domain ) == SUCCESS ) {
         // check HTTP_HOST from $_SERVER
