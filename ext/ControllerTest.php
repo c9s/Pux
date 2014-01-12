@@ -62,8 +62,9 @@ class ControllerTest extends PHPUnit_Framework_ExtensionTestCase
         ok($mux);
 
         ok( $routes = $mux->getRoutes() );
+        count_ok( 3, $routes );
 
-        var_dump( $routes );
+        ok( $controller->toJson(array('foo' => 1) ) );
     }
 
 

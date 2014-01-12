@@ -24,5 +24,8 @@ PHP_METHOD(Controller, __construct);
 PHP_METHOD(Controller, expand);
 PHP_METHOD(Controller, getActionMethods);
 PHP_METHOD(Controller, getActionPaths);
+PHP_METHOD(Controller, before);
+PHP_METHOD(Controller, after);
+PHP_METHOD(Controller, toJson);
 
 #endif

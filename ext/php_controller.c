@@ -26,6 +26,11 @@ const zend_function_entry controller_methods[] = {
   PHP_ME(Controller, expand, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Controller, getActionMethods, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Controller, getActionPaths, NULL, ZEND_ACC_PUBLIC)
+
+  PHP_ME(Controller, before, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Controller, after, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Controller, toJson, NULL, ZEND_ACC_PUBLIC)
+
   // PHP_ME(Controller, __destruct,  NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR) 
   PHP_FE_END
 };
@@ -82,7 +87,8 @@ PHP_METHOD(Controller, getActionMethods)
     while (zend_hash_get_current_data_ex(&Z_OBJCE_P(this_ptr)->function_table, (void **) &mptr, &pos) == SUCCESS) {
         const char * key = mptr->common.function_name;
         int    key_len = strlen(mptr->common.function_name);
-        if ( (strpos(key, "Action")) == (key_len - strlen("Action")) ) {
+        int p = strpos(key, "Action");
+        if ( p != -1 && p == (key_len - strlen("Action")) ) {
             add_next_index_stringl(funcs, key, key_len, 1);
         }
         zend_hash_move_forward_ex(&Z_OBJCE_P(this_ptr)->function_table, &pos);
@@ -219,4 +225,42 @@ PHP_METHOD(Controller, expand)
     *return_value = *new_mux;
     zval_copy_ctor(return_value);
 }
+
+PHP_METHOD(Controller, before) {
+
+}
+
+PHP_METHOD(Controller, after) {
+
+}
+
+PHP_METHOD(Controller, toJson)
+{
+    zval *z_data = NULL;
+    long options = 0;
+    long depth = 0;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z|ll", &z_data, &options, &depth) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    zval *z_options = NULL;
+    zval *z_depth= NULL;
+
+    ALLOC_INIT_ZVAL(z_options);
+    ALLOC_INIT_ZVAL(z_depth);
+
+    Z_LVAL_P(z_depth) = 0;
+    Z_LVAL_P(z_options) = 0;
+
+    
+
+    zval *rv = NULL;
+    // zend_call_method_with_3_params(NULL, NULL, NULL, "json_encode", sizeof("json_encode"), &rv, 3, z_data, z_options, z_depth TSRMLS_CC );
+    zend_call_method_with_2_params(NULL, NULL, NULL, "json_encode", &rv, z_data, z_options TSRMLS_CC );
+
+    *return_value = *rv;
+    zval_copy_ctor(return_value);
+}
+
+
 
