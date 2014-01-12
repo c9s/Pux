@@ -19,6 +19,8 @@
 
 zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
 int get_current_request_method(TSRMLS_D);
+int get_current_https(TSRMLS_D);
+zval * get_current_http_host(TSRMLS_D);
 
 PHP_FUNCTION(pux_match);
 PHP_FUNCTION(pux_sort_routes);

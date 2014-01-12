@@ -106,12 +106,50 @@ PHP_FUNCTION(pux_sort_routes)
     }
 }
 
+
+int validate_request_method(zval **z_route_options_pp, int current_request_method)
+{
+    zval **z_route_method = NULL;
+    if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "method", sizeof("method"), (void**) &z_route_method ) == SUCCESS ) {
+        if ( Z_TYPE_PP(z_route_method) == IS_LONG && Z_LVAL_PP(z_route_method) != current_request_method ) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int validate_https(zval **z_route_options_pp, int https) {
+    zval **z_route_secure = NULL;
+    if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "secure", sizeof("secure"), (void**) &z_route_secure ) == SUCCESS ) {
+        // check HTTPS flag
+        if ( https && ! Z_BVAL_PP(z_route_secure) ) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int validate_domain(zval **z_route_options_pp, zval * http_host) {
+    zval **z_route_domain = NULL;
+    if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "domain", sizeof("domain"), (void**) &z_route_domain ) == SUCCESS ) {
+        // check HTTP_HOST from $_SERVER
+        if ( strncmp(Z_STRVAL_PP(z_route_domain), Z_STRVAL_P(http_host), Z_STRLEN_PP(z_route_domain) ) != 0 ) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 // int zend_hash_has_key( )
 zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
 
     int current_request_method;
+    int current_https;
+    zval * current_http_host;
 
     current_request_method = get_current_request_method(TSRMLS_CC);
+    current_https          = get_current_https(TSRMLS_CC);
+    current_http_host      = get_current_http_host(TSRMLS_CC);
 
     HashPosition z_routes_pointer;
     HashTable    *z_routes_hash;
@@ -126,17 +164,12 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
     // callback @ route[2]
     zval **z_route_options_pp; // route[3]
 
-    zval **z_route_method = NULL;
-    zval **z_route_secure = NULL;
-    zval **z_route_domain = NULL;
-
     pcre_cache_entry *pce;              /* Compiled regular expression */
 
     for(zend_hash_internal_pointer_reset_ex(z_routes_hash, &z_routes_pointer); 
             zend_hash_get_current_data_ex(z_routes_hash, (void**) &z_route_pp, &z_routes_pointer) == SUCCESS; 
             zend_hash_move_forward_ex(z_routes_hash, &z_routes_pointer)) 
     {
-
         if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 0, (void**) &z_is_pcre_pp) == FAILURE ) {
             continue;
         }
@@ -145,20 +178,6 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
         }
         if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 3, (void**) &z_route_options_pp) == FAILURE ) {
             continue;
-        }
-
-        if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "method", sizeof("method"), (void**) &z_route_method ) == SUCCESS ) {
-            if ( Z_TYPE_PP(z_route_method) == IS_LONG && Z_LVAL_PP(z_route_method) != current_request_method ) {
-                continue;
-            }
-        }
-
-        if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "secure", sizeof("secure"), (void**) &z_route_secure ) == SUCCESS ) {
-            // check HTTPS flag
-        }
-
-        if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "domain", sizeof("domain"), (void**) &z_route_domain ) == SUCCESS ) {
-            // check HTTP_HOST from $_SERVER
         }
 
         if ( Z_BVAL_PP(z_is_pcre_pp) ) {
@@ -174,11 +193,24 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
             ALLOC_INIT_ZVAL(pcre_ret);
             php_pcre_match_impl(pce, path, path_len, pcre_ret, z_subpats, 0, 0, 0, 0 TSRMLS_CC);
 
+            // is matched ?
             if ( ! Z_BVAL_P(pcre_ret) ) {
                 zval_ptr_dtor(&pcre_ret);
                 zval_ptr_dtor(&z_subpats);
                 continue;
             }
+
+            // check conditions
+            if ( 0 == validate_request_method( z_route_options_pp, current_request_method ) ) {
+                continue;
+            }
+            if ( 0 == validate_https( z_route_options_pp, current_https ) ) {
+                continue;
+            }
+            if ( 0 == validate_domain( z_route_options_pp, current_http_host ) ) {
+                continue;
+            }
+
 
             if ( z_subpats == NULL ) {
                 ALLOC_INIT_ZVAL(z_subpats);
@@ -223,6 +255,17 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
             // normal string comparison
             // pattern-prefix match
             if ( strncmp(Z_STRVAL_PP( z_pattern_pp ), path, Z_STRLEN_PP( z_pattern_pp )) == 0 ) {
+
+                // check conditions
+                if ( 0 == validate_request_method( z_route_options_pp, current_request_method ) ) {
+                    continue;
+                }
+                if ( 0 == validate_https( z_route_options_pp, current_https ) ) {
+                    continue;
+                }
+                if ( 0 == validate_domain( z_route_options_pp, current_http_host ) ) {
+                    continue;
+                }
                 return *z_route_pp;
             }
         }
@@ -230,6 +273,36 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
     return NULL;
 }
 
+zval * get_current_http_host(TSRMLS_D) {
+    zval **z_server_hash;
+    zval **z_http_host;
+
+    if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
+        Z_TYPE_PP(z_server_hash) == IS_ARRAY &&
+        zend_hash_find(Z_ARRVAL_PP(z_server_hash), "HTTP_HOST", sizeof("HTTP_HOST"), (void **) &z_http_host) == SUCCESS
+    ) {
+        if ( Z_BVAL_PP(z_http_host) ) {
+            return *z_http_host;
+        }
+    }
+    return NULL;
+}
+
+
+int get_current_https(TSRMLS_D) {
+    zval **z_server_hash;
+    zval **z_https;
+
+    if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
+        Z_TYPE_PP(z_server_hash) == IS_ARRAY &&
+        zend_hash_find(Z_ARRVAL_PP(z_server_hash), "HTTPS", sizeof("HTTPS"), (void **) &z_https) == SUCCESS
+    ) {
+        if ( Z_BVAL_PP(z_https) ) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 /**
  * get request method type in constant value.

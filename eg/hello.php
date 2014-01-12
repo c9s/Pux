@@ -1,5 +1,8 @@
 <?php
 // require '../src/Pux/Mux.php';
+
+var_dump( $_SERVER ); 
+
 use Pux\Mux;
 
 class HelloController {
