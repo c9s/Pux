@@ -247,6 +247,20 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         $mux->mount( '/sub' , $submux);
     }
 
+    public function testRouteWithDomainCondition() {
+        $mux = new \Pux\Mux;
+        $mux->expand = false;
+        ok($mux, "got mux");
+        $mux->add('/foo', [ 'HelloController','indexAction' ], [ 'domain' => 'test.dev' ]);
+        $_SERVER['HTTP_HOST'] = 'test.dev';
+        $route = $mux->dispatch('/foo');
+        ok($route);
+
+        $_SERVER['HTTP_HOST'] = 'github.com';
+        $route = $mux->dispatch('/foo');
+        ok(! $route);
+    }
+
     public function testRouteWithId() {
         $mux = new \Pux\Mux;
         $mux->expand = false;
