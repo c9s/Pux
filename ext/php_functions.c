@@ -9,6 +9,7 @@
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
 #include "php_functions.h"
+#include "php_expandable_mux.h"
 
 /*
  * pux_match(array $routes, string $path);
@@ -151,9 +152,9 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
     int current_https;
     zval * current_http_host;
 
-    current_request_method = get_current_request_method_const(TSRMLS_CC);
-    current_https          = get_current_https(TSRMLS_CC);
-    current_http_host      = get_current_http_host(TSRMLS_CC);
+    current_request_method = get_current_request_method_const(TSRMLS_C);
+    current_https          = get_current_https(TSRMLS_C);
+    current_http_host      = get_current_http_host(TSRMLS_C);
 
     HashPosition z_routes_pointer;
     HashTable    *z_routes_hash;
