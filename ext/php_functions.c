@@ -304,7 +304,6 @@ zval * get_current_request_uri(TSRMLS_D) {
 }
 
 int get_current_https(TSRMLS_D) {
-    zval **z_server_hash;
     zval *https = fetch_server_var( "HTTPS", sizeof("HTTPS") );
     if ( https && Z_BVAL_P(https) ) {
         return 1;
