@@ -100,7 +100,15 @@ char * translate_method_name_to_path(const char *method_name)
         return NULL;
     }
 
-    char * new_path = ecalloc( 128 , sizeof(char) );
+    char * new_path;
+    if ( strncmp(method_name, "indexAction", strlen("indexAction") ) == 0 ) {
+        new_path = ecalloc( 1 , sizeof(char) );
+        // memcpy(new_path, "", 1);
+        return new_path;
+    }
+
+    new_path = ecalloc( 128 , sizeof(char) );
+
     int    len = p - method_name;
     char * c = (char*) method_name;
     int    x = 0;
@@ -204,6 +212,10 @@ PHP_METHOD(Controller, expand)
         zval *rv = NULL;
         zend_call_method_with_2_params(&new_mux, ce_pux_mux, NULL, "add", &rv, *z_path, z_callback TSRMLS_CC );
     }
+
+    zval *rv = NULL;
+    zend_call_method_with_0_params(&new_mux, ce_pux_mux, NULL, "sort", &rv TSRMLS_CC );
+
     *return_value = *new_mux;
     zval_copy_ctor(return_value);
 }

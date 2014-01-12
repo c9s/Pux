@@ -10,6 +10,10 @@ use Pux\Controller;
 
 class ProductController extends Controller
 {
+    public function indexAction() 
+    {
+
+    }
 
     public function addAction() {
 
@@ -45,18 +49,21 @@ class ControllerTest extends PHPUnit_Framework_ExtensionTestCase
         $actions = $controller->getActionMethods();
         ok($actions);
         ok( is_array($actions), 'is array' );
-        count_ok( 2, $actions);
+        count_ok( 3, $actions);
 
         $paths = $controller->getActionPaths();
         ok($paths);
-        count_ok(2, $paths);
+        count_ok(3, $paths);
         ok( is_array($paths[0]) );
         ok( is_array($paths[1]) );
+        ok( is_array($paths[2]) );
 
         $mux = $controller->expand();
         ok($mux);
 
         ok( $routes = $mux->getRoutes() );
+
+        var_dump( $routes );
     }
 
 
