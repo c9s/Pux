@@ -140,7 +140,9 @@ int validate_domain(zval **z_route_options_pp, zval * http_host) {
     return 1;
 }
 
+// 
 // int zend_hash_has_key( )
+//
 zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
 
     int current_request_method;

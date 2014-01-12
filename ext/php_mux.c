@@ -978,9 +978,12 @@ PHP_METHOD(Mux, add) {
         add_index_zval( z_new_routes, 3 , z_options);
         add_next_index_zval(z_routes, z_new_routes);
 
-        zval * z_static_routes = zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
-        if ( z_static_routes ) {
-            add_assoc_zval(z_static_routes, pattern, z_new_routes);
+        if (zend_hash_has_more_elements(Z_ARRVAL_P(z_options)) != SUCCESS ) {
+            // if there is no option specified in z_options, we can add the route to our static route hash
+            zval * z_static_routes = zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
+            if ( z_static_routes ) {
+                add_assoc_zval(z_static_routes, pattern, z_new_routes);
+            }
         }
     }
 }
