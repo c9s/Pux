@@ -275,33 +275,32 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
     return NULL;
 }
 
-zval * get_current_http_host(TSRMLS_D) {
+zval * fetch_server_var( char *key , int key_len ) {
     zval **z_server_hash;
-    zval **z_http_host;
-
+    zval **rv;
     if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
         Z_TYPE_PP(z_server_hash) == IS_ARRAY &&
-        zend_hash_find(Z_ARRVAL_PP(z_server_hash), "HTTP_HOST", sizeof("HTTP_HOST"), (void **) &z_http_host) == SUCCESS
+        zend_hash_find(Z_ARRVAL_PP(z_server_hash), key, key_len, (void **) &rv) == SUCCESS
     ) {
-        if ( Z_BVAL_PP(z_http_host) ) {
-            return *z_http_host;
-        }
+        return *rv;
     }
     return NULL;
 }
 
+zval * get_current_remote_addr(TSRMLS_D) {
+    // REMOTE_ADDR
+    return fetch_server_var( "REMOTE_ADDR", sizeof("REMOTE_ADDR") );
+}
+
+zval * get_current_http_host(TSRMLS_D) {
+    return fetch_server_var( "HTTP_HOST", sizeof("HTTP_HOST") );
+}
 
 int get_current_https(TSRMLS_D) {
     zval **z_server_hash;
-    zval **z_https;
-
-    if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
-        Z_TYPE_PP(z_server_hash) == IS_ARRAY &&
-        zend_hash_find(Z_ARRVAL_PP(z_server_hash), "HTTPS", sizeof("HTTPS"), (void **) &z_https) == SUCCESS
-    ) {
-        if ( Z_BVAL_PP(z_https) ) {
-            return 1;
-        }
+    zval *https = fetch_server_var( "HTTPS", sizeof("HTTPS") );
+    if ( https && Z_BVAL_P(https) ) {
+        return 1;
     }
     return 0;
 }
