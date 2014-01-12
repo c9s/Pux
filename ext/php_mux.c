@@ -457,11 +457,11 @@ PHP_METHOD(Mux, mount) {
         zend_function *fe_getid = NULL; // method entry
         zend_function *fe_add   = NULL; // method entry
 
-        if ( zend_hash_find( &Z_OBJCE_P(z_mux)->function_table, "getid", sizeof("getid"), (void **) &fe_getid) == FAILURE ) {
+        if ( zend_hash_find(&ce_pux_mux->function_table, "getid", sizeof("getid"), (void **) &fe_getid) == FAILURE ) {
             php_error(E_ERROR, "Cannot call method Mux::getid()");
             RETURN_FALSE;
         }
-        if ( zend_hash_find( &Z_OBJCE_P(this_ptr)->function_table, "add", sizeof("add"),    (void **) &fe_add) == FAILURE ) {
+        if ( zend_hash_find(&ce_pux_mux->function_table, "add", sizeof("add"),    (void **) &fe_add) == FAILURE ) {
             php_error(E_ERROR, "Cannot call method Mux::add()");
             RETURN_FALSE;
         }
@@ -486,7 +486,11 @@ PHP_METHOD(Mux, mount) {
         zval *z_retval = NULL;
         zend_call_method_with_3_params( &this_ptr, ce_pux_mux, &fe_add, "add",
                 strlen("add"), &z_retval, 3, z_pattern, z_mux_id, z_options TSRMLS_CC);
+
+
+
         zval *z_submux_array = zend_read_property( ce_pux_mux, this_ptr , "submux", sizeof("submux") - 1, 1 TSRMLS_CC);
+        Z_ADDREF_P(z_mux);
         add_index_zval( z_submux_array, Z_LVAL_P(z_mux_id) , z_mux);
 
         // release zvals
@@ -688,10 +692,6 @@ PHP_METHOD(Mux, dispatch) {
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len) == FAILURE) {
         RETURN_FALSE;
-    }
-
-    if ( path_len == 0 ) {
-        php_error(E_ERROR, "Dispatch path required. empty path given.");
     }
 
     ALLOC_INIT_ZVAL(z_trimed_path);

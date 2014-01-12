@@ -65,6 +65,21 @@ class ControllerTest extends PHPUnit_Framework_ExtensionTestCase
         count_ok( 3, $routes );
 
         ok( $controller->toJson(array('foo' => 1) ) );
+
+        $mainMux = new Mux;
+        $mainMux->mount( '/product' , $controller->expand() );
+        ok( $mainMux->getRoutes() ); 
+        ok( $mainMux->dispatch('/product') );
+        ok( $mainMux->dispatch('/product/add') );
+        ok( $mainMux->dispatch('/product/del') );
+
+        $mainMux = new Mux;
+        $mainMux->expand = false;
+        $mainMux->mount( '/product' , $controller->expand() );
+        ok( $mainMux->getRoutes() ); 
+        ok( $r = $mainMux->dispatch('/product') );
+        ok( $r = $mainMux->dispatch('/product/add') );
+        ok( $r = $mainMux->dispatch('/product/del') );
     }
 
 
