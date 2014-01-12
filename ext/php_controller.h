@@ -20,5 +20,6 @@ void pux_init_controller(TSRMLS_D);
 
 PHP_METHOD(Controller, __construct);
 PHP_METHOD(Controller, expand);
+PHP_METHOD(Controller, getActions);
 
 #endif
