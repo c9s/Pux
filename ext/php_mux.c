@@ -23,6 +23,7 @@ const zend_function_entry mux_methods[] = {
   // PHP_ME(Mux, __destruct,  NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR) 
   PHP_ME(Mux, getId, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, add, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, any, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, compile, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, sort, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, dispatch, NULL, ZEND_ACC_PUBLIC)
@@ -933,8 +934,8 @@ PHP_METHOD(Mux, appendPCRERoute) {
 }
 
 
-
-PHP_METHOD(Mux, add) {
+static void mux_add_route(INTERNAL_FUNCTION_PARAMETERS)
+{
     char *pattern;
     int  pattern_len;
 
@@ -1023,9 +1024,15 @@ PHP_METHOD(Mux, add) {
             zval * z_routes_by_id = zend_read_property(ce_pux_mux, this_ptr, "routesById", sizeof("routesById")-1, 1 TSRMLS_CC);
             add_assoc_zval(z_routes_by_id, Z_STRVAL_PP(z_route_id), z_new_routes);
         }
-
-
-
     }
+}
+
+
+PHP_METHOD(Mux, add) {
+    mux_add_route(INTERNAL_FUNCTION_PARAM_PASSTHRU);
+}
+
+PHP_METHOD(Mux, any) {
+    mux_add_route(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 

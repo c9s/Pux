@@ -280,8 +280,8 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         $mux->expand = false;
         ok($mux, "got mux");
         $submux = new \Pux\Mux;
-        $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
-        $submux->add('/foo', [ 'HelloController','indexAction' ]);
+        $submux->any('/hello/:name', [ 'HelloController','indexAction' ]);
+        $submux->any('/foo', [ 'HelloController','indexAction' ]);
         $mux->mount( '/sub' , $submux);
     }
 
@@ -292,8 +292,8 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         ok($mux);
 
         $submux = new \Pux\Mux;
-        $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
-        $submux->add('/foo', [ 'HelloController','indexAction' ]);
+        $submux->any('/hello/:name', [ 'HelloController','indexAction' ]);
+        $submux->any('/foo', [ 'HelloController','indexAction' ]);
         $mux->mount( '/sub' , $submux);
 
         ok($submux, 'submux');
@@ -319,7 +319,7 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         is(0, $mux->length());
 
         $submux = new \Pux\Mux;
-        $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
+        $submux->any('/hello/:name', [ 'HelloController','indexAction' ]);
         ok($submux);
         ok($routes = $submux->getRoutes());
         is(1, $submux->length());
@@ -337,7 +337,7 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         is(0, $mux->length());
 
         $submux = new \Pux\Mux;
-        $submux->add('/hello/:name', [ 'HelloController','indexAction' ]);
+        $submux->any('/hello/:name', [ 'HelloController','indexAction' ]);
         ok($submux);
         ok($routes = $submux->getRoutes());
         is(1, $submux->length());

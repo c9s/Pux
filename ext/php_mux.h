@@ -26,6 +26,7 @@ PHP_METHOD(Mux, __construct);
 // PHP_METHOD(Mux, __destruct);
 PHP_METHOD(Mux, getId);
 PHP_METHOD(Mux, add);
+PHP_METHOD(Mux, any);
 PHP_METHOD(Mux, length);
 PHP_METHOD(Mux, compile);
 PHP_METHOD(Mux, sort);
