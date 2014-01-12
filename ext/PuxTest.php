@@ -247,6 +247,16 @@ class PuxTest extends PHPUnit_Framework_ExtensionTestCase
         $mux->mount( '/sub' , $submux);
     }
 
+    public function testRouteWithId() {
+        $mux = new \Pux\Mux;
+        $mux->expand = false;
+        ok($mux, "got mux");
+        $submux = new \Pux\Mux;
+        $submux->add('/hello/:name', [ 'HelloController','indexAction' ], [ 'id' => 'hello-name' ]);
+        $submux->add('/foo', [ 'HelloController','indexAction' ], [ 'id' => 'foo' ]);
+        $mux->mount( '/sub' , $submux);
+    }
+
     public function testMuxMountNoExpand() {
         $mux = new \Pux\Mux;
         $mux->expand = false;

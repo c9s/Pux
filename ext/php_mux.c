@@ -51,6 +51,7 @@ void pux_init_mux(TSRMLS_D) {
     ce_pux_mux = zend_register_internal_class(&ce TSRMLS_CC);
     zend_declare_property_null(ce_pux_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(ce_pux_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(ce_pux_mux, "routesById", strlen("routesById"), ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(ce_pux_mux, "staticRoutes", strlen("staticRoutes"), ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_null(ce_pux_mux, "submux", strlen("submux"), ZEND_ACC_PUBLIC TSRMLS_CC);
     zend_declare_property_bool(ce_pux_mux, "expand", strlen("expand"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
@@ -100,17 +101,20 @@ zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry 
 
 
 PHP_METHOD(Mux, __construct) {
-    zval *z_routes = NULL , *z_submux = NULL, *z_static_routes = NULL;
+    zval *z_routes = NULL, *z_routes_by_id , *z_submux = NULL, *z_static_routes = NULL;
 
     ALLOC_INIT_ZVAL(z_routes);
+    ALLOC_INIT_ZVAL(z_routes_by_id);
     ALLOC_INIT_ZVAL(z_static_routes);
     ALLOC_INIT_ZVAL(z_submux);
 
     array_init(z_routes);
+    array_init(z_routes_by_id);
     array_init(z_static_routes);
     array_init(z_submux);
 
     zend_update_property( ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
+    zend_update_property( ce_pux_mux, this_ptr, "routesById", sizeof("routesById")-1, z_routes_by_id TSRMLS_CC);
     zend_update_property( ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, z_static_routes TSRMLS_CC);
     zend_update_property( ce_pux_mux, this_ptr, "submux", sizeof("submux")-1, z_submux TSRMLS_CC);
 }
@@ -931,6 +935,7 @@ PHP_METHOD(Mux, add) {
         array_init(z_options);
     }
 
+
     zval * z_routes = zend_read_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
     // PCRE pattern here
@@ -963,6 +968,12 @@ PHP_METHOD(Mux, add) {
         add_index_zval(z_new_routes, 3, z_compiled_route);
         add_next_index_zval(z_routes, z_new_routes);
 
+
+        zval **z_route_id;
+        if ( zend_hash_find( Z_ARRVAL_P(z_options) , "id", sizeof("id"), (void**)&z_route_id) == SUCCESS ) {
+            zval * z_routes_by_id = zend_read_property(ce_pux_mux, this_ptr, "routesById", sizeof("routesById")-1, 1 TSRMLS_CC);
+            add_assoc_zval(z_routes_by_id, Z_STRVAL_PP(z_route_id), z_new_routes);
+        }
     } else {
         Z_ADDREF_P(z_options); // reference it so it will not be recycled.
         Z_ADDREF_P(z_callback);
@@ -985,6 +996,15 @@ PHP_METHOD(Mux, add) {
                 add_assoc_zval(z_static_routes, pattern, z_new_routes);
             }
         }
+
+        zval **z_route_id;
+        if ( zend_hash_find( Z_ARRVAL_P(z_options) , "id", sizeof("id"), (void**)&z_route_id) == SUCCESS ) {
+            zval * z_routes_by_id = zend_read_property(ce_pux_mux, this_ptr, "routesById", sizeof("routesById")-1, 1 TSRMLS_CC);
+            add_assoc_zval(z_routes_by_id, Z_STRVAL_PP(z_route_id), z_new_routes);
+        }
+
+
+
     }
 }
 
