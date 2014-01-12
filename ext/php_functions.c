@@ -149,7 +149,7 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
     int current_https;
     zval * current_http_host;
 
-    current_request_method = get_current_request_method(TSRMLS_CC);
+    current_request_method = get_current_request_method_const(TSRMLS_CC);
     current_https          = get_current_https(TSRMLS_CC);
     current_http_host      = get_current_http_host(TSRMLS_CC);
 
@@ -296,6 +296,10 @@ zval * get_current_http_host(TSRMLS_D) {
     return fetch_server_var( "HTTP_HOST", sizeof("HTTP_HOST") );
 }
 
+zval * get_current_request_uri(TSRMLS_D) {
+    return fetch_server_var( "REQUEST_URI", sizeof("REQUEST_URI") );
+}
+
 int get_current_https(TSRMLS_D) {
     zval **z_server_hash;
     zval *https = fetch_server_var( "HTTPS", sizeof("HTTPS") );
@@ -305,19 +309,18 @@ int get_current_https(TSRMLS_D) {
     return 0;
 }
 
+zval * get_current_request_method(TSRMLS_D) {
+    return fetch_server_var( "REQUEST_METHOD", sizeof("REQUEST_METHOD") );
+}
+
 /**
  * get request method type in constant value.
  */
-int get_current_request_method(TSRMLS_D) {
+int get_current_request_method_const(TSRMLS_D) {
     char *c_request_method;
-    zval **z_server_hash;
-    zval **z_request_method;
-
-    if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
-        Z_TYPE_PP(z_server_hash) == IS_ARRAY &&
-        zend_hash_find(Z_ARRVAL_PP(z_server_hash), "REQUEST_METHOD", sizeof("REQUEST_METHOD"), (void **) &z_request_method) == SUCCESS
-    ) {
-        c_request_method = Z_STRVAL_PP(z_request_method);
+    zval *z_request_method = get_current_request_method();
+    if ( z_request_method ) {
+        c_request_method = Z_STRVAL_P(z_request_method);
         if ( strncmp("GET", c_request_method , sizeof("GET") ) == 0 ) {
             return REQ_METHOD_GET;
         } else if ( strncmp("POST", c_request_method , sizeof("POST") ) == 0 ) {
