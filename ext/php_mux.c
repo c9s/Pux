@@ -181,7 +181,6 @@ PHP_METHOD(Mux, __set_state) {
     zval *new_object;
     ALLOC_INIT_ZVAL(new_object);
     object_init_ex(new_object, ce_pux_mux);
-
     CALL_METHOD(Mux, __construct, new_object, new_object);
 
     // zend_update_property_long( Z_OBJCE_P(new_object), new_object, "id", sizeof("id")-1, Z_LVAL_PP(z_id) TSRMLS_CC);

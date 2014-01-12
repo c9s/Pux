@@ -1,17 +1,20 @@
 #include "string.h"
+#include "ctype.h"
 #include "php.h"
 #include "main/php_main.h"
 #include "Zend/zend_API.h"
 #include "Zend/zend_variables.h"
 #include "zend_exceptions.h"
 #include "zend_interfaces.h"
+#include "Zend/zend_interfaces.h"
 #include "zend_object_handlers.h"
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
 #include "ext/standard/php_var.h"
 
-#include "php_pux.h"
 #include "ct_helper.h"
+#include "php_pux.h"
+#include "php_mux.h"
 #include "php_functions.h"
 #include "php_expandable_mux.h"
 #include "php_controller.h"
@@ -21,7 +24,8 @@ zend_class_entry *ce_pux_controller;
 const zend_function_entry controller_methods[] = {
   PHP_ME(Controller, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
   PHP_ME(Controller, expand, NULL, ZEND_ACC_PUBLIC)
-  PHP_ME(Controller, getActions, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Controller, getActionMethods, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Controller, getActionPaths, NULL, ZEND_ACC_PUBLIC)
   // PHP_ME(Controller, __destruct,  NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR) 
   PHP_FE_END
 };
@@ -53,7 +57,7 @@ PHP_METHOD(Controller, __construct) {
     */
 }
 
-int strpos(char *haystack, char *needle)
+int strpos(const char *haystack, char *needle)
 {
    char *p = strstr(haystack, needle);
    if (p)
@@ -61,41 +65,146 @@ int strpos(char *haystack, char *needle)
    return -1;
 }
 
-PHP_METHOD(Controller, getActions)
+PHP_METHOD(Controller, getActionMethods)
 {
     // get function table hash
     HashTable *function_table = &Z_OBJCE_P(this_ptr)->function_table;
-    HashPosition pointer;
-    zval **func = NULL;
+    HashPosition pos;
 
-
-    zval *funcs;
-
+    zval *funcs = NULL;
     ALLOC_INIT_ZVAL(funcs);
     array_init(funcs);
 
-    for(zend_hash_internal_pointer_reset_ex(function_table, &pointer); 
-            zend_hash_get_current_data_ex(function_table, (void**) &func, &pointer) == SUCCESS; 
-            zend_hash_move_forward_ex(function_table, &pointer)) 
-    {
-        char *key = NULL;
-        uint   key_len = 0;
-        ulong   int_key = 0;
-        if ( zend_hash_get_current_key_ex(function_table, &key, &key_len, &int_key, 0, &pointer) == HASH_KEY_IS_STRING ) {
-            // php_printf("%s\n", key);
-            char *pos;
-            if ( (strpos(key, "action")) == (key_len - strlen("action") - 1) ) {
-                add_next_index_stringl(funcs, key, key_len, 1);
-            }
+
+    zend_function *mptr;
+    zend_hash_internal_pointer_reset_ex(&Z_OBJCE_P(this_ptr)->function_table, &pos);
+
+    while (zend_hash_get_current_data_ex(&Z_OBJCE_P(this_ptr)->function_table, (void **) &mptr, &pos) == SUCCESS) {
+        const char * key = mptr->common.function_name;
+        int    key_len = strlen(mptr->common.function_name);
+        if ( (strpos(key, "Action")) == (key_len - strlen("Action")) ) {
+            add_next_index_stringl(funcs, key, key_len, 1);
         }
+        zend_hash_move_forward_ex(&Z_OBJCE_P(this_ptr)->function_table, &pos);
     }
     *return_value = *funcs;
     zval_copy_ctor(return_value);
     return;
 }
 
+
+char * translate_method_name_to_path(const char *method_name)
+{
+    char *p = strstr(method_name, "Action");
+    if ( p == NULL ) {
+        return NULL;
+    }
+
+    char * new_path = ecalloc( 128 , sizeof(char) );
+    int    len = p - method_name;
+    char * c = (char*) method_name;
+    int    x = 0;
+    new_path[x++] = '/';
+    int    new_path_len = 1;
+    while( len-- ) {
+        if ( isupper(*c) ) {
+            new_path[x++] = '/';
+            new_path[x++] = tolower(*c);
+            new_path_len += 2;
+        } else {
+            new_path[x++] = *c;
+            new_path_len ++;
+        }
+        c++;
+    }
+    return new_path;
+}
+
+PHP_METHOD(Controller, getActionPaths)
+{
+    zend_function *fe;
+    if ( zend_hash_find( &ce_pux_controller->function_table, "getactionmethods", sizeof("getactionmethods"), (void **) &fe) == FAILURE ) {
+        php_error(E_ERROR, "getActionMethods method not found");
+    }
+    // call export method
+    zval *rv = NULL;
+    zend_call_method_with_0_params( &this_ptr, ce_pux_controller, &fe, "getactionmethods", &rv TSRMLS_CC );
+
+    // php_var_dump(rv, 1);
+
+    HashTable *func_list = Z_ARRVAL_P(rv);
+    HashPosition pointer;
+    zval **func = NULL;
+
+
+    array_init(return_value);
+
+    for(zend_hash_internal_pointer_reset_ex(func_list, &pointer); 
+            zend_hash_get_current_data_ex(func_list, (void**) &func, &pointer) == SUCCESS; 
+            zend_hash_move_forward_ex(func_list, &pointer)) 
+    {
+        const char *method_name = Z_STRVAL_PP(func);
+        char * path = translate_method_name_to_path(method_name);
+        if ( path ) {
+            zval * new_item;
+            ALLOC_INIT_ZVAL(new_item);
+            array_init(new_item);
+            add_next_index_string(new_item, path, 0);
+            add_next_index_stringl(new_item, method_name, Z_STRLEN_PP(func) , 1);
+            add_next_index_zval(return_value, new_item);
+        }
+    }
+    return;
+}
+
 PHP_METHOD(Controller, expand)
 {
+    zval *new_mux;
+    ALLOC_INIT_ZVAL(new_mux);
+    object_init_ex(new_mux, ce_pux_mux);
+    CALL_METHOD(Mux, __construct, new_mux, new_mux);
 
+
+    zval *path_array = NULL;
+    zend_call_method_with_0_params( &this_ptr, ce_pux_controller, NULL, "getactionpaths", &path_array TSRMLS_CC );
+
+    if ( Z_TYPE_P(path_array) != IS_ARRAY ) {
+        php_error(E_ERROR, "getActionPaths does not return an array.");
+        RETURN_FALSE;
+    }
+
+    const char *class_name = NULL;
+    zend_uint   class_name_len;
+    int   dup = zend_get_object_classname(this_ptr, &class_name, &class_name_len TSRMLS_CC);
+
+    // php_printf("%s\n", class_name);
+
+    HashPosition pointer;
+    zval **path_entry = NULL;
+    for(zend_hash_internal_pointer_reset_ex( Z_ARRVAL_P(path_array), &pointer); 
+            zend_hash_get_current_data_ex( Z_ARRVAL_P(path_array), (void**) &path_entry, &pointer) == SUCCESS; 
+            zend_hash_move_forward_ex( Z_ARRVAL_P(path_array), &pointer)) 
+    {
+        zval **z_path;
+        zval **z_method;
+
+        if ( zend_hash_index_find(Z_ARRVAL_PP(path_entry), 0, (void**) &z_path) == FAILURE ) {
+            continue;
+        }
+        if ( zend_hash_index_find(Z_ARRVAL_PP(path_entry), 1, (void**) &z_method) == FAILURE ) {
+            continue;
+        }
+
+        zval *z_callback;
+        ALLOC_INIT_ZVAL(z_callback);
+        array_init(z_callback);
+        add_next_index_stringl(z_callback, class_name, class_name_len, 1);
+        add_next_index_zval(z_callback, *z_method);
+
+        zval *rv = NULL;
+        zend_call_method_with_2_params(&new_mux, ce_pux_mux, NULL, "add", &rv, *z_path, z_callback TSRMLS_CC );
+    }
+    *return_value = *new_mux;
+    zval_copy_ctor(return_value);
 }
 

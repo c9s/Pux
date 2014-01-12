@@ -18,8 +18,11 @@ extern zend_class_entry *ce_pux_controller;
 
 void pux_init_controller(TSRMLS_D);
 
+char * translate_method_name_to_path(const char *method_name);
+
 PHP_METHOD(Controller, __construct);
 PHP_METHOD(Controller, expand);
-PHP_METHOD(Controller, getActions);
+PHP_METHOD(Controller, getActionMethods);
+PHP_METHOD(Controller, getActionPaths);
 
 #endif
