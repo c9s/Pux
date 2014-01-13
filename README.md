@@ -231,6 +231,24 @@ When expand is disabled, the pattern comparison strategy for
 strings will match the prefix.
 
 
+
+APCDispatcher
+----------------------
+Although Pux\\Mux is already fast, you can still add APCDispatcher to boost the
+performance, which is to avoid re-lookup route.
+
+This is pretty useful when you have a lot of PCRE routes.
+
+```
+use Pux\Dispatcher\APCDispatcher;
+$dispatcher = new APCDispatcher($mux, array(
+    'namespace' => 'app_',
+    'expiry' => ...,
+));
+$route = $dispatcher->dispatch('/request/uri');
+var_dump($route);
+```
+
 Controller
 --------------------
 
