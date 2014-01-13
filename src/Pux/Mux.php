@@ -255,6 +255,11 @@ class Mux
         return $this->routes;
     }
 
+    public function setRoutes($routes)
+    {
+        $this->routes = $routes;
+    }
+
     public function export() {
         return var_export($this, true);
     }
