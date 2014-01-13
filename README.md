@@ -74,23 +74,29 @@ Installation
 --------------------
 You can install Pux with composer by defining the following requirement in your composer.json:
 
-    {
-        "require": {
-            "corneltek/pux": "~1.2"
-        }
+```json
+{
+    "require": {
+        "corneltek/pux": "~1.2"
     }
+}
+```
 
 To install pux extension to boost the performance:
 
-    git clone https://github.com/c9s/Pux.git
-    cd Pux/ext
-    phpize
-    ./configure
-    make && make install
+```sh
+git clone https://github.com/c9s/Pux.git
+cd Pux/ext
+phpize
+./configure
+make && make install
+```
 
 Then setup your php.ini config to load pux extension:
 
-    extension=pux.so
+```ini
+extension=pux.so
+```
 
 
 Synopsis
@@ -153,6 +159,8 @@ return $mux;
 Run pux command to compile your routing definition:
 
 ```sh
+curl -O https://raw.github.com/c9s/Pux/master/pux
+chmod +x pux
 pux compile -o mux.php routes.php
 ```
 
