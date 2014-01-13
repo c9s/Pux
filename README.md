@@ -17,7 +17,7 @@ Why It's Faster
 - Pux uses simpler data structure (indexed array) to store the patterns and flags.
     (In PHP internals, `zend_hash_index_find` is faster than `zend_hash_find`).
 
-- When matching routes, symfony uses a lot of function calls for each routes:
+- When matching routes, symfony uses a lot of function calls for each route:
 
     https://github.com/symfony/Routing/blob/master/Matcher/UrlMatcher.php#L124
 
@@ -26,7 +26,7 @@ Why It's Faster
     https://github.com/c9s/Pux/blob/master/src/Pux/Mux.php#L189
 
 - Pux separates static routes and dynamic routes automatically, Pux uses hash
-  table to look up static routes without looping the whole routes.
+  table to look up static routes without looping the whole route array.
 
 - Pux\\Mux is written in C extension.
 
@@ -36,15 +36,18 @@ Why It's Faster
 
 Why It's Here
 --------------------
-Most of us use a lot of machines to run our applications, however, it uses too much energy and too many resource.
+Most of us use a lot of machines to run our applications, however, it uses too much energy and too many resources.
 
-Pux exists because we want to reduce the energy we use, and try not to produce too much CO2 and make our environment better.
+Pux exists because we want to reduce the energy we use, produce lesser CO2 and make our environment better.
 
 By using Pux, you can also decrease your expense of servers on cloud.
 
 Also we believe that running softwares on slower machines should be easy as possible.
 
 <http://en.wikipedia.org/wiki/Global_warming>
+
+
+
 
 Features
 --------------------
