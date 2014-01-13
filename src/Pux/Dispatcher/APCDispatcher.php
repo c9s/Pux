@@ -1,5 +1,5 @@
 <?php
-namespace Pux;
+namespace Pux\Dispatcher;
 use Pux\Mux;
 
 class APCDispatcher
@@ -37,12 +37,15 @@ class APCDispatcher
     public function dispatch($path) 
     {
         $key = $this->getNamespace() . ':' . $path;
-        if ( $route = apc_fetch($key) ) {
+        if ( ($route = apc_fetch($key)) !== false ) {
             return $route;
         }
-        $route = $mux->dispatch($path);
-        apc_store($key, $route, $this->expiry);
-        return $route;
+        if ( $route = $this->mux->dispatch($path) ) {
+            apc_store($key, $route, $this->expiry);
+            return $route;
+        }
+        apc_store($key, false, $this->expiry);
+        return false;
     }
 }
 
