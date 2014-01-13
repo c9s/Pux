@@ -136,6 +136,11 @@ class Mux
         }
     }
 
+    public function sort() 
+    {
+        usort($this->routes, ['Pux\\MuxCompiler','sort_routes']);
+    }
+
     static public function sort_routes($a, $b) {
         if ( $a[0] && $b[0] ) {
             return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
@@ -157,7 +162,7 @@ class Mux
     public function compile($outFile)
     {
         // compile routes to php file as a cache.
-        usort($this->routes, [ 'Pux\\Mux' , 'sort_routes' ]);
+        $this->sort();
 
         $code = '<?php return ' . $this->export() . ';';
         return file_put_contents($outFile, $code);
