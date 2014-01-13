@@ -147,6 +147,8 @@ $route = $mux->dispatch( $_SERVER['PATH_INFO'] );
 echo Executor::execute($route);
 ```
 
+> Please note that if you need PCRE pattern support for route, you must load `Pux/PatternCompiler.php` before you use.
+
 Mux
 -----
 Mux is where you define your routes, and you can mount multiple mux to a parent one.
@@ -179,6 +181,33 @@ strings will match the full string.
 
 When expand is disabled, the pattern comparison strategy for 
 strings will match the prefix.
+
+
+Controller
+--------------------
+
+Pux provides a simple fast controller in C extension, you can mount your controller methods to paths automatically:
+
+```php
+class ProductController extends \Pux\Controller
+{
+    // translate to path ""
+    public function indexAction() { }
+
+    // translate to path "/add"
+    public function addAction() { }
+
+    // translate to path "/del"
+    public function delAction() { }
+}
+
+$mux = new Pux\Mux;
+$mux->mount( '/product' , $controller->expand() );
+
+$mux->dispatch('/product');       // ProductController->indexAction
+$mux->dispatch('/product/add');   // ProductController->addAction
+$mux->dispatch('/product/del');   // ProductController->delAction
+```
 
 
 
