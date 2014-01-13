@@ -24,10 +24,10 @@ class APCDispatcher
         }
     }
 
-    public function getNamespace() {
+    public function getNamespace()
+    {
         return $this->namespace;
     }
-
 
     public function getExpiry()
     {
