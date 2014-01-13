@@ -36,11 +36,13 @@ Why It's Faster
 
 Why It's Here
 --------------------
-Most of us uses a lot of machines to run our application, however, it uses too much energy and too many resource.
+Most of us use a lot of machines to run our applications, however, it uses too much energy and too many resource.
 
 Pux exists because we want to reduce the energy we use, and try not to produce too much CO2 and make our environment better.
 
-Running softwares on slower machines should be easy as possible.
+By using Pux, you can also decrease your expense of servers on cloud.
+
+Also we believe that running softwares on slower machines should be easy as possible.
 
 <http://en.wikipedia.org/wiki/Global_warming>
 
