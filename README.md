@@ -48,6 +48,26 @@ By using Pux, you can also decrease your expense of servers on cloud.
 
 Also we believe that running softwares on slower machines should be easy as possible.
 
+Some people thinks routing is not the bottleneck, the truth is this project
+does not claim routing is the bottleneck.
+
+Actually the bottleneck is always different in different applications, if you
+have a lot of heavy db requests, then your bottleneck is your db; if you have
+complex computation, then the bottleneck should be your computation; if you
+have a lot of pure PHP code to load, then your bottleneck might be the PHP
+code.
+
+You might start wondering since the bottleneck is not routing, why do we
+implement route dispatcher in C extension? The answer is simple, if you put a
+pure PHP routing component with some empty callbacks and use apache benchmark
+tool to see how many requests you can handle per second, you will find out the
+routing component consumes a lot of computation time and the request number
+will decrease quite a few. (and it does nothing, all it does is ... just
+routing!)
+
+So Pux tries to reduce the overheads of loading PHP classes and the runtime
+method/function calls, and you runs your application faster without the overheads.
+
 
 Features
 --------------------
