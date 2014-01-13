@@ -251,8 +251,7 @@ Hardware:
 
 Environment:
 
-- Apache 2.2 + prefork worker
-- PHP 5.5.6
+- PHP 5.5.6 + APC
 
 
 ### Dispatch Speed
