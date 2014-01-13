@@ -33,6 +33,17 @@ Why It's Faster
 - Pux compiles your routes to plain PHP array, the compiled routes can be
   loaded very fast. you don't need to call functions to register your routes before using it.
 
+
+Why it's here
+--------------------
+Most of us uses a lot of machines to run our application, however, it uses too much energy and resources.
+
+Pux exists because we want to reduce the energy we use, and try not to produce too much CO2.
+
+Running softwares on slower machines should be easy.
+
+<http://en.wikipedia.org/wiki/Global_warming>
+
 Features
 --------------------
 
