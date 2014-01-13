@@ -44,10 +44,6 @@ By using Pux, you can also decrease your expense of servers on cloud.
 
 Also we believe that running softwares on slower machines should be easy as possible.
 
-<http://en.wikipedia.org/wiki/Global_warming>
-
-
-
 
 Features
 --------------------
