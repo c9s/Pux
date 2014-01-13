@@ -185,6 +185,30 @@ The `expand` option means whether to expand/merge submux routes to the parent mu
 When expand is enabled, it improves dispatch performance when you
 have a lot of sub mux to dispatch.
 
+
+### Sorting routes
+
+You need to sort routes when not using compiled routes, it's because pux sorts
+longer path to front:
+
+```php
+$pageMux = new Mux;
+$pageMux->add('/', [ 'PageController', 'page1' ]);
+$pageMux->add('/pa', [ 'PageController', 'page1' ]);
+$pageMux->add('/page', [ 'PageController', 'page1' ]);
+$pageMux->sort();
+```
+
+This sorts routes to:
+
+```
+/page
+/pa
+/
+```
+
+So pux first compares `/page`, `/pa`, than `/`.
+
 ### Different String Comparison Strategies
 
 When expand is enabled, the pattern comparison strategy for 
