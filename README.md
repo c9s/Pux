@@ -16,7 +16,8 @@ Why It's Faster
 
 - Pux uses simpler data structure (indexed array) to store the patterns and flags.
     (In PHP internals, `zend_hash_index_find` is faster than `zend_hash_find`).
-    when matching routes, symfony uses a lot of function calls for each routes:
+
+- When matching routes, symfony uses a lot of function calls for each routes:
 
     https://github.com/symfony/Routing/blob/master/Matcher/UrlMatcher.php#L124
 
