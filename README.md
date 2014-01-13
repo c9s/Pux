@@ -34,7 +34,7 @@ Why It's Faster
   loaded very fast. you don't need to call functions to register your routes before using it.
 
 
-Why it's here
+Why It's Here
 --------------------
 Most of us uses a lot of machines to run our application, however, it uses too much energy and too many resource.
 
