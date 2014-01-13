@@ -29,7 +29,8 @@ Why It's Faster
 
 - Pux\\Mux is written in C extension.
 
-- Pux compiles your routes to plain PHP array, the compiled routes can be loaded very fast. 
+- Pux compiles your routes to plain PHP array, the compiled routes can be
+  loaded very fast. you don't need to call functions to register your routes before using it.
 
 Features
 --------------------
