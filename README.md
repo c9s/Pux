@@ -4,13 +4,32 @@ Pux is a high performance PHP router.
 
 Pux is 48.5x faster than symfony router in static route dispatching, 31x faster in regular expression dispatching. (with pux extension installed)
 
+(Benchmark details here https://github.com/c9s/router-benchmark/blob/master/code)
+
 Pux tries not to consume computation time to build all routes dynamically (like
 Symfony/Routing, although the RouteCompiler of Symfony/Routing caches the
-compiled patterns, but there are still a lot of function call. however function
-calls are pretty slow in PHP). 
+compiled patterns, but there are still a lot of function call and class
+loading from your application code. however, function calls are pretty slow in PHP). 
 
-Instead, Pux compiles your routes to plain PHP
-array for caching, the compiled routes can be loaded from cache very fast.
+Why It's Faster
+---------------
+
+- Pux uses simpler data structure (indexed array) to store the patterns and flags.
+    (In PHP internals, `zend_hash_index_find` is faster than `zend_hash_find`).
+    when matching routes, symfony uses a lot of function calls for each routes:
+
+    https://github.com/symfony/Routing/blob/master/Matcher/UrlMatcher.php#L124
+
+    Pux fetches the pattern from an indexed-array:
+
+    https://github.com/c9s/Pux/blob/master/src/Pux/Mux.php#L189
+
+- Pux separates static routes and dynamic routes automatically, Pux uses hash
+  table to look up static routes without looping the whole routes.
+
+- Pux\\Mux is written in C extension.
+
+- Pux compiles your routes to plain PHP array, the compiled routes can be loaded very fast. 
 
 Features
 --------------------
