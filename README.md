@@ -35,11 +35,13 @@ Why It's Faster
 Features
 --------------------
 
-- Request method condition support.
-- High performance of dispatching routes.
-- Low memory footprint (only 6KB with simple routes and extension installed) .
-- PCRE pattern path support. (Sinatra-style)
 - Zero dependency.
+- Low memory footprint (only 6KB with simple routes and extension installed) .
+- High performance of dispatching routes.
+- PCRE pattern path support. (Sinatra-style)
+- Request method condition support.
+- Domain condition support.
+- https condition support.
 
 Routing Path Format
 ---------------------
