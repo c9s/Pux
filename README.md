@@ -4,7 +4,7 @@ Pux is a high performance PHP router.
 
 Pux is 48.5x faster than symfony router in static route dispatching, 31x faster in regular expression dispatching. (with pux extension installed)
 
-(Benchmark details here https://github.com/c9s/router-benchmark/blob/master/code)
+(Benchmark code and details here https://github.com/c9s/router-benchmark/blob/master/code)
 
 Pux tries not to consume computation time to build all routes dynamically (like
 Symfony/Routing, although the RouteCompiler of Symfony/Routing caches the
