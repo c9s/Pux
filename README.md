@@ -28,7 +28,9 @@ Why It's Faster
 - Pux separates static routes and dynamic routes automatically, Pux uses hash
   table to look up static routes without looping the whole route array.
 
-- Pux\\Mux is written in C extension.
+- Pux\\Mux is written in C extension, method calls are faster!
+
+- With C extension, there is no class loading overhead.
 
 - Pux compiles your routes to plain PHP array, the compiled routes can be
   loaded very fast. you don't need to call functions to register your routes before using it.
