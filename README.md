@@ -25,6 +25,10 @@ Why It's Faster
 
     https://github.com/c9s/Pux/blob/master/src/Pux/Mux.php#L189
 
+- Even you enabled APC or other bytecode cache extension, you are still calling
+  methods and functions in the runtime. Pux reduces the route building to one
+  static method call. `__set_state`.
+
 - Pux separates static routes and dynamic routes automatically, Pux uses hash
   table to look up static routes without looping the whole route array.
 
