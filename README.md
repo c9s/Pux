@@ -52,10 +52,8 @@ Some people thinks routing is not the bottleneck, the truth is this project
 does not claim routing is the bottleneck.
 
 Actually the bottleneck is always different in different applications, if you
-have a lot of heavy db requests, then your bottleneck is your db; if you have
-complex computation, then the bottleneck should be your computation; if you
-have a lot of pure PHP code to load, then your bottleneck might be the PHP
-code.
+have a lot of heavy db requests, then your bottleneck is your db; if you have a
+lot of complex computation, then the bottleneck should be your algorithm.
 
 You might start wondering since the bottleneck is not routing, why do we
 implement route dispatcher in C extension? The answer is simple, if you put a
