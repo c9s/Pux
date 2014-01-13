@@ -4,11 +4,13 @@ Pux is a high performance PHP router.
 
 Pux is 48.5x faster than symfony router in static route dispatching, 31x faster in regular expression dispatching. (with pux extension installed)
 
-Pux tries not to consume computation time to build all routes dynamically (like Symfony/Routing). Instead,
-Pux compiles your routes to plain PHP array for caching, the compiled routes can be loaded from cache very fast.
+Pux tries not to consume computation time to build all routes dynamically (like
+Symfony/Routing, although the RouteCompiler of Symfony/Routing caches the
+compiled patterns, but there are still a lot of function call. however function
+calls are pretty slow in PHP). 
 
-With Pux PHP Extension support, you may load and dispatch the routes 1.5~2x faster than pure PHP Pux.
-
+Instead, Pux compiles your routes to plain PHP
+array for caching, the compiled routes can be loaded from cache very fast.
 
 Features
 --------------------
@@ -280,32 +282,4 @@ With one pcre route:
 
 ### Through Apache
 
-
-Prefork configuration:
-
-    StartServers          2
-    MinSpareServers       3
-    MaxSpareServers       3
-    MaxClients           30
-    MaxRequestsPerChild  1000
-
-
-### Requests per seconds
-
-<img src="https://raw.github.com/c9s/Pux/master/benchmarks/reqs.png"/>
-
-### Response Time
-
-Pux - PURE PHP (around 3ms~38ms)
-
-<img src="https://raw.github.com/c9s/Pux/master/benchmarks/pux.png"/>
-
-Pux - with extension 
-
-<https://gist.github.com/c9s/8273098>
-
-Symfony/Routing (around 9ms~146ms)
-
-<img src="https://raw.github.com/c9s/Pux/master/benchmarks/symfony-routing.png"/>
-
-
+Please see benchmark details here: <https://github.com/c9s/router-benchmark>
