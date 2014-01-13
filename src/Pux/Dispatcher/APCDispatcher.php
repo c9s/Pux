@@ -38,6 +38,7 @@ class APCDispatcher
     {
         $key = $this->getNamespace() . ':' . $path;
         if ( ($route = apc_fetch($key)) !== false ) {
+            apc_inc('hits:'.$key); // record the hits
             return $route;
         }
         if ( $route = $this->mux->dispatch($path) ) {
