@@ -4,7 +4,8 @@ use Pux\Mux;
 
 class FooController
 {
-    public function index() {  }
+    public function index($name, $phone = null) { 
+    }
 }
 
 class MuxCompilerTest extends PHPUnit_Framework_TestCase
@@ -23,7 +24,10 @@ class MuxCompilerTest extends PHPUnit_Framework_TestCase
         ok( $compiler->load("tests/hello_mux.php") );
         ok( $compiler->load("tests/bye_mux.php") );
 
+        $compiler->compileReflectionParameters();
+
         ok( $compiler->compile("tests/merged_mux.php") );
+
 
         path_ok( "tests/merged_mux.php" );
 
@@ -32,6 +36,7 @@ class MuxCompilerTest extends PHPUnit_Framework_TestCase
 
         $routes = $mux->getRoutes();
         ok($routes);
+
 
         count_ok(2, $routes);
 

@@ -1,6 +1,7 @@
 <?php
 namespace Pux;
 use Pux\Mux;
+use ReflectionClass;
 
 class MuxCompiler
 {
@@ -93,6 +94,37 @@ class MuxCompiler
                 if ( ! method_exists($controller, $method) ) {
                     throw new Exception("Method $method not found in controller $class.");
                 }
+            }
+        }
+    }
+
+    public function compileReflectionParameters() 
+    {
+        foreach( $this->mux->routes as $route ) {
+            $callback = $route[2];
+            list($class, $method) = $callback;
+
+            $refClass = new ReflectionClass($class);
+            $refMethod = $refClass->getMethod($method);
+            $refParameters = $refMethod->getParameters();
+
+            $route[3]['__reflection'] = array();
+            foreach( $refParameters as $refParam ) {
+                // ReflectionParameter
+                $param = array(
+                    'name' => $refParam->getName(),
+                    'position' => $refParam->getPosition(),
+                );
+                if ( $refParam->isDefaultValueAvailable() ) {
+                    $param['default'] = $refParam->getDefaultValue();
+                    if ( $refParam->isDefaultValueConstant() ) {
+                        $param['constant'] = $refParam->getDefaultValueConstantName();
+                    }
+                }
+                if ( $optional = $refParam->isOptional() ) {
+                    $param['optional'] = $optional;
+                }
+                $route[3]['__reflection']['params'][] = $param;
             }
         }
     }
