@@ -33,6 +33,7 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, appendPCRERoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, match, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getRoutes, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, setRoutes, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getSubMux, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, export, NULL, ZEND_ACC_PUBLIC)
@@ -535,6 +536,15 @@ PHP_METHOD(Mux, getRoute) {
         return;
     }
     RETURN_NULL();
+}
+
+PHP_METHOD(Mux, setRoutes) {
+    zval * routes;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &routes ) == FAILURE) {
+        RETURN_FALSE;
+    }
+    zend_update_property( Z_OBJCE_P(this_ptr) , this_ptr, "routes", sizeof("routes")-1, routes TSRMLS_CC);
+    RETURN_TRUE;
 }
 
 PHP_METHOD(Mux, getRoutes) {

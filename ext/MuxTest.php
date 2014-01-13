@@ -166,6 +166,14 @@ class MuxTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
 
+    public function testRouteGetterAndSetter() {
+        $mux = new \Pux\Mux;
+        ok($mux);
+        $mux->add('/product', [ 'ProductController','listAction' ]);
+        $routes = $mux->getRoutes();
+        $mux->setRoutes($routes);
+    }
+
     public function testMuxAddSimpleRoute() {
         $mux = new \Pux\Mux;
         ok($mux);
