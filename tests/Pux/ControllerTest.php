@@ -19,14 +19,15 @@ class ControllerTest extends PHPUnit_Framework_TestCase
     public function test()
     {
         if (defined('HHVM_VERSION')) {
-            skip("HHVM does not support Reflection to expand controller action methods");
+            echo "HHVM does not support Reflection to expand controller action methods";
+            return;
         }
 
         $controller = new ProductController;
         ok($controller);
 
         ok( is_array( $controller->getActionMethods() ) );
-        
+
         $mux = new Pux\Mux;
         $mux->mount('/product', $controller->expand());
         ok($mux);

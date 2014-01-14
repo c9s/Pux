@@ -7,7 +7,8 @@ class APCDispatcherTest extends PHPUnit_Framework_TestCase
     public function test()
     {
         if ( ! extension_loaded('apc') && ! extension_loaded('apcu') ) {
-            skip('APC or APCu extension is required.');
+            echo 'APC or APCu extension is required.';
+            return;
         }
 
         $mux = new Mux;
