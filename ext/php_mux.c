@@ -203,7 +203,6 @@ PHP_METHOD(Mux, __set_state) {
     zend_update_property(ce_pux_mux, new_object, "routesById", sizeof("routesById")-1, *z_routes_by_id TSRMLS_CC);
     *return_value = *new_object;
     zval_copy_ctor(return_value);
-    zval_ptr_dtor(&z_array);
 }
 
 
@@ -541,9 +540,7 @@ PHP_METHOD(Mux, getRoute) {
 
     zval **z_route = NULL;
     if ( zend_hash_find( Z_ARRVAL_P(z_routes_by_id) , route_id, route_id_len, (void**) &z_route ) == SUCCESS ) {
-        *return_value = **z_route;
-        zval_copy_ctor(return_value);
-        return;
+        RETURN_ZVAL(*z_route, 1 , 0);
     }
     RETURN_NULL();
 }
