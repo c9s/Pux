@@ -277,8 +277,8 @@ class MuxTest extends PHPUnit_Framework_ExtensionTestCase
         $submux->add('/hello/:name', [ 'HelloController','indexAction' ], [ 'id' => 'hello-name' ]);
         $submux->add('/foo', [ 'HelloController','indexAction' ], [ 'id' => 'foo' ]);
 
-        ok($submux->getRoute('foo'));
-        ok($submux->getRoute('hello-name'));
+        ok($submux->getRoute('foo'),'got foo route');
+        ok($submux->getRoute('hello-name'), 'got hello-name route');
 
         $mux->mount( '/sub' , $submux);
     }

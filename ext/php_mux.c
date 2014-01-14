@@ -650,12 +650,8 @@ PHP_METHOD(Mux, compile) {
     zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &rv, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
     zval_ptr_dtor(&z_sort_callback); // recycle sort callback zval
-    if ( rv ) {
-        zval_ptr_dtor(&rv); // recycle sort callback zval
-    }
     // php_error(E_ERROR,"route sort failed.");
     // zend_update_property(ce_pux_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
-
 
     // $code = '<?php return ' . $this->export() . ';';
 
@@ -676,6 +672,7 @@ PHP_METHOD(Mux, compile) {
 
     int  buf_len = Z_STRLEN_P(compiled_code) + sizeof("<?php return ;") + 3;
     char *buf = (char* ) ecalloc(buf_len, sizeof(char));
+    // char *buf = (char* ) emalloc(buf_len * sizeof(char));
 
     strncat(buf, "<?php return ", sizeof("<?php return ") );
     strncat(buf, Z_STRVAL_P(compiled_code), Z_STRLEN_P(compiled_code));
