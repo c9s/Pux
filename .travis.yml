@@ -7,7 +7,7 @@ php:
 before_script:
   - 'phpenv rehash'
   - 'composer install --dev'
-  - '[[ -z $(php -v | grep 5.4) ]] || pecl install APC'
+  - 'echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini'
 script:
   - phpunit --debug
   - phpunit --repeat 1000
