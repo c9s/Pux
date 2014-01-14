@@ -171,6 +171,9 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
 
     pcre_cache_entry *pce;              /* Compiled regular expression */
 
+    zval *pcre_ret = NULL;
+    zval *z_subpats = NULL; /* Array for subpatterns */
+
     for(zend_hash_internal_pointer_reset_ex(z_routes_hash, &z_routes_pointer); 
             zend_hash_get_current_data_ex(z_routes_hash, (void**) &z_route_pp, &z_routes_pointer) == SUCCESS; 
             zend_hash_move_forward_ex(z_routes_hash, &z_routes_pointer)) 
@@ -192,30 +195,33 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
                 return NULL;
             }
 
-            zval *z_subpats = NULL; /* Array for subpatterns */
-            zval *pcre_ret = NULL;
-            ALLOC_INIT_ZVAL(z_subpats);
-            ALLOC_INIT_ZVAL(pcre_ret);
+            ALLOC_INIT_ZVAL(pcre_ret); // this is required.
+            ALLOC_INIT_ZVAL(z_subpats); // also required
             php_pcre_match_impl(pce, path, path_len, pcre_ret, z_subpats, 0, 0, 0, 0 TSRMLS_CC);
 
-            // is matched ?
+            // not matched ?
             if ( ! Z_BVAL_P(pcre_ret) ) {
                 zval_ptr_dtor(&pcre_ret);
                 zval_ptr_dtor(&z_subpats);
                 continue;
             }
 
-            // check conditions
+            // tell garbage collector to collect it, we need to use z_subpats later.
+            zval_ptr_dtor(&pcre_ret);
+
+            // check conditions only when route option is provided
             if ( 0 == validate_request_method( z_route_options_pp, current_request_method ) ) {
+                zval_ptr_dtor(&z_subpats);
                 continue;
             }
             if ( 0 == validate_https( z_route_options_pp, current_https ) ) {
+                zval_ptr_dtor(&z_subpats);
                 continue;
             }
             if ( 0 == validate_domain( z_route_options_pp, current_http_host ) ) {
+                zval_ptr_dtor(&z_subpats);
                 continue;
             }
-
 
             if ( z_subpats == NULL ) {
                 ALLOC_INIT_ZVAL(z_subpats);
@@ -224,7 +230,6 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
                 array_init(z_subpats);
             }
 
-            zval_ptr_dtor(&pcre_ret);
             Z_ADDREF_P(z_subpats);
             add_assoc_zval(*z_route_options_pp , "vars" , z_subpats);
             return *z_route_pp;
