@@ -178,13 +178,11 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
             zend_hash_get_current_data_ex(z_routes_hash, (void**) &z_route_pp, &z_routes_pointer) == SUCCESS; 
             zend_hash_move_forward_ex(z_routes_hash, &z_routes_pointer)) 
     {
-        if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 0, (void**) &z_is_pcre_pp) == FAILURE ) {
-            continue;
-        }
-        if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 1, (void**) &z_pattern_pp) == FAILURE ) {
-            continue;
-        }
-        if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 3, (void**) &z_route_options_pp) == FAILURE ) {
+        if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 0, (void**) &z_is_pcre_pp) == FAILURE 
+            || zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 1, (void**) &z_pattern_pp) == FAILURE 
+            || zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 3, (void**) &z_route_options_pp) == FAILURE 
+            )
+        {
             continue;
         }
 
@@ -210,17 +208,19 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
             zval_ptr_dtor(&pcre_ret);
 
             // check conditions only when route option is provided
-            if ( 0 == validate_request_method( z_route_options_pp, current_request_method ) ) {
-                zval_ptr_dtor(&z_subpats);
-                continue;
-            }
-            if ( 0 == validate_https( z_route_options_pp, current_https ) ) {
-                zval_ptr_dtor(&z_subpats);
-                continue;
-            }
-            if ( 0 == validate_domain( z_route_options_pp, current_http_host ) ) {
-                zval_ptr_dtor(&z_subpats);
-                continue;
+            if ( zend_hash_num_elements(Z_ARRVAL_PP(z_route_options_pp)) ) {
+                if ( 0 == validate_request_method( z_route_options_pp, current_request_method ) ) {
+                    zval_ptr_dtor(&z_subpats);
+                    continue;
+                }
+                if ( 0 == validate_https( z_route_options_pp, current_https ) ) {
+                    zval_ptr_dtor(&z_subpats);
+                    continue;
+                }
+                if ( 0 == validate_domain( z_route_options_pp, current_http_host ) ) {
+                    zval_ptr_dtor(&z_subpats);
+                    continue;
+                }
             }
 
             if ( z_subpats == NULL ) {
@@ -265,16 +265,17 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
             // normal string comparison
             // pattern-prefix match
             if ( strncmp(Z_STRVAL_PP( z_pattern_pp ), path, Z_STRLEN_PP( z_pattern_pp )) == 0 ) {
-
                 // check conditions
-                if ( 0 == validate_request_method( z_route_options_pp, current_request_method ) ) {
-                    continue;
-                }
-                if ( 0 == validate_https( z_route_options_pp, current_https ) ) {
-                    continue;
-                }
-                if ( 0 == validate_domain( z_route_options_pp, current_http_host ) ) {
-                    continue;
+                if ( zend_hash_num_elements(Z_ARRVAL_PP(z_route_options_pp)) ) {
+                    if ( 0 == validate_request_method( z_route_options_pp, current_request_method ) ) {
+                        continue;
+                    }
+                    if ( 0 == validate_https( z_route_options_pp, current_https ) ) {
+                        continue;
+                    }
+                    if ( 0 == validate_domain( z_route_options_pp, current_http_host ) ) {
+                        continue;
+                    }
                 }
                 return *z_route_pp;
             }
