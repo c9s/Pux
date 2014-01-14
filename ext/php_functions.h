@@ -25,9 +25,9 @@ extern inline zval * get_current_http_host(TSRMLS_D);
 extern inline zval * get_current_request_uri(TSRMLS_D);
 extern inline zval * get_current_request_method(TSRMLS_D);
 
-int validate_request_method(zval **z_route_options_pp, int current_request_method TSRMLS_DC);
-int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC);
-int validate_https(zval **z_route_options_pp, int https TSRMLS_DC);
+extern inline int validate_request_method(zval **z_route_options_pp, int current_request_method TSRMLS_DC);
+extern inline int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC);
+extern inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC);
 
 PHP_FUNCTION(pux_match);
 PHP_FUNCTION(pux_sort_routes);
