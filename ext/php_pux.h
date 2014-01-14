@@ -54,7 +54,7 @@ zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
 
 zval * call_mux_method(zval * object , char * method_name , int method_name_len, int param_count, zval* arg1, zval* arg2, zval* arg3 TSRMLS_DC);
 
-zend_class_entry ** get_pattern_compiler_ce(TSRMLS_DC);
+zend_class_entry ** get_pattern_compiler_ce(TSRMLS_D);
 
 extern zend_class_entry *ce_pux_exception;
 
