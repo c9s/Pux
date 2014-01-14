@@ -61,7 +61,7 @@ void pux_init_mux(TSRMLS_D) {
     zend_declare_property_long(ce_pux_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
 }
 
-zend_class_entry ** get_pattern_compiler_ce(TSRMLS_DC) {
+zend_class_entry ** get_pattern_compiler_ce(TSRMLS_D) {
     zend_class_entry **ce_pattern_compiler = NULL;
     if ( zend_lookup_class( "Pux\\PatternCompiler", strlen("Pux\\PatternCompiler") , &ce_pattern_compiler TSRMLS_CC) == FAILURE ) {
         php_error(E_ERROR, "Class Pux\\PatternCompiler not found.");
