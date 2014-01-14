@@ -10,3 +10,6 @@ before_script:
   - ./tests/travis-setup.sh
 script:
   - ./tests/travis-test.sh
+cache:
+  directories:
+  - vendor
