@@ -142,7 +142,7 @@ PHP_METHOD(Controller, getActionPaths)
     }
     // call export method
     zval *rv = NULL;
-    zend_call_method_with_0_params( &this_ptr, ce_pux_controller, &fe, "getactionmethods", &rv TSRMLS_CC );
+    zend_call_method_with_0_params( &this_ptr, ce_pux_controller, &fe, "getactionmethods", &rv );
 
     // php_var_dump(rv, 1);
 
@@ -180,7 +180,7 @@ PHP_METHOD(Controller, expand)
 
 
     zval *path_array = NULL;
-    zend_call_method_with_0_params( &this_ptr, ce_pux_controller, NULL, "getactionpaths", &path_array TSRMLS_CC );
+    zend_call_method_with_0_params( &this_ptr, ce_pux_controller, NULL, "getactionpaths", &path_array );
 
     if ( Z_TYPE_P(path_array) != IS_ARRAY ) {
         php_error(E_ERROR, "getActionPaths does not return an array.");
@@ -216,11 +216,11 @@ PHP_METHOD(Controller, expand)
         add_next_index_zval(z_callback, *z_method);
 
         zval *rv = NULL;
-        zend_call_method_with_2_params(&new_mux, ce_pux_mux, NULL, "add", &rv, *z_path, z_callback TSRMLS_CC );
+        zend_call_method_with_2_params(&new_mux, ce_pux_mux, NULL, "add", &rv, *z_path, z_callback );
     }
 
     zval *rv = NULL;
-    zend_call_method_with_0_params(&new_mux, ce_pux_mux, NULL, "sort", &rv TSRMLS_CC );
+    zend_call_method_with_0_params(&new_mux, ce_pux_mux, NULL, "sort", &rv );
 
     *return_value = *new_mux;
     zval_copy_ctor(return_value);
@@ -256,7 +256,7 @@ PHP_METHOD(Controller, toJson)
 
     zval *rv = NULL;
     // zend_call_method_with_3_params(NULL, NULL, NULL, "json_encode", sizeof("json_encode"), &rv, 3, z_data, z_options, z_depth TSRMLS_CC );
-    zend_call_method_with_2_params(NULL, NULL, NULL, "json_encode", &rv, z_data, z_options TSRMLS_CC );
+    zend_call_method_with_2_params(NULL, NULL, NULL, "json_encode", &rv, z_data, z_options);
 
     *return_value = *rv;
     zval_copy_ctor(return_value);
