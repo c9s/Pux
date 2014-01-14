@@ -4,8 +4,9 @@ php:
   - 5.5
   - hhvm
 before_script:
-  - 'phpenv rehash'
-  - 'composer install --dev'
+  - phpenv rehash
+  - phpenv version-name
+  - composer install --dev
   - ./tests/travis-setup.sh
 script:
   - ./tests/travis-test.sh
