@@ -1,9 +1,5 @@
 #!/bin/bash
 if [[ $(phpenv version-name) =~ 5.[345] ]] ; then
-    pear channel-discover pear.corneltek.com
-    pear install -a -f corneltek/PHPUnit_TestMore
-    pear install -a -f corneltek/PHPUnit_Framework_ExtensionTestCase
-    pear install -a -f corneltek/ExtUnit
     cd ext
     phpize && ./configure
     cd ..
