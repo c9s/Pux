@@ -3,11 +3,12 @@ php:
   - 5.3
   - 5.4
   - 5.5
-  #  - hhvm
+  - hhvm
 before_script:
   - 'phpenv rehash'
   - 'composer install --dev'
   - 'echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini'
+  - 'sudo apt-get install php5-dev'
 script:
   - phpunit --debug
   - phpunit --repeat 1000
