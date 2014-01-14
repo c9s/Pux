@@ -201,13 +201,13 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
 
             // check conditions only when route option is provided
             if ( zend_hash_has_more_elements(Z_ARRVAL_PP(z_route_options_pp)) == SUCCESS ) {
-                if ( 0 == validate_request_method( z_route_options_pp, current_request_method ) ) {
+                if ( 0 == validate_request_method( z_route_options_pp, current_request_method TSRMLS_CC) ) {
                     continue;
                 }
-                if ( 0 == validate_https( z_route_options_pp, current_https ) ) {
+                if ( 0 == validate_https( z_route_options_pp, current_https TSRMLS_CC) ) {
                     continue;
                 }
-                if ( 0 == validate_domain( z_route_options_pp, current_http_host ) ) {
+                if ( 0 == validate_domain( z_route_options_pp, current_http_host TSRMLS_CC) ) {
                     continue;
                 }
             }
@@ -253,13 +253,13 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
             if ( strncmp(Z_STRVAL_PP( z_pattern_pp ), path, Z_STRLEN_PP( z_pattern_pp )) == 0 ) {
                 // check conditions
                 if ( zend_hash_num_elements(Z_ARRVAL_PP(z_route_options_pp)) ) {
-                    if ( 0 == validate_request_method( z_route_options_pp, current_request_method ) ) {
+                    if ( 0 == validate_request_method( z_route_options_pp, current_request_method TSRMLS_CC) ) {
                         continue;
                     }
-                    if ( 0 == validate_https( z_route_options_pp, current_https ) ) {
+                    if ( 0 == validate_https( z_route_options_pp, current_https TSRMLS_CC) ) {
                         continue;
                     }
-                    if ( 0 == validate_domain( z_route_options_pp, current_http_host ) ) {
+                    if ( 0 == validate_domain( z_route_options_pp, current_http_host TSRMLS_CC) ) {
                         continue;
                     }
                 }
