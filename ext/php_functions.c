@@ -283,7 +283,7 @@ inline zval ** fetch_server_vars_hash(TSRMLS_D) {
     return NULL;
 }
 
-inline zval * fetch_server_var(zval ** z_server_hash, char *key , int key_len ) {
+inline zval * fetch_server_var(zval ** z_server_hash, char *key , int key_len TSRMLS_DC) {
     zval **rv;
     if ( zend_hash_find(Z_ARRVAL_PP(z_server_hash), key, key_len, (void **) &rv) == SUCCESS ) {
         return *rv;
@@ -293,19 +293,19 @@ inline zval * fetch_server_var(zval ** z_server_hash, char *key , int key_len ) 
 
 inline zval * get_current_remote_addr(zval ** server_vars_hash TSRMLS_DC) {
     // REMOTE_ADDR
-    return fetch_server_var(server_vars_hash, "REMOTE_ADDR", sizeof("REMOTE_ADDR") );
+    return fetch_server_var(server_vars_hash, "REMOTE_ADDR", sizeof("REMOTE_ADDR") TSRMLS_CC);
 }
 
 inline zval * get_current_http_host(zval ** server_vars_hash TSRMLS_DC) {
-    return fetch_server_var(server_vars_hash, "HTTP_HOST", sizeof("HTTP_HOST") );
+    return fetch_server_var(server_vars_hash, "HTTP_HOST", sizeof("HTTP_HOST") TSRMLS_CC);
 }
 
 inline zval * get_current_request_uri(zval ** server_vars_hash TSRMLS_DC) {
-    return fetch_server_var(server_vars_hash, "REQUEST_URI", sizeof("REQUEST_URI") );
+    return fetch_server_var(server_vars_hash, "REQUEST_URI", sizeof("REQUEST_URI") TSRMLS_CC);
 }
 
 inline int get_current_https(zval ** server_vars_hash TSRMLS_DC) {
-    zval *https = fetch_server_var(server_vars_hash, "HTTPS", sizeof("HTTPS") );
+    zval *https = fetch_server_var(server_vars_hash, "HTTPS", sizeof("HTTPS") TSRMLS_CC);
     if ( https && Z_BVAL_P(https) ) {
         return 1;
     }
