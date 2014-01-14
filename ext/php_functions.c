@@ -278,7 +278,7 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
     return NULL;
 }
 
-zval * fetch_server_var( char *key , int key_len ) {
+inline zval * fetch_server_var( char *key , int key_len ) {
     zval **z_server_hash;
     zval **rv;
     if (zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS &&
@@ -290,20 +290,20 @@ zval * fetch_server_var( char *key , int key_len ) {
     return NULL;
 }
 
-zval * get_current_remote_addr(TSRMLS_D) {
+inline zval * get_current_remote_addr(TSRMLS_D) {
     // REMOTE_ADDR
     return fetch_server_var( "REMOTE_ADDR", sizeof("REMOTE_ADDR") );
 }
 
-zval * get_current_http_host(TSRMLS_D) {
+inline zval * get_current_http_host(TSRMLS_D) {
     return fetch_server_var( "HTTP_HOST", sizeof("HTTP_HOST") );
 }
 
-zval * get_current_request_uri(TSRMLS_D) {
+inline zval * get_current_request_uri(TSRMLS_D) {
     return fetch_server_var( "REQUEST_URI", sizeof("REQUEST_URI") );
 }
 
-int get_current_https(TSRMLS_D) {
+inline int get_current_https(TSRMLS_D) {
     zval *https = fetch_server_var( "HTTPS", sizeof("HTTPS") );
     if ( https && Z_BVAL_P(https) ) {
         return 1;
@@ -311,14 +311,14 @@ int get_current_https(TSRMLS_D) {
     return 0;
 }
 
-zval * get_current_request_method(TSRMLS_D) {
+inline zval * get_current_request_method(TSRMLS_D) {
     return fetch_server_var( "REQUEST_METHOD", sizeof("REQUEST_METHOD") );
 }
 
 /**
  * get request method type in constant value.
  */
-int get_current_request_method_const(TSRMLS_D) {
+inline int get_current_request_method_const(TSRMLS_D) {
     char *c_request_method;
     zval *z_request_method = get_current_request_method();
     if ( z_request_method ) {
