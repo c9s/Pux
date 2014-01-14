@@ -350,6 +350,9 @@ PHP_METHOD(Mux, mount) {
     z_expand = zend_read_property( ce_pux_mux, getThis(), "expand", sizeof("expand")-1, 1 TSRMLS_CC);
 
 
+    // TODO: merge routesById and staticRoutes properties
+
+
     if ( Z_BVAL_P(z_expand) ) {
         // fetch routes from $mux
         //
