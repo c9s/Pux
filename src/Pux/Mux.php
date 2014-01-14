@@ -130,7 +130,9 @@ class Mux
                 $callback,
                 $options,
             );
-            $this->staticRoutes[$pattern] = $route;
+            if ( empty($options) ) {
+                $this->staticRoutes[$pattern] = $route;
+            }
             // generate a simple string route.
             return $this->routes[] = $route;
         }

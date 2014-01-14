@@ -871,7 +871,7 @@ PHP_METHOD(Mux, match) {
             return;
         }
     }
-    z_route = php_pux_match(zend_read_property(ce_pux_mux , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC), path, path_len);
+    z_route = php_pux_match(zend_read_property(ce_pux_mux , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC), path, path_len TSRMLS_CC);
     if ( z_route != NULL ) {
         *return_value = *z_route;
         zval_copy_ctor(z_route);
