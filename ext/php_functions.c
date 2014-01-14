@@ -182,7 +182,6 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
     {
         zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 0, (void**) &z_is_pcre_pp);
         zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 1, (void**) &z_pattern_pp);
-        zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 3, (void**) &z_route_options_pp);
 
         if ( Z_BVAL_PP(z_is_pcre_pp) ) {
             /* Compile regex or get it from cache. */
@@ -201,15 +200,17 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
             // tell garbage collector to collect it, we need to use pcre_subpats later.
 
             // check conditions only when route option is provided
-            if ( zend_hash_has_more_elements(Z_ARRVAL_PP(z_route_options_pp)) == SUCCESS ) {
-                if ( 0 == validate_request_method( z_route_options_pp, current_request_method TSRMLS_CC) ) {
-                    continue;
-                }
-                if ( 0 == validate_https( z_route_options_pp, current_https TSRMLS_CC) ) {
-                    continue;
-                }
-                if ( 0 == validate_domain( z_route_options_pp, current_http_host TSRMLS_CC) ) {
-                    continue;
+            if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 3, (void**) &z_route_options_pp) == SUCCESS ) {
+                if ( zend_hash_has_more_elements(Z_ARRVAL_PP(z_route_options_pp)) == SUCCESS ) {
+                    if ( 0 == validate_request_method( z_route_options_pp, current_request_method TSRMLS_CC) ) {
+                        continue;
+                    }
+                    if ( 0 == validate_https( z_route_options_pp, current_https TSRMLS_CC) ) {
+                        continue;
+                    }
+                    if ( 0 == validate_domain( z_route_options_pp, current_http_host TSRMLS_CC) ) {
+                        continue;
+                    }
                 }
             }
 
@@ -253,15 +254,17 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
             // pattern-prefix match
             if ( strncmp(Z_STRVAL_PP( z_pattern_pp ), path, Z_STRLEN_PP( z_pattern_pp )) == 0 ) {
                 // check conditions
-                if ( zend_hash_num_elements(Z_ARRVAL_PP(z_route_options_pp)) ) {
-                    if ( 0 == validate_request_method( z_route_options_pp, current_request_method TSRMLS_CC) ) {
-                        continue;
-                    }
-                    if ( 0 == validate_https( z_route_options_pp, current_https TSRMLS_CC) ) {
-                        continue;
-                    }
-                    if ( 0 == validate_domain( z_route_options_pp, current_http_host TSRMLS_CC) ) {
-                        continue;
+                if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 3, (void**) &z_route_options_pp) == SUCCESS ) {
+                    if ( zend_hash_num_elements(Z_ARRVAL_PP(z_route_options_pp)) ) {
+                        if ( 0 == validate_request_method( z_route_options_pp, current_request_method TSRMLS_CC) ) {
+                            continue;
+                        }
+                        if ( 0 == validate_https( z_route_options_pp, current_https TSRMLS_CC) ) {
+                            continue;
+                        }
+                        if ( 0 == validate_domain( z_route_options_pp, current_http_host TSRMLS_CC) ) {
+                            continue;
+                        }
                     }
                 }
                 // we didn't use the pcre variables
