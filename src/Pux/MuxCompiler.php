@@ -110,6 +110,7 @@ class MuxCompiler
 
             // HHVM does not support Reflection currently.
             if (! defined('HHVM_VERSION')) {
+                // when __reflection is defined, we re-use the reflection info.
                 $route[3]['__reflection'] = array();
                 foreach( $refParameters as $refParam ) {
                     // ReflectionParameter
