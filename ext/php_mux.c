@@ -140,6 +140,11 @@ PHP_METHOD(Mux, __set_state) {
         RETURN_FALSE;
     }
 
+    zval *new_object;
+    ALLOC_INIT_ZVAL(new_object);
+    object_init_ex(new_object, ce_pux_mux);
+    CALL_METHOD(Mux, __construct, new_object, new_object);
+
     zval **z_id = NULL;
     zval **z_routes = NULL;
     zval **z_static_routes = NULL;
@@ -147,60 +152,31 @@ PHP_METHOD(Mux, __set_state) {
     zval **z_submux = NULL;
     zval **z_expand = NULL;
 
-    if ( zend_hash_find(Z_ARRVAL_P(z_array), "id", sizeof("id"), (void**)&z_id) == FAILURE ) {
-        zend_throw_exception(ce_pux_exception, "mux->id load failed.", 0 TSRMLS_CC);
-        RETURN_FALSE;
+    if ( zend_hash_find(Z_ARRVAL_P(z_array), "id", sizeof("id"), (void**)&z_id) == SUCCESS ) {
+        // zend_update_property_long( Z_OBJCE_P(new_object), new_object, "id", sizeof("id")-1, Z_LVAL_PP(z_id) TSRMLS_CC);
+        zend_update_property(ce_pux_mux, new_object, "id", sizeof("id")-1, *z_id TSRMLS_CC);
     }
 
-    if ( zend_hash_find(Z_ARRVAL_P(z_array), "routes", sizeof("routes"), (void**)&z_routes) == FAILURE ) {
-        zval *a = NULL;
-        ALLOC_ZVAL(a);
-        array_init(a);
-        z_routes = &a;
+    if ( zend_hash_find(Z_ARRVAL_P(z_array), "routes", sizeof("routes"), (void**)&z_routes) == SUCCESS ) {
+        zend_update_property(ce_pux_mux, new_object, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
     }
 
-    if ( zend_hash_find(Z_ARRVAL_P(z_array), "staticRoutes", sizeof("staticRoutes"), (void**)&z_static_routes) == FAILURE ) {
-        // php_error(E_ERROR, "empty staticRoutes");
-        zval *a = NULL;
-        ALLOC_ZVAL(a);
-        array_init(a);
-        z_static_routes = &a;
+    if ( zend_hash_find(Z_ARRVAL_P(z_array), "staticRoutes", sizeof("staticRoutes"), (void**)&z_static_routes) == SUCCESS ) {
+        zend_update_property(ce_pux_mux, new_object, "staticRoutes", sizeof("staticRoutes")-1, *z_static_routes TSRMLS_CC);
     }
 
-    if ( zend_hash_find(Z_ARRVAL_P(z_array), "routesById", sizeof("routesById"), (void**)&z_routes_by_id) == FAILURE ) {
-        // php_error(E_ERROR, "empty staticRoutes");
-        zval *a = NULL;
-        ALLOC_ZVAL(a);
-        array_init(a);
-        z_routes_by_id = &a;
+    if ( zend_hash_find(Z_ARRVAL_P(z_array), "routesById", sizeof("routesById"), (void**)&z_routes_by_id) == SUCCESS ) {
+        zend_update_property(ce_pux_mux, new_object, "routesById", sizeof("routesById")-1, *z_routes_by_id TSRMLS_CC);
     }
 
-    if ( zend_hash_find(Z_ARRVAL_P(z_array), "submux", sizeof("submux"), (void**)&z_submux) == FAILURE ) {
-        zval *a = NULL;
-        ALLOC_ZVAL(a);
-        array_init(a);
-        z_submux = &a;
+    if ( zend_hash_find(Z_ARRVAL_P(z_array), "submux", sizeof("submux"), (void**)&z_submux) == SUCCESS ) {
+        zend_update_property(ce_pux_mux, new_object, "submux", sizeof("submux")-1, *z_submux TSRMLS_CC);
     }
 
-    if ( zend_hash_find(Z_ARRVAL_P(z_array), "expand", sizeof("expand"), (void**)&z_expand) == FAILURE ) {
-        zval *a = NULL;
-        ALLOC_INIT_ZVAL(a);
-        ZVAL_BOOL(a, 0);
-        z_expand = &a;
+    if ( zend_hash_find(Z_ARRVAL_P(z_array), "expand", sizeof("expand"), (void**)&z_expand) == SUCCESS ) {
+        zend_update_property(ce_pux_mux, new_object, "expand", sizeof("expand")-1, *z_expand TSRMLS_CC);
     }
 
-    zval *new_object;
-    ALLOC_INIT_ZVAL(new_object);
-    object_init_ex(new_object, ce_pux_mux);
-    CALL_METHOD(Mux, __construct, new_object, new_object);
-
-    // zend_update_property_long( Z_OBJCE_P(new_object), new_object, "id", sizeof("id")-1, Z_LVAL_PP(z_id) TSRMLS_CC);
-    zend_update_property(ce_pux_mux, new_object, "id", sizeof("id")-1, *z_id TSRMLS_CC);
-    zend_update_property(ce_pux_mux, new_object, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
-    zend_update_property(ce_pux_mux, new_object, "submux", sizeof("submux")-1, *z_submux TSRMLS_CC);
-    zend_update_property(ce_pux_mux, new_object, "expand", sizeof("expand")-1, *z_expand TSRMLS_CC);
-    zend_update_property(ce_pux_mux, new_object, "staticRoutes", sizeof("staticRoutes")-1, *z_static_routes TSRMLS_CC);
-    zend_update_property(ce_pux_mux, new_object, "routesById", sizeof("routesById")-1, *z_routes_by_id TSRMLS_CC);
     *return_value = *new_object;
     zval_copy_ctor(return_value);
 }
