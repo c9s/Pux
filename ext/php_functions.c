@@ -152,6 +152,8 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
     int current_https;
     zval * current_http_host;
 
+    zval * server_vars_hash = fetch_server_vars_hash(TSRMLS_C);
+
     current_request_method = get_current_request_method_const(TSRMLS_C);
     current_https          = get_current_https(TSRMLS_C);
     current_http_host      = get_current_http_host(TSRMLS_C);
@@ -280,6 +282,14 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
                 return *z_route_pp;
             }
         }
+    }
+    return NULL;
+}
+
+inline zval * fetch_server_vars_hash(TSRMLS_D) {
+    zval **z_server_hash = NULL;
+    if ( zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS ) {
+        return *z_server_hash;
     }
     return NULL;
 }

@@ -20,6 +20,7 @@
 extern inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
 extern inline int get_current_request_method_const(TSRMLS_D);
 extern inline int get_current_https(TSRMLS_D);
+extern inline zval * fetch_server_vars_hash(TSRMLS_D);
 extern inline zval * fetch_server_var( char *key , int key_len );
 extern inline zval * get_current_http_host(TSRMLS_D);
 extern inline zval * get_current_request_uri(TSRMLS_D);
