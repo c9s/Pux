@@ -6,6 +6,10 @@ class APCDispatcherTest extends PHPUnit_Framework_TestCase
 {
     public function test()
     {
+        if ( ! extension_loaded('apc') || ! extension_loaded('apcu') ) {
+            skip('APC or APCu extension is required.');
+        }
+
         $mux = new Mux;
         $mux->add('/product/add', ['ProductController', 'addAction']);
         $dispatcher = new APCDispatcher($mux, array(
