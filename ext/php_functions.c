@@ -1,6 +1,7 @@
 
 #include "php.h"
 #include "string.h"
+#include "pcre.h"
 #include "main/php_main.h"
 #include "Zend/zend_API.h"
 #include "zend_exceptions.h"
@@ -313,7 +314,7 @@ inline int get_current_https(zval ** server_vars_hash TSRMLS_DC) {
 }
 
 inline zval * get_current_request_method(zval ** server_vars_hash TSRMLS_DC) {
-    return fetch_server_var(server_vars_hash, "REQUEST_METHOD", sizeof("REQUEST_METHOD") );
+    return fetch_server_var(server_vars_hash, "REQUEST_METHOD", sizeof("REQUEST_METHOD") TSRMLS_CC);
 }
 
 /**

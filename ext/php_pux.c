@@ -10,7 +10,6 @@
 #include "zend_exceptions.h"
 #include "zend_interfaces.h"
 #include "zend_object_handlers.h"
-#include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
 
 #include "php_pux.h"

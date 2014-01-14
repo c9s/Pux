@@ -271,16 +271,14 @@ class MuxTest extends PHPUnit_Framework_ExtensionTestCase
 
     public function testRouteWithId() {
         $mux = new \Pux\Mux;
-        $mux->expand = false;
-        ok($mux, "got mux");
-        $submux = new \Pux\Mux;
-        $submux->add('/hello/:name', [ 'HelloController','indexAction' ], [ 'id' => 'hello-name' ]);
-        $submux->add('/foo', [ 'HelloController','indexAction' ], [ 'id' => 'foo' ]);
+        $mux->add('/hello/:name', [ 'HelloController','indexAction' ], [ 'id' => 'hello-name' ]);
+        $mux->add('/foo', [ 'HelloController','indexAction' ], [ 'id' => 'foo' ]);
 
-        ok($submux->getRoute('foo'),'got foo route');
-        ok($submux->getRoute('hello-name'), 'got hello-name route');
-
-        $mux->mount( '/sub' , $submux);
+        ok($mux->routesById);
+        ok($mux->routesById['foo']);
+        $r = $mux->getRoute('foo');
+        ok( $r ,'should return foo route');
+        ok($mux->getRoute('hello-name'), 'should return hello-name route');
     }
 
     public function testMuxMountNoExpand() {

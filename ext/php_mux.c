@@ -535,12 +535,15 @@ PHP_METHOD(Mux, getRoute) {
         RETURN_FALSE;
     }
 
-    zval *z_routes_by_id;
+    zval *z_routes_by_id = NULL;
+    zval **z_route = NULL;
     z_routes_by_id = zend_read_property( ce_pux_mux , this_ptr, "routesById", sizeof("routesById")-1, 1 TSRMLS_CC);
 
-    zval **z_route = NULL;
-    if ( zend_hash_find( Z_ARRVAL_P(z_routes_by_id) , route_id, route_id_len, (void**) &z_route ) == SUCCESS ) {
-        RETURN_ZVAL(*z_route, 1 , 0);
+    // php_var_dump(&z_routes_by_id, 1 TSRMLS_CC);
+    if ( zend_hash_find( Z_ARRVAL_P(z_routes_by_id) , route_id, route_id_len + 1, (void**) &z_route ) == SUCCESS ) {
+        *return_value = **z_route;
+        zval_copy_ctor(return_value);
+        return;
     }
     RETURN_NULL();
 }
@@ -667,22 +670,23 @@ PHP_METHOD(Mux, compile) {
     }
 
 
-    int  buf_len = Z_STRLEN_P(compiled_code) + sizeof("<?php return ;") + 3;
+    int  buf_len = Z_STRLEN_P(compiled_code) + strlen("<?php return ;") + 1;
     char *buf = (char* ) ecalloc(buf_len, sizeof(char));
-    // char *buf = (char* ) emalloc(buf_len * sizeof(char));
-
-    strncat(buf, "<?php return ", sizeof("<?php return ") );
+    strncat(buf, "<?php return ", strlen("<?php return ") );
     strncat(buf, Z_STRVAL_P(compiled_code), Z_STRLEN_P(compiled_code));
     strncat(buf, ";", 1);
-    // strncat(buf, "\0", 1);
+    *(buf + buf_len - 1) = '\0';
 
+
+    // memcpytrncat(buf, "\0", 1);
     zval *z_code = NULL;
     zval *z_filename = NULL;
     zval *retval = NULL;
     ALLOC_INIT_ZVAL(z_code);
     ALLOC_INIT_ZVAL(z_filename);
-    ZVAL_STRING(z_code, buf, 0);
-    ZVAL_STRINGL(z_filename, filename, filename_len, 0);
+    ZVAL_STRING(z_code, buf, 1);
+    // CHECK_ZVAL_STRING(z_code);
+    ZVAL_STRINGL(z_filename, filename, filename_len, 1);
 
     zend_call_method( NULL, NULL, NULL, "file_put_contents", strlen("file_put_contents"), &retval, 2, z_filename, z_code TSRMLS_CC );
     zval_ptr_dtor(&z_filename);
@@ -772,7 +776,7 @@ PHP_METHOD(Mux, dispatch) {
             zval *z_route_vars_0_len;
             zval *z_substr = NULL;
 
-            if ( zend_hash_find( Z_ARRVAL_PP(z_options) , "vars", strlen("vars") , (void**) &z_route_vars ) == FAILURE ) {
+            if ( zend_hash_find( Z_ARRVAL_PP(z_options) , "vars", sizeof("vars") , (void**) &z_route_vars ) == FAILURE ) {
                 php_error(E_ERROR, "require route vars");
                 RETURN_FALSE;
             }
@@ -1014,29 +1018,38 @@ static void mux_add_route(INTERNAL_FUNCTION_PARAMETERS)
         Z_ADDREF_P(z_options); // reference it so it will not be recycled.
         Z_ADDREF_P(z_callback);
 
-        zval *z_new_routes;
-        ALLOC_INIT_ZVAL(z_new_routes);
-        array_init(z_new_routes);
+        zval *z_new_route;
+        ALLOC_INIT_ZVAL(z_new_route);
+        array_init(z_new_route);
 
         /* make the array: [ pcreFlag, pattern, callback, options ] */
-        add_index_bool(z_new_routes, 0 , 0); // pcre flag == false
-        add_index_stringl( z_new_routes, 1 , pattern, pattern_len , 1 );
-        add_index_zval( z_new_routes, 2 , z_callback);
-        add_index_zval( z_new_routes, 3 , z_options);
-        add_next_index_zval(z_routes, z_new_routes);
+        add_index_bool(z_new_route, 0 , 0); // pcre flag == false
+        add_index_stringl( z_new_route, 1 , pattern, pattern_len , 1 );
+        add_index_zval( z_new_route, 2 , z_callback);
+        add_index_zval( z_new_route, 3 , z_options);
+        add_next_index_zval(z_routes, z_new_route);
 
         // if there is no option specified in z_options, we can add the route to our static route hash
         if (zend_hash_has_more_elements(Z_ARRVAL_P(z_options)) != SUCCESS ) {
             zval * z_static_routes = zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
             if ( z_static_routes ) {
-                add_assoc_zval(z_static_routes, pattern, z_new_routes);
+                add_assoc_zval(z_static_routes, pattern, z_new_route);
             }
         }
 
         zval **z_route_id;
         if ( zend_hash_find( Z_ARRVAL_P(z_options) , "id", sizeof("id"), (void**)&z_route_id) == SUCCESS ) {
             zval * z_routes_by_id = zend_read_property(ce_pux_mux, this_ptr, "routesById", sizeof("routesById")-1, 1 TSRMLS_CC);
-            add_assoc_zval(z_routes_by_id, Z_STRVAL_PP(z_route_id), z_new_routes);
+
+            /*
+            zval *id_route = NULL;
+            ALLOC_ZVAL(id_route);
+            ZVAL_COPY_VALUE(id_route, z_new_route);
+            zval_copy_ctor(id_route);
+            add_assoc_zval(z_routes_by_id, Z_STRVAL_PP(z_route_id), id_route);
+            */
+
+            add_assoc_zval(z_routes_by_id, Z_STRVAL_PP(z_route_id), z_new_route);
         }
     }
 }
