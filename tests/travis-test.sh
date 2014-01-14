@@ -3,7 +3,7 @@ echo "Basic testing..."
 phpunit --debug
 
 echo "Stress testing..."
-phpunit --repeat 1000
+phpunit --repeat 100
 
 echo "Testing pux extension..."
 if [[ $(phpenv version-name) =~ "5.[345]" ]] ; then
@@ -12,7 +12,7 @@ if [[ $(phpenv version-name) =~ "5.[345]" ]] ; then
     extunit --phpunit --debug ControllerTest.php
 
     echo "Stress testing..."
-    extunit --phpunit --repeat 1000 MuxTest.php
-    extunit --phpunit --repeat 1000 ControllerTest.php
+    extunit --phpunit --repeat 100 MuxTest.php
+    extunit --phpunit --repeat 100 ControllerTest.php
     cd ..
 fi
