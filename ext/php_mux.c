@@ -866,21 +866,11 @@ PHP_METHOD(Mux, match) {
     zval **z_route_options_pp = NULL;
     if ( zend_hash_find( Z_ARRVAL_P( zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes") - 1, 1 TSRMLS_CC) ), path, path_len, (void**)&z_route_pp) == SUCCESS ) {
         if ( Z_TYPE_PP(z_route_pp) != IS_NULL ) {
-            if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 3, (void**) &z_route_options_pp) == SUCCESS 
-                && zend_hash_has_more_elements( Z_ARRVAL_PP( z_route_options_pp) ) == SUCCESS ) {
-                // validate route conditions here.
-                // if not pass, fallback to route dispatch
-                goto LOOKUP_ROUTES;
-            }
-
             *return_value = **z_route_pp;
             zval_copy_ctor(*z_route_pp);
             return;
         }
     }
-
-LOOKUP_ROUTES:
-
     z_route = php_pux_match(zend_read_property(ce_pux_mux , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC), path, path_len);
     if ( z_route != NULL ) {
         *return_value = *z_route;
@@ -1041,8 +1031,8 @@ static void mux_add_route(INTERNAL_FUNCTION_PARAMETERS)
         add_index_zval( z_new_routes, 3 , z_options);
         add_next_index_zval(z_routes, z_new_routes);
 
+        // if there is no option specified in z_options, we can add the route to our static route hash
         if (zend_hash_has_more_elements(Z_ARRVAL_P(z_options)) != SUCCESS ) {
-            // if there is no option specified in z_options, we can add the route to our static route hash
             zval * z_static_routes = zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
             if ( z_static_routes ) {
                 add_assoc_zval(z_static_routes, pattern, z_new_routes);
