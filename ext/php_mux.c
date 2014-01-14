@@ -79,7 +79,7 @@ zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry 
 {
     // zend_class_entry **ce_pattern_compiler;
     if ( ce_pattern_compiler == NULL ) {
-        ce_pattern_compiler = get_pattern_compiler_ce(TSRMLS_CC);
+        ce_pattern_compiler = get_pattern_compiler_ce(TSRMLS_C);
         if ( ce_pattern_compiler == NULL ) {
             return NULL;
         }
@@ -338,7 +338,7 @@ PHP_METHOD(Mux, mount) {
     }
 
 
-    zend_class_entry **ce_pattern_compiler = get_pattern_compiler_ce(TSRMLS_CC);
+    zend_class_entry **ce_pattern_compiler = get_pattern_compiler_ce(TSRMLS_C);
     if ( ce_pattern_compiler == NULL ) {
         RETURN_FALSE;
     }
@@ -938,7 +938,7 @@ PHP_METHOD(Mux, appendPCRERoute) {
 
     z_routes = zend_read_property(Z_OBJCE_P(this_ptr), getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
-    zend_class_entry **ce_pattern_compiler = get_pattern_compiler_ce(TSRMLS_CC);
+    zend_class_entry **ce_pattern_compiler = get_pattern_compiler_ce(TSRMLS_C);
     if ( ce_pattern_compiler == NULL ) {
         RETURN_FALSE;
     }
