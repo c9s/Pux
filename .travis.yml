@@ -6,10 +6,6 @@ php:
 before_script:
   - 'phpenv rehash'
   - 'composer install --dev'
-  - 'sudo apt-get install php5-dev'
-  - '[[ $(phpenv version-name) =~ "5.[34]" ]] && echo "extension=apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini'
-  - '[[ $(phpenv version-name) =~ "5.5" ]] && pecl install APCu-beta'
-  - '[[ $(phpenv version-name) =~ "5.5" ]] && echo "extension=apcc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini'
+  - ./tests/travis-setup.sh
 script:
-  - phpunit --debug
-  - phpunit --repeat 1000
+  - ./tests/travis-test.sh
