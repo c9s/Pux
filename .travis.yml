@@ -4,7 +4,7 @@ php:
   - 5.5
   - hhvm
 install:
-  - apt-get install php5-dev
+  - sudo apt-get install php5-dev
   - composer install --dev
   - pear channel-discover pear.corneltek.com
   - pear install -a -f corneltek/PHPUnit_TestMore
