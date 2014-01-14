@@ -208,7 +208,7 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
             zval_ptr_dtor(&pcre_ret);
 
             // check conditions only when route option is provided
-            if ( zend_hash_num_elements(Z_ARRVAL_PP(z_route_options_pp)) ) {
+            if ( zend_hash_has_more_elements(Z_ARRVAL_PP(z_route_options_pp)) == SUCCESS ) {
                 if ( 0 == validate_request_method( z_route_options_pp, current_request_method ) ) {
                     zval_ptr_dtor(&z_subpats);
                     continue;

@@ -777,6 +777,7 @@ PHP_METHOD(Mux, dispatch) {
             zval *z_path = NULL;
             zval *z_route_vars_0_len;
             zval *z_substr = NULL;
+
             if ( zend_hash_find( Z_ARRVAL_PP(z_options) , "vars", strlen("vars") , (void**) &z_route_vars ) == FAILURE ) {
                 php_error(E_ERROR, "require route vars");
                 RETURN_FALSE;
@@ -892,6 +893,9 @@ PHP_METHOD(Mux, appendRoute) {
         RETURN_FALSE;
     }
 
+    zval *z_routes;
+    zval *z_new_routes;
+
     if ( z_options == NULL ) {
         ALLOC_INIT_ZVAL(z_options);
         array_init(z_options);
@@ -900,10 +904,8 @@ PHP_METHOD(Mux, appendRoute) {
         array_init(z_options);
     }
 
-    zval *z_routes;
     z_routes = zend_read_property(Z_OBJCE_P(this_ptr), this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
-    zval *z_new_routes;
     ALLOC_INIT_ZVAL(z_new_routes);
     array_init(z_new_routes);
 
