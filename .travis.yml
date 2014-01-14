@@ -11,5 +11,6 @@ before_script:
 script:
   - ./tests/travis-test.sh
 cache:
+  apc: true
   directories:
   - vendor
