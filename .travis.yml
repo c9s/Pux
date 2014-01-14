@@ -5,8 +5,9 @@ php:
   - 5.5
   #  - hhvm
 before_script:
-  - phpenv rehash
-  - composer install --dev
+  - 'phpenv rehash'
+  - 'composer install --dev'
+  - '[[ -z $(php -v | grep 5.4) ]] || pecl install APC'
 script:
   - phpunit --debug
   - phpunit --repeat 1000
