@@ -17,7 +17,7 @@
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
 
-zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
+inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
 int get_current_request_method_const(TSRMLS_D);
 int get_current_https(TSRMLS_D);
 zval * fetch_server_var( char *key , int key_len );

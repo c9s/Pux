@@ -98,6 +98,10 @@ You can install Pux with composer by defining the following requirement in your 
 }
 ```
 
+
+
+### Install Extension
+
 To install pux extension to boost the performance:
 
 ```sh
@@ -106,6 +110,12 @@ cd Pux/ext
 phpize
 ./configure
 make && make install
+```
+
+Or you can configure the optimization flag to gain more when running `configure` command.:
+
+```sh
+CFLAGS="-O3" ./configure
 ```
 
 Then setup your php.ini config to load pux extension:

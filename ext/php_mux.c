@@ -743,11 +743,11 @@ PHP_METHOD(Mux, dispatch) {
     zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 2 , (void**) &z_callback );
     zend_hash_index_find( Z_ARRVAL_P(z_return_route) , 3 , (void**) &z_options );
 
+    zval *z_submux_array = NULL;
+    zval **z_submux = NULL;
 
     // dispatch to submux if the callback is an ID.
     if ( Z_TYPE_PP(z_callback) == IS_LONG ) {
-        zval *z_submux_array = NULL;
-        zval **z_submux = NULL;
         z_submux_array = zend_read_property( ce_pux_mux, this_ptr, "submux", sizeof("submux")-1, 1 TSRMLS_CC);
 
         if ( z_submux_array == NULL ) {
@@ -860,9 +860,11 @@ PHP_METHOD(Mux, match) {
         RETURN_FALSE;
     }
 
+    zval *z_routes = NULL;
     zval *z_route = NULL;
+    zval *z_static_routes = NULL;
 
-    zval * z_static_routes = zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes") - 1, 1 TSRMLS_CC);
+    z_static_routes = zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes") - 1, 1 TSRMLS_CC);
     if ( zend_hash_find( Z_ARRVAL_P(z_static_routes), path, path_len, (void**)&z_route) == SUCCESS ) {
         if ( Z_TYPE_P(z_route) != IS_NULL ) {
             *return_value = *z_route;
@@ -871,7 +873,7 @@ PHP_METHOD(Mux, match) {
         }
     }
 
-    zval * z_routes = zend_read_property(ce_pux_mux , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    z_routes = zend_read_property(ce_pux_mux , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     z_route = php_pux_match(z_routes, path, path_len);
     if ( z_route != NULL ) {
         *return_value = *z_route;
