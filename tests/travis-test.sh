@@ -8,6 +8,7 @@ phpunit --repeat 100
 if [[ $(phpenv version-name) =~ 5.[345] ]] ; then
     echo "Testing pux extension..."
     cd ext
+    make clean && make || exit 1
     extunit --phpunit --debug MuxTest.php || exit 1
     extunit --phpunit --debug ControllerTest.php || exit 1
 
