@@ -861,7 +861,6 @@ PHP_METHOD(Mux, match) {
         RETURN_FALSE;
     }
 
-    zval *z_routes = NULL;
     zval **z_route_pp = NULL;
     zval *z_route = NULL;
     zval *z_static_routes = NULL;
@@ -876,8 +875,7 @@ PHP_METHOD(Mux, match) {
         }
     }
 
-    z_routes = zend_read_property(ce_pux_mux , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC);
-    z_route = php_pux_match(z_routes, path, path_len);
+    z_route = php_pux_match(zend_read_property(ce_pux_mux , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC), path, path_len);
     if ( z_route != NULL ) {
         *return_value = *z_route;
         zval_copy_ctor(z_route);
