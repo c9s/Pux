@@ -108,23 +108,26 @@ class MuxCompiler
             $refMethod = $refClass->getMethod($method);
             $refParameters = $refMethod->getParameters();
 
-            $route[3]['__reflection'] = array();
-            foreach( $refParameters as $refParam ) {
-                // ReflectionParameter
-                $param = array(
-                    'name' => $refParam->getName(),
-                    'position' => $refParam->getPosition(),
-                );
-                if ( $refParam->isDefaultValueAvailable() ) {
-                    $param['default'] = $refParam->getDefaultValue();
-                    if ( $refParam->isDefaultValueConstant() ) {
-                        $param['constant'] = $refParam->getDefaultValueConstantName();
+            // HHVM does not support Reflection currently.
+            if (! defined('HHVM_VERSION')) {
+                $route[3]['__reflection'] = array();
+                foreach( $refParameters as $refParam ) {
+                    // ReflectionParameter
+                    $param = array(
+                        'name' => $refParam->getName(),
+                        'position' => $refParam->getPosition(),
+                    );
+                    if ( $refParam->isDefaultValueAvailable() ) {
+                        $param['default'] = $refParam->getDefaultValue();
+                        if ( $refParam->isDefaultValueConstant() ) {
+                            $param['constant'] = $refParam->getDefaultValueConstantName();
+                        }
                     }
+                    if ( $optional = $refParam->isOptional() ) {
+                        $param['optional'] = $optional;
+                    }
+                    $route[3]['__reflection']['params'][] = $param;
                 }
-                if ( $optional = $refParam->isOptional() ) {
-                    $param['optional'] = $optional;
-                }
-                $route[3]['__reflection']['params'][] = $param;
             }
         }
     }
