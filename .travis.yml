@@ -11,6 +11,7 @@ install:
   - pear install -a -f corneltek/PHPUnit_Framework_ExtensionTestCase
   - pear install -a -f corneltek/ExtUnit
 before_script:
+  - php-config
   - phpenv rehash
   - phpenv version-name
   - ./tests/travis-setup.sh
