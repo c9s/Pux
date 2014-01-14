@@ -867,11 +867,9 @@ PHP_METHOD(Mux, match) {
 
     z_static_routes = zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes") - 1, 1 TSRMLS_CC);
     if ( zend_hash_find( Z_ARRVAL_P(z_static_routes), path, path_len, (void**)&z_route) == SUCCESS ) {
-        if ( Z_TYPE_P(z_route) != IS_NULL ) {
-            *return_value = *z_route;
-            zval_copy_ctor(z_route);
-            return;
-        }
+        *return_value = *z_route;
+        zval_copy_ctor(z_route);
+        return;
     }
 
     z_routes = zend_read_property(ce_pux_mux , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC);
