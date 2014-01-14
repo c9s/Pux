@@ -159,9 +159,6 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
     current_http_host      = get_current_http_host(TSRMLS_C);
 
     HashPosition z_routes_pointer;
-    HashTable    *z_routes_hash;
-
-    z_routes_hash = Z_ARRVAL_P(z_routes);
 
     // for iterating routes
     zval **z_route_pp;
@@ -176,9 +173,9 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
     zval *pcre_ret = NULL;
     zval *z_subpats = NULL; /* Array for subpatterns */
 
-    for(zend_hash_internal_pointer_reset_ex(z_routes_hash, &z_routes_pointer); 
-            zend_hash_get_current_data_ex(z_routes_hash, (void**) &z_route_pp, &z_routes_pointer) == SUCCESS; 
-            zend_hash_move_forward_ex(z_routes_hash, &z_routes_pointer)) 
+    for(zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_routes), &z_routes_pointer); 
+            zend_hash_get_current_data_ex(Z_ARRVAL_P(z_routes), (void**) &z_route_pp, &z_routes_pointer) == SUCCESS; 
+            zend_hash_move_forward_ex(Z_ARRVAL_P(z_routes), &z_routes_pointer)) 
     {
         if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 0, (void**) &z_is_pcre_pp) == FAILURE 
             || zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 1, (void**) &z_pattern_pp) == FAILURE 
