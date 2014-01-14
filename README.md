@@ -430,36 +430,41 @@ With one pcre route:
 
 Compare to other PHP routers (test code: <https://github.com/c9s/router-benchmark/blob/master/code/dispatch.php> ):
 
-    n=10000
-    Running pux extension - . 100862.19625101/s
-    Running klein - . 1882.724378535/s
-    Running ham - . 16594.562964364/s
-    Running aura - . 39738.054814455/s
-    Running symfony/routing - . 2088.8575643833/s
-    
-                         Rate   Mem pux extension aura ham symfony/routing klein
-      pux extension 100.86K/s    0B            -- -39%-16%             -2%   -1%
-               aura  39.74K/s    0B          253%   ---41%             -5%   -4%
-                ham  16.59K/s    0B          607% 239%  --            -12%  -11%
-    symfony/routing   2.09K/s  524K         4828%1902%794%              --  -90%
-              klein   1.88K/s  262K         5357%2110%881%            110%    --
-    
-    
-    ================================== Bar Chart ==================================
-    
-        pux extension 100.86K/s | ████████████████████████████████████████████████████████████  |
-                 aura  39.74K/s | ███████████████████████                                       |
-                  ham  16.59K/s | █████████                                                     |
-      symfony/routing   2.09K/s | █                                                             |
-                klein   1.88K/s | █                                                             |
-    
-    
-    ============================== System Information ==============================
-    
-    PHP Version: 5.5.6
-    CPU Brand String: Intel(R) Core(TM) i5-3427U CPU @ 1.80GHz
-    
-    With XDebug Extension.
+<pre>
+n=10000
+Runing php array - . 138796.45654569/s
+Runing pux - . 124982.98519026/s
+Runing klein - . 1801.5070399717/s
+Runing ham - . 13566.734991391/s
+Runing aura - . 39657.986477172/s
+Runing symfony/routing - . 1934.2415677861/s
+
+                     Rate   Mem php array pux aura ham symfony/routing klein
+      php array  138.8K/s    0B        ---90% -28% -9%             -1%   -1%
+            pux 124.98K/s    0B      111%  -- -31%-10%             -1%   -1%
+           aura  39.66K/s    0B      349%315%   ---34%             -4%   -4%
+            ham  13.57K/s    0B     1023%921% 292%  --            -14%  -13%
+symfony/routing   1.93K/s  786K     7175%6461%2050%701%              --  -93%
+          klein    1.8K/s  262K     7704%6937%2201%753%            107%    --
+
+
+================================== Bar Chart ==================================
+
+        php array  138.8K/s | ████████████████████████████████████████████████████████████  |
+              pux 124.98K/s | ██████████████████████████████████████████████████████        |
+             aura  39.66K/s | █████████████████                                             |
+              ham  13.57K/s | █████                                                         |
+  symfony/routing   1.93K/s |                                                               |
+            klein    1.8K/s |                                                               |
+
+
+============================== System Information ==============================
+
+PHP Version: 5.5.6
+CPU Brand String: Intel(R) Core(TM) i5-3427U CPU @ 1.80GHz
+
+With XDebug Extension.
+</pre>
 
 
 ### Through Apache
