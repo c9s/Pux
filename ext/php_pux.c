@@ -60,7 +60,8 @@ ZEND_GET_MODULE(pux)
 
 static void php_pux_init_globals(zend_pux_globals *pux_globals)
 {
-    // hello_globals->direction = 1;
+    ALLOC_INIT_ZVAL(pux_globals->mux_array);
+    array_init(pux_globals->mux_array);
 }
 
 PHP_MINIT_FUNCTION(pux) {
