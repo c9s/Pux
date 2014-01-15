@@ -49,6 +49,11 @@ zend_module_entry pux_module_entry = {
     STANDARD_MODULE_PROPERTIES
 };
 
+PHP_INI_BEGIN()
+    // PHP_INI_ENTRY("pux.fstat", "Hello World", PHP_INI_ALL, NULL)
+    // STD_PHP_INI_ENTRY("pux.direction", "1", PHP_INI_ALL, OnUpdateBool, direction, zend_hello_globals, hello_globals)
+PHP_INI_END()
+
 #ifdef COMPILE_DL_PUX
 ZEND_GET_MODULE(pux)
 #endif
