@@ -66,6 +66,8 @@ ZEND_END_MODULE_GLOBALS(pux)
   POP_PARAM(); POP_PARAM();
 
 PHP_MINIT_FUNCTION(pux);
+PHP_MSHUTDOWN_FUNCTION(pux);
+PHP_RINIT_FUNCTION(pux);
 
 zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
 

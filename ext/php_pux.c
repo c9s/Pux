@@ -41,8 +41,8 @@ zend_module_entry pux_module_entry = {
     PHP_PUX_EXTNAME,
     php_functions,
     PHP_MINIT(pux),
-    NULL,
-    NULL,
+    PHP_MSHUTDOWN(pux),
+    PHP_RINIT(pux),
     NULL,
     NULL,
     PHP_PUX_VERSION,
@@ -57,6 +57,14 @@ PHP_MINIT_FUNCTION(pux) {
   pux_init_mux(TSRMLS_C);
   pux_init_expandable_mux(TSRMLS_C);
   pux_init_controller(TSRMLS_C);
+  return SUCCESS;
+}
+
+PHP_MSHUTDOWN_FUNCTION(pux) {
+  return SUCCESS;
+}
+
+PHP_RINIT_FUNCTION(pux) {
   return SUCCESS;
 }
 
