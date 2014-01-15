@@ -76,25 +76,20 @@ PHP_METHOD(Controller, getActionMethods)
     HashTable *function_table = &Z_OBJCE_P(this_ptr)->function_table;
     HashPosition pos;
 
-    zval *funcs = NULL;
-    ALLOC_INIT_ZVAL(funcs);
-    array_init(funcs);
-
+    array_init(return_value);
 
     zend_function *mptr;
-    zend_hash_internal_pointer_reset_ex(&Z_OBJCE_P(this_ptr)->function_table, &pos);
+    zend_hash_internal_pointer_reset_ex(function_table, &pos);
 
-    while (zend_hash_get_current_data_ex(&Z_OBJCE_P(this_ptr)->function_table, (void **) &mptr, &pos) == SUCCESS) {
+    while (zend_hash_get_current_data_ex(function_table, (void **) &mptr, &pos) == SUCCESS) {
         const char * key = mptr->common.function_name;
         int    key_len = strlen(mptr->common.function_name);
         int p = strpos(key, "Action");
         if ( p != -1 && p == (key_len - strlen("Action")) ) {
-            add_next_index_stringl(funcs, key, key_len, 1);
+            add_next_index_stringl(return_value, key, key_len, 1);
         }
-        zend_hash_move_forward_ex(&Z_OBJCE_P(this_ptr)->function_table, &pos);
+        zend_hash_move_forward_ex(function_table, &pos);
     }
-    *return_value = *funcs;
-    zval_copy_ctor(return_value);
     return;
 }
 
@@ -137,7 +132,7 @@ char * translate_method_name_to_path(const char *method_name)
 PHP_METHOD(Controller, getActionPaths)
 {
     zend_function *fe;
-    if ( zend_hash_find( &ce_pux_controller->function_table, "getactionmethods", sizeof("getactionmethods"), (void **) &fe) == FAILURE ) {
+    if ( zend_hash_quick_find( &ce_pux_controller->function_table, "getactionmethods", sizeof("getactionmethods"), zend_inline_hash_func(ZEND_STRS("getactionmethods")), (void **) &fe) == FAILURE ) {
         php_error(E_ERROR, "getActionMethods method not found");
     }
     // call export method
@@ -161,8 +156,8 @@ PHP_METHOD(Controller, getActionPaths)
         char * path = translate_method_name_to_path(method_name);
         if ( path ) {
             zval * new_item;
-            ALLOC_INIT_ZVAL(new_item);
-            array_init(new_item);
+            MAKE_STD_ZVAL(new_item);
+            array_init_size(new_item, 2);
             add_next_index_string(new_item, path, 0);
             add_next_index_stringl(new_item, method_name, Z_STRLEN_PP(func) , 1);
             add_next_index_zval(return_value, new_item);
@@ -174,7 +169,7 @@ PHP_METHOD(Controller, getActionPaths)
 PHP_METHOD(Controller, expand)
 {
     zval *new_mux;
-    ALLOC_INIT_ZVAL(new_mux);
+    MAKE_STD_ZVAL(new_mux);
     object_init_ex(new_mux, ce_pux_mux);
     CALL_METHOD(Mux, __construct, new_mux, new_mux);
 
@@ -210,8 +205,8 @@ PHP_METHOD(Controller, expand)
         }
 
         zval *z_callback;
-        ALLOC_INIT_ZVAL(z_callback);
-        array_init(z_callback);
+        MAKE_STD_ZVAL(z_callback);
+        array_init_size(z_callback, 2);
         add_next_index_stringl(z_callback, class_name, class_name_len, 1);
         add_next_index_zval(z_callback, *z_method);
 
@@ -236,21 +231,21 @@ PHP_METHOD(Controller, after) {
 
 PHP_METHOD(Controller, toJson)
 {
-    zval *z_data = NULL;
+    zval *z_data;
     long options = 0;
     long depth = 0;
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z|ll", &z_data, &options, &depth) == FAILURE) {
         RETURN_FALSE;
     }
 
-    zval *z_options = NULL;
-    zval *z_depth= NULL;
+    zval *z_options;
+    zval *z_depth;
 
-    ALLOC_INIT_ZVAL(z_options);
-    ALLOC_INIT_ZVAL(z_depth);
+    MAKE_STD_ZVAL(z_options);
+    MAKE_STD_ZVAL(z_depth);
 
-    Z_LVAL_P(z_depth) = 0;
-    Z_LVAL_P(z_options) = 0;
+    ZVAL_LONG(z_depth, 0);
+    ZVAL_LONG(z_options, 0);
 
     
 
