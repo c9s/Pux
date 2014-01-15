@@ -58,14 +58,26 @@ PHP_INI_END()
 ZEND_GET_MODULE(pux)
 #endif
 
+static void php_pux_init_globals(zend_pux_globals *pux_globals)
+{
+    // hello_globals->direction = 1;
+}
+
 PHP_MINIT_FUNCTION(pux) {
+
+  ZEND_INIT_MODULE_GLOBALS(pux, php_pux_init_globals, NULL);
+  REGISTER_INI_ENTRIES();
+
   pux_init_mux(TSRMLS_C);
   pux_init_expandable_mux(TSRMLS_C);
   pux_init_controller(TSRMLS_C);
+
+
   return SUCCESS;
 }
 
 PHP_MSHUTDOWN_FUNCTION(pux) {
+  UNREGISTER_INI_ENTRIES();
   return SUCCESS;
 }
 

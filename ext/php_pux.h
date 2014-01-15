@@ -19,9 +19,12 @@
 #include "TSRM.h"
 #endif
 
+
+// global variable structure
 ZEND_BEGIN_MODULE_GLOBALS(pux)
-    long counter;
-    zend_bool direction;
+    zval *mux_array;
+    // HashTable *
+    // zend_bool direction;
 ZEND_END_MODULE_GLOBALS(pux)
 
 #ifdef ZTS
