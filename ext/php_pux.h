@@ -11,7 +11,7 @@
 #include "zend_object_handlers.h"
 #include "ext/standard/php_string.h"
 
-#define PHP_PUX_VERSION "1.1.2"
+#define PHP_PUX_VERSION "1.3.1"
 #define PHP_PUX_EXTNAME "pux"
 
 #define ZEND_HASH_FETCH(hash,key,ret) \
