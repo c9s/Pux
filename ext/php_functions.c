@@ -38,6 +38,27 @@ PHP_FUNCTION(pux_match)
     RETURN_NULL();
 }
 
+PHP_FUNCTION(pux_mux_store)
+{
+    zval *z_mux;
+    char *key;
+    int  key_len;
+
+    /* parse parameters */
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa", 
+                    &path, &path_len ,
+                    &z_mux ) == FAILURE) {
+        RETURN_FALSE;
+    }
+    PUX_G(mux_array);
+    RETURN_TRUE();
+}
+
+PHP_FUNCTION(pux_mux_fetch)
+{
+
+}
+
 PHP_FUNCTION(pux_sort_routes)
 {
     zval *a;

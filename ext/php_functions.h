@@ -32,5 +32,7 @@ extern inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC)
 
 PHP_FUNCTION(pux_match);
 PHP_FUNCTION(pux_sort_routes);
+PHP_FUNCTION(pux_mux_store);
+PHP_FUNCTION(pux_mux_fetch);
 
 #endif
