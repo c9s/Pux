@@ -21,6 +21,8 @@
 
 zend_class_entry *ce_pux_exception;
 
+ZEND_DECLARE_MODULE_GLOBALS(pux);
+
 // #define DEBUG 1
 static const zend_function_entry php_functions[] = {
     PHP_FE(pux_match, NULL)

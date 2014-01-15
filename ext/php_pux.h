@@ -14,6 +14,24 @@
 #define PHP_PUX_VERSION "1.3.1"
 #define PHP_PUX_EXTNAME "pux"
 
+
+#ifdef ZTS
+#include "TSRM.h"
+#endif
+
+ZEND_BEGIN_MODULE_GLOBALS(pux)
+    long counter;
+    zend_bool direction;
+ZEND_END_MODULE_GLOBALS(pux)
+
+#ifdef ZTS
+#define PUX_G(v) TSRMG(pux_globals_id, zend_pux_globals *, v)
+#else
+#define PUX_G(v) (pux_globals.v)
+#endif
+
+
+
 #define ZEND_HASH_FETCH(hash,key,ret) \
     zend_hash_find(hash, key, sizeof(key), (void**)&ret) == SUCCESS
 
