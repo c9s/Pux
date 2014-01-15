@@ -19,6 +19,7 @@
 #include "TSRM.h"
 #endif
 
+extern int pux_globals_id;
 
 // global variable structure
 ZEND_BEGIN_MODULE_GLOBALS(pux)

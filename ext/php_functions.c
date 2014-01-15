@@ -9,6 +9,7 @@
 #include "zend_object_handlers.h"
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
+#include "php_pux.h"
 #include "php_functions.h"
 #include "php_expandable_mux.h"
 
@@ -46,17 +47,18 @@ PHP_FUNCTION(pux_mux_store)
 
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa", 
-                    &path, &path_len ,
+                    &key, &key_len ,
                     &z_mux ) == FAILURE) {
         RETURN_FALSE;
     }
     PUX_G(mux_array);
-    RETURN_TRUE();
+    RETURN_TRUE;
 }
 
 PHP_FUNCTION(pux_mux_fetch)
 {
 
+    RETURN_TRUE;
 }
 
 PHP_FUNCTION(pux_sort_routes)
