@@ -15,7 +15,12 @@ class Executor
         $cb = $route[2]; /* get callback */
 
         // create the reflection class
-        $rc = new ReflectionClass( $cb[0] );
+        try
+        {
+            $rc = new ReflectionClass( $cb[0] );
+        } catch (Exception $e) {
+            throw new Exception('Class exception');
+        }
 
         $args = null;
 
