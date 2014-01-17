@@ -39,12 +39,35 @@ PHP_FUNCTION(pux_match)
     RETURN_NULL();
 }
 
+static int _pux_store_mux(char *name, zval * mux TSRMLS_DC) {
+    zend_rsrc_list_entry new_le;
+    char *persistent_key;
+    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+    Z_ADDREF_P(mux);
+    new_le.type = le_mux_hash_persist;
+    new_le.ptr = mux;
+    int ret = zend_hash_update(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
+    efree(persistent_key);
+    return ret;
+}
+
+static zval * _pux_fetch_mux(char *name TSRMLS_DC) {
+    zend_rsrc_list_entry *le;
+    char *persistent_key;
+    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS) {
+        efree(persistent_key);
+        return (zval*) le->ptr;
+    }
+    efree(persistent_key);
+    return NULL;
+}
+
 PHP_FUNCTION(pux_store_mux)
 {
     zval *mux;
     char *name;
     int  name_len;
-    zend_rsrc_list_entry *le, new_le;
 
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz", 
@@ -52,16 +75,14 @@ PHP_FUNCTION(pux_store_mux)
                     &mux ) == FAILURE) {
         RETURN_FALSE;
     }
-    char *persistent_key;
-    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
-    Z_ADDREF_P(mux);
-    new_le.type = le_mux_hash_persist;
-    new_le.ptr = mux;
 
-    zend_hash_update(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
-    efree(persistent_key);
-    RETURN_TRUE;
+    if ( _pux_store_mux(name, mux TSRMLS_CC) == SUCCESS ) {
+        RETURN_TRUE;
+    }
+    RETURN_FALSE;
 }
+
+
 
 PHP_FUNCTION(pux_delete_mux)
 {
@@ -90,25 +111,18 @@ PHP_FUNCTION(pux_fetch_mux)
 {
     char *name;
     int  name_len;
-    zend_rsrc_list_entry *le;
 
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", 
                     &name, &name_len) == FAILURE) {
         RETURN_FALSE;
     }
-
-    char *persistent_key;
-    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
-
-    if (zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS) {
-        efree(persistent_key);
-        zval *mux = (zval*) le->ptr;
+    zval * mux = _pux_fetch_mux(name TSRMLS_CC);
+    if ( mux ) {
         *return_value = *mux;
         zval_copy_ctor(return_value);
         return;
     }
-    efree(persistent_key);
     RETURN_FALSE;
 }
 
