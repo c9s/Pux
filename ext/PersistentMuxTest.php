@@ -31,4 +31,8 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         ok( is_object($m) );
         ok( $m instanceof Mux);
     }
+
+    public function testPersistentDispatch() {
+        pux_persistent_dispatch('testing', '_test_mux.php', '/');
+    }
 }

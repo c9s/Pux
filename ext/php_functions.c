@@ -3,6 +3,7 @@
 #include "string.h"
 #include "pcre.h"
 #include "main/php_main.h"
+#include "Zend/zend_compile.h"
 #include "Zend/zend_API.h"
 #include "zend_exceptions.h"
 #include "zend_interfaces.h"
@@ -40,19 +41,93 @@ PHP_FUNCTION(pux_match)
 }
 
 
-int _pux_compile_file(char *filename TSRMLS_DC) {
-    zend_op_array *op_array;
+#if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION > 2)) || (PHP_MAJOR_VERSION > 5)
+#define PUX_STORE_EG_ENVIRON() \
+	{ \
+		zval ** __old_return_value_pp   = EG(return_value_ptr_ptr); \
+		zend_op ** __old_opline_ptr  	= EG(opline_ptr); \
+		zend_op_array * __old_op_array  = EG(active_op_array);
+
+#define PUX_RESTORE_EG_ENVIRON() \
+		EG(return_value_ptr_ptr) = __old_return_value_pp;\
+		EG(opline_ptr)			 = __old_opline_ptr; \
+		EG(active_op_array)		 = __old_op_array; \
+	}
+
+#else
+
+#define PUX_STORE_EG_ENVIRON() \
+	{ \
+		zval ** __old_return_value_pp  		   = EG(return_value_ptr_ptr); \
+		zend_op ** __old_opline_ptr 		   = EG(opline_ptr); \
+		zend_op_array * __old_op_array 		   = EG(active_op_array); \
+		zend_function_state * __old_func_state = EG(function_state_ptr);
+
+#define PUX_RESTORE_EG_ENVIRON() \
+		EG(return_value_ptr_ptr) = __old_return_value_pp;\
+		EG(opline_ptr)			 = __old_opline_ptr; \
+		EG(active_op_array)		 = __old_op_array; \
+		EG(function_state_ptr)	 = __old_func_state; \
+	}
+
+#endif
+
+
+int pux_loader(char *path, zval *rv TSRMLS_DC) {
     zend_file_handle file_handle;
-    file_handle.filename = filename;
+    zend_op_array   *op_array;
+    char realpath[MAXPATHLEN];
+
+    if (!VCWD_REALPATH(path, realpath)) {
+        return 0;
+    }
+
+    file_handle.filename = path;
     file_handle.free_filename = 0;
     file_handle.type = ZEND_HANDLE_FILENAME;
     file_handle.opened_path = NULL;
-    op_array =  zend_compile_file(&file_handle, ZEND_INCLUDE TSRMLS_CC);
-    if(!op_array) {
-        php_error(E_ERROR, "Error parsing source: %s\n", file_handle.filename);
-        return 0;
+    file_handle.handle.fp = NULL;
+
+    op_array = zend_compile_file(&file_handle, ZEND_REQUIRE TSRMLS_CC);
+
+    if (op_array && file_handle.handle.stream.handle) {
+        int dummy = 1;
+
+        if (!file_handle.opened_path) {
+            file_handle.opened_path = path;
+        }
+
+        zend_hash_add(&EG(included_files), file_handle.opened_path, strlen(file_handle.opened_path)+1, (void *)&dummy, sizeof(int), NULL);
     }
-    return 1;
+    zend_destroy_file_handle(&file_handle TSRMLS_CC);
+
+    if (op_array) {
+        PUX_STORE_EG_ENVIRON();
+
+        EG(return_value_ptr_ptr) = &rv;
+        EG(active_op_array)      = op_array;
+
+#if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION > 2)) || (PHP_MAJOR_VERSION > 5)
+        if (!EG(active_symbol_table)) {
+            zend_rebuild_symbol_table(TSRMLS_C);
+        }
+#endif
+        zend_execute(op_array TSRMLS_CC);
+
+
+        destroy_op_array(op_array TSRMLS_CC);
+        efree(op_array);
+
+        if (!EG(exception)) {
+            if (EG(return_value_ptr_ptr) && *EG(return_value_ptr_ptr)) {
+                zval_ptr_dtor(EG(return_value_ptr_ptr));
+            }
+        }
+        PUX_RESTORE_EG_ENVIRON();
+        return 1;
+    }
+
+    return 0;
 }
 
 int _pux_store_mux(char *name, zval * mux TSRMLS_DC) {
@@ -109,6 +184,12 @@ PHP_FUNCTION(pux_persistent_dispatch)
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sss", &ns, &ns_len, &filename, &filename_len, &path, &path_len) == FAILURE) {
         RETURN_FALSE;
+    }
+    zval *rv = NULL;
+    ALLOC_INIT_ZVAL(rv);
+    if ( pux_loader(filename, rv TSRMLS_CC) ) {
+        php_printf("import success");
+        php_var_dump(&rv, 1);
     }
     RETURN_FALSE;
 }
