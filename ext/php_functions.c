@@ -41,7 +41,7 @@ PHP_FUNCTION(pux_match)
 
 PHP_FUNCTION(pux_store_mux)
 {
-    zval *z_mux;
+    zval *mux;
     char *name;
     int  name_len;
     zend_rsrc_list_entry *le, new_le;
@@ -49,27 +49,15 @@ PHP_FUNCTION(pux_store_mux)
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz", 
                     &name, &name_len ,
-                    &z_mux ) == FAILURE) {
+                    &mux ) == FAILURE) {
         RETURN_FALSE;
     }
-
     char *persistent_key;
     int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
-
-    /*
-    if (zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS) {
-        efree(persistent_key);
-        RETURN_TRUE;
-    }
-    */
-
-    // alloc persistent_mux
-    // zval *persistent_mux = (zval*) pemalloc( sizeof(zval*) , 1);
-    // INIT_PZVAL(persistent_mux);
-    // ZVAL_COPY_VALUE(persistent_mux, z_mux);
-    // new_le.ptr = persistent_mux;
-    new_le.ptr = z_mux;
+    Z_ADDREF_P(mux);
     new_le.type = le_mux_hash_persist;
+    new_le.ptr = mux;
+
     zend_hash_update(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
     efree(persistent_key);
     RETURN_TRUE;
@@ -77,7 +65,28 @@ PHP_FUNCTION(pux_store_mux)
 
 PHP_FUNCTION(pux_fetch_mux)
 {
-    RETURN_TRUE;
+    char *name;
+    int  name_len;
+    zend_rsrc_list_entry *le;
+
+    /* parse parameters */
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", 
+                    &name, &name_len) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    char *persistent_key;
+    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+
+    if (zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS) {
+        efree(persistent_key);
+        zval *mux = (zval*) le->ptr;
+        *return_value = *mux;
+        zval_copy_ctor(return_value);
+        return;
+    }
+    efree(persistent_key);
+    RETURN_FALSE;
 }
 
 PHP_FUNCTION(pux_sort_routes)

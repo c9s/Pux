@@ -14,5 +14,20 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         $mux = new Mux;
         ok( pux_store_mux('phpunit1', $mux), 'mux stored' );
         ok( pux_store_mux('phpunit1', $mux), 'mux updated' );
+        $m = pux_fetch_mux('phpunit1');
+        ok($m);
+        ok( is_object($m) );
+        ok( $m instanceof Mux);
+    }
+
+
+
+    /**
+     * @depends testStore
+     */
+    public function testFetch() {
+        $m = pux_fetch_mux('phpunit1');
+        ok( is_object($m) );
+        ok( $m instanceof Mux);
     }
 }
