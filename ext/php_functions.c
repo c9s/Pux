@@ -55,19 +55,22 @@ PHP_FUNCTION(pux_store_mux)
 
     char *persistent_key;
     int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+
+    /*
     if (zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS) {
         efree(persistent_key);
-        return;
+        RETURN_TRUE;
     }
+    */
 
     // alloc persistent_mux
-    zval *persistent_mux = (zval*) pemalloc( sizeof(zval*) , 1);
-    INIT_PZVAL(persistent_mux);
-    ZVAL_COPY_VALUE(persistent_mux, z_mux);
-
-    new_le.ptr = persistent_mux;
+    // zval *persistent_mux = (zval*) pemalloc( sizeof(zval*) , 1);
+    // INIT_PZVAL(persistent_mux);
+    // ZVAL_COPY_VALUE(persistent_mux, z_mux);
+    // new_le.ptr = persistent_mux;
+    new_le.ptr = z_mux;
     new_le.type = le_mux_hash_persist;
-    zend_hash_add(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
+    zend_hash_update(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
     efree(persistent_key);
     RETURN_TRUE;
 }
