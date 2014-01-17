@@ -33,6 +33,7 @@ static const zend_function_entry php_functions[] = {
     PHP_FE(pux_fetch_mux, NULL)
     PHP_FE(pux_store_mux, NULL)
     PHP_FE(pux_delete_mux, NULL)
+    PHP_FE(pux_persistent_dispatch, NULL)
     PHP_FE_END
 };
 

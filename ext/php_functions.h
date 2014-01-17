@@ -30,10 +30,19 @@ extern inline int validate_request_method(zval **z_route_options_pp, int current
 extern inline int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC);
 extern inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC);
 
+int _pux_store_mux(char *name, zval * mux TSRMLS_DC);
+zval * _pux_fetch_mux(char *name TSRMLS_DC);
+
+
+
+
+
+
 PHP_FUNCTION(pux_match);
 PHP_FUNCTION(pux_sort_routes);
 PHP_FUNCTION(pux_store_mux);
 PHP_FUNCTION(pux_fetch_mux);
 PHP_FUNCTION(pux_delete_mux);
+PHP_FUNCTION(pux_persistent_dispatch);
 
 #endif

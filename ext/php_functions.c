@@ -39,19 +39,36 @@ PHP_FUNCTION(pux_match)
     RETURN_NULL();
 }
 
-static int _pux_store_mux(char *name, zval * mux TSRMLS_DC) {
+
+int _pux_compile_file(char *filename TSRMLS_DC) {
+    zend_op_array *op_array;
+    zend_file_handle file_handle;
+    file_handle.filename = filename;
+    file_handle.free_filename = 0;
+    file_handle.type = ZEND_HANDLE_FILENAME;
+    file_handle.opened_path = NULL;
+    op_array =  zend_compile_file(&file_handle, ZEND_INCLUDE TSRMLS_CC);
+    if(!op_array) {
+        php_error(E_ERROR, "Error parsing source: %s\n", file_handle.filename);
+        return 0;
+    }
+    return 1;
+}
+
+int _pux_store_mux(char *name, zval * mux TSRMLS_DC) {
     zend_rsrc_list_entry new_le;
     char *persistent_key;
-    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+    int ret, persistent_key_len;
+    persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
     Z_ADDREF_P(mux);
     new_le.type = le_mux_hash_persist;
     new_le.ptr = mux;
-    int ret = zend_hash_update(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
+    ret = zend_hash_update(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
     efree(persistent_key);
     return ret;
 }
 
-static zval * _pux_fetch_mux(char *name TSRMLS_DC) {
+zval * _pux_fetch_mux(char *name TSRMLS_DC) {
     zend_rsrc_list_entry *le;
     char *persistent_key;
     int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
@@ -83,11 +100,25 @@ PHP_FUNCTION(pux_store_mux)
 }
 
 
+PHP_FUNCTION(pux_persistent_dispatch)
+{
+    char *ns, *filename, *path;
+    int  ns_len, filename_len, path_len;
+    zval *mux;
+
+    /* parse parameters */
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sss", &ns, &ns_len, &filename, &filename_len, &path, &path_len) == FAILURE) {
+        RETURN_FALSE;
+    }
+    RETURN_FALSE;
+}
+
+
 
 PHP_FUNCTION(pux_delete_mux)
 {
-    char *name;
-    int  name_len;
+    char *name, *persistent_key;
+    int  name_len, persistent_key_len;
     zend_rsrc_list_entry *le;
 
     /* parse parameters */
@@ -96,8 +127,7 @@ PHP_FUNCTION(pux_delete_mux)
         RETURN_FALSE;
     }
 
-    char *persistent_key;
-    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+    persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
 
     if (zend_hash_del(&EG(persistent_list), persistent_key, persistent_key_len + 1) == SUCCESS) {
         efree(persistent_key);
@@ -111,13 +141,15 @@ PHP_FUNCTION(pux_fetch_mux)
 {
     char *name;
     int  name_len;
+    zval * mux;
 
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", 
                     &name, &name_len) == FAILURE) {
         RETURN_FALSE;
     }
-    zval * mux = _pux_fetch_mux(name TSRMLS_CC);
+
+    mux = _pux_fetch_mux(name TSRMLS_CC);
     if ( mux ) {
         *return_value = *mux;
         zval_copy_ctor(return_value);
