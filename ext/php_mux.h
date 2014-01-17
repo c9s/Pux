@@ -16,6 +16,7 @@
 
 extern zend_class_entry *ce_pux_mux;
 
+
 void pux_init_mux(TSRMLS_D);
 
 zend_class_entry ** get_pattern_compiler_ce(TSRMLS_D);

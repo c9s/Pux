@@ -19,14 +19,19 @@
 #include "php_expandable_mux.h"
 #include "php_controller.h"
 
+ZEND_DECLARE_MODULE_GLOBALS(pux);
+
+int le_mux_hash_persist;
+
 zend_class_entry *ce_pux_exception;
 
-ZEND_DECLARE_MODULE_GLOBALS(pux);
 
 // #define DEBUG 1
 static const zend_function_entry php_functions[] = {
     PHP_FE(pux_match, NULL)
     PHP_FE(pux_sort_routes, NULL)
+    PHP_FE(pux_fetch_mux, NULL)
+    PHP_FE(pux_store_mux, NULL)
     PHP_FE_END
 };
 
@@ -34,6 +39,11 @@ void pux_init_exception(TSRMLS_D) {
   zend_class_entry e;
   INIT_CLASS_ENTRY(e, "PuxException", NULL);
   ce_pux_exception = zend_register_internal_class_ex(&e, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
+}
+
+static void php_mux_hash_persist_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
+{
+     HashTable *hash = (HashTable*)rsrc->ptr;
 }
 
 zend_module_entry pux_module_entry = {
@@ -58,22 +68,12 @@ PHP_INI_END()
 ZEND_GET_MODULE(pux)
 #endif
 
-static void php_pux_init_globals(zend_pux_globals *pux_globals)
-{
-    ALLOC_INIT_ZVAL(pux_globals->mux_array);
-    array_init(pux_globals->mux_array);
-}
-
 PHP_MINIT_FUNCTION(pux) {
-
-  ZEND_INIT_MODULE_GLOBALS(pux, php_pux_init_globals, NULL);
   REGISTER_INI_ENTRIES();
-
   pux_init_mux(TSRMLS_C);
   pux_init_expandable_mux(TSRMLS_C);
   pux_init_controller(TSRMLS_C);
-
-
+  le_mux_hash_persist = zend_register_list_destructors_ex (NULL, php_mux_hash_persist_dtor, "Mux", module_number);
   return SUCCESS;
 }
 

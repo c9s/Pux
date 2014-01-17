@@ -21,9 +21,11 @@
 
 extern int pux_globals_id;
 
+extern int le_mux_hash_persist;
+
 // global variable structure
 ZEND_BEGIN_MODULE_GLOBALS(pux)
-    zval *mux_array;
+    // zval *mux_array;
     // HashTable *
     // zend_bool direction;
 ZEND_END_MODULE_GLOBALS(pux)

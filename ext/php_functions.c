@@ -39,25 +39,41 @@ PHP_FUNCTION(pux_match)
     RETURN_NULL();
 }
 
-PHP_FUNCTION(pux_mux_store)
+PHP_FUNCTION(pux_store_mux)
 {
     zval *z_mux;
-    char *key;
-    int  key_len;
+    char *name;
+    int  name_len;
+    zend_rsrc_list_entry *le, new_le;
 
     /* parse parameters */
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa", 
-                    &key, &key_len ,
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz", 
+                    &name, &name_len ,
                     &z_mux ) == FAILURE) {
         RETURN_FALSE;
     }
-    PUX_G(mux_array);
+
+    char *persistent_key;
+    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+    if (zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS) {
+        efree(persistent_key);
+        return;
+    }
+
+    // alloc persistent_mux
+    zval *persistent_mux = (zval*) pemalloc( sizeof(zval*) , 1);
+    INIT_PZVAL(persistent_mux);
+    ZVAL_COPY_VALUE(persistent_mux, z_mux);
+
+    new_le.ptr = persistent_mux;
+    new_le.type = le_mux_hash_persist;
+    zend_hash_add(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
+    efree(persistent_key);
     RETURN_TRUE;
 }
 
-PHP_FUNCTION(pux_mux_fetch)
+PHP_FUNCTION(pux_fetch_mux)
 {
-
     RETURN_TRUE;
 }
 
