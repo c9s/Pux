@@ -34,5 +34,6 @@ PHP_FUNCTION(pux_match);
 PHP_FUNCTION(pux_sort_routes);
 PHP_FUNCTION(pux_store_mux);
 PHP_FUNCTION(pux_fetch_mux);
+PHP_FUNCTION(pux_delete_mux);
 
 #endif

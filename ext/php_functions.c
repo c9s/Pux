@@ -63,6 +63,29 @@ PHP_FUNCTION(pux_store_mux)
     RETURN_TRUE;
 }
 
+PHP_FUNCTION(pux_delete_mux)
+{
+    char *name;
+    int  name_len;
+    zend_rsrc_list_entry *le;
+
+    /* parse parameters */
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", 
+                    &name, &name_len) == FAILURE) {
+        RETURN_FALSE;
+    }
+
+    char *persistent_key;
+    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+
+    if (zend_hash_del(&EG(persistent_list), persistent_key, persistent_key_len + 1) == SUCCESS) {
+        efree(persistent_key);
+        RETURN_TRUE;
+    }
+    efree(persistent_key);
+    RETURN_FALSE;
+}
+
 PHP_FUNCTION(pux_fetch_mux)
 {
     char *name;
