@@ -211,7 +211,9 @@ PHP_FUNCTION(pux_delete_mux)
 
     persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
 
-    if (zend_hash_del(&EG(persistent_list), persistent_key, persistent_key_len + 1) == SUCCESS) {
+    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS ) {
+        zval_ptr_dtor((zval**) &le->ptr);
+        zend_hash_del(&EG(persistent_list), persistent_key, persistent_key_len + 1);
         efree(persistent_key);
         RETURN_TRUE;
     }

@@ -37,8 +37,8 @@ static int _pux_store_mux(char *name, zval * mux TSRMLS_DC) {
     int ret, persistent_key_len;
     persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
 
-    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, &le, NULL) ) {
-        zval_val_dtor((zval*) le->ptr);
+    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS ) {
+        zval_ptr_dtor((zval**) &le->ptr);
         zend_hash_del(&EG(persistent_list), persistent_key, persistent_key_len + 1);
     }
 
