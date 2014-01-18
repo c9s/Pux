@@ -33,7 +33,8 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
     }
 
     public function testPersistentDispatch() {
-        $mux = pux_persistent_dispatch('testing', '_test_mux.php', '/');
-        print_r($mux);
+        $route = pux_persistent_dispatch('testing', '_test_mux.php', '/');
+        ok($route);
+        ok(is_array($route));
     }
 }

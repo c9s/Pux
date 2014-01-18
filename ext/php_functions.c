@@ -72,13 +72,13 @@ PHP_FUNCTION(pux_match)
 
 #endif
 
-int pux_loader(char *path, zval *result TSRMLS_DC) {
+int mux_loader(char *path, zval *result TSRMLS_DC) {
     zend_file_handle file_handle;
     zend_op_array   *op_array;
     char realpath[MAXPATHLEN];
 
     if (!VCWD_REALPATH(path, realpath)) {
-        return 0;
+        return FAILURE;
     }
 
     file_handle.filename = path;
@@ -128,10 +128,10 @@ int pux_loader(char *path, zval *result TSRMLS_DC) {
             }
         }
         PUX_RESTORE_EG_ENVIRON();
-        return 1;
+        return SUCCESS;
     }
 
-    return 0;
+    return FAILURE;
 }
 
 int _pux_store_mux(char *name, zval * mux TSRMLS_DC) {
@@ -183,20 +183,40 @@ PHP_FUNCTION(pux_persistent_dispatch)
 {
     char *ns, *filename, *path;
     int  ns_len, filename_len, path_len;
-    zval *mux;
+    zval *mux = NULL;
+    zval *route = NULL;
+    zval *z_path = NULL;
 
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sss", &ns, &ns_len, &filename, &filename_len, &path, &path_len) == FAILURE) {
         RETURN_FALSE;
     }
-    zval *mux = NULL;
-    ALLOC_INIT_ZVAL(retval);
-    if ( pux_loader(filename, mux TSRMLS_CC) ) {
-        // php_printf("import success");
+
+    ALLOC_INIT_ZVAL(z_path);
+    ZVAL_STRINGL(z_path, path ,path_len, 0); // no copy
+
+    mux = _pux_fetch_mux(ns TSRMLS_CC);
+    if ( mux == NULL ) {
+        ALLOC_INIT_ZVAL(mux);
+        if ( mux_loader(filename, mux TSRMLS_CC) == FAILURE ) {
+            php_error(E_ERROR, "Can not load Mux object from %s", filename);
+        }
+        // TODO: compile mux and sort routes
         // zend_print_zval_r(retval, 0 TSRMLS_CC);
-        // RETVAL_ZVAL(mux, 1, 0);
-        // return;
+        if ( _pux_store_mux(ns, mux TSRMLS_CC) == FAILURE ) {
+            php_error(E_ERROR, "Can not store Mux object from %s", filename);
+        }
     }
+
+    // do dispatch
+    route = call_mux_method(mux, "dispatch" , sizeof("dispatch"), 1 , z_path, NULL, NULL TSRMLS_CC);
+    // zval_ptr_dtor(&z_path);
+    if ( route ) {
+        *return_value = *route;
+        zval_copy_ctor(return_value);
+        return;
+    }
+    // route not found
     RETURN_FALSE;
 }
 
