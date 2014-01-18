@@ -45,8 +45,8 @@ void pux_init_exception(TSRMLS_D) {
 
 static void php_mux_hash_persist_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {
-     zval *mux = (zval*)rsrc->ptr;
-     zval_ptr_dtor(&mux);
+     // zval *mux = (zval*)rsrc->ptr;
+     // zval_ptr_dtor(&mux);
 }
 
 zend_module_entry pux_module_entry = {

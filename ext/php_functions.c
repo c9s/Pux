@@ -72,7 +72,7 @@ PHP_FUNCTION(pux_match)
 
 #endif
 
-int mux_loader(char *path, zval *result TSRMLS_DC) {
+static int mux_loader(char *path, zval *result TSRMLS_DC) {
     zend_file_handle file_handle;
     zend_op_array   *op_array;
     char realpath[MAXPATHLEN];
@@ -132,31 +132,6 @@ int mux_loader(char *path, zval *result TSRMLS_DC) {
     }
 
     return FAILURE;
-}
-
-int _pux_store_mux(char *name, zval * mux TSRMLS_DC) {
-    zend_rsrc_list_entry new_le;
-    char *persistent_key;
-    int ret, persistent_key_len;
-    persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
-    Z_ADDREF_P(mux);
-    new_le.type = le_mux_hash_persist;
-    new_le.ptr = mux;
-    ret = zend_hash_update(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
-    efree(persistent_key);
-    return ret;
-}
-
-zval * _pux_fetch_mux(char *name TSRMLS_DC) {
-    zend_rsrc_list_entry *le;
-    char *persistent_key;
-    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
-    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS) {
-        efree(persistent_key);
-        return (zval*) le->ptr;
-    }
-    efree(persistent_key);
-    return NULL;
 }
 
 PHP_FUNCTION(pux_store_mux)

@@ -8,6 +8,7 @@
 
 
 #include "php.h"
+#include "php_pux.h"
 #include "string.h"
 #include "main/php_main.h"
 #include "Zend/zend_API.h"
@@ -30,11 +31,30 @@ extern inline int validate_request_method(zval **z_route_options_pp, int current
 extern inline int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC);
 extern inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC);
 
-int _pux_store_mux(char *name, zval * mux TSRMLS_DC);
-zval * _pux_fetch_mux(char *name TSRMLS_DC);
+static int _pux_store_mux(char *name, zval * mux TSRMLS_DC) {
+    zend_rsrc_list_entry new_le;
+    char *persistent_key;
+    int ret, persistent_key_len;
+    persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+    Z_ADDREF_P(mux);
+    new_le.type = le_mux_hash_persist;
+    new_le.ptr = mux;
+    ret = zend_hash_update(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
+    efree(persistent_key);
+    return ret;
+}
 
-
-
+static zval * _pux_fetch_mux(char *name TSRMLS_DC) {
+    zend_rsrc_list_entry *le;
+    char *persistent_key;
+    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS) {
+        efree(persistent_key);
+        return (zval*) le->ptr;
+    }
+    efree(persistent_key);
+    return NULL;
+}
 
 
 

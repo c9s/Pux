@@ -8,5 +8,10 @@ class HelloController {
     }
 }
 
-$mux = require 'hello_mux.php';
-$r = $mux->dispatch('/hello');
+// $r = pux_persistent_dispatch('hello', 'hello_mux.php', '/hello');
+// var_dump( $r ); 
+// pux_store_mux('hello', new Mux);
+// echo "stored\n";
+
+// $mux = require 'hello_mux.php';
+// $r = $mux->dispatch('/hello');
