@@ -36,6 +36,11 @@ static int _pux_store_mux(char *name, zval * mux TSRMLS_DC) {
     char *persistent_key;
     int ret, persistent_key_len;
     persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+
+    if ( zend_hash_exists(&EG(persistent_list), persistent_key, persistent_key_len + 1) ) {
+        zend_hash_del(&EG(persistent_list), persistent_key, persistent_key_len + 1);
+    }
+
     Z_ADDREF_P(mux);
     new_le.type = le_mux_hash_persist;
     new_le.ptr = mux;
