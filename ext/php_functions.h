@@ -32,12 +32,13 @@ extern inline int validate_domain(zval **z_route_options_pp, zval * http_host TS
 extern inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC);
 
 static int _pux_store_mux(char *name, zval * mux TSRMLS_DC) {
-    zend_rsrc_list_entry new_le;
+    zend_rsrc_list_entry new_le, *le;
     char *persistent_key;
     int ret, persistent_key_len;
     persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
 
-    if ( zend_hash_exists(&EG(persistent_list), persistent_key, persistent_key_len + 1) ) {
+    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, &le, NULL) ) {
+        zval_val_dtor((zval*) le->ptr);
         zend_hash_del(&EG(persistent_list), persistent_key, persistent_key_len + 1);
     }
 

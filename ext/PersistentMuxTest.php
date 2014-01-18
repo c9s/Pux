@@ -15,13 +15,12 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         $mux->add('/', [ 'IndexController', 'index' ]);
         ok( pux_store_mux('phpunit1', $mux), 'mux stored' );
         ok( pux_store_mux('phpunit1', $mux), 'mux updated' );
+        ok( pux_store_mux('phpunit1', $mux), 'mux updated again' );
         $m = pux_fetch_mux('phpunit1');
         ok($m);
         ok( is_object($m) );
         ok( $m instanceof Mux);
     }
-
-
 
     /**
      * @depends testStore
