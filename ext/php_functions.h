@@ -63,9 +63,12 @@ extern inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC)
 
 #endif
 
+int persistent_store(char *key, int key_len, void * val TSRMLS_DC);
+HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC);
+
 zval * _pux_fetch_mux(char *name TSRMLS_DC);
 int mux_loader(char *path, zval *result TSRMLS_DC);
-int _pux_store_mux(char *name, zval * mux TSRMLS_DC) 
+int _pux_store_mux(char *name, zval * mux TSRMLS_DC) ;
 
 PHP_FUNCTION(pux_match);
 PHP_FUNCTION(pux_sort_routes);

@@ -4,6 +4,8 @@
 #include "pcre.h"
 #include "main/php_main.h"
 #include "Zend/zend_compile.h"
+#include "Zend/zend_alloc.h"
+#include "Zend/zend_operators.h"
 #include "Zend/zend_API.h"
 #include "zend_exceptions.h"
 #include "zend_interfaces.h"
@@ -14,40 +16,131 @@
 #include "php_functions.h"
 #include "php_expandable_mux.h"
 
+#define CHECK(p) { if ((p) == NULL) return NULL; }
+
+void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC);
+
+void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
+{
+	switch (Z_TYPE_P(zvalue) & IS_CONSTANT_TYPE_MASK) {
+		case IS_RESOURCE: {
+				TSRMLS_FETCH();
+
+				zend_list_addref(zvalue->value.lval);
+			}
+			break;
+		case IS_BOOL:
+		case IS_LONG:
+		case IS_NULL:
+			break;
+		case IS_CONSTANT:
+		case IS_STRING:
+			CHECK_ZVAL_STRING_REL(zvalue);
+			if (!IS_INTERNED(zvalue->value.str.val)) {
+				zvalue->value.str.val = (char *) pestrndup(zvalue->value.str.val, zvalue->value.str.len, 1);
+			}
+			break;
+		case IS_ARRAY:
+		case IS_CONSTANT_ARRAY: {
+				zval *tmp;
+				HashTable *original_ht = zvalue->value.ht;
+				HashTable *tmp_ht = NULL;
+				TSRMLS_FETCH();
+
+				if (zvalue->value.ht == &EG(symbol_table)) {
+					return; /* do nothing */
+				}
+				// ALLOC_HASHTABLE_REL(tmp_ht);
+                tmp_ht = pemalloc(sizeof(HashTable), 1);
+				zend_hash_init(tmp_ht, zend_hash_num_elements(original_ht), NULL, ZVAL_PTR_DTOR, 1);
+				zend_hash_copy(tmp_ht, original_ht, (copy_ctor_func_t) my_zval_copy_ctor_func, (void *) &tmp, sizeof(zval *));
+				zvalue->value.ht = tmp_ht;
+			}
+			break;
+		case IS_OBJECT:
+			{
+				TSRMLS_FETCH();
+				Z_OBJ_HT_P(zvalue)->add_ref(zvalue TSRMLS_CC);
+			}
+			break;
+	}
+}
+
+
+int persistent_store(char *key, int key_len, void * val TSRMLS_DC) {
+    zend_rsrc_list_entry new_le;
+    zend_rsrc_list_entry *le;
+    if ( zend_hash_find(&EG(persistent_list), key, key_len + 1, (void**) &le) == SUCCESS ) {
+        // if the key exists, delete it.
+        zend_hash_del(&EG(persistent_list), key, key_len + 1);
+    }
+    new_le.type = le_mux_hash_persist;
+    new_le.ptr = val;
+    return zend_hash_update(&EG(persistent_list), key, key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
+}
+
+
+HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC)
+{
+    zval *tmp;
+    HashTable* dst;
+    dst = pecalloc(1, sizeof(HashTable), 1);
+    zend_hash_init(dst, 5, NULL, NULL, 1);
+    zend_hash_copy(dst, src, (copy_ctor_func_t) my_zval_copy_ctor_func, &tmp, sizeof(zval*) );
+    return dst;
+}
+
 
 int _pux_store_mux(char *name, zval * mux TSRMLS_DC) 
 {
     zend_rsrc_list_entry new_le, *le;
-    char *persistent_key;
-    int ret, persistent_key_len;
-    persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
 
-    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS ) {
-        zend_hash_del(&EG(persistent_list), persistent_key, persistent_key_len + 1);
+    // variables for copying mux object properties
+    char        *routes_key,   *static_routes_key, *id_key, *expand_key;
+    int status, routes_key_len, static_routes_key_len, id_key_len, expand_key_len;
+
+    id_key_len = spprintf(&id_key, 0, "mux_id_%s", name);
+    expand_key_len = spprintf(&expand_key, 0, "mux_expand_%s", name);
+    routes_key_len = spprintf(&routes_key, 0, "mux_routes_%s", name);
+    static_routes_key_len = spprintf(&static_routes_key, 0, "mux_static_routes_%s", name);
+
+    // make the hash table persistent
+    zval *prop, *tmp;
+    HashTable *routes_dst, *static_routes_dst; 
+
+    prop = zend_read_property(Z_OBJCE_P(mux), mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
+    persistent_store( routes_key, routes_key_len, (void*) routes_dst TSRMLS_CC);
+
+    prop = zend_read_property(Z_OBJCE_P(mux), mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
+    static_routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop)  TSRMLS_CC);
+    persistent_store( static_routes_key, static_routes_key_len, (void*) static_routes_dst TSRMLS_CC);
+    
+
+    // copy ID
+    prop = zend_read_property(Z_OBJCE_P(mux), mux, "id", sizeof("id")-1, 1 TSRMLS_CC);
+    tmp = pemalloc(sizeof(zval), 1);
+    INIT_PZVAL(tmp);
+    Z_TYPE_P(tmp) = IS_LONG;
+    Z_LVAL_P(tmp) = Z_LVAL_P(prop);
+    persistent_store( id_key, id_key_len, (void*) tmp TSRMLS_CC);
+
+
+    // We cannot copy un-expandable mux object because we don't support recursively copy for Mux object.
+    prop = zend_read_property(Z_OBJCE_P(mux), mux, "expand", sizeof("expand")-1, 1 TSRMLS_CC);
+    if ( ! Z_BVAL_P(prop) ) {
+        php_error(E_ERROR, "We cannot copy un-expandable mux object because we don't support recursively copy for Mux object.");
     }
 
-    zend_object_clone_obj_t clone_call;
-    zend_class_entry *ce;
 
-    ce = Z_OBJCE_P(mux);
-    clone_call =  Z_OBJ_HT_P(mux)->clone_obj;
+    // zend_hash_destroy(routes_dst);
+    // pefree(routes_dst, 1);
+    efree(routes_key);
+    efree(static_routes_key);
+    efree(id_key);
+    efree(expand_key);
 
-   if (!clone_call) {
-        if (ce) {
-            php_error_docref(NULL TSRMLS_CC, E_ERROR, "Trying to clone an uncloneable object of class %s", ce->name);
-        } else {
-            php_error_docref(NULL TSRMLS_CC, E_ERROR, "Trying to clone an uncloneable object");
-        }
-        return FAILURE;
-    }
-
-    zval *new_mux = pecalloc(1, sizeof(zval*), 1);
-    Z_OBJVAL_P(new_mux) = clone_call(mux TSRMLS_CC);
-    Z_TYPE_P(new_mux) = IS_OBJECT;
-    Z_SET_REFCOUNT_P(new_mux, 2);
-    Z_UNSET_ISREF_P(new_mux);
     return SUCCESS;
-
     /*
     object_init_ex(new_mux, ce_pux_mux);
     // object_and_properties_init(new_mux, ce_pux_mux, Z_OBJPROP_P(mux) );
@@ -62,11 +155,13 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
     // CALL_METHOD(Mux, __construct, new_object, new_object);
     // copy properties
 
+    /*
     new_le.type = le_mux_hash_persist;
     new_le.ptr = new_mux;
-    ret = zend_hash_update(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
-    efree(persistent_key);
-    return ret;
+    status = zend_hash_update(&EG(persistent_list), routes_key, routes_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
+    efree(routes_key);
+    return status;
+    */
 }
 
 zval * _pux_fetch_mux(char *name TSRMLS_DC) 
