@@ -101,7 +101,13 @@ zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry 
     return z_compiled_route;
 }
 
-
+static void var_export(zval *return_value, zval *what TSRMLS_DC)
+{
+    smart_str buf = {0};
+    php_var_export_ex(&what, 0, &buf TSRMLS_CC);
+    smart_str_0 (&buf);
+    ZVAL_STRINGL(return_value, buf.c, buf.len, 0);
+}
 
 PHP_METHOD(Mux, __construct) {
     zval *z_routes = NULL, *z_routes_by_id , *z_submux = NULL, *z_static_routes = NULL;
@@ -540,18 +546,7 @@ PHP_METHOD(Mux, getRoutes) {
 
 PHP_METHOD(Mux, export) {
 
-    zval *should_return;
-    MAKE_STD_ZVAL(should_return);
-    ZVAL_TRUE(should_return);
-
-    zval *rv = NULL;
-    zend_call_method( NULL, NULL, NULL, "var_export", strlen("var_export"), &rv, 2, this_ptr, should_return TSRMLS_CC );
-    zval_ptr_dtor(&should_return);
-
-    if (rv) {
-        *return_value = *rv;
-        zval_copy_ctor(return_value);
-    }
+    var_export(return_value, this_ptr TSRMLS_CC);
 }
 
 PHP_METHOD(Mux, getId) {
