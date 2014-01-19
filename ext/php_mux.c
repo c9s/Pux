@@ -635,7 +635,7 @@ PHP_METHOD(Mux, compile) {
     zend_call_method( &this_ptr, Z_OBJCE_P(this_ptr) , &fe_export, "export", strlen("export"), &compiled_code, 0, NULL, NULL TSRMLS_CC );
 
     if ( compiled_code == NULL || Z_TYPE_P(compiled_code) == IS_NULL ) {
-        php_error(E_ERROR, "Can not compile routes.");
+        php_error(E_ERROR, "Cannot compile routes.");
     }
 
 
@@ -741,9 +741,7 @@ PHP_METHOD(Mux, dispatch) {
             zval **z_route_vars = NULL;
             zval **z_route_vars_0 = NULL;
             zval *retval = NULL;
-            zval *z_path = NULL;
-            zval *z_route_vars_0_len;
-            zval *z_substr = NULL;
+            zval *z_substr;
 
             if ( zend_hash_quick_find( Z_ARRVAL_PP(z_options) , "vars", sizeof("vars"), zend_inline_hash_func(ZEND_STRS("vars")), (void**) &z_route_vars ) == FAILURE ) {
                 php_error(E_ERROR, "require route vars");
@@ -754,18 +752,8 @@ PHP_METHOD(Mux, dispatch) {
                 RETURN_FALSE;
             }
 
-            MAKE_STD_ZVAL(z_path);
-            MAKE_STD_ZVAL(z_route_vars_0_len);
-
-            ZVAL_STRINGL(z_path, path ,path_len, 1);
-            ZVAL_LONG(z_route_vars_0_len, Z_STRLEN_PP(z_route_vars_0) );
-
-            zend_call_method( NULL, NULL, NULL, "substr", strlen("substr"), &z_substr, 2, z_path, z_route_vars_0_len TSRMLS_CC );
-            zval_ptr_dtor(&z_path);
-            zval_ptr_dtor(&z_route_vars_0_len);
-            if ( z_substr == NULL ) {
-                RETURN_FALSE;
-            }
+            MAKE_STD_ZVAL(z_substr);
+            ZVAL_STRING(z_substr, path + Z_STRLEN_PP(z_route_vars_0), 1);
 
             retval = call_mux_method( *z_submux, "dispatch" , sizeof("dispatch"), 1 , z_substr, NULL, NULL TSRMLS_CC);
             zval_ptr_dtor(&z_substr);
@@ -778,21 +766,10 @@ PHP_METHOD(Mux, dispatch) {
             return;
 
         } else {
-            zval *z_path = NULL, *z_pattern_len = NULL, *z_substr = NULL;
+            zval *z_substr;
 
-            MAKE_STD_ZVAL(z_path);
-            ZVAL_STRINGL(z_path, path ,path_len, 1);
-
-            MAKE_STD_ZVAL(z_pattern_len);
-            ZVAL_LONG(z_pattern_len, Z_STRLEN_PP(z_pattern));
-
-            zend_call_method( NULL, NULL, NULL, "substr", strlen("substr"), &z_substr, 2, z_path, z_pattern_len TSRMLS_CC );
-            zval_ptr_dtor(&z_path);
-            zval_ptr_dtor(&z_pattern_len);
-
-            if ( ! z_substr ) {
-                RETURN_FALSE;
-            }
+            MAKE_STD_ZVAL(z_substr);
+            ZVAL_STRING(z_substr, path + Z_STRLEN_PP(z_pattern), 1);
 
             //     return $submux->dispatch(
             //         substr($path, strlen($route[1]))
