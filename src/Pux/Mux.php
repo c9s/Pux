@@ -229,7 +229,7 @@ class Mux
     }
 
     public function dispatch($path) {
-        $path = rtrim($path, '/');
+        // $path = rtrim($path, '/');
         if ( $route = $this->match($path) ) {
             if ( is_int($route[2]) ) {
                 $submux = $this->submux[ $route[2] ];
