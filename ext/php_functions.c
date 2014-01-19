@@ -14,6 +14,154 @@
 #include "php_functions.h"
 #include "php_expandable_mux.h"
 
+
+int _pux_store_mux(char *name, zval * mux TSRMLS_DC) 
+{
+    zend_rsrc_list_entry new_le, *le;
+    char *persistent_key;
+    int ret, persistent_key_len;
+    persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+
+    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS ) {
+        zend_hash_del(&EG(persistent_list), persistent_key, persistent_key_len + 1);
+    }
+
+    zend_object_clone_obj_t clone_call;
+    zend_class_entry *ce;
+
+    ce = Z_OBJCE_P(mux);
+    clone_call =  Z_OBJ_HT_P(mux)->clone_obj;
+
+   if (!clone_call) {
+        if (ce) {
+            php_error_docref(NULL TSRMLS_CC, E_ERROR, "Trying to clone an uncloneable object of class %s", ce->name);
+        } else {
+            php_error_docref(NULL TSRMLS_CC, E_ERROR, "Trying to clone an uncloneable object");
+        }
+        return FAILURE;
+    }
+
+    zval *new_mux = pecalloc(1, sizeof(zval*), 1);
+    Z_OBJVAL_P(new_mux) = clone_call(mux TSRMLS_CC);
+    Z_TYPE_P(new_mux) = IS_OBJECT;
+    Z_SET_REFCOUNT_P(new_mux, 2);
+    Z_UNSET_ISREF_P(new_mux);
+    return SUCCESS;
+
+    /*
+    object_init_ex(new_mux, ce_pux_mux);
+    // object_and_properties_init(new_mux, ce_pux_mux, Z_OBJPROP_P(mux) );
+    // zend_objects_clone_members( );
+    new_mux->value.obj = zend_objects_clone_obj(mux);
+    // php_debug_zval_dump(&mux, 1 TSRMLS_CC);
+    */
+    // php_debug_zval_dump(&new_mux, 1 TSRMLS_CC);
+    // return SUCCESS;
+
+    // INIT_PZVAL(new_object);
+    // CALL_METHOD(Mux, __construct, new_object, new_object);
+    // copy properties
+
+    new_le.type = le_mux_hash_persist;
+    new_le.ptr = new_mux;
+    ret = zend_hash_update(&EG(persistent_list), persistent_key, persistent_key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
+    efree(persistent_key);
+    return ret;
+}
+
+zval * _pux_fetch_mux(char *name TSRMLS_DC) 
+{
+    zend_rsrc_list_entry *le;
+    char *persistent_key;
+    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
+    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS) {
+        efree(persistent_key);
+        return (zval*) le->ptr;
+    }
+    efree(persistent_key);
+    return NULL;
+}
+
+
+int mux_loader(char *path, zval *result TSRMLS_DC) 
+{
+    zend_file_handle file_handle;
+    zend_op_array   *op_array;
+    char realpath[MAXPATHLEN];
+
+    if (!VCWD_REALPATH(path, realpath)) {
+        return FAILURE;
+    }
+
+    file_handle.filename = path;
+    file_handle.free_filename = 0;
+    file_handle.type = ZEND_HANDLE_FILENAME;
+    file_handle.opened_path = NULL;
+    file_handle.handle.fp = NULL;
+
+    op_array = zend_compile_file(&file_handle, ZEND_INCLUDE TSRMLS_CC);
+
+
+    if (op_array && file_handle.handle.stream.handle) {
+        int dummy = 1;
+
+        if (!file_handle.opened_path) {
+            file_handle.opened_path = path;
+        }
+
+        zend_hash_add(&EG(included_files), file_handle.opened_path, strlen(file_handle.opened_path)+1, (void *)&dummy, sizeof(int), NULL);
+    }
+    zend_destroy_file_handle(&file_handle TSRMLS_CC);
+
+    if (op_array) {
+        zval *local_retval_ptr = NULL;
+
+        PUX_STORE_EG_ENVIRON();
+        EG(return_value_ptr_ptr) = &local_retval_ptr;
+        EG(active_op_array)      = op_array;
+
+#if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION > 2)) || (PHP_MAJOR_VERSION > 5)
+        if (!EG(active_symbol_table)) {
+            zend_rebuild_symbol_table(TSRMLS_C);
+        }
+#endif
+        zend_execute(op_array TSRMLS_CC);
+
+        destroy_op_array(op_array TSRMLS_CC);
+        efree(op_array);
+
+        if (!EG(exception)) {
+            if (local_retval_ptr) {
+                if ( result ) {
+                    COPY_PZVAL_TO_ZVAL(*result, local_retval_ptr);
+                } else {
+                    zval_ptr_dtor(EG(return_value_ptr_ptr));
+                }
+            }
+        }
+        PUX_RESTORE_EG_ENVIRON();
+        return SUCCESS;
+    }
+
+    return FAILURE;
+}
+
+
+
+/*
+zend_object_value util_dir_object_new(zend_class_entry *ce TSRMLS_DC) {
+    zend_object_value retval;
+    util_dir_object *intern;
+    intern = pecalloc(1, sizeof(util_dir_object));
+    zend_object_std_init(&(intern->std), ce TSRMLS_CC);
+    zend_hash_copy(intern->std.properties, &ce->default_properties, (copy_ctor_func_t) zval_add_ref, NULL, sizeof(zval *));
+    retval.handle = zend_objects_store_put(intern, util_dir_object_dtor, NULL TSRMLS_CC);
+    retval.handlers = &util_dir_handlers;
+    return retval;
+}
+*/
+
+
 /*
  * pux_match(array $routes, string $path);
  */
@@ -41,98 +189,6 @@ PHP_FUNCTION(pux_match)
 }
 
 
-#if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION > 2)) || (PHP_MAJOR_VERSION > 5)
-#define PUX_STORE_EG_ENVIRON() \
-	{ \
-		zval ** __old_return_value_pp   = EG(return_value_ptr_ptr); \
-		zend_op ** __old_opline_ptr  	= EG(opline_ptr); \
-		zend_op_array * __old_op_array  = EG(active_op_array);
-
-#define PUX_RESTORE_EG_ENVIRON() \
-		EG(return_value_ptr_ptr) = __old_return_value_pp;\
-		EG(opline_ptr)			 = __old_opline_ptr; \
-		EG(active_op_array)		 = __old_op_array; \
-	}
-
-#else
-
-#define PUX_STORE_EG_ENVIRON() \
-	{ \
-		zval ** __old_return_value_pp  		   = EG(return_value_ptr_ptr); \
-		zend_op ** __old_opline_ptr 		   = EG(opline_ptr); \
-		zend_op_array * __old_op_array 		   = EG(active_op_array); \
-		zend_function_state * __old_func_state = EG(function_state_ptr);
-
-#define PUX_RESTORE_EG_ENVIRON() \
-		EG(return_value_ptr_ptr) = __old_return_value_pp;\
-		EG(opline_ptr)			 = __old_opline_ptr; \
-		EG(active_op_array)		 = __old_op_array; \
-		EG(function_state_ptr)	 = __old_func_state; \
-	}
-
-#endif
-
-static int mux_loader(char *path, zval *result TSRMLS_DC) {
-    zend_file_handle file_handle;
-    zend_op_array   *op_array;
-    char realpath[MAXPATHLEN];
-
-    if (!VCWD_REALPATH(path, realpath)) {
-        return FAILURE;
-    }
-
-    file_handle.filename = path;
-    file_handle.free_filename = 0;
-    file_handle.type = ZEND_HANDLE_FILENAME;
-    file_handle.opened_path = NULL;
-    file_handle.handle.fp = NULL;
-
-    op_array = zend_compile_file(&file_handle, ZEND_REQUIRE TSRMLS_CC);
-
-    if (op_array && file_handle.handle.stream.handle) {
-        int dummy = 1;
-
-        if (!file_handle.opened_path) {
-            file_handle.opened_path = path;
-        }
-
-        zend_hash_add(&EG(included_files), file_handle.opened_path, strlen(file_handle.opened_path)+1, (void *)&dummy, sizeof(int), NULL);
-    }
-    zend_destroy_file_handle(&file_handle TSRMLS_CC);
-
-    if (op_array) {
-        zval *local_retval_ptr = NULL;
-        PUX_STORE_EG_ENVIRON();
-        EG(return_value_ptr_ptr) = &local_retval_ptr;
-        EG(active_op_array)      = op_array;
-
-#if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION > 2)) || (PHP_MAJOR_VERSION > 5)
-        if (!EG(active_symbol_table)) {
-            zend_rebuild_symbol_table(TSRMLS_C);
-        }
-#endif
-        zend_execute(op_array TSRMLS_CC);
-
-
-        destroy_op_array(op_array TSRMLS_CC);
-        efree(op_array);
-
-        if (!EG(exception)) {
-
-            if (EG(return_value_ptr_ptr) && *EG(return_value_ptr_ptr)) {
-                if ( result ) {
-                    COPY_PZVAL_TO_ZVAL(*result, local_retval_ptr);
-                } else {
-                    zval_ptr_dtor(EG(return_value_ptr_ptr));
-                }
-            }
-        }
-        PUX_RESTORE_EG_ENVIRON();
-        return SUCCESS;
-    }
-
-    return FAILURE;
-}
 
 PHP_FUNCTION(pux_store_mux)
 {
@@ -167,15 +223,16 @@ PHP_FUNCTION(pux_persistent_dispatch)
         RETURN_FALSE;
     }
 
-    ALLOC_INIT_ZVAL(z_path);
-    ZVAL_STRINGL(z_path, path ,path_len, 0); // no copy
 
     mux = _pux_fetch_mux(ns TSRMLS_CC);
     if ( mux == NULL ) {
+        php_printf("require %s\n", filename);
+
         ALLOC_INIT_ZVAL(mux);
         if ( mux_loader(filename, mux TSRMLS_CC) == FAILURE ) {
             php_error(E_ERROR, "Can not load Mux object from %s", filename);
         }
+
         // TODO: compile mux and sort routes
         // zend_print_zval_r(retval, 0 TSRMLS_CC);
         if ( _pux_store_mux(ns, mux TSRMLS_CC) == FAILURE ) {
@@ -183,9 +240,23 @@ PHP_FUNCTION(pux_persistent_dispatch)
         }
     }
 
+    /*
+    *return_value = *mux;
+    zval_copy_ctor(return_value);
+
+    // php_debug_zval_dump( &mux, 1 TSRMLS_CC);
+    // php_var_dump(&mux, 1);
+    return;
+    */
+
+    ALLOC_INIT_ZVAL(z_path);
+    ZVAL_STRINGL(z_path, path ,path_len, 1); // no copy
+    
+
     // do dispatch
     route = call_mux_method(mux, "dispatch" , sizeof("dispatch"), 1 , z_path, NULL, NULL TSRMLS_CC);
-    // zval_ptr_dtor(&z_path);
+    zval_ptr_dtor(&z_path);
+
     if ( route ) {
         *return_value = *route;
         zval_copy_ctor(return_value);
