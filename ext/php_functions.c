@@ -18,6 +18,8 @@
 
 #define CHECK(p) { if ((p) == NULL) return NULL; }
 
+
+
 void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC);
 
 void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
@@ -171,7 +173,6 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
     efree(expand_key);
     return SUCCESS;
     /*
-    object_init_ex(new_mux, ce_pux_mux);
     // object_and_properties_init(new_mux, ce_pux_mux, Z_OBJPROP_P(mux) );
     // zend_objects_clone_members( );
     new_mux->value.obj = zend_objects_clone_obj(mux);
@@ -195,15 +196,34 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
 
 zval * _pux_fetch_mux(char *name TSRMLS_DC) 
 {
-    zend_rsrc_list_entry *le;
-    char *persistent_key;
-    int persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
-    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS) {
-        efree(persistent_key);
-        return (zval*) le->ptr;
-    }
-    efree(persistent_key);
-    return NULL;
+    // zend_rsrc_list_entry *le;
+    zval *new_mux = NULL;
+    MAKE_STD_ZVAL(new_mux);
+    object_init_ex(new_mux, ce_pux_mux);
+
+    // fetch related hash to this mux object.
+    HashTable *routes_hash = (HashTable*) pux_persistent_fetch(name, "routes" TSRMLS_CC);
+    HashTable *static_routes_hash = (HashTable*) pux_persistent_fetch(name, "static_routes" TSRMLS_CC);
+    zval *z_id = (zval*) pux_persistent_fetch(name, "id" TSRMLS_CC);
+
+    zval *z_routes, *z_static_routes;
+    MAKE_STD_ZVAL(z_routes);
+    MAKE_STD_ZVAL(z_static_routes);
+
+    array_init(z_routes);
+    array_init(z_static_routes);
+
+    // ZEND_API void zend_hash_copy(HashTable *target, HashTable *source, copy_ctor_func_t pCopyConstructor, void *tmp, uint size)
+    zval *tmp;
+
+    zend_hash_copy( Z_ARRVAL_P(z_routes), routes_hash, NULL, (void*) &tmp, sizeof(zval *));
+    zend_hash_copy( Z_ARRVAL_P(z_static_routes), static_routes_hash, NULL, (void*) &tmp, sizeof(zval *));
+
+    add_property_long(new_mux, "id", Z_LVAL_P(z_id) );
+    add_property_bool(new_mux, "expand", 1 ); // persistent mux should always be expanded. (no recursive structure)
+    add_property_zval(new_mux, "routes", z_routes);
+    add_property_zval(new_mux, "staticRoutes", z_static_routes);
+    return new_mux;
 }
 
 
