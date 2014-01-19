@@ -67,7 +67,7 @@ void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
 }
 
 
-inline int persistent_store(char *key, int key_len, void * val TSRMLS_DC)
+inline int persistent_store(char *key, int key_len, int list_type, void * val TSRMLS_DC)
 {
     zend_rsrc_list_entry new_le;
     zend_rsrc_list_entry *le;
@@ -75,9 +75,24 @@ inline int persistent_store(char *key, int key_len, void * val TSRMLS_DC)
         // if the key exists, delete it.
         zend_hash_del(&EG(persistent_list), key, key_len + 1);
     }
-    new_le.type = le_mux_hash_persist;
+    new_le.type = list_type;
     new_le.ptr = val;
     return zend_hash_update(&EG(persistent_list), key, key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
+}
+
+inline void * persistent_fetch(char *key, int key_len, void * val TSRMLS_DC)
+{
+    zend_rsrc_list_entry *le;
+    if ( zend_hash_find(&EG(persistent_list), key, key_len + 1, (void**) &le) == SUCCESS ) {
+        return le->ptr;
+    }
+    return NULL;
+}
+
+
+inline int pux_persistent_fetch(char *ns, char *key, void * val)
+{
+    return 0;
 }
 
 /*
@@ -89,7 +104,7 @@ inline int pux_persistent_store(char *ns, char *key, void * val TSRMLS_DC)
     int   newkey_len;
     int   status;
     newkey_len = spprintf(&newkey, 0, "pux_%s_%s", ns, key);
-    status = persistent_store(newkey, newkey_len, val TSRMLS_CC);
+    status = persistent_store(newkey, newkey_len, le_mux_hash_persist, val TSRMLS_CC);
     efree(newkey);
     return status;
 }
@@ -129,14 +144,13 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
 
     pux_persistent_store(name, "static_routes", (void *) static_routes_dst TSRMLS_CC) ;
     
-
     // copy ID
     prop = zend_read_property(Z_OBJCE_P(mux), mux, "id", sizeof("id")-1, 1 TSRMLS_CC);
     tmp = pemalloc(sizeof(zval), 1);
     INIT_PZVAL(tmp);
     Z_TYPE_P(tmp) = IS_LONG;
     Z_LVAL_P(tmp) = Z_LVAL_P(prop);
-    persistent_store( id_key, id_key_len, (void*) tmp TSRMLS_CC);
+    pux_persistent_store( name, "id", (void*) tmp TSRMLS_CC);
 
 
     // We cannot copy un-expandable mux object because we don't support recursively copy for Mux object.
@@ -150,7 +164,6 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
     // pefree(routes_dst, 1);
     efree(id_key);
     efree(expand_key);
-
     return SUCCESS;
     /*
     object_init_ex(new_mux, ce_pux_mux);
