@@ -382,7 +382,6 @@ PHP_FUNCTION(pux_persistent_dispatch)
 
     mux = _pux_fetch_mux(ns TSRMLS_CC);
     if ( mux == NULL ) {
-        // php_printf("require %s\n", filename);
         ALLOC_INIT_ZVAL(mux);
         if ( mux_loader(filename, mux TSRMLS_CC) == FAILURE ) {
             php_error(E_ERROR, "Can not load Mux object from %s", filename);
@@ -406,7 +405,6 @@ PHP_FUNCTION(pux_persistent_dispatch)
 
     ALLOC_INIT_ZVAL(z_path);
     ZVAL_STRINGL(z_path, path ,path_len, 1); // no copy
-    
 
     // do dispatch
     route = call_mux_method(mux, "dispatch" , sizeof("dispatch"), 1 , z_path, NULL, NULL TSRMLS_CC);
