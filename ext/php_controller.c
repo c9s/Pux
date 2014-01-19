@@ -83,9 +83,9 @@ PHP_METHOD(Controller, getActionMethods)
 
     while (zend_hash_get_current_data_ex(function_table, (void **) &mptr, &pos) == SUCCESS) {
         const char * key = mptr->common.function_name;
-        int    key_len = strlen(mptr->common.function_name);
+        size_t   key_len = strlen(mptr->common.function_name);
         int p = strpos(key, "Action");
-        if ( p != -1 && p == (key_len - strlen("Action")) ) {
+        if ( p != -1 && (size_t)p == (key_len - strlen("Action")) ) {
             add_next_index_stringl(return_value, key, key_len, 1);
         }
         zend_hash_move_forward_ex(function_table, &pos);

@@ -10,6 +10,7 @@
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
 #include "ext/standard/php_var.h"
+#include "ext/standard/php_smart_str.h"
 
 #include "php_pux.h"
 #include "ct_helper.h"
@@ -807,7 +808,6 @@ PHP_METHOD(Mux, match) {
 
     zval **z_route_pp = NULL;
     zval *z_route = NULL;
-    zval **z_route_options_pp = NULL;
     if ( zend_hash_find( Z_ARRVAL_P( zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes") - 1, 1 TSRMLS_CC) ), path, path_len, (void**)&z_route_pp) == SUCCESS ) {
         if ( Z_TYPE_PP(z_route_pp) != IS_NULL ) {
             *return_value = **z_route_pp;
