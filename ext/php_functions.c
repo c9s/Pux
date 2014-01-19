@@ -79,6 +79,19 @@ int persistent_store(char *key, int key_len, void * val TSRMLS_DC) {
     return zend_hash_update(&EG(persistent_list), key, key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
 }
 
+/*
+ * Store persistent value with pux namespace.
+ */
+int pux_persistent_store(char *ns, char *key, void * val TSRMLS_DC) 
+{
+    char *newkey;
+    int   newkey_len;
+    int   status;
+    newkey_len = spprintf(&newkey, 0, "pux_%s_%s", ns, key);
+    status = persistent_store(newkey, newkey_len, val TSRMLS_CC);
+    efree(newkey);
+    return status;
+}
 
 HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC)
 {
@@ -96,13 +109,11 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
     zend_rsrc_list_entry new_le, *le;
 
     // variables for copying mux object properties
-    char        *routes_key,   *static_routes_key, *id_key, *expand_key;
-    int status, routes_key_len, static_routes_key_len, id_key_len, expand_key_len;
+    char        *id_key, *expand_key;
+    int status, id_key_len, expand_key_len;
 
     id_key_len = spprintf(&id_key, 0, "mux_id_%s", name);
     expand_key_len = spprintf(&expand_key, 0, "mux_expand_%s", name);
-    routes_key_len = spprintf(&routes_key, 0, "mux_routes_%s", name);
-    static_routes_key_len = spprintf(&static_routes_key, 0, "mux_static_routes_%s", name);
 
     // make the hash table persistent
     zval *prop, *tmp;
@@ -110,11 +121,12 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
 
     prop = zend_read_property(Z_OBJCE_P(mux), mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
-    persistent_store( routes_key, routes_key_len, (void*) routes_dst TSRMLS_CC);
+    pux_persistent_store( name, "routes", (void*) routes_dst TSRMLS_CC);
 
     prop = zend_read_property(Z_OBJCE_P(mux), mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
     static_routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop)  TSRMLS_CC);
-    persistent_store( static_routes_key, static_routes_key_len, (void*) static_routes_dst TSRMLS_CC);
+
+    pux_persistent_store(name, "static_routes", (void *) static_routes_dst TSRMLS_CC) ;
     
 
     // copy ID
@@ -135,8 +147,6 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
 
     // zend_hash_destroy(routes_dst);
     // pefree(routes_dst, 1);
-    efree(routes_key);
-    efree(static_routes_key);
     efree(id_key);
     efree(expand_key);
 
