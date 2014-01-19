@@ -304,21 +304,6 @@ int mux_loader(char *path, zval *result TSRMLS_DC)
 }
 
 
-
-/*
-zend_object_value util_dir_object_new(zend_class_entry *ce TSRMLS_DC) {
-    zend_object_value retval;
-    util_dir_object *intern;
-    intern = pecalloc(1, sizeof(util_dir_object));
-    zend_object_std_init(&(intern->std), ce TSRMLS_CC);
-    zend_hash_copy(intern->std.properties, &ce->default_properties, (copy_ctor_func_t) zval_add_ref, NULL, sizeof(zval *));
-    retval.handle = zend_objects_store_put(intern, util_dir_object_dtor, NULL TSRMLS_CC);
-    retval.handlers = &util_dir_handlers;
-    return retval;
-}
-*/
-
-
 /*
  * pux_match(array $routes, string $path);
  */
