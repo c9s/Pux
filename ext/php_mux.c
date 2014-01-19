@@ -183,6 +183,18 @@ PHP_METHOD(Mux, __set_state) {
 }
 
 
+/**
+ * get_mux_function_entry("method", sizeof("method"), zend_inline_hash_func(ZEND_STRS("pattern")));
+ */
+inline zend_function * get_mux_function_entry(char * method_name, int method_name_len, ulong h) {
+    zend_function *fe;
+    if ( zend_hash_quick_find( &ce_pux_mux->function_table, method_name, method_name_len, h, (void **) &fe) == SUCCESS ) {
+        return fe;
+    }
+    php_error(E_ERROR, "%s method not found", method_name);
+    return NULL;
+}
+
 inline zval * call_mux_method(zval * object , char * method_name , int method_name_len, int param_count, zval* arg1, zval* arg2, zval* arg3 TSRMLS_DC)
 {
     zend_function *fe;
