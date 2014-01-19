@@ -68,6 +68,9 @@ HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC);
 extern inline int persistent_store(char *key, int key_len, int list_type, void * val TSRMLS_DC);
 extern inline int pux_persistent_store(char *ns, char *key, void * val TSRMLS_DC) ;
 
+extern inline void * persistent_fetch(char *key, int key_len TSRMLS_DC);
+extern inline void * pux_persistent_fetch(char *ns, char *key TSRMLS_DC);
+
 zval * _pux_fetch_mux(char *name TSRMLS_DC);
 int mux_loader(char *path, zval *result TSRMLS_DC);
 int _pux_store_mux(char *name, zval * mux TSRMLS_DC) ;

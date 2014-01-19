@@ -80,7 +80,7 @@ inline int persistent_store(char *key, int key_len, int list_type, void * val TS
     return zend_hash_update(&EG(persistent_list), key, key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
 }
 
-inline void * persistent_fetch(char *key, int key_len, void * val TSRMLS_DC)
+inline void * persistent_fetch(char *key, int key_len TSRMLS_DC)
 {
     zend_rsrc_list_entry *le;
     if ( zend_hash_find(&EG(persistent_list), key, key_len + 1, (void**) &le) == SUCCESS ) {
@@ -90,9 +90,14 @@ inline void * persistent_fetch(char *key, int key_len, void * val TSRMLS_DC)
 }
 
 
-inline int pux_persistent_fetch(char *ns, char *key, void * val)
+inline void * pux_persistent_fetch(char *ns, char *key TSRMLS_DC)
 {
-    return 0;
+    char *newkey;
+    int   newkey_len;
+    newkey_len = spprintf(&newkey, 0, "pux_%s_%s", ns, key);
+    void *ptr = persistent_fetch(newkey, newkey_len TSRMLS_CC);
+    efree(newkey);
+    return ptr;
 }
 
 /*
