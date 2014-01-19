@@ -73,8 +73,8 @@ PHP_FUNCTION(pux_sort_routes)
 
     // return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
     if ( Z_BVAL_PP(a_pcre) && Z_BVAL_PP(b_pcre) ) {
-        zend_hash_find( Z_ARRVAL_PP(a_options) , "compiled", strlen("compiled"), (void**)&a_compiled_pattern);
-        zend_hash_find( Z_ARRVAL_PP(b_options) , "compiled", strlen("compiled"), (void**)&b_compiled_pattern);
+        zend_hash_quick_find( Z_ARRVAL_PP(a_options) , "compiled", strlen("compiled"), zend_inline_hash_func(ZEND_STRS("compiled")), (void**)&a_compiled_pattern);
+        zend_hash_quick_find( Z_ARRVAL_PP(b_options) , "compiled", strlen("compiled"), zend_inline_hash_func(ZEND_STRS("compiled")), (void**)&b_compiled_pattern);
 
         int a_len = Z_STRLEN_PP(a_compiled_pattern);
         int b_len = Z_STRLEN_PP(b_compiled_pattern);
@@ -111,7 +111,7 @@ PHP_FUNCTION(pux_sort_routes)
 inline int validate_request_method(zval **z_route_options_pp, int current_request_method TSRMLS_DC)
 {
     zval **z_route_method = NULL;
-    if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "method", sizeof("method"), (void**) &z_route_method ) == SUCCESS ) {
+    if ( zend_hash_quick_find( Z_ARRVAL_PP(z_route_options_pp) , "method", sizeof("method"),  zend_inline_hash_func(ZEND_STRS("method")), (void**) &z_route_method ) == SUCCESS ) {
         if ( Z_TYPE_PP(z_route_method) == IS_LONG && Z_LVAL_PP(z_route_method) != current_request_method ) {
             return 0;
         }
@@ -122,7 +122,7 @@ inline int validate_request_method(zval **z_route_options_pp, int current_reques
 inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC) 
 {
     zval **z_route_secure = NULL;
-    if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "secure", sizeof("secure"), (void**) &z_route_secure ) == SUCCESS ) {
+    if ( zend_hash_quick_find( Z_ARRVAL_PP(z_route_options_pp) , "secure", sizeof("secure"), zend_inline_hash_func(ZEND_STRS("secure")), (void**) &z_route_secure ) == SUCCESS ) {
         // check HTTPS flag
         if ( https && ! Z_BVAL_PP(z_route_secure) ) {
             return 0;
@@ -134,7 +134,7 @@ inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC)
 inline int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC) 
 {
     zval **z_route_domain = NULL;
-    if ( zend_hash_find( Z_ARRVAL_PP(z_route_options_pp) , "domain", sizeof("domain"), (void**) &z_route_domain ) == SUCCESS ) {
+    if ( zend_hash_quick_find( Z_ARRVAL_PP(z_route_options_pp) , "domain", sizeof("domain"), zend_inline_hash_func(ZEND_STRS("domain")), (void**) &z_route_domain ) == SUCCESS ) {
         // check HTTP_HOST from $_SERVER
         if ( strncmp(Z_STRVAL_PP(z_route_domain), Z_STRVAL_P(http_host), Z_STRLEN_PP(z_route_domain) ) != 0 ) {
             return 0;
@@ -281,7 +281,7 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
 
 inline zval ** fetch_server_vars_hash(TSRMLS_D) {
     zval **z_server_hash = NULL;
-    if ( zend_hash_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), (void **) &z_server_hash) == SUCCESS ) {
+    if ( zend_hash_quick_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), zend_inline_hash_func(ZEND_STRS("_SERVER")), (void **) &z_server_hash) == SUCCESS ) {
         return z_server_hash;
     }
     return NULL;

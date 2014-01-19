@@ -27,7 +27,7 @@ static int implement_expandable_mux_interface_handler(zend_class_entry *interfac
     if (implementor->type == ZEND_USER_CLASS &&
         !instanceof_function(implementor, ce_pux_expandable_mux TSRMLS_CC)
     ) {
-        zend_error(E_ERROR, "DateTimeInterface can't be implemented by user classes");
+        zend_error(E_ERROR, "Pux\\ExpandableMux can't be implemented by user classes");
     }
     return SUCCESS;
 }
