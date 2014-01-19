@@ -67,7 +67,8 @@ void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
 }
 
 
-int persistent_store(char *key, int key_len, void * val TSRMLS_DC) {
+inline int persistent_store(char *key, int key_len, void * val TSRMLS_DC)
+{
     zend_rsrc_list_entry new_le;
     zend_rsrc_list_entry *le;
     if ( zend_hash_find(&EG(persistent_list), key, key_len + 1, (void**) &le) == SUCCESS ) {
@@ -82,7 +83,7 @@ int persistent_store(char *key, int key_len, void * val TSRMLS_DC) {
 /*
  * Store persistent value with pux namespace.
  */
-int pux_persistent_store(char *ns, char *key, void * val TSRMLS_DC) 
+inline int pux_persistent_store(char *ns, char *key, void * val TSRMLS_DC) 
 {
     char *newkey;
     int   newkey_len;
