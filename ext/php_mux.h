@@ -21,6 +21,8 @@ void pux_init_mux(TSRMLS_D);
 zend_class_entry ** get_pattern_compiler_ce(TSRMLS_D);
 zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry **ce_pattern_compiler TSRMLS_DC);
 
+extern inline zval * call_mux_method(zval * object , char * method_name , int method_name_len, int param_count, zval* arg1, zval* arg2, zval* arg3 TSRMLS_DC);
+
 
 PHP_METHOD(Mux, __construct);
 // PHP_METHOD(Mux, __destruct);
