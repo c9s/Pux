@@ -158,7 +158,6 @@ PHP_METHOD(Mux, __set_state) {
     zval **z_expand = NULL;
 
     if ( zend_hash_quick_find(Z_ARRVAL_P(z_array), "id", sizeof("id"), zend_inline_hash_func(ZEND_STRS("id")), (void**)&z_id) == SUCCESS ) {
-        // zend_update_property_long( Z_OBJCE_P(return_value), return_value, "id", sizeof("id")-1, Z_LVAL_PP(z_id) TSRMLS_CC);
         zend_update_property(ce_pux_mux, return_value, "id", sizeof("id")-1, *z_id TSRMLS_CC);
     }
 
@@ -187,7 +186,7 @@ PHP_METHOD(Mux, __set_state) {
 inline zval * call_mux_method(zval * object , char * method_name , int method_name_len, int param_count, zval* arg1, zval* arg2, zval* arg3 TSRMLS_DC)
 {
     zend_function *fe;
-    if ( zend_hash_find( &Z_OBJCE_P(object)->function_table, method_name, method_name_len, (void **) &fe) == FAILURE ) {
+    if ( zend_hash_find( &ce_pux_mux->function_table, method_name, method_name_len, (void **) &fe) == FAILURE ) {
         php_error(E_ERROR, "%s method not found", method_name);
     }
     // call export method
@@ -534,13 +533,13 @@ PHP_METHOD(Mux, setRoutes) {
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &routes ) == FAILURE) {
         RETURN_FALSE;
     }
-    zend_update_property( Z_OBJCE_P(this_ptr) , this_ptr, "routes", sizeof("routes")-1, routes TSRMLS_CC);
+    zend_update_property(ce_pux_mux , this_ptr, "routes", sizeof("routes")-1, routes TSRMLS_CC);
     RETURN_TRUE;
 }
 
 PHP_METHOD(Mux, getRoutes) {
     zval *z_routes;
-    z_routes = zend_read_property( Z_OBJCE_P(this_ptr) , this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    z_routes = zend_read_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     *return_value = *z_routes;
     zval_copy_ctor(return_value);
 }
@@ -554,7 +553,7 @@ PHP_METHOD(Mux, getId) {
     zval *z_id;
     long counter = 0;
 
-    z_id = zend_read_property( Z_OBJCE_P(this_ptr) , getThis(), "id", sizeof("id")-1, 1 TSRMLS_CC);
+    z_id = zend_read_property(ce_pux_mux, getThis(), "id", sizeof("id")-1, 1 TSRMLS_CC);
 
     if ( z_id != NULL && Z_TYPE_P(z_id) != IS_NULL ) {
         RETURN_LONG( Z_LVAL_P(z_id) );
@@ -565,7 +564,7 @@ PHP_METHOD(Mux, getId) {
 
     if ( rv ) {
         counter = Z_LVAL_P(rv);
-        zend_update_property_long(Z_OBJCE_P(this_ptr), this_ptr, "id" , sizeof("id") - 1, counter TSRMLS_CC);
+        zend_update_property_long(ce_pux_mux, this_ptr, "id" , sizeof("id") - 1, counter TSRMLS_CC);
         zval_ptr_dtor(&rv);
     }
     RETURN_LONG(counter);
@@ -573,7 +572,7 @@ PHP_METHOD(Mux, getId) {
 
 PHP_METHOD(Mux, length) {
     zval *z_routes;
-    z_routes = zend_read_property(Z_OBJCE_P(this_ptr), this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    z_routes = zend_read_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
     long length = zend_hash_num_elements( Z_ARRVAL_P(z_routes) );
 
@@ -690,7 +689,7 @@ PHP_METHOD(Mux, dispatch) {
 
 
     zend_function *fe; // method entry
-    zend_hash_quick_find( &Z_OBJCE_P(this_ptr)->function_table, "match",    sizeof("match"), zend_inline_hash_func(ZEND_STRS("match")),    (void **) &fe);
+    zend_hash_quick_find( &ce_pux_mux->function_table, "match",    sizeof("match"), zend_inline_hash_func(ZEND_STRS("match")),    (void **) &fe);
     zend_call_method( &this_ptr, ce_pux_mux, &fe, "match", strlen("match"), &z_return_route, 1, z_trimed_path, NULL TSRMLS_CC );
 
     if ( ! z_return_route || Z_TYPE_P(z_return_route) == IS_NULL ) {
@@ -976,7 +975,7 @@ static void mux_add_route(INTERNAL_FUNCTION_PARAMETERS)
         add_next_index_zval(z_routes, z_new_route);
 
         // if there is no option specified in z_options, we can add the route to our static route hash
-        if (zend_hash_has_more_elements(Z_ARRVAL_P(z_options)) != SUCCESS ) {
+        if ( zend_hash_num_elements(Z_ARRVAL_P(z_options)) ) {
             zval * z_static_routes = zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
             if ( z_static_routes ) {
                 add_assoc_zval(z_static_routes, pattern, z_new_route);
