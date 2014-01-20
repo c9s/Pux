@@ -18,9 +18,92 @@
 
 #define CHECK(p) { if ((p) == NULL) return NULL; }
 
+typedef void* (*ht_copy_fun_t)(void*, void* TSRMLS_DC);
+
+/**
+ * Recursively copy hash and all its value.
+ */
+HashTable * my_zend_hash_copy(HashTable *target, HashTable *source, ht_copy_fun_t copy_fn, void *tmp, uint size TSRMLS_DC)
+{
+    Bucket *curr = NULL, *prev = NULL , *newp = NULL;
+    void *new_entry;
+    int first = 1;
+
+    // allocate persistent memory for target and initialize it.
+    target = pemalloc(sizeof(HashTable), 1);
+    memcpy(target, source, sizeof(source[0]));
+    memset(target->arBuckets, 0, target->nTableSize * sizeof(Bucket*));
+    target->pInternalPointer = NULL;
+    target->pListHead = NULL;
+
+
+    curr = source->pListHead;
+    while (curr) {
+        // hash index
+        int n = curr->h % target->nTableSize;
+
+        // allocate new bucket
+
+// from apc
+#ifdef ZEND_ENGINE_2_4
+        if (!curr->nKeyLength) {
+            newp = (Bucket*) pemalloc(sizeof(Bucket), 1);
+            memcpy(newp, curr, sizeof(Bucket));
+        } else if (IS_INTERNED(curr->arKey)) {
+            newp = (Bucket*) pemalloc(sizeof(Bucket), 1);
+            memcpy(newp, curr, sizeof(Bucket));
+        } else {
+            // CHECK((newp = (Bucket*) apc_pmemcpy(curr, sizeof(Bucket) + curr->nKeyLength, pool TSRMLS_CC)));
+            // ugly but we need to copy
+            newp = (Bucket*) pemalloc(sizeof(Bucket) + curr->nKeyLength, 1);
+            memcpy(newp, curr, sizeof(Bucket) + curr->nKeyLength );
+            newp->arKey = (const char*)(newp+1);
+        }
+#else
+        newp = (Bucket*) pemalloc((sizeof(Bucket) + curr->nKeyLength - 1), 1);
+        memcpy(newp, curr, sizeof(Bucket) + curr->nKeyLength - 1);
+#endif
+
+
+        /* insert 'newp' into the linked list at its hashed index */
+        if (target->arBuckets[n]) {
+            newp->pNext = target->arBuckets[n];
+            newp->pLast = NULL;
+            newp->pNext->pLast = newp;
+        } else {
+            newp->pNext = newp->pLast = NULL;
+        }
+        target->arBuckets[n] = newp;
+
+        // now we copy the bucket data using our 'copy_fn'
+        newp->pData = copy_fn(NULL, curr->pData TSRMLS_CC);
+        memcpy(&newp->pDataPtr, newp->pData, sizeof(void*));
+
+        /* insert 'newp' into the table-thread linked list */
+        newp->pListLast = prev;
+        newp->pListNext = NULL;
+
+        if (prev) {
+            prev->pListNext = newp;
+        }
+        if (first) {
+            target->pListHead = newp;
+            first = 0;
+        }
+        prev = newp;
+
+        curr = curr->pListNext;
+    }
+
+    target->pListTail = newp;
+    zend_hash_internal_pointer_reset(target);
+
+    // return the newly allocated memory
+    return target;
+}
+
 
 void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC);
-
 
 void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
 {
@@ -54,7 +137,7 @@ void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
                 }
                 ALLOC_HASHTABLE_REL(tmp_ht);
                 zend_hash_init(tmp_ht, zend_hash_num_elements(original_ht), NULL, ZVAL_PTR_DTOR, 0);
-                zend_hash_copy(tmp_ht, original_ht, (copy_ctor_func_t) zval_add_ref, (void *) &tmp, sizeof(zval *));
+                zend_hash_copy(tmp_ht, original_ht, (copy_ctor_func_t) my_zval_copy_ctor_func, (void *) &tmp, sizeof(zval *));
                 zvalue->value.ht = tmp_ht;
             }
             break;
@@ -68,26 +151,34 @@ void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
     Z_ADDREF_P(zvalue);
 }
 
-
 void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC)
 {
+    /*
+    zval *orig_zvalue;
+    orig_zvalue = zvalue;
+    zvalue = pemalloc(sizeof(zval), 1);
+    *zvalue = *zvalue;
+    zval_copy_ctor(zvalue);
+    Z_SET_REFCOUNT_P(zvalue, 1);
+    Z_UNSET_ISREF_P(zvalue);
+    // MAKE_COPY_ZVAL(&new_zvalue, zvalue);
+    SEPARATE_ZVAL(&zvalue);
+    */
+
     switch (Z_TYPE_P(zvalue) & IS_CONSTANT_TYPE_MASK) {
-        case IS_RESOURCE: {
-                TSRMLS_FETCH();
-                zend_list_addref(zvalue->value.lval);
-            }
-            break;
+        case IS_RESOURCE:
         case IS_BOOL:
         case IS_LONG:
+        case IS_DOUBLE:
         case IS_NULL:
             break;
+
         case IS_CONSTANT:
         case IS_STRING:
             CHECK_ZVAL_STRING_REL(zvalue);
-            if (!IS_INTERNED(zvalue->value.str.val)) {
-                zvalue->value.str.val = (char *) pestrndup(zvalue->value.str.val, zvalue->value.str.len, 1);
-            }
+            zvalue->value.str.val = (char *) pestrndup(zvalue->value.str.val, zvalue->value.str.len, 1);
             break;
+
         case IS_ARRAY:
         case IS_CONSTANT_ARRAY: {
                 zval *tmp;
@@ -112,7 +203,6 @@ void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC)
     }
     Z_SET_REFCOUNT_P(zvalue, 1);
 }
-
 
 inline int persistent_store(char *key, int key_len, int list_type, void * val TSRMLS_DC)
 {
@@ -216,8 +306,16 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
     return SUCCESS;
 }
 
+
+/**
+ * Fetch mux related properties (hash tables) from EG(persistent_list) hash table and 
+ * rebless a new Mux object with these properties.
+ *
+ * @return Mux object
+ */
 zval * _pux_fetch_mux(char *name TSRMLS_DC)
 {
+    zval *z_id, *z_routes, *z_static_routes, *tmp;
     HashTable *routes_hash;
     HashTable *static_routes_hash;
 
@@ -232,7 +330,6 @@ zval * _pux_fetch_mux(char *name TSRMLS_DC)
         return NULL;
     }
 
-    zval *z_id, *z_routes, *z_static_routes, *tmp;
     z_id = (zval*) pux_persistent_fetch(name, "id" TSRMLS_CC);
     MAKE_STD_ZVAL(z_routes);
     MAKE_STD_ZVAL(z_static_routes);
