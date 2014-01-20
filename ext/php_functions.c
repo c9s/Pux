@@ -19,9 +19,57 @@
 #define CHECK(p) { if ((p) == NULL) return NULL; }
 
 
-void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC);
+void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC);
+
 
 void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
+{
+    switch (Z_TYPE_P(zvalue) & IS_CONSTANT_TYPE_MASK) {
+        case IS_RESOURCE: {
+                TSRMLS_FETCH();
+
+                zend_list_addref(zvalue->value.lval);
+            }
+            break;
+        case IS_BOOL:
+        case IS_LONG:
+        case IS_NULL:
+            break;
+        case IS_CONSTANT:
+        case IS_STRING:
+            CHECK_ZVAL_STRING_REL(zvalue);
+            if (!IS_INTERNED(zvalue->value.str.val)) {
+                zvalue->value.str.val = (char *) estrndup_rel(zvalue->value.str.val, zvalue->value.str.len);
+            }
+            break;
+        case IS_ARRAY:
+        case IS_CONSTANT_ARRAY: {
+                zval *tmp;
+                HashTable *original_ht = zvalue->value.ht;
+                HashTable *tmp_ht = NULL;
+                TSRMLS_FETCH();
+
+                if (zvalue->value.ht == &EG(symbol_table)) {
+                    return; /* do nothing */
+                }
+                ALLOC_HASHTABLE_REL(tmp_ht);
+                zend_hash_init(tmp_ht, zend_hash_num_elements(original_ht), NULL, ZVAL_PTR_DTOR, 0);
+                zend_hash_copy(tmp_ht, original_ht, (copy_ctor_func_t) zval_add_ref, (void *) &tmp, sizeof(zval *));
+                zvalue->value.ht = tmp_ht;
+            }
+            break;
+        case IS_OBJECT:
+            {
+                TSRMLS_FETCH();
+                Z_OBJ_HT_P(zvalue)->add_ref(zvalue TSRMLS_CC);
+            }
+            break;
+    }
+    Z_ADDREF_P(zvalue);
+}
+
+
+void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC)
 {
     switch (Z_TYPE_P(zvalue) & IS_CONSTANT_TYPE_MASK) {
         case IS_RESOURCE: {
@@ -51,7 +99,7 @@ void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
                 }
                 tmp_ht = pemalloc(sizeof(HashTable), 1);
                 zend_hash_init(tmp_ht, zend_hash_num_elements(original_ht), NULL, ZVAL_PTR_DTOR, 1);
-                zend_hash_copy(tmp_ht, original_ht, (copy_ctor_func_t) my_zval_copy_ctor_func, (void *) &tmp, sizeof(zval *));
+                zend_hash_copy(tmp_ht, original_ht, (copy_ctor_func_t) my_zval_copy_ctor_persistent_func, (void *) &tmp, sizeof(zval *));
                 zvalue->value.ht = tmp_ht;
             }
             break;
@@ -120,7 +168,7 @@ HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC)
     HashTable* dst;
     dst = pecalloc(1, sizeof(HashTable), 1);
     zend_hash_init(dst, 5, NULL, NULL, 1);
-    zend_hash_copy(dst, src, (copy_ctor_func_t) my_zval_copy_ctor_func, &tmp, sizeof(zval*) );
+    zend_hash_copy(dst, src, (copy_ctor_func_t) my_zval_copy_ctor_persistent_func, &tmp, sizeof(zval*) );
     return dst;
 }
 
@@ -195,8 +243,8 @@ zval * _pux_fetch_mux(char *name TSRMLS_DC)
     Z_ADDREF_P(z_routes);
     Z_ADDREF_P(z_static_routes);
 
-    zend_hash_copy( Z_ARRVAL_P(z_routes)        , routes_hash        , (copy_ctor_func_t) _zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
-    zend_hash_copy( Z_ARRVAL_P(z_static_routes) , static_routes_hash , (copy_ctor_func_t) _zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
+    zend_hash_copy( Z_ARRVAL_P(z_routes)        , routes_hash        , (copy_ctor_func_t) my_zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
+    zend_hash_copy( Z_ARRVAL_P(z_static_routes) , static_routes_hash , (copy_ctor_func_t) my_zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
 
     // create new object and return to userspace.
     zval *new_mux = NULL;
