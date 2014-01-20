@@ -370,7 +370,6 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
 
     prop = zend_read_property(ce_pux_mux, mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
-    return SUCCESS;
     pux_persistent_store( name, "routes", (void*) routes_dst TSRMLS_CC);
 
     prop = zend_read_property(ce_pux_mux, mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);

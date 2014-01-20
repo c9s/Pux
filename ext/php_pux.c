@@ -45,12 +45,11 @@ void pux_init_exception(TSRMLS_D) {
 
 static void php_mux_hash_persist_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {
-     /*
-     zval *mux = (zval*)rsrc->ptr;
-     if (mux) {
-        zval_ptr_dtor(&mux);
+     HashTable *h = (HashTable*) rsrc->ptr;
+     if (h) {
+         zend_hash_destroy(h);
+         pefree(h, 1);
      }
-     */
 }
 
 zend_module_entry pux_module_entry = {
@@ -75,12 +74,19 @@ PHP_INI_END()
 ZEND_GET_MODULE(pux)
 #endif
 
+static void php_pux_init_globals(zend_pux_globals *pux_globals)
+{
+    // pux_globals->persistent_list = (HashTable*) 
+    // array_init(pux_globals->persistent_list);
+}
+
 PHP_MINIT_FUNCTION(pux) {
+  ZEND_INIT_MODULE_GLOBALS(pux, php_pux_init_globals, NULL);
   REGISTER_INI_ENTRIES();
   pux_init_mux(TSRMLS_C);
   pux_init_expandable_mux(TSRMLS_C);
   pux_init_controller(TSRMLS_C);
-  le_mux_hash_persist = zend_register_list_destructors_ex (NULL, php_mux_hash_persist_dtor, "Mux", module_number);
+  le_mux_hash_persist = zend_register_list_destructors_ex(NULL, php_mux_hash_persist_dtor, "Mux", module_number);
   return SUCCESS;
 }
 
