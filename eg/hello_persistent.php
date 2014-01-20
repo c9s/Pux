@@ -16,13 +16,3 @@ echo '</pre>';
 var_dump( $r ); 
 /*
  */
-    
-/*
-if ( $mux = pux_fetch_mux('hello') ) {
-    var_dump( $mux ); 
-} else {
-    $mux = require 'hello_mux.php';
-    pux_store_mux('hello', $mux);
-}
- */
-// $r = $mux->dispatch('/hello');

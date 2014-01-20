@@ -22,6 +22,15 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         ok($m ,'mux fetched');
         ok( is_object($m) , 'fetched mux is an object' );
         ok( $m instanceof Mux, 'fetched mux is an Mux object');
+        count_ok( 1, $m->getRoutes() );
+
+        $routes = $m->getRoutes();
+
+        foreach( $routes as $route ) {
+            $this->assertRoute($route);
+        }
+
+        // var_dump( $routes ); 
         // pux_delete_mux('phpunit1');
     }
 
