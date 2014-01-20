@@ -116,13 +116,20 @@ HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_c
     void *new_entry;
     int first = 1;
 
+    assert(source != NULL);
+
     // allocate persistent memory for target and initialize it.
-    target = pemalloc(sizeof(HashTable), 1);
+    if (!target) {
+        CHECK(target = pecalloc(1, sizeof(source[0]), 1));
+    }
     memcpy(target, source, sizeof(source[0]));
     memset(target->arBuckets, 0, target->nTableSize * sizeof(Bucket*));
     target->pInternalPointer = NULL;
     target->pListHead = NULL;
 
+    // since it's persistent, destructor should be NULL
+    target->persistent = 1;
+    target->pDestructor = NULL;
 
     curr = source->pListHead;
     while (curr) {
@@ -134,20 +141,20 @@ HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_c
 // from apc
 #ifdef ZEND_ENGINE_2_4
         if (!curr->nKeyLength) {
-            newp = (Bucket*) pemalloc(sizeof(Bucket), 1);
+            CHECK(newp = (Bucket*) pecalloc(1, sizeof(Bucket), 1));
             memcpy(newp, curr, sizeof(Bucket));
         } else if (IS_INTERNED(curr->arKey)) {
-            newp = (Bucket*) pemalloc(sizeof(Bucket), 1);
+            CHECK(newp = (Bucket*) pecalloc(1, sizeof(Bucket), 1));
             memcpy(newp, curr, sizeof(Bucket));
         } else {
             // CHECK((newp = (Bucket*) apc_pmemcpy(curr, sizeof(Bucket) + curr->nKeyLength, pool TSRMLS_CC)));
             // ugly but we need to copy
-            newp = (Bucket*) pemalloc(sizeof(Bucket) + curr->nKeyLength, 1);
+            CHECK(newp = (Bucket*) pecalloc(1, sizeof(Bucket) + curr->nKeyLength, 1));
             memcpy(newp, curr, sizeof(Bucket) + curr->nKeyLength );
             newp->arKey = (const char*)(newp+1);
         }
 #else
-        newp = (Bucket*) pemalloc((sizeof(Bucket) + curr->nKeyLength - 1), 1);
+        CHECK(newp = (Bucket*) pecalloc(1, (sizeof(Bucket) + curr->nKeyLength - 1), 1));
         memcpy(newp, curr, sizeof(Bucket) + curr->nKeyLength - 1);
 #endif
 
@@ -361,31 +368,29 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
     zval *prop, *tmp;
     HashTable *routes_dst, *static_routes_dst; 
 
-    prop = zend_read_property(Z_OBJCE_P(mux), mux, "routes", sizeof("routes")-1, 0 TSRMLS_CC);
-
-
-    return SUCCESS;
-    if ( Z_TYPE_P(prop) != IS_ARRAY ) {
-        return FAILURE;
-    }
+    prop = zend_read_property(ce_pux_mux, mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
+    return SUCCESS;
     pux_persistent_store( name, "routes", (void*) routes_dst TSRMLS_CC);
 
-    prop = zend_read_property(Z_OBJCE_P(mux), mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
+    prop = zend_read_property(ce_pux_mux, mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
     static_routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop)  TSRMLS_CC);
     pux_persistent_store(name, "static_routes", (void *) static_routes_dst TSRMLS_CC) ;
     
     // copy ID
-    prop = zend_read_property(Z_OBJCE_P(mux), mux, "id", sizeof("id")-1, 1 TSRMLS_CC);
+    /*
+    prop = zend_read_property(ce_pux_mux, mux, "id", sizeof("id")-1, 1 TSRMLS_CC);
     tmp = pemalloc(sizeof(zval), 1);
-    INIT_PZVAL(tmp);
+    INIT_ZVAL(tmp);
     Z_TYPE_P(tmp) = IS_LONG;
     Z_LVAL_P(tmp) = Z_LVAL_P(prop);
+    Z_SET_REFCOUNT_P(tmp, 1);
     pux_persistent_store( name, "id", (void*) tmp TSRMLS_CC);
+    */
 
 
     // We cannot copy un-expandable mux object because we don't support recursively copy for Mux object.
-    prop = zend_read_property(Z_OBJCE_P(mux), mux, "expand", sizeof("expand")-1, 1 TSRMLS_CC);
+    prop = zend_read_property(ce_pux_mux, mux, "expand", sizeof("expand")-1, 1 TSRMLS_CC);
     if ( ! Z_BVAL_P(prop) ) {
         php_error(E_ERROR, "We cannot copy un-expandable mux object because we don't support recursively copy for Mux object.");
     }
@@ -550,14 +555,8 @@ PHP_FUNCTION(pux_store_mux)
     int  name_len;
 
     /* parse parameters */
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz", 
-                    &name, &name_len ,
-                    &mux ) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz", &name, &name_len, &mux ) == FAILURE) {
         RETURN_FALSE;
-    }
-
-    if ( Z_TYPE_P(mux) != IS_OBJECT ) {
-        php_error(E_ERROR, "Should be a Mux object.");
     }
     if ( _pux_store_mux(name, mux TSRMLS_CC) == SUCCESS ) {
         RETURN_TRUE;
