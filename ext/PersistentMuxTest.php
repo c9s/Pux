@@ -10,7 +10,15 @@ use Pux\Executor;
 class PersistentMuxTest extends PHPUnit_Framework_TestCase
 {
 
-    public function testStore() 
+    public function testStoreOnly() 
+    {
+        $mux = new Mux;
+        $mux->id = 1;
+        $mux->add('/', [ 'IndexController', 'index' ]);
+        ok( pux_store_mux('phpunit1', $mux), 'mux stored' );
+    }
+
+    public function testStoreAndFetch() 
     {
         $mux = new Mux;
         $mux->id = 1;
@@ -35,7 +43,6 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
     }
 
     public function testPersistentDispatch() {
-        return;
         // this one load mux from _test_mux.php
         $route = pux_persistent_dispatch('testing', '_test_mux.php', '/');
         $this->assertRoute($route);

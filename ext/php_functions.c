@@ -1,3 +1,6 @@
+/*
+vim:fdm=marker:et:sw=4:ts=4:sts=4:
+*/
 
 #include "php.h"
 #include "string.h"
@@ -18,12 +21,96 @@
 
 #define CHECK(p) { if ((p) == NULL) return NULL; }
 
+
+/**
+ * new_dst = ht_copy_fun_t(NULL, src);
+ *
+ * Can be our zval copy function
+ */
 typedef void* (*ht_copy_fun_t)(void*, void* TSRMLS_DC);
+HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_copy_fun_t copy_fn, void *tmp, uint size TSRMLS_DC);
+
+
+static zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC);
+
+static zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC);
+
+/* {{{ my_copy_zval_ptr */
+static zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC)
+{
+    zval* dst_new;
+    assert(src != NULL);
+    if (!dst) {
+        dst = (zval**) pemalloc(sizeof(zval*), 1);
+    }
+    dst[0] = (zval*) pemalloc(sizeof(zval), 1);
+    dst_new = my_copy_zval(*dst, *src TSRMLS_CC);
+    if (dst_new != *dst) {
+        *dst = dst_new;
+    }
+    return dst;
+}
+/* }}} */
+
+
+
+
+/* {{{ my_copy_zval */
+static zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC)
+{
+    zval **tmp;
+    assert(dst != NULL);
+    assert(src != NULL);
+    memcpy(dst, src, sizeof(src[0]));
+
+    /* deep copies are refcount(1), but moved up for recursive 
+     * arrays,  which end up being add_ref'd during its copy. */
+    Z_SET_REFCOUNT_P(dst, 1);
+    Z_UNSET_ISREF_P(dst);
+
+    switch (src->type & IS_CONSTANT_TYPE_MASK) {
+    case IS_RESOURCE:
+    case IS_BOOL:
+    case IS_LONG:
+    case IS_DOUBLE:
+    case IS_NULL:
+        break;
+
+    case IS_CONSTANT:
+    case IS_STRING:
+        if (src->value.str.val) {
+            dst->value.str.val = pestrndup(src->value.str.val, src->value.str.len, 1);
+        }
+        break;
+
+    case IS_ARRAY:
+    case IS_CONSTANT_ARRAY:
+        dst->value.ht = persistent_copy_hashtable(NULL, src->value.ht, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *) TSRMLS_CC);
+        break;
+
+    // XXX: we don't serialize object.
+    case IS_OBJECT:
+        break;
+#ifdef ZEND_ENGINE_2_4
+    case IS_CALLABLE:
+        // XXX: we don't serialize callbable object.
+        break;
+#endif
+    default:
+        assert(0);
+    }
+    return dst;
+}
+/* }}} */
+
+
 
 /**
  * Recursively copy hash and all its value.
+ *
+ * This replaces zend_hash_copy
  */
-HashTable * my_zend_hash_copy(HashTable *target, HashTable *source, ht_copy_fun_t copy_fn, void *tmp, uint size TSRMLS_DC)
+HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_copy_fun_t copy_fn, void *tmp, uint size TSRMLS_DC)
 {
     Bucket *curr = NULL, *prev = NULL , *newp = NULL;
     void *new_entry;
@@ -254,12 +341,8 @@ inline int pux_persistent_store(char *ns, char *key, void * val TSRMLS_DC)
 
 HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC)
 {
-    zval *tmp;
-    HashTable* dst;
-    dst = pecalloc(1, sizeof(HashTable), 1);
-    zend_hash_init(dst, 5, NULL, NULL, 1);
-    zend_hash_copy(dst, src, (copy_ctor_func_t) my_zval_copy_ctor_persistent_func, &tmp, sizeof(zval*) );
-    return dst;
+    zval **tmp;
+    return persistent_copy_hashtable(NULL, src, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *) TSRMLS_CC);
 }
 
 
@@ -278,13 +361,18 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
     zval *prop, *tmp;
     HashTable *routes_dst, *static_routes_dst; 
 
-    prop = zend_read_property(Z_OBJCE_P(mux), mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    prop = zend_read_property(Z_OBJCE_P(mux), mux, "routes", sizeof("routes")-1, 0 TSRMLS_CC);
+
+
+    return SUCCESS;
+    if ( Z_TYPE_P(prop) != IS_ARRAY ) {
+        return FAILURE;
+    }
     routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
     pux_persistent_store( name, "routes", (void*) routes_dst TSRMLS_CC);
 
     prop = zend_read_property(Z_OBJCE_P(mux), mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
     static_routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop)  TSRMLS_CC);
-
     pux_persistent_store(name, "static_routes", (void *) static_routes_dst TSRMLS_CC) ;
     
     // copy ID
@@ -468,6 +556,9 @@ PHP_FUNCTION(pux_store_mux)
         RETURN_FALSE;
     }
 
+    if ( Z_TYPE_P(mux) != IS_OBJECT ) {
+        php_error(E_ERROR, "Should be a Mux object.");
+    }
     if ( _pux_store_mux(name, mux TSRMLS_CC) == SUCCESS ) {
         RETURN_TRUE;
     }
