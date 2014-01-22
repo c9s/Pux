@@ -290,6 +290,7 @@ $r = pux_persistent_dispatch('hello', 'hello_mux.php', '/hello');
 ```
 
 > Please note that the `hello_mux.php` must be a compiled mux PHP file.
+> The `pux_persistent_dispatch` is only available in extension.
 
 
 Controller
