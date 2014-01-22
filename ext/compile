@@ -16,9 +16,13 @@ usage()
 
 do_clean=0
 do_install=0
+do_phpize=0
 
-while getopts "ci" o; do
+while getopts "cip" o; do
     case "${o}" in
+        p)
+            do_phpize=1
+            ;;
         c)
             do_clean=1
             ;;
@@ -31,7 +35,7 @@ while getopts "ci" o; do
     esac
 done
 
-if [[ ! -e configure || $(statm config.m4) -gt $(statm configure) ]] ; then
+if [[ $do_phpize == 1 || ! -e configure || $(statm config.m4) -gt $(statm configure) ]] ; then
     echo "===> Found change, scaffolding..."
     phpize --clean > /dev/null
     phpize || exit 1
