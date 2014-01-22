@@ -15,7 +15,6 @@
 #include "pux_functions.h"
 
 
-#define PUX_DEBUG 1
 #if PUX_DEBUG
 #define HT_OK				0
 #define HT_IS_DESTROYING	1
