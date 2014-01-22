@@ -27,11 +27,11 @@ if test $PHP_PUX != "no"; then
     PHP_ADD_LIBRARY(stdc++, 1, PUX_SHARED_LIBADD)
     PHP_ADD_INCLUDE(/opt/local/include)
     PHP_NEW_EXTENSION(pux, php_pux.c \
-        php_mux.c \
+        pux_mux.c \
         php_expandable_mux.c \
-        php_controller.c \
+        pux_controller.c \
         ct_helper.c \
-        php_functions.c \
+        pux_functions.c \
         pux_persistent.c \
         hash.c \
         , $ext_shared)

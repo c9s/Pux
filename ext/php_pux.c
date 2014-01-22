@@ -14,10 +14,10 @@
 
 #include "php_pux.h"
 #include "ct_helper.h"
-#include "php_functions.h"
-#include "php_mux.h"
+#include "pux_functions.h"
+#include "pux_mux.h"
 #include "php_expandable_mux.h"
-#include "php_controller.h"
+#include "pux_controller.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(pux);
 
@@ -27,7 +27,7 @@ zend_class_entry *ce_pux_exception;
 
 
 // #define DEBUG 1
-static const zend_function_entry php_functions[] = {
+static const zend_function_entry pux_functions[] = {
     PHP_FE(pux_match, NULL)
     PHP_FE(pux_sort_routes, NULL)
     PHP_FE(pux_fetch_mux, NULL)
@@ -43,7 +43,7 @@ void pux_init_exception(TSRMLS_D) {
   ce_pux_exception = zend_register_internal_class_ex(&e, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
 }
 
-static void php_mux_hash_persist_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
+static void pux_mux_hash_persist_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {
      HashTable *h = (HashTable*) rsrc->ptr;
      if (h) {
@@ -55,7 +55,7 @@ static void php_mux_hash_persist_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 zend_module_entry pux_module_entry = {
     STANDARD_MODULE_HEADER,
     PHP_PUX_EXTNAME,
-    php_functions,
+    pux_functions,
     PHP_MINIT(pux),
     PHP_MSHUTDOWN(pux),
     PHP_RINIT(pux),
@@ -86,7 +86,7 @@ PHP_MINIT_FUNCTION(pux) {
   pux_init_mux(TSRMLS_C);
   pux_init_expandable_mux(TSRMLS_C);
   pux_init_controller(TSRMLS_C);
-  le_mux_hash_persist = zend_register_list_destructors_ex(NULL, php_mux_hash_persist_dtor, "Mux", module_number);
+  le_mux_hash_persist = zend_register_list_destructors_ex(NULL, pux_mux_hash_persist_dtor, "Mux", module_number);
   return SUCCESS;
 }
 

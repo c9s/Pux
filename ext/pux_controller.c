@@ -14,10 +14,10 @@
 
 #include "ct_helper.h"
 #include "php_pux.h"
-#include "php_mux.h"
-#include "php_functions.h"
+#include "pux_mux.h"
+#include "pux_functions.h"
 #include "php_expandable_mux.h"
-#include "php_controller.h"
+#include "pux_controller.h"
 
 zend_class_entry *ce_pux_controller;
 

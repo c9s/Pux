@@ -11,8 +11,8 @@
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
 #include "php_pux.h"
-#include "php_mux.h"
-#include "php_functions.h"
+#include "pux_mux.h"
+#include "pux_functions.h"
 
 
 #define PUX_DEBUG 1

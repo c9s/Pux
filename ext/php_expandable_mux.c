@@ -7,7 +7,7 @@
 #include "zend_object_handlers.h"
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
-#include "php_functions.h"
+#include "pux_functions.h"
 #include "php_expandable_mux.h"
 
 zend_class_entry *ce_pux_expandable_mux;

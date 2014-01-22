@@ -16,8 +16,8 @@
 #include "ext/pcre/php_pcre.h"
 #include "ext/standard/php_string.h"
 #include "php_pux.h"
-#include "php_mux.h"
-#include "php_functions.h"
+#include "pux_mux.h"
+#include "pux_functions.h"
 
 extern inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
 extern inline int get_current_request_method_const(zval ** server_vars_hash TSRMLS_DC);
