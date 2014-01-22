@@ -1,10 +1,19 @@
 #!/bin/bash
-if [[ ! -e configure || $(stat -f '%m' config.m4) -gt $(stat -f '%m' configure) ]] ; then
+function statm()
+{
+    if [[ `uname` == "Darwin" ]] ; then
+        stat -f '%m' $1
+    elif [[ `uname` == "Linux" ]] ; then
+        stat --format '%Y' $1
+    fi
+}
+
+if [[ ! -e configure || $(statm config.m4) -gt $(statm configure) ]] ; then
     echo "===> Found change, scaffolding..."
     phpize --clean > /dev/null
     phpize || exit 1
 fi
-if [[ ! -e Makefile || $(stat -f '%m' configure) -gt $(stat -f '%m' Makefile) ]] ; then
+if [[ ! -e Makefile || $(statm configure) -gt $(statm Makefile) ]] ; then
     echo "===> Configuring..."
     ./configure > /dev/null || exit 1
 fi
