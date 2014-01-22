@@ -279,6 +279,19 @@ $route = $dispatcher->dispatch('/request/uri');
 var_dump($route);
 ```
 
+Persistent Dispatcher
+---------------------
+Rather than reload the mux object from php file everytime (or load from APC), there still a lot of overhead. 
+
+Pux provides a persistent way to dispatch your route and keep the routes array in the persistent memory:
+
+```php
+$r = pux_persistent_dispatch('hello', 'hello_mux.php', '/hello');
+```
+
+> Please note that the `hello_mux.php` must be a compiled mux PHP file.
+
+
 Controller
 --------------------
 
