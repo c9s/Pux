@@ -1,5 +1,5 @@
 #!/bin/bash
-function statm()
+statm()
 {
     if [[ `uname` == "Darwin" ]] ; then
         stat -f '%m' $1
@@ -7,6 +7,29 @@ function statm()
         stat --format '%Y' $1
     fi
 }
+
+usage()
+{
+    echo "Usage: $0 [-ci]" 1>&2
+    exit 1
+}
+
+do_clean=0
+do_install=0
+
+while getopts "ci" o; do
+    case "${o}" in
+        c)
+            do_clean=1
+            ;;
+        i)
+            do_install=1
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
 
 if [[ ! -e configure || $(statm config.m4) -gt $(statm configure) ]] ; then
     echo "===> Found change, scaffolding..."
@@ -17,7 +40,16 @@ if [[ ! -e Makefile || $(statm configure) -gt $(statm Makefile) ]] ; then
     echo "===> Configuring..."
     ./configure > /dev/null || exit 1
 fi
-echo "===> Cleaning..."
-make clean > /dev/null || exit 1
+
+if [[ $do_clean == 1 ]] ; then
+    echo "===> Cleaning..."
+    make clean > /dev/null || exit 1
+fi
+
 echo "===> Building..."
-make clean > /dev/null && make > /dev/null && make install
+make > /dev/null || exit 1
+
+if [[ $do_install == 1 ]] ;then
+    echo "===> Installing..."
+    make install
+fi
