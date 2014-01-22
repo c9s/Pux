@@ -1,0 +1,14 @@
+#!/bin/bash
+if [[ ! -e configure || $(stat -f '%m' config.m4) -gt $(stat -f '%m' configure) ]] ; then
+    echo "===> Found change, scaffolding..."
+    phpize --clean > /dev/null
+    phpize || exit 1
+fi
+if [[ ! -e Makefile || $(stat -f '%m' configure) -gt $(stat -f '%m' Makefile) ]] ; then
+    echo "===> Configuring..."
+    ./configure > /dev/null || exit 1
+fi
+echo "===> Cleaning..."
+make clean > /dev/null || exit 1
+echo "===> Building..."
+make clean > /dev/null && make > /dev/null && make install
