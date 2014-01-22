@@ -18,6 +18,7 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         ok( pux_store_mux('phpunit1', $mux), 'mux stored' );
     }
 
+    /*
     public function testStoreAndFetch() 
     {
         $mux = new Mux;
@@ -29,10 +30,12 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         $m = pux_fetch_mux('phpunit1');
         $this->assertMux($m);
     }
+    */
 
     /**
      * @depends testStore
      */
+    /*
     public function testFetch() 
     {
         $i = 10;
@@ -50,6 +53,7 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         // $route = pux_persistent_dispatch('testing', '_test_mux.php', '/');
         // $this->assertRoute($route);
     }
+     */
 
     public function assertMux($m) 
     {

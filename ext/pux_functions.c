@@ -94,8 +94,7 @@ zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC)
 }
 /* }}} */
 
-void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC);
-
+/* my_zval_copy_ctor_func {{{*/
 void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
 {
     switch (Z_TYPE_P(zvalue) & IS_CONSTANT_TYPE_MASK) {
@@ -141,7 +140,9 @@ void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
     }
     Z_ADDREF_P(zvalue);
 }
+/*}}}*/
 
+// my_zval_copy_ctor_persistent_func {{{
 void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC)
 {
     /*
@@ -194,7 +195,7 @@ void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC)
     }
     Z_SET_REFCOUNT_P(zvalue, 1);
 }
-
+// }}}
 
 int _pux_store_mux(char *name, zval * mux TSRMLS_DC) 
 {
@@ -213,7 +214,10 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
 
     prop = zend_read_property(ce_pux_mux, mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     routes = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
+    return SUCCESS;
+
     pux_persistent_store( name, "routes", (void*) routes TSRMLS_CC);
+
 
     prop = zend_read_property(ce_pux_mux, mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
     static_routes = zend_hash_clone_persistent( Z_ARRVAL_P(prop)  TSRMLS_CC);
@@ -387,8 +391,6 @@ PHP_FUNCTION(pux_match)
     }
     RETURN_NULL();
 }
-
-
 
 PHP_FUNCTION(pux_store_mux)
 {
@@ -576,42 +578,6 @@ PHP_FUNCTION(pux_sort_routes)
     }
 }
 
-
-inline int validate_request_method(zval **z_route_options_pp, int current_request_method TSRMLS_DC)
-{
-    zval **z_route_method = NULL;
-    if ( zend_hash_quick_find( Z_ARRVAL_PP(z_route_options_pp) , "method", sizeof("method"),  zend_inline_hash_func(ZEND_STRS("method")), (void**) &z_route_method ) == SUCCESS ) {
-        if ( Z_TYPE_PP(z_route_method) == IS_LONG && Z_LVAL_PP(z_route_method) != current_request_method ) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC) 
-{
-    zval **z_route_secure = NULL;
-    if ( zend_hash_quick_find( Z_ARRVAL_PP(z_route_options_pp) , "secure", sizeof("secure"), zend_inline_hash_func(ZEND_STRS("secure")), (void**) &z_route_secure ) == SUCCESS ) {
-        // check HTTPS flag
-        if ( https && ! Z_BVAL_PP(z_route_secure) ) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-inline int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC) 
-{
-    zval **z_route_domain = NULL;
-    if ( zend_hash_quick_find( Z_ARRVAL_PP(z_route_options_pp) , "domain", sizeof("domain"), zend_inline_hash_func(ZEND_STRS("domain")), (void**) &z_route_domain ) == SUCCESS ) {
-        // check HTTP_HOST from $_SERVER
-        if ( strncmp(Z_STRVAL_PP(z_route_domain), Z_STRVAL_P(http_host), Z_STRLEN_PP(z_route_domain) ) != 0 ) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
 // 
 // int zend_hash_has_key( )
 //
@@ -789,8 +755,7 @@ inline zval * get_current_request_method(zval ** server_vars_hash TSRMLS_DC) {
     return fetch_server_var(server_vars_hash, "REQUEST_METHOD", sizeof("REQUEST_METHOD") TSRMLS_CC);
 }
 
-/**
- * get request method type in constant value.
+/* get request method type in constant value. {{{
  */
 inline int get_current_request_method_const(zval **server_vars_hash TSRMLS_DC) {
     char *c_request_method;
@@ -808,5 +773,41 @@ inline int get_current_request_method_const(zval **server_vars_hash TSRMLS_DC) {
         }
     }
     return 0;
+}
+// }}}
+
+inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC) 
+{
+    zval **z_route_secure = NULL;
+    if ( zend_hash_quick_find( Z_ARRVAL_PP(z_route_options_pp) , "secure", sizeof("secure"), zend_inline_hash_func(ZEND_STRS("secure")), (void**) &z_route_secure ) == SUCCESS ) {
+        // check HTTPS flag
+        if ( https && ! Z_BVAL_PP(z_route_secure) ) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+inline int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC) 
+{
+    zval **z_route_domain = NULL;
+    if ( zend_hash_quick_find( Z_ARRVAL_PP(z_route_options_pp) , "domain", sizeof("domain"), zend_inline_hash_func(ZEND_STRS("domain")), (void**) &z_route_domain ) == SUCCESS ) {
+        // check HTTP_HOST from $_SERVER
+        if ( strncmp(Z_STRVAL_PP(z_route_domain), Z_STRVAL_P(http_host), Z_STRLEN_PP(z_route_domain) ) != 0 ) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+inline int validate_request_method(zval **z_route_options_pp, int current_request_method TSRMLS_DC)
+{
+    zval **z_route_method = NULL;
+    if ( zend_hash_quick_find( Z_ARRVAL_PP(z_route_options_pp) , "method", sizeof("method"),  zend_inline_hash_func(ZEND_STRS("method")), (void**) &z_route_method ) == SUCCESS ) {
+        if ( Z_TYPE_PP(z_route_method) == IS_LONG && Z_LVAL_PP(z_route_method) != current_request_method ) {
+            return 0;
+        }
+    }
+    return 1;
 }
 

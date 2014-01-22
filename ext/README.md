@@ -1,14 +1,14 @@
 
-# Install
+## Build
 
-    pear channel-discover pear.corneltek.com
-    pear install -a corneltek/PHPUnit_TestMore
-    pear install -a corneltek/PHPUnit_Framework_ExtensionTestCase
-    pear install -a corneltek/ExtUnit
+    ./compile
 
-# Run TestCases
+## Build and Install
 
-    extunit --phpunit PuxTest.php
-    extunit --phpunit --repeat 100 PuxTest.php
-    extunit --phpunit --debug PuxTest.php
+    ./compile -i
+
+## Run TestCases
+
+    ./test --debug PuxTest.php
+    ./test --repeat 100 PuxTest.php
 
