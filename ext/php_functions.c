@@ -17,26 +17,17 @@ vim:fdm=marker:et:sw=4:ts=4:sts=4:
 #include "ext/standard/php_string.h"
 #include "php_pux.h"
 #include "php_functions.h"
+#include "pux_persistent.h"
 #include "php_expandable_mux.h"
-
-#define CHECK(p) { if ((p) == NULL) return NULL; }
-
+#include "hash.h"
 
 /**
  * new_dst = ht_copy_fun_t(NULL, src);
  *
  * Can be our zval copy function
  */
-typedef void* (*ht_copy_fun_t)(void*, void* TSRMLS_DC);
-HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_copy_fun_t copy_fn, void *tmp, uint size TSRMLS_DC);
-
-
-static zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC);
-
-static zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC);
-
 /* {{{ my_copy_zval_ptr */
-static zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC)
+zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC)
 {
     zval* dst_new;
     assert(src != NULL);
@@ -56,7 +47,7 @@ static zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC)
 
 
 /* {{{ my_copy_zval */
-static zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC)
+zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC)
 {
     zval **tmp;
     assert(dst != NULL);
@@ -102,100 +93,6 @@ static zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC)
     return dst;
 }
 /* }}} */
-
-
-
-/**
- * Recursively copy hash and all its value.
- *
- * This replaces zend_hash_copy
- */
-HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_copy_fun_t copy_fn, void *tmp, uint size TSRMLS_DC)
-{
-    Bucket *curr = NULL, *prev = NULL , *newp = NULL;
-    void *new_entry;
-    int first = 1;
-
-    assert(source != NULL);
-
-    // allocate persistent memory for target and initialize it.
-    if (!target) {
-        CHECK(target = pecalloc(1, sizeof(source[0]), 1));
-    }
-    memcpy(target, source, sizeof(source[0]));
-    memset(target->arBuckets, 0, target->nTableSize * sizeof(Bucket*));
-    target->pInternalPointer = NULL;
-    target->pListHead = NULL;
-
-    // since it's persistent, destructor should be NULL
-    target->persistent = 1;
-    target->pDestructor = NULL;
-
-    curr = source->pListHead;
-    while (curr) {
-        // hash index
-        int n = curr->h % target->nTableSize;
-
-        // allocate new bucket
-
-// from apc
-#ifdef ZEND_ENGINE_2_4
-        if (!curr->nKeyLength) {
-            CHECK(newp = (Bucket*) pecalloc(1, sizeof(Bucket), 1));
-            memcpy(newp, curr, sizeof(Bucket));
-        } else if (IS_INTERNED(curr->arKey)) {
-            CHECK(newp = (Bucket*) pecalloc(1, sizeof(Bucket), 1));
-            memcpy(newp, curr, sizeof(Bucket));
-        } else {
-            // CHECK((newp = (Bucket*) apc_pmemcpy(curr, sizeof(Bucket) + curr->nKeyLength, pool TSRMLS_CC)));
-            // ugly but we need to copy
-            CHECK(newp = (Bucket*) pecalloc(1, sizeof(Bucket) + curr->nKeyLength, 1));
-            memcpy(newp, curr, sizeof(Bucket) + curr->nKeyLength );
-            newp->arKey = (const char*)(newp+1);
-        }
-#else
-        CHECK(newp = (Bucket*) pecalloc(1, (sizeof(Bucket) + curr->nKeyLength - 1), 1));
-        memcpy(newp, curr, sizeof(Bucket) + curr->nKeyLength - 1);
-#endif
-
-
-        /* insert 'newp' into the linked list at its hashed index */
-        if (target->arBuckets[n]) {
-            newp->pNext = target->arBuckets[n];
-            newp->pLast = NULL;
-            newp->pNext->pLast = newp;
-        } else {
-            newp->pNext = newp->pLast = NULL;
-        }
-        target->arBuckets[n] = newp;
-
-        // now we copy the bucket data using our 'copy_fn'
-        newp->pData = copy_fn(NULL, curr->pData TSRMLS_CC);
-        memcpy(&newp->pDataPtr, newp->pData, sizeof(void*));
-
-        /* insert 'newp' into the table-thread linked list */
-        newp->pListLast = prev;
-        newp->pListNext = NULL;
-
-        if (prev) {
-            prev->pListNext = newp;
-        }
-        if (first) {
-            target->pListHead = newp;
-            first = 0;
-        }
-        prev = newp;
-
-        curr = curr->pListNext;
-    }
-
-    target->pListTail = newp;
-    zend_hash_internal_pointer_reset(target);
-
-    // return the newly allocated memory
-    return target;
-}
-
 
 void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC);
 
@@ -298,60 +195,6 @@ void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC)
     Z_SET_REFCOUNT_P(zvalue, 1);
 }
 
-inline int persistent_store(char *key, int key_len, int list_type, void * val TSRMLS_DC)
-{
-    zend_rsrc_list_entry new_le;
-    zend_rsrc_list_entry *le;
-    if ( zend_hash_find(&EG(persistent_list), key, key_len + 1, (void**) &le) == SUCCESS ) {
-        // if the key exists, delete it.
-        zend_hash_del(&EG(persistent_list), key, key_len + 1);
-    }
-    new_le.type = list_type;
-    new_le.ptr = val;
-    return zend_hash_update(&EG(persistent_list), key, key_len + 1, &new_le, sizeof(zend_rsrc_list_entry), NULL);
-}
-
-inline void * persistent_fetch(char *key, int key_len TSRMLS_DC)
-{
-    zend_rsrc_list_entry *le;
-    if ( zend_hash_find(&EG(persistent_list), key, key_len + 1, (void**) &le) == SUCCESS ) {
-        return le->ptr;
-    }
-    return NULL;
-}
-
-
-inline void * pux_persistent_fetch(char *ns, char *key TSRMLS_DC)
-{
-    char *newkey;
-    int   newkey_len;
-    void *ptr;
-    newkey_len = spprintf(&newkey, 0, "pux_%s_%s", ns, key);
-    ptr = persistent_fetch(newkey, newkey_len TSRMLS_CC);
-    efree(newkey);
-    return ptr;
-}
-
-/*
- * Store persistent value with pux namespace.
- */
-inline int pux_persistent_store(char *ns, char *key, void * val TSRMLS_DC) 
-{
-    char *newkey;
-    int   newkey_len;
-    int   status;
-    newkey_len = spprintf(&newkey, 0, "pux_%s_%s", ns, key);
-    status = persistent_store(newkey, newkey_len, le_mux_hash_persist, val TSRMLS_CC);
-    efree(newkey);
-    return status;
-}
-
-HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC)
-{
-    zval **tmp;
-    return persistent_copy_hashtable(NULL, src, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *) TSRMLS_CC);
-}
-
 
 int _pux_store_mux(char *name, zval * mux TSRMLS_DC) 
 {
@@ -366,15 +209,15 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
 
     // make the hash table persistent
     zval *prop, *tmp;
-    HashTable *routes_dst, *static_routes_dst; 
+    HashTable *routes, *static_routes; 
 
     prop = zend_read_property(ce_pux_mux, mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
-    routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
-    pux_persistent_store( name, "routes", (void*) routes_dst TSRMLS_CC);
+    routes = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
+    pux_persistent_store( name, "routes", (void*) routes TSRMLS_CC);
 
     prop = zend_read_property(ce_pux_mux, mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
-    static_routes_dst = zend_hash_clone_persistent( Z_ARRVAL_P(prop)  TSRMLS_CC);
-    pux_persistent_store(name, "static_routes", (void *) static_routes_dst TSRMLS_CC) ;
+    static_routes = zend_hash_clone_persistent( Z_ARRVAL_P(prop)  TSRMLS_CC);
+    pux_persistent_store(name, "static_routes", (void *) static_routes TSRMLS_CC) ;
     
     // copy ID
     /*

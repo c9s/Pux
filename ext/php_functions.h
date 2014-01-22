@@ -63,49 +63,13 @@ extern inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC)
 
 #endif
 
-#define PUX_DEBUG 1
-#if PUX_DEBUG
-#define HT_OK				0
-#define HT_IS_DESTROYING	1
-#define HT_DESTROYED		2
-#define HT_CLEANING			3
-
-static void _zend_is_inconsistent(const HashTable *ht, const char *file, int line)
-{
-	if (ht->inconsistent==HT_OK) {
-		return;
-	}
-	switch (ht->inconsistent) {
-		case HT_IS_DESTROYING:
-			zend_output_debug_string(1, "%s(%d) : ht=%p is being destroyed", file, line, ht);
-			break;
-		case HT_DESTROYED:
-			zend_output_debug_string(1, "%s(%d) : ht=%p is already destroyed", file, line, ht);
-			break;
-		case HT_CLEANING:
-			zend_output_debug_string(1, "%s(%d) : ht=%p is being cleaned", file, line, ht);
-			break;
-		default:
-			zend_output_debug_string(1, "%s(%d) : ht=%p is inconsistent", file, line, ht);
-			break;
-	}
-	zend_bailout();
-}
-#define IS_CONSISTENT(a) _zend_is_inconsistent(a, __FILE__, __LINE__);
-#define SET_INCONSISTENT(n) ht->inconsistent = n;
-#else
-#define IS_CONSISTENT(a)
-#define SET_INCONSISTENT(n)
-#endif
+#define CHECK(p) { if ((p) == NULL) return NULL; }
 
 
-HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC);
+zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC);
 
-extern inline int persistent_store(char *key, int key_len, int list_type, void * val TSRMLS_DC);
-extern inline int pux_persistent_store(char *ns, char *key, void * val TSRMLS_DC) ;
+zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC);
 
-extern inline void * persistent_fetch(char *key, int key_len TSRMLS_DC);
-extern inline void * pux_persistent_fetch(char *ns, char *key TSRMLS_DC);
 
 zval * _pux_fetch_mux(char *name TSRMLS_DC);
 int mux_loader(char *path, zval *result TSRMLS_DC);
