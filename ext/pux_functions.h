@@ -20,13 +20,13 @@
 #include "pux_functions.h"
 
 extern inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
-extern inline int get_current_request_method_const(zval ** server_vars_hash TSRMLS_DC);
-extern inline int get_current_https(zval ** server_vars_hash TSRMLS_DC);
-extern inline zval ** fetch_server_vars_hash(TSRMLS_D);
-extern inline zval * fetch_server_var(zval **server_vars_hash, char *key , int key_len TSRMLS_DC);
-extern inline zval * get_current_http_host(zval ** server_vars_hash TSRMLS_DC);
-extern inline zval * get_current_request_uri(zval ** server_vars_hash TSRMLS_DC);
-extern inline zval * get_current_request_method(zval ** server_vars_hash TSRMLS_DC);
+extern inline int get_current_request_method_const(HashTable * server_vars_hash TSRMLS_DC);
+extern inline int get_current_https(HashTable * server_vars_hash TSRMLS_DC);
+extern inline HashTable * fetch_server_vars_hash(TSRMLS_D);
+extern inline zval * fetch_server_var(HashTable *server_vars_hash, char *key , int key_len TSRMLS_DC);
+extern inline zval * get_current_http_host(HashTable * server_vars_hash TSRMLS_DC);
+extern inline zval * get_current_request_uri(HashTable * server_vars_hash TSRMLS_DC);
+extern inline zval * get_current_request_method(HashTable * server_vars_hash TSRMLS_DC);
 
 extern inline int validate_request_method(zval **z_route_options_pp, int current_request_method TSRMLS_DC);
 extern inline int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC);

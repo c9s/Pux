@@ -39,7 +39,7 @@ HashTable * my_copy_hashtable(HashTable *target, HashTable *source, ht_copy_fun_
     target->pListHead = NULL;
 
     // since it's persistent, destructor should be NULL
-    target->persistent = 1;
+    target->persistent = persistent;
     target->pDestructor = NULL;
 
     curr = source->pListHead;

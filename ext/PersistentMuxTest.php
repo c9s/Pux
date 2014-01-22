@@ -50,8 +50,8 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         $route = pux_persistent_dispatch('testing', '_test_mux.php', '/');
         $this->assertRoute($route);
         // this one use persistent mux store.
-        // $route = pux_persistent_dispatch('testing', '_test_mux.php', '/');
-        // $this->assertRoute($route);
+        $route = pux_persistent_dispatch('testing', '_test_mux.php', '/');
+        $this->assertRoute($route);
     }
 
     public function assertMux($m) 

@@ -15,9 +15,7 @@
       ),
     ),
   ),
-   'submux' => 
-  array (
-  ),
+   'submux' => array(),
    'id' => NULL,
    'expand' => true,
 )); /* version */

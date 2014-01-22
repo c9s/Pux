@@ -600,14 +600,16 @@ PHP_FUNCTION(pux_sort_routes)
 // int zend_hash_has_key( )
 //
 inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) {
-    int current_request_method;
-    int current_https;
-    zval * current_http_host;
+    int current_request_method = 0;
+    int current_https = 0;
+    zval * current_http_host = NULL;
 
-    zval **server_vars_hash = fetch_server_vars_hash(TSRMLS_C);
-    current_request_method = get_current_request_method_const(server_vars_hash TSRMLS_CC);
-    current_https          = get_current_https(server_vars_hash TSRMLS_CC);
-    current_http_host      = get_current_http_host(server_vars_hash TSRMLS_CC);
+    HashTable *server_vars_hash = fetch_server_vars_hash(TSRMLS_C);
+    if ( server_vars_hash ) {
+        current_request_method = get_current_request_method_const(server_vars_hash TSRMLS_CC);
+        current_https          = get_current_https(server_vars_hash TSRMLS_CC);
+        current_http_host      = get_current_http_host(server_vars_hash TSRMLS_CC);
+    }
 
     HashPosition z_routes_pointer;
 
@@ -732,36 +734,36 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
     return NULL;
 }
 
-inline zval ** fetch_server_vars_hash(TSRMLS_D) {
+inline HashTable * fetch_server_vars_hash(TSRMLS_D) {
     zval **z_server_hash = NULL;
     if ( zend_hash_quick_find(&EG(symbol_table), "_SERVER", sizeof("_SERVER"), zend_inline_hash_func(ZEND_STRS("_SERVER")), (void **) &z_server_hash) == SUCCESS ) {
-        return z_server_hash;
+        return Z_ARRVAL_PP(z_server_hash);
     }
     return NULL;
 }
 
-inline zval * fetch_server_var(zval ** z_server_hash, char *key , int key_len TSRMLS_DC) {
+inline zval * fetch_server_var(HashTable * server_hash, char *key , int key_len TSRMLS_DC) {
     zval **rv;
-    if ( zend_hash_find(Z_ARRVAL_PP(z_server_hash), key, key_len, (void **) &rv) == SUCCESS ) {
+    if ( zend_hash_find(server_hash, key, key_len, (void **) &rv) == SUCCESS ) {
         return *rv;
     }
     return NULL;
 }
 
-inline zval * get_current_remote_addr(zval ** server_vars_hash TSRMLS_DC) {
+inline zval * get_current_remote_addr(HashTable * server_vars_hash TSRMLS_DC) {
     // REMOTE_ADDR
     return fetch_server_var(server_vars_hash, "REMOTE_ADDR", sizeof("REMOTE_ADDR") TSRMLS_CC);
 }
 
-inline zval * get_current_http_host(zval ** server_vars_hash TSRMLS_DC) {
+inline zval * get_current_http_host(HashTable * server_vars_hash TSRMLS_DC) {
     return fetch_server_var(server_vars_hash, "HTTP_HOST", sizeof("HTTP_HOST") TSRMLS_CC);
 }
 
-inline zval * get_current_request_uri(zval ** server_vars_hash TSRMLS_DC) {
+inline zval * get_current_request_uri(HashTable * server_vars_hash TSRMLS_DC) {
     return fetch_server_var(server_vars_hash, "REQUEST_URI", sizeof("REQUEST_URI") TSRMLS_CC);
 }
 
-inline int get_current_https(zval ** server_vars_hash TSRMLS_DC) {
+inline int get_current_https(HashTable * server_vars_hash TSRMLS_DC) {
     zval *https = fetch_server_var(server_vars_hash, "HTTPS", sizeof("HTTPS") TSRMLS_CC);
     if ( https && Z_BVAL_P(https) ) {
         return 1;
@@ -769,13 +771,13 @@ inline int get_current_https(zval ** server_vars_hash TSRMLS_DC) {
     return 0;
 }
 
-inline zval * get_current_request_method(zval ** server_vars_hash TSRMLS_DC) {
+inline zval * get_current_request_method(HashTable * server_vars_hash TSRMLS_DC) {
     return fetch_server_var(server_vars_hash, "REQUEST_METHOD", sizeof("REQUEST_METHOD") TSRMLS_CC);
 }
 
 /* get request method type in constant value. {{{
  */
-inline int get_current_request_method_const(zval **server_vars_hash TSRMLS_DC) {
+inline int get_current_request_method_const(HashTable * server_vars_hash TSRMLS_DC) {
     char *c_request_method;
     zval *z_request_method = get_current_request_method(server_vars_hash TSRMLS_CC);
     if ( z_request_method ) {
