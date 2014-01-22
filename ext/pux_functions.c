@@ -34,8 +34,8 @@ zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC)
     if (!dst) {
         dst = (zval**) pemalloc(sizeof(zval*), 1);
     }
-    dst[0] = (zval*) pemalloc(sizeof(zval), 1);
-    dst_new = my_copy_zval(*dst, *src TSRMLS_CC);
+    CHECK(dst[0] = (zval*) pecalloc(1, sizeof(zval), 1));
+    CHECK(dst_new = my_copy_zval(*dst, *src TSRMLS_CC));
     if (dst_new != *dst) {
         *dst = dst_new;
     }
@@ -52,7 +52,7 @@ zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC)
     zval **tmp;
     assert(dst != NULL);
     assert(src != NULL);
-    memcpy(dst, src, sizeof(src[0]));
+    memcpy(dst, src, sizeof(zval));
 
     /* deep copies are refcount(1), but moved up for recursive 
      * arrays,  which end up being add_ref'd during its copy. */
@@ -61,6 +61,8 @@ zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC)
 
     switch (src->type & IS_CONSTANT_TYPE_MASK) {
     case IS_RESOURCE:
+        php_error(E_ERROR, "Cannot copy resource");
+        break;
     case IS_BOOL:
     case IS_LONG:
     case IS_DOUBLE:
@@ -81,9 +83,11 @@ zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC)
 
     // XXX: we don't serialize object.
     case IS_OBJECT:
+        php_error(E_ERROR, "Cannot copy Object.");
         break;
 #ifdef ZEND_ENGINE_2_4
     case IS_CALLABLE:
+        php_error(E_ERROR, "Cannot copy Callable.");
         // XXX: we don't serialize callbable object.
         break;
 #endif
@@ -208,20 +212,30 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
     id_key_len = spprintf(&id_key, 0, "mux_id_%s", name);
     expand_key_len = spprintf(&expand_key, 0, "mux_expand_%s", name);
 
+    Z_ADDREF_P(mux);
+
     // make the hash table persistent
     zval *prop, *tmp;
     HashTable *routes, *static_routes; 
 
     prop = zend_read_property(ce_pux_mux, mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
-    routes = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
-    return SUCCESS;
 
+    routes = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
+    if ( ! routes ) {
+        php_error(E_ERROR, "Can not clone HashTable");
+        return FAILURE;
+    }
     pux_persistent_store( name, "routes", (void*) routes TSRMLS_CC);
 
 
     prop = zend_read_property(ce_pux_mux, mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
     static_routes = zend_hash_clone_persistent( Z_ARRVAL_P(prop)  TSRMLS_CC);
+    if ( ! static_routes ) {
+        php_error(E_ERROR, "Can not clone HashTable");
+        return FAILURE;
+    }
     pux_persistent_store(name, "static_routes", (void *) static_routes TSRMLS_CC) ;
+
     
     // copy ID
     /*

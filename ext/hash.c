@@ -23,9 +23,11 @@ HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_c
 
     // allocate persistent memory for target and initialize it.
     if (!target) {
-        CHECK(target = pecalloc(1, sizeof(source[0]), 1));
+        target = pemalloc(sizeof(source[0]), 1);
     }
     memcpy(target, source, sizeof(source[0]));
+    target->arBuckets = pemalloc(target->nTableSize * sizeof(Bucket*), 1);
+
     memset(target->arBuckets, 0, target->nTableSize * sizeof(Bucket*));
     target->pInternalPointer = NULL;
     target->pListHead = NULL;
@@ -40,24 +42,22 @@ HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_c
         int n = curr->h % target->nTableSize;
 
         // allocate new bucket
-
 // from apc
 #ifdef ZEND_ENGINE_2_4
         if (!curr->nKeyLength) {
-            CHECK(newp = (Bucket*) pecalloc(1, sizeof(Bucket), 1));
+            newp = (Bucket*) pecalloc(1, sizeof(Bucket), 1);
             memcpy(newp, curr, sizeof(Bucket));
         } else if (IS_INTERNED(curr->arKey)) {
-            CHECK(newp = (Bucket*) pecalloc(1, sizeof(Bucket), 1));
+            newp = (Bucket*) pecalloc(1, sizeof(Bucket), 1);
             memcpy(newp, curr, sizeof(Bucket));
         } else {
-            // CHECK((newp = (Bucket*) apc_pmemcpy(curr, sizeof(Bucket) + curr->nKeyLength, pool TSRMLS_CC)));
             // ugly but we need to copy
-            CHECK(newp = (Bucket*) pecalloc(1, sizeof(Bucket) + curr->nKeyLength, 1));
+            newp = (Bucket*) pecalloc(1, sizeof(Bucket) + curr->nKeyLength, 1);
             memcpy(newp, curr, sizeof(Bucket) + curr->nKeyLength );
             newp->arKey = (const char*)(newp+1);
         }
 #else
-        CHECK(newp = (Bucket*) pecalloc(1, (sizeof(Bucket) + curr->nKeyLength - 1), 1));
+        newp = (Bucket*) pecalloc(1, (sizeof(Bucket) + curr->nKeyLength - 1), 1);
         memcpy(newp, curr, sizeof(Bucket) + curr->nKeyLength - 1);
 #endif
 

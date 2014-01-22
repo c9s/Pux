@@ -16,11 +16,11 @@ AC_MSG_RESULT($PHP_PUX_DEBUG)
 
 
 if test $PHP_PUX != "no"; then
-    PHP_REQUIRE_CXX()
+    # PHP_REQUIRE_CXX()
 
     if test "$PHP_PUX_DEBUG" != "no"; then
         AC_DEFINE(PUX_DEBUG, 1, [ ])
-        CFLAGS="$CFLAGS -O0 -ggdb -fprofile-arcs"
+        CFLAGS="$CFLAGS -O0 -g3 -ggdb -fprofile-arcs"
     fi
 
     PHP_SUBST(PUX_SHARED_LIBADD)

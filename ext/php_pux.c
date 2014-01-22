@@ -86,7 +86,7 @@ PHP_MINIT_FUNCTION(pux) {
   pux_init_mux(TSRMLS_C);
   pux_init_expandable_mux(TSRMLS_C);
   pux_init_controller(TSRMLS_C);
-  le_mux_hash_persist = zend_register_list_destructors_ex(NULL, pux_mux_hash_persist_dtor, "Mux", module_number);
+  le_mux_hash_persist = zend_register_list_destructors_ex(NULL, pux_mux_hash_persist_dtor, "mux", module_number);
   return SUCCESS;
 }
 
