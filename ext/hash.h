@@ -52,7 +52,7 @@ static void _zend_is_inconsistent(const HashTable *ht, const char *file, int lin
 
 HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC);
 
-typedef void* (*ht_copy_fun_t)(void*, void* TSRMLS_DC);
-HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_copy_fun_t copy_fn, void *tmp, uint size TSRMLS_DC);
+typedef void* (*ht_copy_fun_t)(void*, void*, int TSRMLS_DC);
+HashTable * my_copy_hashtable(HashTable *target, HashTable *source, ht_copy_fun_t copy_fn, void *tmp, uint size, int persistent TSRMLS_DC);
 
 #endif

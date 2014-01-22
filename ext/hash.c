@@ -4,7 +4,7 @@
 HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC)
 {
     zval **tmp;
-    return persistent_copy_hashtable(NULL, src, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *) TSRMLS_CC);
+    return my_copy_hashtable(NULL, src, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *), 1 TSRMLS_CC);
 }
 
 
@@ -13,7 +13,7 @@ HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC)
  *
  * This replaces zend_hash_copy
  */
-HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_copy_fun_t copy_fn, void *tmp, uint size TSRMLS_DC)
+HashTable * my_copy_hashtable(HashTable *target, HashTable *source, ht_copy_fun_t copy_fn, void *tmp, uint size, int persistent TSRMLS_DC)
 {
     Bucket *curr = NULL, *prev = NULL , *newp = NULL;
     void *new_entry;
@@ -23,10 +23,10 @@ HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_c
 
     // allocate persistent memory for target and initialize it.
     if (!target) {
-        target = pemalloc(sizeof(source[0]), 1);
+        target = pemalloc(sizeof(source[0]), persistent);
     }
     memcpy(target, source, sizeof(source[0]));
-    target->arBuckets = pemalloc(target->nTableSize * sizeof(Bucket*), 1);
+    target->arBuckets = pemalloc(target->nTableSize * sizeof(Bucket*), persistent);
 
     memset(target->arBuckets, 0, target->nTableSize * sizeof(Bucket*));
     target->pInternalPointer = NULL;
@@ -45,19 +45,19 @@ HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_c
 // from apc
 #ifdef ZEND_ENGINE_2_4
         if (!curr->nKeyLength) {
-            newp = (Bucket*) pecalloc(1, sizeof(Bucket), 1);
+            newp = (Bucket*) pemalloc(sizeof(Bucket), persistent);
             memcpy(newp, curr, sizeof(Bucket));
         } else if (IS_INTERNED(curr->arKey)) {
-            newp = (Bucket*) pecalloc(1, sizeof(Bucket), 1);
+            newp = (Bucket*) pemalloc(sizeof(Bucket), persistent);
             memcpy(newp, curr, sizeof(Bucket));
         } else {
             // ugly but we need to copy
-            newp = (Bucket*) pecalloc(1, sizeof(Bucket) + curr->nKeyLength, 1);
+            newp = (Bucket*) pemalloc(sizeof(Bucket) + curr->nKeyLength, persistent);
             memcpy(newp, curr, sizeof(Bucket) + curr->nKeyLength );
             newp->arKey = (const char*)(newp+1);
         }
 #else
-        newp = (Bucket*) pecalloc(1, (sizeof(Bucket) + curr->nKeyLength - 1), 1);
+        newp = (Bucket*) pecalloc(1, (sizeof(Bucket) + curr->nKeyLength - 1), persistent);
         memcpy(newp, curr, sizeof(Bucket) + curr->nKeyLength - 1);
 #endif
 
@@ -73,7 +73,7 @@ HashTable * persistent_copy_hashtable(HashTable *target, HashTable *source, ht_c
         target->arBuckets[n] = newp;
 
         // now we copy the bucket data using our 'copy_fn'
-        newp->pData = copy_fn(NULL, curr->pData TSRMLS_CC);
+        newp->pData = copy_fn(NULL, curr->pData, persistent TSRMLS_CC);
         memcpy(&newp->pDataPtr, newp->pData, sizeof(void*));
 
         /* insert 'newp' into the table-thread linked list */

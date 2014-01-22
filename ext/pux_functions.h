@@ -66,9 +66,9 @@ extern inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC)
 #define CHECK(p) { if ((p) == NULL) return NULL; }
 
 
-zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC);
+zval* my_copy_zval(zval* dst, const zval* src, int persistent TSRMLS_DC);
 
-zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC);
+zval** my_copy_zval_ptr(zval** dst, const zval** src, int persistent TSRMLS_DC);
 
 
 zval * _pux_fetch_mux(char *name TSRMLS_DC);

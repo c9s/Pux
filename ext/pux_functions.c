@@ -27,15 +27,15 @@ vim:fdm=marker:et:sw=4:ts=4:sts=4:
  * Can be our zval copy function
  */
 /* {{{ my_copy_zval_ptr */
-zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC)
+zval** my_copy_zval_ptr(zval** dst, const zval** src, int persistent TSRMLS_DC)
 {
     zval* dst_new;
     assert(src != NULL);
     if (!dst) {
-        dst = (zval**) pemalloc(sizeof(zval*), 1);
+        dst = (zval**) pemalloc(sizeof(zval*), persistent);
     }
-    CHECK(dst[0] = (zval*) pecalloc(1, sizeof(zval), 1));
-    CHECK(dst_new = my_copy_zval(*dst, *src TSRMLS_CC));
+    CHECK(dst[0] = (zval*) pemalloc(sizeof(zval), persistent));
+    CHECK(dst_new = my_copy_zval(*dst, *src, persistent TSRMLS_CC));
     if (dst_new != *dst) {
         *dst = dst_new;
     }
@@ -47,7 +47,7 @@ zval** my_copy_zval_ptr(zval** dst, const zval** src TSRMLS_DC)
 
 
 /* {{{ my_copy_zval */
-zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC)
+zval* my_copy_zval(zval* dst, const zval* src, int persistent TSRMLS_DC)
 {
     zval **tmp;
     assert(dst != NULL);
@@ -72,13 +72,13 @@ zval* my_copy_zval(zval* dst, const zval* src TSRMLS_DC)
     case IS_CONSTANT:
     case IS_STRING:
         if (src->value.str.val) {
-            dst->value.str.val = pestrndup(src->value.str.val, src->value.str.len, 1);
+            dst->value.str.val = pestrndup(src->value.str.val, src->value.str.len, persistent);
         }
         break;
 
     case IS_ARRAY:
     case IS_CONSTANT_ARRAY:
-        dst->value.ht = persistent_copy_hashtable(NULL, src->value.ht, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *) TSRMLS_CC);
+        dst->value.ht = my_copy_hashtable(NULL, src->value.ht, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *), persistent TSRMLS_CC);
         break;
 
     // XXX: we don't serialize object.
@@ -248,7 +248,6 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
     pux_persistent_store( name, "id", (void*) tmp TSRMLS_CC);
     */
 
-
     // We cannot copy un-expandable mux object because we don't support recursively copy for Mux object.
     prop = zend_read_property(ce_pux_mux, mux, "expand", sizeof("expand")-1, 1 TSRMLS_CC);
     if ( ! Z_BVAL_P(prop) ) {
@@ -293,15 +292,17 @@ zval * _pux_fetch_mux(char *name TSRMLS_DC)
     Z_ADDREF_P(z_routes);
     Z_ADDREF_P(z_static_routes);
 
-    zend_hash_copy( Z_ARRVAL_P(z_routes)        , routes_hash        , (copy_ctor_func_t) my_zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
-    zend_hash_copy( Z_ARRVAL_P(z_static_routes) , static_routes_hash , (copy_ctor_func_t) my_zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
+    // Z_ARRVAL_P(z_routes) = routes_hash;
+    // Z_ARRVAL_P(z_static_routes) = static_routes_hash;
+
+    // zend_hash_copy( Z_ARRVAL_P(z_routes)        , routes_hash        , (copy_ctor_func_t) my_zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
+    // zend_hash_copy( Z_ARRVAL_P(z_static_routes) , static_routes_hash , (copy_ctor_func_t) my_zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
 
     // create new object and return to userspace.
     zval *new_mux = NULL;
     ALLOC_INIT_ZVAL(new_mux);
     object_init_ex(new_mux, ce_pux_mux);
     CALL_METHOD(Mux, __construct, new_mux, new_mux);
-
     Z_SET_REFCOUNT_P(new_mux, 1);
 
     if ( z_id ) {
