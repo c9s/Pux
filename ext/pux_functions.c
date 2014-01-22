@@ -451,7 +451,6 @@ PHP_FUNCTION(pux_persistent_dispatch)
         }
 
         // TODO: compile mux and sort routes
-        // zend_print_zval_r(retval, 0 TSRMLS_CC);
         if ( _pux_store_mux(ns, mux TSRMLS_CC) == FAILURE ) {
             php_error(E_ERROR, "Can not store Mux object from %s", filename);
         }
