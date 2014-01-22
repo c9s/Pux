@@ -142,7 +142,6 @@ PHP_METHOD(Mux, __destruct) {
 
     val = zend_read_property(ce_pux_mux, getThis(), "submux", sizeof("submux")-1, 1 TSRMLS_CC);
     zval_ptr_dtor(&val);
-
 }
 
 PHP_METHOD(Mux, generate_id) {
@@ -701,27 +700,20 @@ PHP_METHOD(Mux, dispatch) {
     int  path_len;
     zval *z_path;
 
-    char  trim_char[2] = { '\\', 0 };
-    zval *z_trimed_path;
     zval *z_return_route = NULL;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &path, &path_len) == FAILURE) {
         RETURN_FALSE;
     }
 
-    ALLOC_INIT_ZVAL(z_trimed_path);
     MAKE_STD_ZVAL(z_path);
     ZVAL_STRINGL(z_path, path, path_len, 1);
 
-    php_trim(path, path_len, trim_char, 1, z_trimed_path, 2 TSRMLS_CC); // mode 2 == rtrim
-
-
     zend_function *fe; // method entry
     zend_hash_quick_find( &ce_pux_mux->function_table, "match",    sizeof("match"), zend_inline_hash_func(ZEND_STRS("match")),    (void **) &fe);
-    zend_call_method( &this_ptr, ce_pux_mux, &fe, "match", strlen("match"), &z_return_route, 1, z_trimed_path, NULL TSRMLS_CC );
+    zend_call_method( &this_ptr, ce_pux_mux, &fe, "match", strlen("match"), &z_return_route, 1, z_path, NULL TSRMLS_CC );
 
     if ( ! z_return_route || Z_TYPE_P(z_return_route) == IS_NULL ) {
-        zval_ptr_dtor(&z_trimed_path);
         zval_ptr_dtor(&z_path);
         RETURN_NULL();
     }
@@ -790,6 +782,7 @@ PHP_METHOD(Mux, dispatch) {
                 *return_value = *retval;
                 zval_copy_ctor(return_value);
             }
+            // zval_ptr_dtor(&z_return_route);
             RETURN_FALSE;
             return;
 
@@ -810,19 +803,17 @@ PHP_METHOD(Mux, dispatch) {
                 *return_value = *z_retval;
                 zval_copy_ctor(return_value);
             }
+            // zval_ptr_dtor(&z_return_route);
             return;
 
         }
     }
 
-
     if ( z_return_route ) {
         *return_value = *z_return_route;
         zval_copy_ctor(return_value);
     }
-
     zval_ptr_dtor(&z_path);
-    zval_ptr_dtor(&z_trimed_path);
     zval_ptr_dtor(&z_return_route);
     return;
 }
@@ -839,14 +830,16 @@ PHP_METHOD(Mux, match) {
     if ( zend_hash_find( Z_ARRVAL_P( zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes") - 1, 1 TSRMLS_CC) ), path, path_len, (void**)&z_route_pp) == SUCCESS ) {
         if ( Z_TYPE_PP(z_route_pp) != IS_NULL ) {
             *return_value = **z_route_pp;
-            zval_copy_ctor(*z_route_pp);
+            Z_ADDREF_PP(z_route_pp);
+            zval_copy_ctor(return_value);
             return;
         }
     }
     z_route = php_pux_match(zend_read_property(ce_pux_mux , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC), path, path_len TSRMLS_CC);
     if ( z_route != NULL ) {
         *return_value = *z_route;
-        zval_copy_ctor(z_route);
+        zval_copy_ctor(return_value);
+        Z_ADDREF_P(z_route);
         return;
     }
     RETURN_NULL();

@@ -293,6 +293,7 @@ zval * _pux_fetch_mux(char *name TSRMLS_DC)
     array_init(z_routes_by_id);
     array_init(z_submux);
 
+    // we need to clone hash table deeply because when Mux object returned to userspace, it will be freed.
     Z_ARRVAL_P(z_routes)        = zend_hash_clone(routes_hash TSRMLS_CC);
     Z_ARRVAL_P(z_static_routes) = zend_hash_clone(static_routes_hash TSRMLS_CC);
 
@@ -300,6 +301,8 @@ zval * _pux_fetch_mux(char *name TSRMLS_DC)
     zval *new_mux = NULL;
     ALLOC_INIT_ZVAL(new_mux);
     object_init_ex(new_mux, ce_pux_mux);
+
+    // We don't need __construct because we assign the property by ourself.
     // CALL_METHOD(Mux, __construct, new_mux, new_mux);
     Z_SET_REFCOUNT_P(new_mux, 1);
 
@@ -454,18 +457,10 @@ PHP_FUNCTION(pux_persistent_dispatch)
         }
     }
 
-    /*
-    *return_value = *mux;
-    zval_copy_ctor(return_value);
-
-    // php_debug_zval_dump( &mux, 1 TSRMLS_CC);
-    // php_var_dump(&mux, 1);
-    return;
-    */
     ALLOC_INIT_ZVAL(z_path);
     ZVAL_STRINGL(z_path, path ,path_len, 1); // no copy
 
-    // do dispatch
+    // XXX: pass return_value to the method call, so we don't need to copy
     route = call_mux_method(mux, "dispatch" , sizeof("dispatch"), 1 , z_path, NULL, NULL TSRMLS_CC);
     zval_ptr_dtor(&z_path);
 

@@ -14,5 +14,3 @@ echo "process ", getmypid(), "\n";
 $r = pux_persistent_dispatch('hello', 'hello_mux.php', '/hello');
 echo '</pre>';
 var_dump( $r ); 
-/*
- */

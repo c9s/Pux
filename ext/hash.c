@@ -40,7 +40,10 @@ HashTable * my_copy_hashtable(HashTable *target, HashTable *source, ht_copy_fun_
 
     // since it's persistent, destructor should be NULL
     target->persistent = persistent;
-    target->pDestructor = NULL;
+
+    if (! target->persistent) {
+        target->pDestructor = ZVAL_PTR_DTOR;
+    }
 
     curr = source->pListHead;
     while (curr) {
