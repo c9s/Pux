@@ -295,6 +295,9 @@ zval * _pux_fetch_mux(char *name TSRMLS_DC)
     // Z_ARRVAL_P(z_routes) = routes_hash;
     // Z_ARRVAL_P(z_static_routes) = static_routes_hash;
 
+    Z_ARRVAL_P(z_routes)        = zend_hash_clone(routes_hash TSRMLS_CC);
+    Z_ARRVAL_P(z_static_routes) = zend_hash_clone(static_routes_hash TSRMLS_CC);
+
     // zend_hash_copy( Z_ARRVAL_P(z_routes)        , routes_hash        , (copy_ctor_func_t) my_zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
     // zend_hash_copy( Z_ARRVAL_P(z_static_routes) , static_routes_hash , (copy_ctor_func_t) my_zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
 

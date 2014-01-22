@@ -45,11 +45,13 @@ void pux_init_exception(TSRMLS_D) {
 
 static void pux_mux_hash_persist_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {
+    /*
      HashTable *h = (HashTable*) rsrc->ptr;
      if (h) {
          zend_hash_destroy(h);
          pefree(h, 1);
      }
+     */
 }
 
 zend_module_entry pux_module_entry = {

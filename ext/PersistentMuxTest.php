@@ -18,7 +18,6 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         ok( pux_store_mux('phpunit1', $mux), 'mux stored' );
     }
 
-    /*
     public function testStoreAndFetch() 
     {
         $mux = new Mux;
@@ -29,19 +28,20 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         // ok( pux_store_mux('phpunit1', $mux), 'mux updated again' );
         $m = pux_fetch_mux('phpunit1');
         $this->assertMux($m);
+        count_ok(1, $m->getRoutes(), 'should get one route');
     }
-    */
+
 
     /**
-     * @depends testStore
+     * @depends testStoreOnly
      */
-    /*
     public function testFetch() 
     {
         $i = 10;
         while( $i--) {
             $m = pux_fetch_mux('phpunit1');
             $this->assertMux($m);
+            count_ok(1, $m->getRoutes(), 'should get one route');
         }
     }
 
@@ -53,7 +53,6 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         // $route = pux_persistent_dispatch('testing', '_test_mux.php', '/');
         // $this->assertRoute($route);
     }
-     */
 
     public function assertMux($m) 
     {

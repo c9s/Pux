@@ -804,9 +804,12 @@ PHP_METHOD(Mux, dispatch) {
         *return_value = *z_return_route;
         zval_copy_ctor(return_value);
     }
+
+    /*
     zval_ptr_dtor(&z_path);
     zval_ptr_dtor(&z_trimed_path);
     zval_ptr_dtor(&z_return_route);
+    */
     return;
 }
 

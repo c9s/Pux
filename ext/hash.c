@@ -7,6 +7,12 @@ HashTable * zend_hash_clone_persistent(HashTable* src TSRMLS_DC)
     return my_copy_hashtable(NULL, src, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *), 1 TSRMLS_CC);
 }
 
+HashTable * zend_hash_clone(HashTable* src TSRMLS_DC)
+{
+    zval **tmp;
+    return my_copy_hashtable(NULL, src, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *), 0 TSRMLS_CC);
+}
+
 
 /**
  * Recursively copy hash and all its value.
