@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 EXTENSION=pux
 PHP=$(which php)
 PHPUNIT=$(which phpunit)
