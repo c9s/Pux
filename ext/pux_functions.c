@@ -267,7 +267,7 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
  */
 zval * _pux_fetch_mux(char *name TSRMLS_DC)
 {
-    zval *z_id, *z_routes, *z_static_routes, *tmp;
+    zval *z_id, *z_routes, *z_static_routes, *z_submux, *z_routes_by_id, *tmp;
     HashTable *routes_hash;
     HashTable *static_routes_hash;
 
@@ -285,28 +285,25 @@ zval * _pux_fetch_mux(char *name TSRMLS_DC)
     z_id = (zval*) pux_persistent_fetch(name, "id" TSRMLS_CC);
     MAKE_STD_ZVAL(z_routes);
     MAKE_STD_ZVAL(z_static_routes);
+    MAKE_STD_ZVAL(z_routes_by_id);
+    MAKE_STD_ZVAL(z_submux);
 
-    array_init(z_routes);
-    array_init(z_static_routes);
-
-    Z_ADDREF_P(z_routes);
-    Z_ADDREF_P(z_static_routes);
-
-    // Z_ARRVAL_P(z_routes) = routes_hash;
-    // Z_ARRVAL_P(z_static_routes) = static_routes_hash;
+    Z_TYPE_P(z_routes) = IS_ARRAY;
+    Z_TYPE_P(z_static_routes) = IS_ARRAY;
+    array_init(z_routes_by_id);
+    array_init(z_submux);
 
     Z_ARRVAL_P(z_routes)        = zend_hash_clone(routes_hash TSRMLS_CC);
     Z_ARRVAL_P(z_static_routes) = zend_hash_clone(static_routes_hash TSRMLS_CC);
-
-    // zend_hash_copy( Z_ARRVAL_P(z_routes)        , routes_hash        , (copy_ctor_func_t) my_zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
-    // zend_hash_copy( Z_ARRVAL_P(z_static_routes) , static_routes_hash , (copy_ctor_func_t) my_zval_copy_ctor_func , (void*) &tmp , sizeof(zval *));
 
     // create new object and return to userspace.
     zval *new_mux = NULL;
     ALLOC_INIT_ZVAL(new_mux);
     object_init_ex(new_mux, ce_pux_mux);
-    CALL_METHOD(Mux, __construct, new_mux, new_mux);
+    // CALL_METHOD(Mux, __construct, new_mux, new_mux);
     Z_SET_REFCOUNT_P(new_mux, 1);
+
+
 
     if ( z_id ) {
         Z_ADDREF_P(z_id);
@@ -316,6 +313,9 @@ zval * _pux_fetch_mux(char *name TSRMLS_DC)
     zend_update_property_bool(ce_pux_mux , new_mux , "expand"       , sizeof("expand")-1       , 1  TSRMLS_CC);
     zend_update_property(ce_pux_mux      , new_mux , "routes"       , sizeof("routes")-1       , z_routes TSRMLS_CC);
     zend_update_property(ce_pux_mux      , new_mux , "staticRoutes" , sizeof("staticRoutes")-1 , z_static_routes TSRMLS_CC);
+
+    zend_update_property(ce_pux_mux, new_mux, "routesById", sizeof("routesById")-1, z_routes_by_id TSRMLS_CC);
+    zend_update_property(ce_pux_mux, new_mux, "submux", sizeof("submux")-1, z_submux TSRMLS_CC);
     return new_mux;
 }
 
@@ -462,7 +462,6 @@ PHP_FUNCTION(pux_persistent_dispatch)
     // php_var_dump(&mux, 1);
     return;
     */
-
     ALLOC_INIT_ZVAL(z_path);
     ZVAL_STRINGL(z_path, path ,path_len, 1); // no copy
 
@@ -471,7 +470,6 @@ PHP_FUNCTION(pux_persistent_dispatch)
     zval_ptr_dtor(&z_path);
 
     if ( route ) {
-        Z_ADDREF_P(route);
         *return_value = *route;
         zval_copy_ctor(return_value);
         return;

@@ -21,7 +21,7 @@ zend_class_entry *ce_pux_mux;
 
 const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-  // PHP_ME(Mux, __destruct,  NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR) 
+  PHP_ME(Mux, __destruct,  NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR) 
   PHP_ME(Mux, getId, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, add, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, any, NULL, ZEND_ACC_PUBLIC)
@@ -123,10 +123,26 @@ PHP_METHOD(Mux, __construct) {
     array_init(z_static_routes);
     array_init(z_submux);
 
-    zend_update_property( ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
-    zend_update_property( ce_pux_mux, this_ptr, "routesById", sizeof("routesById")-1, z_routes_by_id TSRMLS_CC);
-    zend_update_property( ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, z_static_routes TSRMLS_CC);
-    zend_update_property( ce_pux_mux, this_ptr, "submux", sizeof("submux")-1, z_submux TSRMLS_CC);
+    zend_update_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
+    zend_update_property(ce_pux_mux, this_ptr, "routesById", sizeof("routesById")-1, z_routes_by_id TSRMLS_CC);
+    zend_update_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, z_static_routes TSRMLS_CC);
+    zend_update_property(ce_pux_mux, this_ptr, "submux", sizeof("submux")-1, z_submux TSRMLS_CC);
+}
+
+PHP_METHOD(Mux, __destruct) {
+    zval * val;
+    val = zend_read_property(ce_pux_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    zval_ptr_dtor(&val);
+
+    val = zend_read_property(ce_pux_mux, getThis(), "routesById", sizeof("routesById")-1, 1 TSRMLS_CC);
+    zval_ptr_dtor(&val);
+
+    val = zend_read_property(ce_pux_mux, getThis(), "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
+    zval_ptr_dtor(&val);
+
+    val = zend_read_property(ce_pux_mux, getThis(), "submux", sizeof("submux")-1, 1 TSRMLS_CC);
+    zval_ptr_dtor(&val);
+
 }
 
 PHP_METHOD(Mux, generate_id) {

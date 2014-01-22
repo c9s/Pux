@@ -25,7 +25,7 @@ extern inline zval * call_mux_method(zval * object , char * method_name , int me
 
 
 PHP_METHOD(Mux, __construct);
-// PHP_METHOD(Mux, __destruct);
+PHP_METHOD(Mux, __destruct);
 PHP_METHOD(Mux, getId);
 PHP_METHOD(Mux, add);
 PHP_METHOD(Mux, any);
