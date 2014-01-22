@@ -670,7 +670,7 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
 
             // check conditions only when route option is provided
             if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 3, (void**) &z_route_options_pp) == SUCCESS ) {
-                if ( zend_hash_has_more_elements(Z_ARRVAL_PP(z_route_options_pp)) == SUCCESS ) {
+                if ( zend_hash_num_elements(Z_ARRVAL_PP(z_route_options_pp)) ) {
                     if ( 0 == validate_request_method( z_route_options_pp, current_request_method TSRMLS_CC) ) {
                         continue;
                     }
