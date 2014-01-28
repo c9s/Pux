@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+# set -e
 
 gdb=0
 lldb=0
