@@ -7,7 +7,11 @@
          verbose="true">
   <testsuites>
     <testsuite name="Pux">
-      <directory suffix="Test.php">tests</directory>
+       <directory suffix="Test.php">tests/Pux</directory>
+    </testsuite>
+
+    <testsuite name="Pux Extension">
+       <directory suffix="Test.php">tests/ExtensionOnly</directory>
     </testsuite>
   </testsuites>
 </phpunit>

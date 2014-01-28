@@ -4,19 +4,6 @@ use Pux\Executor;
 
 class MuxTest extends PHPUnit_Framework_TestCase
 {
-    public function testFunctions()
-    {
-        $funcs = array(
-            'pux_match',
-            'pux_sort_routes',
-        );
-        if ( extension_loaded('pux') ) {
-            foreach( $funcs as $f ) {
-                ok( function_exists($f) );
-            }
-        }
-    }
-
     public function testMuxRouteRouteDefine() {
         $mux = new Mux;
         $mux->add('/', ['IndexController', 'indexAction']);
@@ -31,67 +18,6 @@ class MuxTest extends PHPUnit_Framework_TestCase
         $mux = new Mux;
         $mux->add('/hello/:name', ['IndexController', 'indexAction']);
         ok($mux->getId());
-    }
-
-    public function testMethodDispatch() {
-        $routes = array(
-            array(
-                true, '#^ /product /(?P<id>[^/]+?) $#xs',
-                array( 'ProductController', 'itemAction' ),
-                array(
-                    'require' => array ( 'id' => '\\d+',),
-                    'default' => array ( 'id' => '1',),
-                    'variables' => array ( 'id',),
-                    'regex' => '    /product /(?P<id>[^/]+?) ',
-                    'compiled' => '#^ /product /(?P<id>[^/]+?) $#xs',
-                    'pattern' => '/product/:id',
-                    'method'  => 2,  // POST method
-                ),
-            ),
-        );
-        $_SERVER['REQUEST_METHOD'] = "POST";
-
-        $r = pux_match($routes, '/product/10');
-        ok($r, "Found route");
-        ok( $r[3] , "Got route options" );
-        ok( $r[3]['vars'] , "Got route vars" );
-        ok( $r[3]['vars']['id'] , "Got id" );
-        $this->assertSame([ 'ProductController', 'itemAction' ] , $r[2], 'Same callback');
-    }
-
-    public function testPcreDispatch() {
-        $routes = array(
-            array(
-                true, '#^ /product /(?P<id>[^/]+?) $#xs',
-                array( 'ProductController', 'itemAction' ),
-                array(
-                    'require' => array ( 'id' => '\\d+',),
-                    'default' => array ( 'id' => '1',),
-                    'variables' => array ( 'id',),
-                    'regex' => '    /product /(?P<id>[^/]+?) ',
-                    'compiled' => '#^ /product /(?P<id>[^/]+?) $#xs',
-                    'pattern' => '/product/:id',
-                ),
-            ),
-        );
-        $r = pux_match($routes, '/product/10');
-        ok($r, "Found route");
-        ok( $r[3] , "Got route options" );
-        ok( $r[3]['vars'] , "Got route vars" );
-        ok( $r[3]['vars']['id'] , "Got id" );
-        $this->assertSame([ 'ProductController', 'itemAction' ] , $r[2], 'Same callback');
-    }
-
-    public function testStringDispatch() {
-        $routes = array(
-            array( false, '/product/item', ['ProductController', 'itemAction'], [] ),
-            array( false, '/product', ['ProductController', 'listAction'], [] ),
-        );
-        $r = pux_match($routes, '/product');
-        ok($r, "Found route");
-
-        $r = pux_match($routes, '/product/item');
-        ok($r, "Found route");
     }
 
     public function testMuxClass() {
@@ -460,8 +386,9 @@ class MuxTest extends PHPUnit_Framework_TestCase
                 ),
             ),
             'submux' => array(),
-            // 'staticRoutes' => array(),
-            // 'expand' => true,
+            'staticRoutes' => array(),
+            'routesById' => array(),
+            'expand' => true,
         ));
         ok($mux);
     }

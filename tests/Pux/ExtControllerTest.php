@@ -22,21 +22,6 @@ class CRUDProductController extends Controller
 
 class ExtControllerTest extends PHPUnit_Framework_TestCase
 {
-    public function getExtensionName()
-    {
-        return 'pux';
-    }
-
-    public function getFunctions()
-    {
-        return array();
-    }
-
-    public function testExtensionLoaded() 
-    {
-        ok( extension_loaded('pux') );
-    }
-
     public function testController() {
         $controller = new CRUDProductController;
         ok($controller);

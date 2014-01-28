@@ -14,6 +14,8 @@ class Mux
 
     public $staticRoutes = array();
 
+    public $routesById = array();
+
     public $submux = array();
 
     public $id;
@@ -109,6 +111,10 @@ class Mux
         $this->add($pattern, $callback, $options);
     }
 
+    public function any($pattern, $callback, $options = array()) {
+        $this->add($pattern, $callback, $options);
+    }
+
     public function add($pattern, $callback, $options = array())
     {
         // compile place holder to patterns
@@ -117,12 +123,16 @@ class Mux
             $routeArgs = PatternCompiler::compile($pattern, $options);
 
             // generate a pcre pattern route
-            return $this->routes[] = array( 
+            $route = array( 
                 true, // PCRE
                 $routeArgs['compiled'],
                 $callback,
                 $routeArgs,
             );
+            if ( isset($options['id']) ) {
+                $this->routesById[ $options['id'] ] = $route;
+            }
+            return $this->routes[] = $route;
         } else {
             $route = array(
                 false,
@@ -133,9 +143,19 @@ class Mux
             if ( empty($options) ) {
                 $this->staticRoutes[$pattern] = $route;
             }
+            if ( isset($options['id']) ) {
+                $this->routesById[ $options['id'] ] = $route;
+            }
             // generate a simple string route.
             return $this->routes[] = $route;
         }
+    }
+
+    public function getRoute($id) {
+        if ( isset($this->routesById[$id]) ) {
+            return $this->routesById[$id];
+        }
+
     }
 
     public function sort() 
@@ -198,32 +218,38 @@ class Mux
             return $this->staticRoutes[$path];
         }
         $reqmethod = $this->getRequestMethodConstant(@$_SERVER['REQUEST_METHOD']);
+
         foreach( $this->routes as $route ) {
-            // validate request method
-            if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod ) {
-                continue;
-            }
 
             if ( $route[0] ) {
                 if ( preg_match($route[1], $path , $regs ) ) {
                     $route[3]['vars'] = $regs;
+
+                    // validate request method
+                    if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod )
+                        continue;
+                    if ( isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"] )
+                        continue;
+                    if ( isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"] )
+                        continue;
+
                     return $route;
                 } else {
                     continue;
                 }
             } else {
-                if ( $this->expand ) {
-                    if ( $path === $route[1] ) {
-                        return $route;
-                    }
-                } else {
-                    if ( strncmp($route[1] , $path, strlen($route[1]) ) === 0 ) {
-                        return $route;
-                    } else {
+                if ( strncmp($route[1] , $path, strlen($route[1]) ) === 0 ) {
+                    // validate request method
+                    if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod )
                         continue;
-                    }
+                    if ( isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"] )
+                        continue;
+                    if ( isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"] )
+                        continue;
+                    return $route;
+                } else {
+                    continue;
                 }
-
             }
         }
     }
@@ -276,6 +302,9 @@ class Mux
         $mux->routes = $array['routes'];
         $mux->submux = $array['submux'];
         $mux->expand = $array['expand'];
+        if ( isset($array['routesById']) ) {
+            $mux->routesById = $array['routesById'];
+        }
         $mux->id = $array['id'];
         return $mux;
     }
