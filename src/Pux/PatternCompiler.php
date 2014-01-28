@@ -55,6 +55,8 @@ class PatternCompiler
 
         // build tokens
         foreach ($matches as $match) {
+            // match[0][1] // matched position for pattern.
+
 
             /*
              * Split tokens from abstract pattern
@@ -64,18 +66,18 @@ class PatternCompiler
                 $tokens[] = array( self::TOKEN_TYPE_TEXT, $text);
             }
 
-            // the first char from pattern (seperater)
+            // the first char from pattern (which is the seperater)
             $seps = array($pattern[$pos]);
             $pos = $match[0][1] + strlen($match[0][0]);
 
 
-            // optional pattern
+            // generate optional pattern recursively
             if( $match[0][0][0] == '(' ) {
                 $optional = $match[2][0];
                 $subroute = self::compilePattern($optional,array(
-                    'default' => @$options['default'],
-                    'require' => @$options['require'],
-                    'variables' => @$options['variables'],
+                    'default'   => isset($options['default']) ? $options['default'] : null,
+                    'require'   => isset($options['require']) ? $options['require'] : null,
+                    'variables' => isset($options['variables']) ? $options['variables'] : null,
                 ));
 
                 $tokens[] = array( 
@@ -83,32 +85,32 @@ class PatternCompiler
                     $optional[0],
                     $subroute['regex'],
                 );
-
                 foreach( $subroute['variables'] as $var ) {
                     $variables[] = $var;
                 }
-            }
-            else {
-                // field name (variable name)
-                $var = $match[1][0];
+            } else {
+                // generate a variable token 
+                $varName = $match[1][0];
 
-                /* build field pattern from require */
-                if ( isset( $options['require'][$var] ) && $req = $options['require'][$var]) {
+                // if we defined a pattern for this variable, we should use the given pattern..
+                if ( isset( $options['require'][$varName] ) && $req = $options['require'][$varName]) {
                     $regexp = $req;
                 } else {
                     if ($pos !== $len) {
                         $seps[] = $pattern[$pos];
                     }
-
-                    // build regexp (from separater)
+                    // use the default pattern (which is based on the separater charactors we got)
                     $regexp = sprintf('[^%s]+?', preg_quote(implode('', array_unique($seps)), '#'));
                 }
 
+                // append token item
                 $tokens[] = array(self::TOKEN_TYPE_VARIABLE, 
                     $match[0][0][0], 
                     $regexp, 
-                    $var);
-                $variables[] = $var;
+                    $varName);
+
+                // append variable name
+                $variables[] = $varName;
             }
         }
 
@@ -132,6 +134,8 @@ class PatternCompiler
 
         // compute the matching regexp
         $regex = '';
+
+        // indentation level
         $indent = 1;
 
 
@@ -149,7 +153,7 @@ class PatternCompiler
             // output regexp with separator and
             $regex .= str_repeat(' ', $indent * 4) . sprintf("%s(?:\n", preg_quote($token[1], '#'));
 
-            // regular expression with place holder name. ( 
+            // regular expression with place holder name. (?P<name>pattern)
             $regex .= str_repeat(' ', $indent * 4) . sprintf("(?P<%s>%s)\n", $token[3], $token[2]);
 
         } else {
@@ -160,9 +164,11 @@ class PatternCompiler
                     $regex .= str_repeat(' ', $indent * 4) . preg_quote($token[1], '#')."\n";
                     break;
                 case self::TOKEN_TYPE_OPTIONAL:
+                    // the question mark is for optional, the optional item may contains multiple tokens and patterns
                     $regex .= str_repeat(' ', $indent * 4) . "(?:\n" . $token[2] . str_repeat(' ', $indent * 4) . ")?\n";
                     break;
                 default:
+                    // append new pattern group for the optional pattern
                     if ($i >= $firstOptional) {
                         $regex .= str_repeat(' ', $indent * 4) . "(?:\n";
                         ++$indent;
@@ -172,6 +178,8 @@ class PatternCompiler
                 }
             }
         }
+
+        // close groups
         while (--$indent) {
             $regex .= str_repeat(' ', $indent * 4).")?\n";
         }
