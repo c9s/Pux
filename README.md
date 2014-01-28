@@ -88,6 +88,12 @@ Routing Path Format
     /post/:id(/:title)         => matches /post/33, /post/33/post%20title
     /post/:id(\.:format)       => matches /post/33, /post/33.json .. /post/33.xml
 
+Requirement
+--------------
+
+- PHP 5.4.x
+- PHP 5.5.x
+
 Installation
 --------------------
 You can install Pux with composer by defining the following requirement in your composer.json:
