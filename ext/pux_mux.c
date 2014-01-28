@@ -572,8 +572,10 @@ PHP_METHOD(Mux, getRoutes) {
 }
 
 PHP_METHOD(Mux, export) {
-
-    var_export(return_value, this_ptr TSRMLS_CC);
+    smart_str buf = {0};
+    php_var_export_ex(&this_ptr, 0, &buf TSRMLS_CC);
+    smart_str_0 (&buf);
+    RETVAL_STRINGL(buf.c, buf.len, 0);
 }
 
 PHP_METHOD(Mux, getId) {
