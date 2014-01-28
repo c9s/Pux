@@ -1,5 +1,6 @@
 #!/bin/bash
-# set -e
+set -e
+set -o xtrace
 
 gdb=0
 lldb=0

@@ -1,5 +1,7 @@
 #!/bin/bash
-# set -e
+set -e
+set -o xtrace
+
 statm()
 {
     if [[ `uname` == "Darwin" ]] ; then
