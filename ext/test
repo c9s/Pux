@@ -41,7 +41,7 @@ else
 fi
 
 if [[ -n `type phpunit | grep phpenv` ]] ; then
-    PHP=$(phpenv which phpunit)
+    PHPUNIT=$(phpenv which phpunit)
 else
     PHPUNIT=$(command which phpunit)
 fi
