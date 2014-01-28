@@ -151,8 +151,16 @@ class ProductController {
     }
 }
 $mux = new Pux\Mux;
-$mux->add('/product', ['ProductController','listAction']);
-$mux->add('/product/:id', ['ProductController','itemAction'] , [
+$mux->any('/product', ['ProductController','listAction']);
+$mux->get('/product/:id', ['ProductController','itemAction'] , [
+    'require' => [ 'id' => '\d+', ],
+    'default' => [ 'id' => '1', ]
+]);
+$mux->post('/product/:id', ['ProductController','updateAction'] , [
+    'require' => [ 'id' => '\d+', ],
+    'default' => [ 'id' => '1', ]
+]);
+$mux->delete('/product/:id', ['ProductController','deleteAction'] , [
     'require' => [ 'id' => '\d+', ],
     'default' => [ 'id' => '1', ]
 ]);
