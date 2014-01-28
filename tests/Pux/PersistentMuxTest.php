@@ -1,14 +1,17 @@
 <?php
-require 'PHPUnit/Framework/ExtensionTestCase.php';
-require 'PHPUnit/TestMore.php';
-require '../src/Pux/PatternCompiler.php';
-require '../src/Pux/MuxCompiler.php';
-require '../src/Pux/Executor.php';
 use Pux\Mux;
 use Pux\Executor;
 
 class PersistentMuxTest extends PHPUnit_Framework_TestCase
 {
+
+    public function setUp()
+    {
+        if ( ! extension_loaded('pux') ) {
+            $this->markTestSkipped("require pux extension to test");
+        }
+    }
+
 
     public function testStoreOnly() 
     {
