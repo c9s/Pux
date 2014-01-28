@@ -1,14 +1,9 @@
 <?php
-require 'PHPUnit/Framework/ExtensionTestCase.php';
-require 'PHPUnit/TestMore.php';
-require '../src/Pux/PatternCompiler.php';
-require '../src/Pux/MuxCompiler.php';
-require '../src/Pux/Executor.php';
 use Pux\Mux;
 use Pux\Executor;
 use Pux\Controller;
 
-class ProductController extends Controller
+class CRUDProductController extends Controller
 {
     public function indexAction() 
     {
@@ -25,7 +20,7 @@ class ProductController extends Controller
 
 }
 
-class ControllerTest extends PHPUnit_Framework_ExtensionTestCase
+class ExtControllerTest extends PHPUnit_Framework_TestCase
 {
     public function getExtensionName()
     {
@@ -43,7 +38,7 @@ class ControllerTest extends PHPUnit_Framework_ExtensionTestCase
     }
 
     public function testController() {
-        $controller = new ProductController;
+        $controller = new CRUDProductController;
         ok($controller);
 
         $actions = $controller->getActionMethods();
