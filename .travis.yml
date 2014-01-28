@@ -19,3 +19,4 @@ cache:
   apc: true
   directories:
   - vendor
+  - composer.lock
