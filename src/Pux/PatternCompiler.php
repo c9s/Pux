@@ -12,7 +12,9 @@ use Exception;
  */
 class PatternCompiler
 {
-
+    const TOKEN_TYPE_OPTIONAL = 1;
+    const TOKEN_TYPE_VARIABLE = 2;
+    const TOKEN_TYPE_TEXT = 3;
 
     /**
      * compile pattern
@@ -58,7 +60,7 @@ class PatternCompiler
              * to rebuild regexp pattern.
              */
             if ($text = substr($pattern, $pos, $match[0][1] - $pos)) {
-                $tokens[] = array('text', $text);
+                $tokens[] = array( self::TOKEN_TYPE_TEXT, $text);
             }
 
             // the first char from pattern (seperater)
@@ -76,7 +78,7 @@ class PatternCompiler
                 ));
 
                 $tokens[] = array( 
-                    'optional',
+                    self::TOKEN_TYPE_OPTIONAL,
                     $optional[0],
                     $subroute['regex'],
                 );
@@ -101,7 +103,7 @@ class PatternCompiler
                     $regexp = sprintf('[^%s]+?', preg_quote(implode('', array_unique($seps)), '#'));
                 }
 
-                $tokens[] = array('variable', 
+                $tokens[] = array(self::TOKEN_TYPE_VARIABLE, 
                     $match[0][0][0], 
                     $regexp, 
                     $var);
@@ -110,13 +112,13 @@ class PatternCompiler
         }
 
         if ($pos < $len) {
-            $tokens[] = array('text', substr($pattern, $pos));
+            $tokens[] = array(self::TOKEN_TYPE_TEXT, substr($pattern, $pos));
         }
 
         // find the first optional token
         $firstOptional = INF;
         for ($i = count($tokens) - 1; $i >= 0; $i--) {
-            if ('variable' === $tokens[$i][0] 
+            if ( self::TOKEN_TYPE_VARIABLE === $tokens[$i][0] 
                 && isset($options['default'][ $tokens[$i][3] ]) )
             {
                 $firstOptional = $i;
@@ -132,11 +134,11 @@ class PatternCompiler
         $indent = 1;
 
 
-        // token structure:
+        // token item structure:
         //   [0] => token type,
         //   [1] => separator
         //   [2] => pattern
-        //   [3] => name , 
+        //   [3] => name, 
 
         // first optional token and only one token.
         if (1 === count($tokens) && 0 === $firstOptional) {
@@ -153,11 +155,11 @@ class PatternCompiler
 
         } else {
             foreach ($tokens as $i => $token) {
-                if ('text' === $token[0]) {
+                if (self::TOKEN_TYPE_TEXT === $token[0]) {
                     $regex .= str_repeat(' ', $indent * 4)
                             . preg_quote($token[1], '#')."\n";
                 }
-                elseif( 'optional' === $token[0]) {
+                elseif( self::TOKEN_TYPE_OPTIONAL === $token[0]) {
                     $regex .= str_repeat(' ', $indent * 4) . "(?:\n";
                     $regex .= $token[2];
                     $regex .= str_repeat(' ', $indent * 4) . ")?\n";
