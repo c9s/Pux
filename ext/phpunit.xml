@@ -1,18 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit
-    backupGlobals="false"
-    verbose="true"
-    debug="true"
-    syntaxCheck="true"
-    colors="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
-    >
-
-    <testsuites>
-        <testsuite name="PuxTest" extension="pux">
-            <directory>PuxTest.php</directory>
-        </testsuite>
-    </testsuites>
-</phpunit>
+../phpunit.xml
