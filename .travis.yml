@@ -8,8 +8,6 @@ install:
   - composer install --dev
   - pear channel-discover pear.corneltek.com
   - pear install -a -f corneltek/PHPUnit_TestMore
-  - pear install -a -f corneltek/PHPUnit_Framework_ExtensionTestCase
-  - pear install -a -f corneltek/ExtUnit
 before_script:
   - php-config || true
   - phpenv rehash
