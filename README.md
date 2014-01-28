@@ -11,7 +11,9 @@ Symfony/Routing, although the RouteCompiler of Symfony/Routing caches the
 compiled patterns, but there are still a lot of function call and class
 loading from your application code. however, function calls are pretty slow in PHP). 
 
+<!--
 [![Build Status](https://travis-ci.org/c9s/Pux.png?branch=master)](https://travis-ci.org/c9s/Pux)
+-->
 
 Why It's Faster
 ---------------
@@ -305,6 +307,8 @@ $r = pux_persistent_dispatch('hello', 'hello_mux.php', '/hello');
 
 > Please note that the `hello_mux.php` must be a compiled mux PHP file.
 > The `pux_persistent_dispatch` is only available in extension.
+
+> NOTE: persistent dispatching is still in beta status.
 
 
 Controller
