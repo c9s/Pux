@@ -145,35 +145,30 @@ class PatternCompiler
         if (1 === count($tokens) && 0 === $firstOptional) {
             $token = $tokens[0];
             ++$indent;
-            $regex .= str_repeat(' ', $indent * 4)
-                . sprintf("%s(?:\n", 
-                    preg_quote($token[1], '#'));
+
+            // output regexp with separator and
+            $regex .= str_repeat(' ', $indent * 4) . sprintf("%s(?:\n", preg_quote($token[1], '#'));
 
             // regular expression with place holder name. ( 
-            $regex .= str_repeat(' ', $indent * 4)
-                . sprintf("(?P<%s>%s)\n", 
-                    $token[3], $token[2]);
+            $regex .= str_repeat(' ', $indent * 4) . sprintf("(?P<%s>%s)\n", $token[3], $token[2]);
 
         } else {
             foreach ($tokens as $i => $token) {
-                if (self::TOKEN_TYPE_TEXT === $token[0]) {
-                    $regex .= str_repeat(' ', $indent * 4)
-                            . preg_quote($token[1], '#')."\n";
-                }
-                elseif( self::TOKEN_TYPE_OPTIONAL === $token[0]) {
-                    $regex .= str_repeat(' ', $indent * 4) . "(?:\n";
-                    $regex .= $token[2];
-                    $regex .= str_repeat(' ', $indent * 4) . ")?\n";
-                }
-                else {
+
+                switch ( $token[0] ) {
+                case self::TOKEN_TYPE_TEXT:
+                    $regex .= str_repeat(' ', $indent * 4) . preg_quote($token[1], '#')."\n";
+                    break;
+                case self::TOKEN_TYPE_OPTIONAL:
+                    $regex .= str_repeat(' ', $indent * 4) . "(?:\n" . $token[2] . str_repeat(' ', $indent * 4) . ")?\n";
+                    break;
+                default:
                     if ($i >= $firstOptional) {
-                        $regex .= str_repeat(' ', $indent * 4)
-                            . "(?:\n";
+                        $regex .= str_repeat(' ', $indent * 4) . "(?:\n";
                         ++$indent;
                     }
-                    $regex .= str_repeat(' ', $indent * 4).
-                        sprintf("%s(?P<%s>%s)\n", 
-                        preg_quote($token[1], '#'), $token[3], $token[2]);
+                    $regex .= str_repeat(' ', $indent * 4). sprintf("%s(?P<%s>%s)\n", preg_quote($token[1], '#'), $token[3], $token[2]);
+                    break;
                 }
             }
         }
