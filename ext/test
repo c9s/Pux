@@ -27,11 +27,16 @@ done
 shift $((OPTIND-1))
 
 EXTENSION=pux
-PHP=$(command which php)
-# PHPUNIT=$(command which phpunit)
 
 PHP=php
 PHPUNIT=phpunit
+
+
+if [[ $gdb || $lldb ]] ; then
+    PHP=$(command which php)
+    PHPUNIT=$(command which phpunit)
+fi
+
 
 if [[ $gdb == 1 ]] ; then
     # write .gdbinit, here is the template
