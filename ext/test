@@ -31,8 +31,11 @@ EXTENSION=pux
 PHP=php
 PHPUNIT=phpunit
 
+type php
+type phpunit
 
-if [[ $gdb || $lldb ]] ; then
+
+if [[ $gdb == "1" || $lldb == "1" ]] ; then
     PHP=$(command which php)
     PHPUNIT=$(command which phpunit)
 fi
