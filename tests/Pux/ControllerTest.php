@@ -1,18 +1,5 @@
 <?php
 
-class ProductController extends Pux\Controller
-{
-    public function indexAction() { }
-
-    public function itemAction() { }
-
-    public function addAction() { }
-
-    public function delAction() { }
-
-    public function fooBarAction() { }
-}
-
 class ControllerTest extends PHPUnit_Framework_TestCase
 {
 
@@ -23,7 +10,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase
             return;
         }
 
-        $controller = new ProductController;
+        $controller = new ExpandableProductController;
         ok($controller);
 
         ok( is_array( $controller->getActionMethods() ) );

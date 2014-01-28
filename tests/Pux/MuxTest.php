@@ -2,26 +2,6 @@
 use Pux\Mux;
 use Pux\Executor;
 
-class HelloController
-{
-
-    public function helloAction($name) {
-        return "hello $name";
-    }
-
-}
-
-class ProductController
-{
-    public function indexAction() { return 'index'; }
-    public function fooAction() { return 'foo'; }
-    public function barAction() { return 'bar'; }
-
-    public function itemAction($id)  { 
-        return "product item $id";
-    }
-}
-
 class MuxTest extends PHPUnit_Framework_TestCase
 {
     public function testFunctions()
@@ -246,7 +226,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
         $mux = new \Pux\Mux;
         $mux->expand = false;
         ok($mux, "got mux");
-        $mux->add('/foo', [ 'HelloController','indexAction' ], [ 'domain' => 'test.dev' ]);
+        $mux->add('/foo', [ 'HelloController2','indexAction' ], [ 'domain' => 'test.dev' ]);
         $_SERVER['HTTP_HOST'] = 'test.dev';
         $route = $mux->dispatch('/foo');
         ok($route);
@@ -258,8 +238,8 @@ class MuxTest extends PHPUnit_Framework_TestCase
 
     public function testRouteWithId() {
         $mux = new \Pux\Mux;
-        $mux->add('/hello/:name', [ 'HelloController','indexAction' ], [ 'id' => 'hello-name' ]);
-        $mux->add('/foo', [ 'HelloController','indexAction' ], [ 'id' => 'foo' ]);
+        $mux->add('/hello/:name', [ 'HelloController2','indexAction' ], [ 'id' => 'hello-name' ]);
+        $mux->add('/foo', [ 'HelloController2','indexAction' ], [ 'id' => 'foo' ]);
 
         ok($mux->routesById);
         ok($mux->routesById['foo']);
@@ -273,8 +253,8 @@ class MuxTest extends PHPUnit_Framework_TestCase
         $mux->expand = false;
         ok($mux, "got mux");
         $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', [ 'HelloController','indexAction' ]);
-        $submux->any('/foo', [ 'HelloController','indexAction' ]);
+        $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
+        $submux->any('/foo', [ 'HelloController2','indexAction' ]);
         $mux->mount( '/sub' , $submux);
     }
 
@@ -285,8 +265,8 @@ class MuxTest extends PHPUnit_Framework_TestCase
         ok($mux);
 
         $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', [ 'HelloController','indexAction' ]);
-        $submux->any('/foo', [ 'HelloController','indexAction' ]);
+        $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
+        $submux->any('/foo', [ 'HelloController2','indexAction' ]);
         $mux->mount( '/sub' , $submux);
 
         ok($submux, 'submux');
@@ -312,7 +292,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
         is(0, $mux->length());
 
         $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', [ 'HelloController','indexAction' ]);
+        $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
         ok($submux);
         ok($routes = $submux->getRoutes());
         is(1, $submux->length());
@@ -330,7 +310,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
         is(0, $mux->length());
 
         $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', [ 'HelloController','indexAction' ]);
+        $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
         ok($submux);
         ok($routes = $submux->getRoutes());
         is(1, $submux->length());
@@ -381,7 +361,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
     public function testExecutor() {
         $mux = new \Pux\Mux;
         ok($mux);
-        $mux->add('/hello/:name', [ 'HelloController','helloAction' ], [
+        $mux->add('/hello/:name', [ 'HelloController2','helloAction' ], [
             'require' => [ 'name' => '\w+' ]
         ]);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
@@ -473,7 +453,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
                         1 => '/hello',
                         2 =>
                         array (
-                            0 => 'HelloController',
+                            0 => 'HelloController2',
                             1 => 'helloAction',
                         ),
                         3 => array (),

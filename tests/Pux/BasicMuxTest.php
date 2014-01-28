@@ -2,24 +2,6 @@
 use Pux\Mux;
 use Pux\Executor;
 
-class HelloController
-{
-    public function index($name) {
-        return "Hello $name";
-    }
-
-    public function show() {
-        return "response";
-    }
-}
-
-class PageController {
-
-    public function page1() { return 'page1'; }
-    public function page2() { return 'page2'; }
-
-}
-
 class BasicMuxTest extends PHPUnit_Framework_TestCase
 {
 
