@@ -22,7 +22,8 @@ class PatternCompiler
      * @param string $pattern
      * @param array $options
      */
-    static function compilePattern($pattern, $options = array() ) {
+    static function compilePattern($pattern, $options = array() ) 
+    {
 
         $len = strlen($pattern);
         /**
@@ -198,11 +199,14 @@ class PatternCompiler
     static function splitTokens($string)
     {
         // split with ":variable" and path
-        preg_match_all('#(?:
-            .:([\w\d_]+)
+        preg_match_all('/(?:
+            # parse variable token with separator
+            .            # separator
+            :([\w\d_]+)  # variable
             |
+            # optional tokens
             \((.*)\)
-        )#x', $string, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        )/x', $string, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         return $matches;
     }
 
