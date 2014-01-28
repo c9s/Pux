@@ -11,10 +11,10 @@ before_script:
   - php-config || true
   - phpenv rehash
   - phpenv version-name
-  - ./tests/travis-setup.sh
+  - bash -x tests/travis-setup.sh
 script:
-  - bash tests/run-pp-tests
-  - bash tests/run-ext-tests
+  - bash -x tests/run-pp-tests
+  - bash -x tests/run-ext-tests
 cache:
   apc: true
   directories:
