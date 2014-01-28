@@ -54,7 +54,7 @@ if [[ $do_clean == 1 ]] ; then
 fi
 
 echo "===> Building..."
-make || exit 1
+make > /dev/null || exit 1
 
 if [[ $do_install == 1 ]] ;then
     echo "===> Installing..."
