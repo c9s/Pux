@@ -8,7 +8,7 @@ phpunit --testsuite PP --repeat 100 || exit 1
 if [[ $(phpenv version-name) =~ 5.[345] ]] ; then
     echo "Testing pux extension..."
     cd ext
-    ./compile -c || exit 1
+    ./compile -cp || exit 1
     ./test -- --debug || exit 1
 
     echo "Stress testing on extension..."
