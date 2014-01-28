@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 echo "Basic testing..."
 phpunit --testsuite PP --debug || exit 1
 
