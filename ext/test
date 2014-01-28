@@ -28,7 +28,10 @@ shift $((OPTIND-1))
 
 EXTENSION=pux
 PHP=$(command which php)
-PHPUNIT=$(command which phpunit)
+# PHPUNIT=$(command which phpunit)
+
+PHP=php
+PHPUNIT=phpunit
 
 if [[ $gdb == 1 ]] ; then
     # write .gdbinit, here is the template
