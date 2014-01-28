@@ -1,9 +1,4 @@
 <?php
-require 'PHPUnit/Framework/ExtensionTestCase.php';
-require 'PHPUnit/TestMore.php';
-require '../src/Pux/PatternCompiler.php';
-require '../src/Pux/MuxCompiler.php';
-require '../src/Pux/Executor.php';
 use Pux\Mux;
 use Pux\Executor;
 
@@ -27,27 +22,19 @@ class ProductController
     }
 }
 
-class MuxTest extends PHPUnit_Framework_ExtensionTestCase
+class MuxTest extends PHPUnit_Framework_TestCase
 {
-
-    public $repeat = 10;
-
-    public function getExtensionName()
+    public function testFunctions()
     {
-        return 'pux';
-    }
-
-    public function getFunctions()
-    {
-        return array(
+        $funcs = array(
             'pux_match',
             'pux_sort_routes',
         );
-    }
-
-    public function testExtensionLoaded() 
-    {
-        ok( extension_loaded('pux') );
+        if ( extension_loaded('pux') ) {
+            foreach( $funcs as $f ) {
+                ok( function_exists($f) );
+            }
+        }
     }
 
     public function testMuxRouteRouteDefine() {
