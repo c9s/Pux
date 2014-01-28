@@ -6,11 +6,11 @@
          colors="true"
          verbose="true">
   <testsuites>
-    <testsuite name="Pux">
+    <testsuite name="PP">
        <directory suffix="Test.php">tests/Pux</directory>
     </testsuite>
 
-    <testsuite name="Pux Extension">
+    <testsuite name="Extension">
        <directory suffix="Test.php">tests/ExtensionOnly</directory>
     </testsuite>
   </testsuites>
