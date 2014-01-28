@@ -6,6 +6,7 @@ install:
   - sudo apt-get install php5-dev php-pear
   - composer install --dev
   - pear channel-discover pear.corneltek.com
+  - pear install -a -f pear.phpunit.de/PHPUnit
   - pear install -a -f corneltek/PHPUnit_TestMore
 before_script:
   - php-config || true
