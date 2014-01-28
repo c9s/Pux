@@ -49,9 +49,10 @@ class PatternCompiler
          */
         $matches = self::splitTokens( $pattern );
 
+
         // build tokens
         foreach ($matches as $match) {
-            
+
             /*
              * Split tokens from abstract pattern
              * to rebuild regexp pattern.
@@ -74,13 +75,12 @@ class PatternCompiler
                     'variables' => @$options['variables'],
                 ));
 
-
                 $tokens[] = array( 
                     'optional',
                     $optional[0],
                     $subroute['regex'],
                 );
-                // $regexp = 
+
                 foreach( $subroute['variables'] as $var ) {
                     $variables[] = $var;
                 }
@@ -179,9 +179,9 @@ class PatternCompiler
         }
 
         // save variables
-        // $options['variables'] = $variables;
+        $options['variables'] = $variables;
         $options['regex'] = $regex;
-        // $options['tokens'] = $tokens;
+        $options['tokens'] = $tokens;
         return $options;
     }
 
