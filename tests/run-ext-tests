@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+echo "Testing pux extension..."
+cd ext
+./compile -cp || exit 1
+./test -- --debug || exit 1
+
+echo "Stress testing on extension..."
+./test -- --repeat 100 || exit 1
+cd ..
