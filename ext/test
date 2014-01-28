@@ -79,7 +79,7 @@ set args \\
     -d 'zlib.output_compression=Off' \\
     -d 'mbstring.func_overload=0' \\
     -d "extension=$EXTENSION.so" \\
-    -n $PHPUNIT -- $*
+    -n $PHPUNIT $*
 END
     for file in .gdbinit.* ; do
         echo "source $file" >> .gdbinit
@@ -116,7 +116,7 @@ elif [[ $lldb == 1 ]] ; then
         -d 'zlib.output_compression=Off' \
         -d 'mbstring.func_overload=0' \
         -d extension=$EXTENSION.so \
-        -n $PHPUNIT -- $*
+        -n $PHPUNIT $*
 else
 
     $PHP -d 'output_handler=' \
@@ -144,6 +144,6 @@ else
         -d 'session.auto_start=0' \
         -d 'zlib.output_compression=Off' \
         -d 'mbstring.func_overload=0' \
-        -d "extension=$EXTENSION.so" -n $PHPUNIT -- $*
+        -d "extension=$EXTENSION.so" -n $PHPUNIT $*
 
 fi
