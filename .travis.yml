@@ -2,7 +2,6 @@ language: php
 php:
   - 5.4
   - 5.5
-    #  - hhvm
 install:
   - sudo apt-get install php5-dev php-pear
   - composer install --dev
@@ -14,8 +13,8 @@ before_script:
   - phpenv version-name
   - ./tests/travis-setup.sh
 script:
-  - ./tests/run-pp-tests
-  - ./tests/run-ext-tests
+  - bash tests/run-pp-tests
+  - bash tests/run-ext-tests
 cache:
   apc: true
   directories:
