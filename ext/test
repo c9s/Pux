@@ -34,12 +34,17 @@ PHPUNIT=phpunit
 type php
 type phpunit
 
-
-if [[ $gdb == "1" || $lldb == "1" ]] ; then
+if [[ -n `type php | grep phpenv` ]] ; then
+    PHP=$(phpenv which php)
+else
     PHP=$(command which php)
-    PHPUNIT=$(command which phpunit)
 fi
 
+if [[ -n `type phpunit | grep phpenv` ]] ; then
+    PHP=$(phpenv which phpunit)
+else
+    PHPUNIT=$(command which phpunit)
+fi
 
 if [[ $gdb == 1 ]] ; then
     # write .gdbinit, here is the template
