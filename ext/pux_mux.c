@@ -630,26 +630,29 @@ PHP_METHOD(Mux, sort) {
 PHP_METHOD(Mux, compile) {
     char *filename;
     int  filename_len;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &filename, &filename_len) == FAILURE) {
+    zend_bool sort_before_compile = 1;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|b", &filename, &filename_len, &sort_before_compile) == FAILURE) {
         RETURN_FALSE;
     }
 
-    zval *z_routes;
-    z_routes = zend_read_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
+    if (sort_before_compile) {
+        zval *z_routes;
+        z_routes = zend_read_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
-    Z_SET_ISREF_P(z_routes);
+        Z_SET_ISREF_P(z_routes);
+        // duplicated code to sort method
+        zval *rv = NULL;
+        zval *z_sort_callback = NULL;
+        MAKE_STD_ZVAL(z_sort_callback);
+        ZVAL_STRING( z_sort_callback, "pux_sort_routes" , 1 );
 
-    // duplicated code to sort method
-    zval *rv = NULL;
-    zval *z_sort_callback = NULL;
-    MAKE_STD_ZVAL(z_sort_callback);
-    ZVAL_STRING( z_sort_callback, "pux_sort_routes" , 1 );
-
-    zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &rv, 2, 
-            z_routes, z_sort_callback TSRMLS_CC );
-    zval_ptr_dtor(&z_sort_callback); // recycle sort callback zval
-    // php_error(E_ERROR,"route sort failed.");
-    // zend_update_property(ce_pux_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
+        zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &rv, 2, 
+                z_routes, z_sort_callback TSRMLS_CC );
+        zval_ptr_dtor(&z_sort_callback); // recycle sort callback zval
+        // php_error(E_ERROR,"route sort failed.");
+        // zend_update_property(ce_pux_mux, getThis(), "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
+    }
 
     // $code = '<?php return ' . $this->export() . ';';
 

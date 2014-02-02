@@ -181,10 +181,12 @@ class Mux
     }
 
 
-    public function compile($outFile)
+    public function compile($outFile, $sortBeforeCompile = true)
     {
         // compile routes to php file as a cache.
-        $this->sort();
+        if ($sortBeforeCompile) {
+            $this->sort();
+        }
 
         $code = '<?php return ' . $this->export() . ';';
         return file_put_contents($outFile, $code);
