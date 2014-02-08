@@ -160,7 +160,7 @@ class Mux
 
     public function sort() 
     {
-        usort($this->routes, ['Pux\\MuxCompiler','sort_routes']);
+        usort($this->routes, array('Pux\\MuxCompiler','sort_routes'));
     }
 
     static public function sort_routes($a, $b) {
