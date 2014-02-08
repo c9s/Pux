@@ -245,6 +245,18 @@ When expand is enabled, it improves dispatch performance when you
 have a lot of sub mux to dispatch.
 
 
+### Methods
+
+- `Mux->add( {path}, {callback array or callable object}, { route options })`
+- `Mux->post( {path}, {callback array or callable object}, { route options })`
+- `Mux->get( {path}, {callback array or callable object}, { route options })`
+- `Mux->put( {path}, {callback array or callable object}, { route options })`
+- `Mux->any( {path}, {callback array or callable object}, { route options })`
+- `Mux->delete( {path}, {callback array or callable object}, { route options })`
+- `Mux->mount( {path}, {mux object}, { route options })`
+- `Mux->length()` returns length of routes
+- `Mux::__set_state({object member array})` returns a Mux object
+
 ### Sorting routes
 
 You need to sort routes when not using compiled routes, it's because pux sorts
@@ -337,6 +349,8 @@ $mux->dispatch('/product/add');   // ProductController->addAction
 $mux->dispatch('/product/del');   // ProductController->delAction
 ```
 
+
+- `Pux\Controller::expand()` returns an array with sub-path and method names.
 
 
 MuxCompiler
