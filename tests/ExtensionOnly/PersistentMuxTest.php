@@ -12,8 +12,14 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testStoreEmptyMuxObject() 
+    {
+        $mux = new Mux;
+        $this->assertMux($mux);
+        ok( pux_store_mux('phpunit1', $mux), 'mux stored' );
+    }
 
-    public function testStoreOnly() 
+    public function testStoreMux() 
     {
         $mux = new Mux;
         $mux->add('/', [ 'IndexController', 'index' ]);
@@ -36,7 +42,7 @@ class PersistentMuxTest extends PHPUnit_Framework_TestCase
 
 
     /**
-     * @depends testStoreOnly
+     * @depends testStoreMux
      */
     public function testFetch() 
     {
