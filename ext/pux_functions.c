@@ -212,7 +212,8 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
     id_key_len = spprintf(&id_key, 0, "mux_id_%s", name);
     expand_key_len = spprintf(&expand_key, 0, "mux_expand_%s", name);
 
-    Z_ADDREF_P(mux);
+
+    // Z_ADDREF_P(mux);
 
     // make the hash table persistent
     zval *prop, *tmp;
@@ -225,7 +226,8 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
         php_error(E_ERROR, "Can not clone HashTable");
         return FAILURE;
     }
-    pux_persistent_store( name, "routes", (void*) routes TSRMLS_CC);
+    pux_persistent_store( name, "routes", le_mux_hash_table, (void*) routes TSRMLS_CC);
+    return SUCCESS;
 
 
     prop = zend_read_property(ce_pux_mux, mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
@@ -234,7 +236,7 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
         php_error(E_ERROR, "Can not clone HashTable");
         return FAILURE;
     }
-    pux_persistent_store(name, "static_routes", (void *) static_routes TSRMLS_CC) ;
+    pux_persistent_store(name, "static_routes", le_mux_hash_table, (void *) static_routes TSRMLS_CC) ;
 
     
     // copy ID

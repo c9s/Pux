@@ -21,7 +21,7 @@
 
 extern int pux_globals_id;
 
-extern int le_mux_hash_persist;
+extern int le_mux_hash_table;
 
 // global variable structure
 ZEND_BEGIN_MODULE_GLOBALS(pux)
@@ -86,6 +86,8 @@ extern zend_class_entry *ce_pux_exception;
 extern zend_module_entry pux_module_entry;
 
 void pux_init_exception(TSRMLS_D);
+
+void pux_mux_le_hash_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 
 #define phpext_pux_ptr &pux_module_entry
 
