@@ -5,6 +5,9 @@
 #define REQ_METHOD_POST 2
 #define REQ_METHOD_PUT 3
 #define REQ_METHOD_DELETE 4
+#define REQ_METHOD_PATCH 5
+#define REQ_METHOD_HEAD 6
+#define REQ_METHOD_OPTIONS 7
 
 #include "php.h"
 #include "string.h"

@@ -47,6 +47,9 @@ PHP_METHOD(Mux, get);
 PHP_METHOD(Mux, post);
 PHP_METHOD(Mux, put);
 PHP_METHOD(Mux, delete);
+PHP_METHOD(Mux, head);
+PHP_METHOD(Mux, patch);
+PHP_METHOD(Mux, options);
 
 PHP_METHOD(Mux, __set_state);
 

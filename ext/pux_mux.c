@@ -43,6 +43,9 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, post, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, put, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, delete, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, head, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, patch, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, options, NULL, ZEND_ACC_PUBLIC)
 
   PHP_ME(Mux, __set_state, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
   PHP_ME(Mux, generate_id, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -250,27 +253,6 @@ PHP_METHOD(Mux, get) {
 
 
 
-PHP_METHOD(Mux, post) {
-    zval *z_pattern = NULL, *z_callback = NULL, *z_options = NULL;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
-        RETURN_FALSE;
-    }
-    if ( z_options == NULL ) {
-        MAKE_STD_ZVAL(z_options);
-        array_init_size(z_options, 1);
-    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
-        array_init_size(z_options, 1);
-    }
-
-    add_assoc_long(z_options, "method", REQ_METHOD_POST);
-
-    // $this->add($pattern, $callback, $options);
-    zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
-    if ( z_retval ) {
-        *return_value = *z_retval;
-        zval_copy_ctor(return_value);
-    }
-}
 
 PHP_METHOD(Mux, put) {
     zval *z_pattern = NULL, *z_callback = NULL, *z_options = NULL;
@@ -316,6 +298,96 @@ PHP_METHOD(Mux, delete) {
         zval_copy_ctor(return_value);
     }
     // zval_ptr_dtor(&z_retval);
+}
+
+
+PHP_METHOD(Mux, post) {
+    zval *z_pattern = NULL, *z_callback = NULL, *z_options = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
+        RETURN_FALSE;
+    }
+    if ( z_options == NULL ) {
+        MAKE_STD_ZVAL(z_options);
+        array_init_size(z_options, 1);
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        array_init_size(z_options, 1);
+    }
+
+    add_assoc_long(z_options, "method", REQ_METHOD_POST);
+
+    // $this->add($pattern, $callback, $options);
+    zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
+    if ( z_retval ) {
+        *return_value = *z_retval;
+        zval_copy_ctor(return_value);
+    }
+}
+
+
+PHP_METHOD(Mux, patch) {
+    zval *z_pattern = NULL, *z_callback = NULL, *z_options = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
+        RETURN_FALSE;
+    }
+    if ( z_options == NULL ) {
+        MAKE_STD_ZVAL(z_options);
+        array_init_size(z_options, 1);
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        array_init_size(z_options, 1);
+    }
+
+    add_assoc_long(z_options, "method", REQ_METHOD_PATCH);
+
+    // $this->add($pattern, $callback, $options);
+    zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
+    if ( z_retval ) {
+        *return_value = *z_retval;
+        zval_copy_ctor(return_value);
+    }
+}
+
+PHP_METHOD(Mux, head) {
+    zval *z_pattern = NULL, *z_callback = NULL, *z_options = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
+        RETURN_FALSE;
+    }
+    if ( z_options == NULL ) {
+        MAKE_STD_ZVAL(z_options);
+        array_init_size(z_options, 1);
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        array_init_size(z_options, 1);
+    }
+
+    add_assoc_long(z_options, "method", REQ_METHOD_HEAD);
+
+    // $this->add($pattern, $callback, $options);
+    zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
+    if ( z_retval ) {
+        *return_value = *z_retval;
+        zval_copy_ctor(return_value);
+    }
+}
+
+PHP_METHOD(Mux, options) {
+    zval *z_pattern = NULL, *z_callback = NULL, *z_options = NULL;
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz|a", &z_pattern, &z_callback, &z_options) == FAILURE) {
+        RETURN_FALSE;
+    }
+    if ( z_options == NULL ) {
+        MAKE_STD_ZVAL(z_options);
+        array_init_size(z_options, 1);
+    } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
+        array_init_size(z_options, 1);
+    }
+
+    add_assoc_long(z_options, "method", REQ_METHOD_OPTIONS);
+
+    // $this->add($pattern, $callback, $options);
+    zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
+    if ( z_retval ) {
+        *return_value = *z_retval;
+        zval_copy_ctor(return_value);
+    }
 }
 
 
