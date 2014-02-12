@@ -784,6 +784,12 @@ inline int get_current_request_method_const(HashTable * server_vars_hash TSRMLS_
             return REQ_METHOD_PUT;
         } else if ( strncmp("DELETE", c_request_method, sizeof("DELETE")  ) == 0 ) {
             return REQ_METHOD_DELETE;
+        } else if ( strncmp("HEAD", c_request_method, sizeof("HEAD")  ) == 0 ) {
+            return REQ_METHOD_HEAD;
+        } else if ( strncmp("PATCH", c_request_method, sizeof("PATCH")  ) == 0 ) {
+            return REQ_METHOD_HEAD;
+        } else if ( strncmp("OPTIONS", c_request_method, sizeof("OPTIONS")  ) == 0 ) {
+            return REQ_METHOD_OPTIONS;
         }
     }
     return 0;
