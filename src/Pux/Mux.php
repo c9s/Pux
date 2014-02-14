@@ -78,9 +78,9 @@ class Mux
                 } else {
                     $this->routes[] = array(
                         false,
-                        $pattern . $route[1],
+                        ($pattern ?: '/') . $route[1],
                         $route[2],
-                        $options,
+                        isset($route[3]) ? array_merge($options, $route[3]) : $options,
                     );
                 }
             }
