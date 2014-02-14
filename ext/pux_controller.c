@@ -1,4 +1,6 @@
 #include "string.h"
+#include "stdlib.h"
+#include "stddef.h"
 #include "ctype.h"
 #include "php.h"
 #include "main/php_main.h"
@@ -129,6 +131,71 @@ char * translate_method_name_to_path(const char *method_name)
     return new_path;
 }
 
+
+int has_suffix(const char *str, const char *suffix) {
+    if (!str && !suffix) {
+        return 1;
+    }
+
+    if (!str || !suffix) {
+        return 0;
+    }
+
+    int str_len = strlen(str);
+    int sfx_len = strlen(suffix);
+
+    return strcmp(str + str_len - sfx_len, suffix) == 0;
+}
+
+
+char *get_http_method(const char *method_name) {
+    if (has_suffix(method_name, "GetAction") != 0) {
+        return "Get";
+    } else if (has_suffix(method_name, "PostAction") != 0) {
+        return "Post";
+    } else if (has_suffix(method_name, "PutAction") != 0) {
+        return "Put";
+    } else if (has_suffix(method_name, "DeleteAction") != 0) {
+        return "Delete";
+    }
+
+    return NULL;
+}
+
+
+// Borrowed with thanks from: Laird Shaw [http://creativeandcritical.net/str-replace-c/]
+char *replace_str(const char *src, const char *substr, const char *repl) {
+    char *ret, *r;
+    const char *p, *q;
+    size_t oldlen = strlen(substr);
+    size_t count, retlen, newlen = strlen(repl);
+
+    if (oldlen != newlen) {
+        for (count = 0, p = src; (q = strstr(p, substr)) != NULL; p = q + oldlen)
+            count++;
+        /* this is undefined if p - src > PTRDIFF_MAX */
+        retlen = p - src + strlen(p) + count * (newlen - oldlen);
+    } else {
+        retlen = strlen(src);
+    }
+
+    if ((ret = malloc(retlen + 1)) == NULL)
+        return NULL;
+
+    for (r = ret, p = src; (q = strstr(p, substr)) != NULL; p = q + oldlen) {
+        /* this is undefined if q - p > PTRDIFF_MAX */
+        ptrdiff_t l = q - p;
+        memcpy(r, p, l);
+        r += l;
+        memcpy(r, repl, newlen);
+        r += newlen;
+    }
+    strcpy(r, p);
+
+    return ret;
+}
+
+
 PHP_METHOD(Controller, getActionPaths)
 {
     zend_function *fe;
@@ -145,7 +212,6 @@ PHP_METHOD(Controller, getActionPaths)
     HashPosition pointer;
     zval **func = NULL;
 
-
     array_init(return_value);
 
     for(zend_hash_internal_pointer_reset_ex(func_list, &pointer); 
@@ -153,13 +219,33 @@ PHP_METHOD(Controller, getActionPaths)
             zend_hash_move_forward_ex(func_list, &pointer)) 
     {
         const char *method_name = Z_STRVAL_PP(func);
-        char * path = translate_method_name_to_path(method_name);
-        if ( path ) {
-            zval * new_item;
+        char *http_method = get_http_method(method_name);
+        char *norm_method, *path;
+
+        if (http_method != NULL) {
+            char *pattern[strlen(http_method) + 6];
+            sprintf(pattern, "%s%s", http_method, "Action");
+            norm_method = replace_str(method_name, pattern, "Action");
+        } else {
+            norm_method = strdup(method_name);
+        }
+
+        path = translate_method_name_to_path(norm_method);
+
+        if (path) {
+            zval *new_item;
             MAKE_STD_ZVAL(new_item);
             array_init_size(new_item, 2);
             add_next_index_string(new_item, path, 0);
-            add_next_index_stringl(new_item, method_name, Z_STRLEN_PP(func) , 1);
+            add_next_index_stringl(new_item, method_name, Z_STRLEN_PP(func), 1);
+
+            if (http_method != NULL) {
+                char *mit, *mp;
+                mit = mp = strdup(http_method);
+                while(*mit++ = toupper(*mit));
+                add_next_index_stringl(new_item, mp, strlen(mp), 0);    
+            }
+
             add_next_index_zval(return_value, new_item);
         }
     }
@@ -172,7 +258,6 @@ PHP_METHOD(Controller, expand)
     MAKE_STD_ZVAL(new_mux);
     object_init_ex(new_mux, ce_pux_mux);
     CALL_METHOD(Mux, __construct, new_mux, new_mux);
-
 
     zval *path_array = NULL;
     zend_call_method_with_0_params( &this_ptr, ce_pux_controller, NULL, "getactionpaths", &path_array );
@@ -196,12 +281,27 @@ PHP_METHOD(Controller, expand)
     {
         zval **z_path;
         zval **z_method;
+        zval **z_http_method;
+        zval *z_options;
+
+        MAKE_STD_ZVAL(z_options);
+        array_init(z_options);
 
         if ( zend_hash_index_find(Z_ARRVAL_PP(path_entry), 0, (void**) &z_path) == FAILURE ) {
             continue;
         }
+
         if ( zend_hash_index_find(Z_ARRVAL_PP(path_entry), 1, (void**) &z_method) == FAILURE ) {
             continue;
+        }
+
+        if ( zend_hash_index_find(Z_ARRVAL_PP(path_entry), 2, (void**) &z_http_method) != FAILURE ) {
+            zval *retval = NULL;
+            zend_call_method_with_1_params(&new_mux, ce_pux_mux, NULL, "getrequestmethodconstant", &retval, *z_http_method);
+
+            if (retval != NULL) {
+                add_assoc_zval(z_options, "method", retval);
+            }
         }
 
         zval *z_callback;
@@ -211,7 +311,7 @@ PHP_METHOD(Controller, expand)
         add_next_index_zval(z_callback, *z_method);
 
         zval *rv = NULL;
-        zend_call_method_with_2_params(&new_mux, ce_pux_mux, NULL, "add", &rv, *z_path, z_callback );
+        zend_call_method_with_3_params(&new_mux, ce_pux_mux, NULL, "add", strlen("add"), &rv, 3, *z_path, z_callback, z_options TSRMLS_CC);
     }
 
     zval *rv = NULL;
