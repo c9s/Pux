@@ -254,8 +254,11 @@ have a lot of sub mux to dispatch.
 - `Mux->any( {path}, {callback array or callable object}, { route options })`
 - `Mux->delete( {path}, {callback array or callable object}, { route options })`
 - `Mux->mount( {path}, {mux object}, { route options })`
-- `Mux->length()` returns length of routes
-- `Mux::__set_state({object member array})` returns a Mux object
+- `Mux->length()` returns length of routes.
+- `Mux->export()` returns Mux constructor via __set_state static method in php code.
+- `Mux->dispatch({path})` dispatch path and return matched route.
+- `Mux->getRoutes()` returns routes array.
+- `Mux::__set_state({object member array})` constructs and returns a Mux object.
 
 ### Sorting routes
 
