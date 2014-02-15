@@ -516,3 +516,32 @@ With XDebug Extension.
 ### Through Apache
 
 Please see benchmark details here: <https://github.com/c9s/router-benchmark>
+
+
+## Contributing
+
+Hacking Pux C extension:
+
+1. Discuss your main idea on GitHub issue page.
+
+2. Fork this project and open a branch for your hack.
+
+3. Development Cycle:
+
+    cd ext
+    ./compile
+    ... hack hack hack ...
+
+    # compile and run phpunit test
+    ./compile && ./test -- --debug tests/Pux/MuxTest.php
+
+    # use lldb to debug extension code
+    ./compile && ./test -l -- tests/Pux/MuxTest.php
+
+    # use gdb to debug extension code
+    ./compile && ./test -g -- tests/Pux/MuxTest.php
+
+4. Commit!
+
+5. Send pull request and describe what you've done and what is changed.
+
