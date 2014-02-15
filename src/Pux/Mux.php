@@ -110,30 +110,30 @@ class Mux
     }
 
     public function post($pattern, $callback, $options = array())
-	{
+    {
         $options['method'] = REQ_METHOD_POST;
         $this->add($pattern, $callback, $options);
     }
 
-	public function patch($pattern, $callback, $options = array())
-	{
-		$options['method'] = REQ_METHOD_PATCH;
-		$this->add($pattern, $callback, $options);
-	}
+    public function patch($pattern, $callback, $options = array())
+    {
+        $options['method'] = REQ_METHOD_PATCH;
+        $this->add($pattern, $callback, $options);
+    }
 
 
-	public function head($pattern, $callback, $options = array())
-	{
-		$options['method'] = REQ_METHOD_HEAD;
-		$this->add($pattern, $callback, $options);
-	}
+    public function head($pattern, $callback, $options = array())
+    {
+        $options['method'] = REQ_METHOD_HEAD;
+        $this->add($pattern, $callback, $options);
+    }
 
 
-	public function options($pattern, $callback, $options = array())
-	{
-		$options['method'] = REQ_METHOD_OPTIONS;
-		$this->add($pattern, $callback, $options);
-	}
+    public function options($pattern, $callback, $options = array())
+    {
+        $options['method'] = REQ_METHOD_OPTIONS;
+        $this->add($pattern, $callback, $options);
+    }
 
     public function any($pattern, $callback, $options = array()) {
         $this->add($pattern, $callback, $options);
@@ -234,12 +234,12 @@ class Mux
             return REQ_METHOD_PUT;
         case "DELETE":
             return REQ_METHOD_DELETE;
-		case "PATCH":
-			return REQ_METHOD_PATCH;
-		case "HEAD":
-			return REQ_METHOD_HEAD;
-		case "OPTIONS":
-			return REQ_METHOD_OPTIONS;
+        case "PATCH":
+            return REQ_METHOD_PATCH;
+        case "HEAD":
+            return REQ_METHOD_HEAD;
+        case "OPTIONS":
+            return REQ_METHOD_OPTIONS;
         default:
             return 0;
         }
