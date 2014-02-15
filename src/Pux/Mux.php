@@ -1,4 +1,5 @@
 <?php
+// vim:et:sw=4:ts=4:sts=4:
 namespace Pux;
 use Pux\PatternCompiler;
 use Exception;
