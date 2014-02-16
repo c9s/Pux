@@ -531,18 +531,18 @@ Hacking Pux C extension:
 
 3. Development Cycle:
 
-    cd ext
-    ./compile
-    ... hack hack hack ...
+        cd ext
+        ./compile
+        ... hack hack hack ...
 
-    # compile and run phpunit test
-    ./compile && ./test -- --debug tests/Pux/MuxTest.php
+        # compile and run phpunit test
+        ./compile && ./test -- --debug tests/Pux/MuxTest.php
 
-    # use lldb to debug extension code
-    ./compile && ./test -l -- tests/Pux/MuxTest.php
+        # use lldb to debug extension code
+        ./compile && ./test -l -- tests/Pux/MuxTest.php
 
-    # use gdb to debug extension code
-    ./compile && ./test -g -- tests/Pux/MuxTest.php
+        # use gdb to debug extension code
+        ./compile && ./test -g -- tests/Pux/MuxTest.php
 
 4. Commit!
 
