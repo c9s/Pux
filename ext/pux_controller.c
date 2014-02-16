@@ -82,12 +82,26 @@ PHP_METHOD(Controller, getActionMethods)
     zend_hash_internal_pointer_reset_ex(function_table, &pos);
 
     while (zend_hash_get_current_data_ex(function_table, (void **) &mptr, &pos) == SUCCESS) {
+
         const char * key = mptr->common.function_name;
         size_t   key_len = strlen(mptr->common.function_name);
         int p = strpos(key, "Action");
         if ( p != -1 && (size_t)p == (key_len - strlen("Action")) ) {
-            add_next_index_stringl(return_value, key, key_len, 1);
+
+            if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
+                // TODO parse the docblock comment
+                // php_printf( mptr->op_array.doc_comment);
+            }
+
+            // append the structure [method name, http method]
+            zval *new_item;
+            ALLOC_ZVAL(new_item);
+            array_init(new_item);
+            add_next_index_stringl(new_item, key, key_len, 1);
+
+            add_next_index_zval(return_value, new_item);
         }
+
         zend_hash_move_forward_ex(function_table, &pos);
     }
     return;
@@ -129,6 +143,8 @@ char * translate_method_name_to_path(const char *method_name)
     return new_path;
 }
 
+// return path => path pairs
+// structure: [[ path, method name ], [ ... ], [ ... ], ... ]
 PHP_METHOD(Controller, getActionPaths)
 {
     zend_function *fe;
@@ -139,27 +155,35 @@ PHP_METHOD(Controller, getActionPaths)
     zval *rv = NULL;
     zend_call_method_with_0_params( &this_ptr, ce_pux_controller, &fe, "getactionmethods", &rv );
 
-    // php_var_dump(rv, 1);
-
     HashTable *func_list = Z_ARRVAL_P(rv);
     HashPosition pointer;
-    zval **func = NULL;
-
+    zval **item = NULL;
 
     array_init(return_value);
 
     for(zend_hash_internal_pointer_reset_ex(func_list, &pointer); 
-            zend_hash_get_current_data_ex(func_list, (void**) &func, &pointer) == SUCCESS; 
+            zend_hash_get_current_data_ex(func_list, (void**) &item, &pointer) == SUCCESS; 
             zend_hash_move_forward_ex(func_list, &pointer)) 
     {
-        const char *method_name = Z_STRVAL_PP(func);
+        zval **z_method_name;
+        zval **z_http_method_type;
+        zend_hash_index_find(Z_ARRVAL_PP(item), 0, (void**) &z_method_name);
+        
+        if ( zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**) &z_http_method_type) == SUCCESS ) {
+
+        }
+
+        const char *method_name = Z_STRVAL_PP(z_method_name);
+        int         method_name_len = Z_STRLEN_PP(z_method_name);
+
         char * path = translate_method_name_to_path(method_name);
         if ( path ) {
+            // return structure [ path, method name ]
             zval * new_item;
             MAKE_STD_ZVAL(new_item);
             array_init_size(new_item, 2);
             add_next_index_string(new_item, path, 0);
-            add_next_index_stringl(new_item, method_name, Z_STRLEN_PP(func) , 1);
+            add_next_index_stringl(new_item, method_name, method_name_len , 1);
             add_next_index_zval(return_value, new_item);
         }
     }

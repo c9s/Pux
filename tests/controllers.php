@@ -37,8 +37,20 @@ class ExpandableProductController extends Pux\Controller
 
     public function itemAction() { }
 
+
+    /**
+     * @method POST
+     */
     public function addAction() { }
 
+    /**
+     * @method PUT
+     */
+    public function updateAction() { }
+
+    /**
+     * @method DELETE
+     */
     public function delAction() { }
 
     public function fooBarAction() { }

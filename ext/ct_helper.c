@@ -11,6 +11,12 @@
 #include "ct_helper.h"
 
 
+#define ZEND_FIND_FUNC(ce, name, name_len, fe) \
+        zend_hash_find(&ce->function_table, name, name_len, (void **) &fe)
+
+#define ZEND_FIND_FUNC_QUICK(ce, name, name_len, fe) \
+        zend_hash_quick_find(&ce->function_table, name, name_len, zend_inline_hash_func(name, name_len) , (void **) &fe)
+
 /* {{{ zend_call_method
  Only returns the returned zval if retval_ptr != NULL */
 ZEND_API zval* zend_call_method_with_3_params(zval **object_pp, zend_class_entry *obj_ce, zend_function **fn_proxy, const char *function_name, int function_name_len, zval **retval_ptr_ptr, int param_count, zval* arg1, zval* arg2, zval* arg3 TSRMLS_DC)
