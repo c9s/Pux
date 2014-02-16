@@ -53,6 +53,7 @@ class ExpandableProductController extends Pux\Controller
      */
     public function delAction() { }
 
+
     public function fooBarAction() { }
 }
 

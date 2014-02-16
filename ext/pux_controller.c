@@ -46,23 +46,6 @@ void pux_init_controller(TSRMLS_D) {
 }
 
 PHP_METHOD(Controller, __construct) {
-    /*
-    zval *z_routes = NULL, *z_routes_by_id , *z_subcontroller = NULL, *z_static_routes = NULL;
-    ALLOC_INIT_ZVAL(z_routes);
-    ALLOC_INIT_ZVAL(z_routes_by_id);
-    ALLOC_INIT_ZVAL(z_static_routes);
-    ALLOC_INIT_ZVAL(z_subcontroller);
-
-    array_init(z_routes);
-    array_init(z_routes_by_id);
-    array_init(z_static_routes);
-    array_init(z_subcontroller);
-
-    zend_update_property( ce_pux_controller, this_ptr, "routes", sizeof("routes")-1, z_routes TSRMLS_CC);
-    zend_update_property( ce_pux_controller, this_ptr, "routesById", sizeof("routesById")-1, z_routes_by_id TSRMLS_CC);
-    zend_update_property( ce_pux_controller, this_ptr, "staticRoutes", sizeof("staticRoutes")-1, z_static_routes TSRMLS_CC);
-    zend_update_property( ce_pux_controller, this_ptr, "subcontroller", sizeof("subcontroller")-1, z_subcontroller TSRMLS_CC);
-    */
 }
 
 int strpos(const char *haystack, char *needle)
@@ -90,6 +73,15 @@ PHP_METHOD(Controller, getActionMethods)
         size_t   key_len = strlen(mptr->common.function_name);
         int p = strpos(key, "Action");
         if ( p != -1 && (size_t)p == (key_len - strlen("Action")) ) {
+            // append the structure [method name, annotations]
+            zval *new_item;
+            ALLOC_ZVAL(new_item);
+            array_init(new_item);
+            add_next_index_stringl(new_item, key, key_len, 1);
+
+            zval *z_method_annotations;
+            ALLOC_INIT_ZVAL(z_method_annotations);
+            array_init(z_method_annotations);
 
             if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
                 const char *comment = mptr->op_array.doc_comment;
@@ -109,22 +101,14 @@ PHP_METHOD(Controller, getActionMethods)
                 ALLOC_ZVAL(z_line);
                 ZVAL_LONG(z_line, line_start);
 
-                zval *z_method_annotations;
-                ALLOC_ZVAL(z_method_annotations);
                 if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line TSRMLS_CC) == SUCCESS) {
                     // TODO: save annotation info
                     php_var_dump(&z_method_annotations, 1 TSRMLS_CC);
                 }
-                
-                // TODO parse the docblock comment
-                php_printf( mptr->op_array.doc_comment);
             }
+            add_next_index_zval(new_item, z_method_annotations);
 
-            // append the structure [method name, http method]
-            zval *new_item;
-            ALLOC_ZVAL(new_item);
-            array_init(new_item);
-            add_next_index_stringl(new_item, key, key_len, 1);
+
 
             add_next_index_zval(return_value, new_item);
         }
@@ -193,10 +177,11 @@ PHP_METHOD(Controller, getActionPaths)
             zend_hash_move_forward_ex(func_list, &pointer)) 
     {
         zval **z_method_name;
-        zval **z_http_method_type;
+        zval **z_annotations;
         zend_hash_index_find(Z_ARRVAL_PP(item), 0, (void**) &z_method_name);
         
-        if ( zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**) &z_http_method_type) == SUCCESS ) {
+        if ( zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**) &z_annotations) == SUCCESS ) {
+            // TODO: read annotation here
 
         }
 
