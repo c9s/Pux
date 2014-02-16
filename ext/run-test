@@ -1,0 +1,149 @@
+#!/bin/bash
+set -e
+set -o xtrace
+
+gdb=0
+lldb=0
+
+usage()
+{
+    echo "Usage: $0 [-g] [phpunit arguments]" 1>&2
+    exit 1
+}
+
+while getopts "gl" o; do
+    case "${o}" in
+        g)
+            gdb=1
+            ;;
+        l)
+            lldb=1
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+EXTENSION=pux
+
+PHP=php
+PHPUNIT=phpunit
+
+type php
+type phpunit
+
+if [[ -n `type php | grep phpenv` ]] ; then
+    PHP=$(phpenv which php)
+else
+    PHP=$(command which php)
+fi
+
+if [[ -n `type phpunit | grep phpenv` ]] ; then
+    PHPUNIT=$(phpenv which phpunit)
+else
+    PHPUNIT=$(command which phpunit)
+fi
+
+if [[ $gdb == 1 ]] ; then
+    # write .gdbinit, here is the template
+    cat <<END > .gdbinit
+# AUTO-GENERATED GDBINIT FILE FOR PHP
+file $PHP
+set args \\
+    -d 'output_handler=' \\
+    -d 'open_basedir=' \\
+    -d 'safe_mode=0' \\
+    -d 'disable_functions=' \\
+    -d 'output_buffering=Off' \\
+    -d 'error_reporting=32767' \\
+    -d 'display_errors=1' \\
+    -d 'display_startup_errors=1' \\
+    -d 'log_errors=0' \\
+    -d 'html_errors=0' \\
+    -d 'track_errors=1' \\
+    -d 'report_memleaks=1' \\
+    -d 'report_zend_debug=0' \\
+    -d 'docref_root=' \\
+    -d 'docref_ext=.html' \\
+    -d 'error_prepend_string=' \\
+    -d 'error_append_string=' \\
+    -d 'auto_prepend_file=' \\
+    -d 'auto_append_file=' -d 'magic_quotes_runtime=0' \\
+    -d 'ignore_repeated_errors=0' \\
+    -d 'precision=14' \\
+    -d 'memory_limit=128M' \\
+    -d "extension_dir=$PWD/modules/" \\
+    -d 'session.auto_start=0' \\
+    -d 'zlib.output_compression=Off' \\
+    -d 'mbstring.func_overload=0' \\
+    -d "extension=$EXTENSION.so" \\
+    -n $PHPUNIT $*
+END
+    for file in .gdbinit.* ; do
+        echo "source $file" >> .gdbinit
+    done
+
+    # execute gdb
+    gdb
+elif [[ $lldb == 1 ]] ; then
+    lldb -- $PHP \
+        -d 'output_handler=' \
+        -d 'open_basedir=' \
+        -d 'safe_mode=0' \
+        -d 'disable_functions=' \
+        -d 'output_buffering=Off' \
+        -d 'error_reporting=32767' \
+        -d 'display_errors=1' \
+        -d 'display_startup_errors=1' \
+        -d 'log_errors=0' \
+        -d 'html_errors=0' \
+        -d 'track_errors=1' \
+        -d 'report_memleaks=1' \
+        -d 'report_zend_debug=0' \
+        -d 'docref_root=' \
+        -d 'docref_ext=.html' \
+        -d 'error_prepend_string=' \
+        -d 'error_append_string=' \
+        -d 'auto_prepend_file=' \
+        -d 'auto_append_file=' -d 'magic_quotes_runtime=0' \
+        -d 'ignore_repeated_errors=0' \
+        -d 'precision=14' \
+        -d 'memory_limit=128M' \
+        -d extension_dir=$PWD/modules/ \
+        -d 'session.auto_start=0' \
+        -d 'zlib.output_compression=Off' \
+        -d 'mbstring.func_overload=0' \
+        -d extension=$EXTENSION.so \
+        -n $PHPUNIT $*
+else
+
+    $PHP -d 'output_handler=' \
+        -d 'open_basedir=' -d 'safe_mode=0' \
+        -d 'disable_functions=' \
+        -d 'output_buffering=Off' \
+        -d 'error_reporting=32767' \
+        -d 'display_errors=1' \
+        -d 'display_startup_errors=1' \
+        -d 'log_errors=0' \
+        -d 'html_errors=0' \
+        -d 'track_errors=1' \
+        -d 'report_memleaks=1' \
+        -d 'report_zend_debug=0' \
+        -d 'docref_root=' \
+        -d 'docref_ext=.html' \
+        -d 'error_prepend_string=' \
+        -d 'error_append_string=' \
+        -d 'auto_prepend_file=' \
+        -d 'auto_append_file=' -d 'magic_quotes_runtime=0' \
+        -d 'ignore_repeated_errors=0' \
+        -d 'precision=14' \
+        -d 'memory_limit=128M' \
+        -d "extension_dir=$PWD/modules/" \
+        -d 'session.auto_start=0' \
+        -d 'zlib.output_compression=Off' \
+        -d 'mbstring.func_overload=0' \
+        -d "extension=$EXTENSION.so" -n $PHPUNIT $*
+
+fi

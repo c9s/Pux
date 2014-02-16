@@ -9,6 +9,6 @@
 
 ## Run TestCases
 
-    ./test --debug PuxTest.php
-    ./test --repeat 100 PuxTest.php
+    ./run-test --debug PuxTest.php
+    ./run-test --repeat 100 PuxTest.php
 
