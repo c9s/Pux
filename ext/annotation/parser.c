@@ -4,7 +4,7 @@
 /* First off, code is include which follows the "include" declaration
 ** in the input file. */
 #include <stdio.h>
-#line 27 "parser.lemon"
+#line 27 "annotation/parser.lemon"
 
 
 #ifdef HAVE_CONFIG_H
@@ -13,17 +13,10 @@
 
 #include "php.h"
 #include "ext/standard/php_smart_str.h"
-#include "php_phalcon.h"
-#include "phalcon.h"
 
 #include "parser.h"
 #include "scanner.h"
 #include "annot.h"
-
-#include "kernel/main.h"
-#include "kernel/memory.h"
-#include "kernel/fcall.h"
-#include "kernel/exception.h"
 
 static zval *phannot_ret_literal_zval(int type, phannot_parser_token *T)
 {
@@ -134,7 +127,7 @@ static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments,
 	return ret;
 }
 
-#line 139 "parser.c"
+#line 132 "annotation/parser.c"
 /* Next is all token values, in a form suitable for use by makeheaders.
 ** This section will be null unless lemon is run with the -m switch.
 */
@@ -488,7 +481,7 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 15:
     case 16:
     case 17:
-#line 221 "parser.lemon"
+#line 214 "annotation/parser.lemon"
 {
 	if ((yypminor->yy0)) {
 		if ((yypminor->yy0)->free_flag) {
@@ -497,7 +490,7 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
 		efree((yypminor->yy0));
 	}
 }
-#line 502 "parser.c"
+#line 495 "annotation/parser.c"
       break;
     case 20:
     case 21:
@@ -505,9 +498,9 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 23:
     case 24:
     case 25:
-#line 234 "parser.lemon"
+#line 227 "annotation/parser.lemon"
 { zval_ptr_dtor(&(yypminor->yy36)); }
-#line 512 "parser.c"
+#line 505 "annotation/parser.c"
       break;
     default:  break;   /* If no destructor action specified: do nothing */
   }
@@ -771,166 +764,166 @@ static void yy_reduce(
   **     break;
   */
       case 0:
-#line 230 "parser.lemon"
+#line 223 "annotation/parser.lemon"
 {
 	status->ret = yymsp[0].minor.yy36;
 }
-#line 780 "parser.c"
+#line 773 "annotation/parser.c"
         break;
       case 1:
       case 14:
       case 15:
-#line 236 "parser.lemon"
+#line 229 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = yymsp[0].minor.yy36;
 }
-#line 789 "parser.c"
+#line 782 "annotation/parser.c"
         break;
       case 2:
-#line 242 "parser.lemon"
+#line 235 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_zval_list(yymsp[-1].minor.yy36, yymsp[0].minor.yy36);
 }
-#line 796 "parser.c"
+#line 789 "annotation/parser.c"
         break;
       case 3:
       case 8:
-#line 246 "parser.lemon"
+#line 239 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_zval_list(NULL, yymsp[0].minor.yy36);
 }
-#line 804 "parser.c"
+#line 797 "annotation/parser.c"
         break;
       case 4:
-#line 253 "parser.lemon"
+#line 246 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_annotation(yymsp[-3].minor.yy0, yymsp[-1].minor.yy36, status->scanner_state);
   yy_destructor(2,&yymsp[-4].minor);
   yy_destructor(4,&yymsp[-2].minor);
   yy_destructor(5,&yymsp[0].minor);
 }
-#line 814 "parser.c"
+#line 807 "annotation/parser.c"
         break;
       case 5:
-#line 257 "parser.lemon"
+#line 250 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_annotation(yymsp[-2].minor.yy0, NULL, status->scanner_state);
   yy_destructor(2,&yymsp[-3].minor);
   yy_destructor(4,&yymsp[-1].minor);
   yy_destructor(5,&yymsp[0].minor);
 }
-#line 824 "parser.c"
+#line 817 "annotation/parser.c"
         break;
       case 6:
-#line 261 "parser.lemon"
+#line 254 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_annotation(yymsp[0].minor.yy0, NULL, status->scanner_state);
   yy_destructor(2,&yymsp[-1].minor);
 }
-#line 832 "parser.c"
+#line 825 "annotation/parser.c"
         break;
       case 7:
-#line 267 "parser.lemon"
+#line 260 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_zval_list(yymsp[-2].minor.yy36, yymsp[0].minor.yy36);
   yy_destructor(1,&yymsp[-1].minor);
 }
-#line 840 "parser.c"
+#line 833 "annotation/parser.c"
         break;
       case 9:
-#line 277 "parser.lemon"
+#line 270 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_named_item(NULL, yymsp[0].minor.yy36);
 }
-#line 847 "parser.c"
+#line 840 "annotation/parser.c"
         break;
       case 10:
       case 12:
-#line 281 "parser.lemon"
+#line 274 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_named_item(yymsp[-2].minor.yy0, yymsp[0].minor.yy36);
   yy_destructor(7,&yymsp[-1].minor);
 }
-#line 856 "parser.c"
+#line 849 "annotation/parser.c"
         break;
       case 11:
       case 13:
-#line 285 "parser.lemon"
+#line 278 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_named_item(yymsp[-2].minor.yy0, yymsp[0].minor.yy36);
   yy_destructor(8,&yymsp[-1].minor);
 }
-#line 865 "parser.c"
+#line 858 "annotation/parser.c"
         break;
       case 16:
-#line 307 "parser.lemon"
+#line 300 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_IDENTIFIER, yymsp[0].minor.yy0);
 }
-#line 872 "parser.c"
+#line 865 "annotation/parser.c"
         break;
       case 17:
-#line 311 "parser.lemon"
+#line 304 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_INTEGER, yymsp[0].minor.yy0);
 }
-#line 879 "parser.c"
+#line 872 "annotation/parser.c"
         break;
       case 18:
-#line 315 "parser.lemon"
+#line 308 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_STRING, yymsp[0].minor.yy0);
 }
-#line 886 "parser.c"
+#line 879 "annotation/parser.c"
         break;
       case 19:
-#line 319 "parser.lemon"
+#line 312 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_DOUBLE, yymsp[0].minor.yy0);
 }
-#line 893 "parser.c"
+#line 886 "annotation/parser.c"
         break;
       case 20:
-#line 323 "parser.lemon"
+#line 316 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_NULL, NULL);
   yy_destructor(11,&yymsp[0].minor);
 }
-#line 901 "parser.c"
+#line 894 "annotation/parser.c"
         break;
       case 21:
-#line 327 "parser.lemon"
+#line 320 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_FALSE, NULL);
   yy_destructor(12,&yymsp[0].minor);
 }
-#line 909 "parser.c"
+#line 902 "annotation/parser.c"
         break;
       case 22:
-#line 331 "parser.lemon"
+#line 324 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_TRUE, NULL);
   yy_destructor(13,&yymsp[0].minor);
 }
-#line 917 "parser.c"
+#line 910 "annotation/parser.c"
         break;
       case 23:
-#line 335 "parser.lemon"
+#line 328 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_array(yymsp[-1].minor.yy36);
   yy_destructor(14,&yymsp[-2].minor);
   yy_destructor(15,&yymsp[0].minor);
 }
-#line 926 "parser.c"
+#line 919 "annotation/parser.c"
         break;
       case 24:
-#line 339 "parser.lemon"
+#line 332 "annotation/parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_array(yymsp[-1].minor.yy36);
   yy_destructor(16,&yymsp[-2].minor);
   yy_destructor(17,&yymsp[0].minor);
 }
-#line 935 "parser.c"
+#line 928 "annotation/parser.c"
         break;
   };
   yygoto = yyRuleInfo[yyruleno].lhs;
@@ -987,7 +980,7 @@ static void yy_syntax_error(
 ){
   phannot_ARG_FETCH;
 #define TOKEN (yyminor.yy0)
-#line 158 "parser.lemon"
+#line 151 "annotation/parser.lemon"
 
 	if (status->scanner_state->start_length) {
 		{
@@ -1049,7 +1042,7 @@ static void yy_syntax_error(
 	}
 
 	status->status = PHANNOT_PARSING_FAILED;
-#line 1055 "parser.c"
+#line 1048 "annotation/parser.c"
   phannot_ARG_STORE; /* Suppress warning about unused %extra_argument variable */
 }
 

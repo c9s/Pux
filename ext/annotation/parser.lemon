@@ -32,17 +32,10 @@
 
 #include "php.h"
 #include "ext/standard/php_smart_str.h"
-#include "php_phalcon.h"
-#include "phalcon.h"
 
 #include "parser.h"
 #include "scanner.h"
 #include "annot.h"
-
-#include "kernel/main.h"
-#include "kernel/memory.h"
-#include "kernel/fcall.h"
-#include "kernel/exception.h"
 
 static zval *phannot_ret_literal_zval(int type, phannot_parser_token *T)
 {

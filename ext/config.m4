@@ -34,6 +34,7 @@ if test $PHP_PUX != "no"; then
         pux_functions.c \
         pux_persistent.c \
         annotation/parser.c \
+        annotation/scanner.c \
         hash.c \
         , $ext_shared)
 
