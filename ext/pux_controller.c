@@ -89,6 +89,7 @@ PHP_METHOD(Controller, getActionMethods)
         if ( p != -1 && (size_t)p == (key_len - strlen("Action")) ) {
 
             if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
+                const char *comment = mptr->op_array.doc_comment;
                 // TODO parse the docblock comment
                 // php_printf( mptr->op_array.doc_comment);
             }
