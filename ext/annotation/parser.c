@@ -13,6 +13,7 @@
 
 #include "php.h"
 #include "ext/standard/php_smart_str.h"
+#include "Zend/zend_exceptions.h"
 
 #include "parser.h"
 #include "scanner.h"
