@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="tests/bootstrap.php"
+<phpunit bootstrap="test/bootstrap.php"
          backupGlobals="false"
          colors="true"
          verbose="true">
   <testsuites>
     <testsuite name="PP">
-       <directory suffix="Test.php">tests/Pux</directory>
+       <directory suffix="Test.php">test/Pux</directory>
     </testsuite>
 
     <testsuite name="Extension">
-       <directory suffix="Test.php">tests/ExtensionOnly</directory>
+       <directory suffix="Test.php">test/ExtensionOnly</directory>
     </testsuite>
   </testsuites>
 </phpunit>
