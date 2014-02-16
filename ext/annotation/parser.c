@@ -4,7 +4,7 @@
 /* First off, code is include which follows the "include" declaration
 ** in the input file. */
 #include <stdio.h>
-#line 27 "annotation/parser.lemon"
+#line 27 "parser.lemon"
 
 
 #ifdef HAVE_CONFIG_H
@@ -127,7 +127,8 @@ static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments,
 	return ret;
 }
 
-#line 132 "annotation/parser.c"
+
+#line 132 "parser.c"
 /* Next is all token values, in a form suitable for use by makeheaders.
 ** This section will be null unless lemon is run with the -m switch.
 */
@@ -245,46 +246,49 @@ typedef union {
 **                     shifting non-terminals after a reduce.
 **  yy_default[]       Default action for each state.
 */
-static const YYACTIONTYPE yy_action[] = {
- /*     0 */    16,   12,   30,   22,   14,   20,   31,   33,   35,   36,
- /*    10 */    37,   38,    2,    1,    3,   16,   12,   30,   16,   14,
- /*    20 */    18,   31,   33,   35,   36,   37,   38,    2,   15,    3,
- /*    30 */    16,   32,   30,   25,   34,   29,   31,   33,   35,   36,
- /*    40 */    37,   38,    2,   54,    3,   30,   10,   17,   28,   31,
- /*    50 */     4,   54,   30,   13,   17,   28,   31,   30,   11,   17,
- /*    60 */    28,   31,   66,   23,    9,   24,   19,   30,    4,   27,
- /*    70 */    28,   31,   30,    5,    7,   21,   31,    6,    8,    4,
- /*    80 */    54,   54,   39,   26,
+static YYACTIONTYPE yy_action[] = {
+ /*     0 */     4,   28,   15,   38,   12,   37,   16,   18,   20,   21,
+ /*    10 */    22,   23,   24,    4,   31,    4,   17,   15,   40,   19,
+ /*    20 */    35,   16,   18,   20,   21,   22,   23,   24,    3,   31,
+ /*    30 */     4,   28,   15,    6,   12,   30,   16,   18,   20,   21,
+ /*    40 */    22,   23,   24,   54,   31,   15,   25,   27,   11,   16,
+ /*    50 */    13,   36,   15,    7,   27,   11,   16,   15,   32,   27,
+ /*    60 */    11,   16,   15,    9,   10,   11,   16,   66,    1,    2,
+ /*    70 */    39,   15,    9,    5,   14,   16,   41,   26,    4,    9,
+ /*    80 */    29,   34,   54,    8,   54,   54,   54,   54,   33,
 };
-static const YYCODETYPE yy_lookahead[] = {
+static YYCODETYPE yy_lookahead[] = {
  /*     0 */     2,    3,   22,    5,    6,   25,   26,    9,   10,   11,
- /*    10 */    12,   13,   14,    4,   16,    2,    3,   22,    2,    6,
- /*    20 */    25,   26,    9,   10,   11,   12,   13,   14,    3,   16,
- /*    30 */     2,    3,   22,   22,    6,   25,   26,    9,   10,   11,
+ /*    10 */    12,   13,   14,    2,   16,    2,    3,   22,    0,    6,
+ /*    20 */    25,   26,    9,   10,   11,   12,   13,   14,   22,   16,
+ /*    30 */     2,    3,   22,    4,    6,   25,   26,    9,   10,   11,
  /*    40 */    12,   13,   14,   27,   16,   22,   23,   24,   25,   26,
- /*    50 */     1,   27,   22,   23,   24,   25,   26,   22,   23,   24,
- /*    60 */    25,   26,   19,   20,   21,   22,   17,   22,    1,   24,
- /*    70 */    25,   26,   22,    7,    8,   25,   26,    7,    8,    1,
- /*    80 */    27,   27,   15,    5,
+ /*    50 */     7,    8,   22,   23,   24,   25,   26,   22,   23,   24,
+ /*    60 */    25,   26,   22,    1,   24,   25,   26,   19,   20,   21,
+ /*    70 */    22,   22,    1,    3,   25,   26,    0,   15,    2,    1,
+ /*    80 */     7,    8,   27,    5,   27,   27,   27,   27,   17,
 };
 #define YY_SHIFT_USE_DFLT (-3)
-#define YY_SHIFT_MAX 16
-static const signed char yy_shift_ofst[] = {
- /*     0 */    16,   -2,   13,   13,   13,   28,   28,   28,   28,   16,
- /*    10 */    78,   67,   70,   49,   66,    9,   25,
+static signed char yy_shift_ofst[] = {
+ /*     0 */    11,   18,   76,   -3,   70,   29,   -2,   78,   -3,   28,
+ /*    10 */    -3,   -3,   43,   13,   -3,   -3,   -3,   -3,   -3,   -3,
+ /*    20 */    -3,   -3,   -3,   -3,   28,   62,   -3,   -3,   73,   13,
+ /*    30 */    -3,   28,   71,   -3,   13,   -3,   13,   -3,   -3,   -3,
 };
 #define YY_REDUCE_USE_DFLT (-21)
-#define YY_REDUCE_MAX 9
-static const signed char yy_reduce_ofst[] = {
- /*     0 */    43,   23,   35,   30,   45,   10,   -5,   50,  -20,   11,
+static signed char yy_reduce_ofst[] = {
+ /*     0 */    48,  -21,    6,  -21,  -21,  -21,   30,  -21,  -21,   40,
+ /*    10 */   -21,  -21,  -21,   49,  -21,  -21,  -21,  -21,  -21,  -21,
+ /*    20 */   -21,  -21,  -21,  -21,   23,  -21,  -21,  -21,  -21,   10,
+ /*    30 */   -21,   35,  -21,  -21,   -5,  -21,  -20,  -21,  -21,  -21,
 };
-static const YYACTIONTYPE yy_default[] = {
- /*     0 */    65,   65,   65,   65,   65,   65,   65,   65,   65,   41,
- /*    10 */    65,   65,   56,   65,   58,   46,   65,   48,   52,   64,
- /*    20 */    53,   51,   45,   40,   43,   42,   44,   47,   49,   50,
- /*    30 */    54,   55,   56,   57,   58,   59,   60,   61,   62,   63,
+static YYACTIONTYPE yy_default[] = {
+ /*     0 */    65,   65,   65,   42,   65,   46,   65,   65,   44,   65,
+ /*    10 */    47,   49,   58,   65,   50,   54,   55,   56,   57,   58,
+ /*    20 */    59,   60,   61,   62,   65,   65,   63,   48,   56,   65,
+ /*    30 */    52,   65,   65,   64,   65,   53,   65,   51,   45,   43,
 };
-#define YY_SZ_ACTTAB (int)(sizeof(yy_action)/sizeof(yy_action[0]))
+#define YY_SZ_ACTTAB (sizeof(yy_action)/sizeof(yy_action[0]))
 
 /* The next table maps tokens into fallback tokens.  If a construct
 ** like the following:
@@ -367,7 +371,7 @@ void phannot_Trace(FILE *TraceFILE, char *zTracePrompt){
 #ifndef NDEBUG
 /* For tracing shifts, the names of all terminals and nonterminals
 ** are required.  The following table supplies these names */
-static const char *const yyTokenName[] = { 
+static const char *yyTokenName[] = { 
   "$",             "COMMA",         "AT",            "IDENTIFIER",  
   "PARENTHESES_OPEN",  "PARENTHESES_CLOSE",  "STRING",        "EQUALS",      
   "COLON",         "INTEGER",       "DOUBLE",        "NULL",        
@@ -381,7 +385,7 @@ static const char *const yyTokenName[] = {
 #ifndef NDEBUG
 /* For tracing reduce actions, the names of all rules are required.
 */
-static const char *const yyRuleName[] = {
+static const char *yyRuleName[] = {
  /*   0 */ "program ::= annotation_language",
  /*   1 */ "annotation_language ::= annotation_list",
  /*   2 */ "annotation_list ::= annotation_list annotation",
@@ -481,7 +485,7 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 15:
     case 16:
     case 17:
-#line 214 "annotation/parser.lemon"
+#line 214 "parser.lemon"
 {
 	if ((yypminor->yy0)) {
 		if ((yypminor->yy0)->free_flag) {
@@ -490,7 +494,7 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
 		efree((yypminor->yy0));
 	}
 }
-#line 495 "annotation/parser.c"
+#line 498 "parser.c"
       break;
     case 20:
     case 21:
@@ -498,9 +502,9 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 23:
     case 24:
     case 25:
-#line 227 "annotation/parser.lemon"
+#line 227 "parser.lemon"
 { zval_ptr_dtor(&(yypminor->yy36)); }
-#line 505 "annotation/parser.c"
+#line 508 "parser.c"
       break;
     default:  break;   /* If no destructor action specified: do nothing */
   }
@@ -564,12 +568,14 @@ void phannot_Free(
 */
 static int yy_find_shift_action(
   yyParser *pParser,        /* The parser */
-  YYCODETYPE iLookAhead     /* The look-ahead token */
+  int iLookAhead            /* The look-ahead token */
 ){
   int i;
   int stateno = pParser->yystack[pParser->yyidx].stateno;
  
-  if( stateno>YY_SHIFT_MAX || (i = yy_shift_ofst[stateno])==YY_SHIFT_USE_DFLT ){
+  /* if( pParser->yyidx<0 ) return YY_NO_ACTION;  */
+  i = yy_shift_ofst[stateno];
+  if( i==YY_SHIFT_USE_DFLT ){
     return yy_default[stateno];
   }
   if( iLookAhead==YYNOCODE ){
@@ -577,35 +583,19 @@ static int yy_find_shift_action(
   }
   i += iLookAhead;
   if( i<0 || i>=YY_SZ_ACTTAB || yy_lookahead[i]!=iLookAhead ){
-    if( iLookAhead>0 ){
 #ifdef YYFALLBACK
-      int iFallback;            /* Fallback token */
-      if( iLookAhead<sizeof(yyFallback)/sizeof(yyFallback[0])
-             && (iFallback = yyFallback[iLookAhead])!=0 ){
+    int iFallback;            /* Fallback token */
+    if( iLookAhead<sizeof(yyFallback)/sizeof(yyFallback[0])
+           && (iFallback = yyFallback[iLookAhead])!=0 ){
 #ifndef NDEBUG
-        if( yyTraceFILE ){
-          fprintf(yyTraceFILE, "%sFALLBACK %s => %s\n",
-             yyTracePrompt, yyTokenName[iLookAhead], yyTokenName[iFallback]);
-        }
-#endif
-        return yy_find_shift_action(pParser, iFallback);
+      if( yyTraceFILE ){
+        fprintf(yyTraceFILE, "%sFALLBACK %s => %s\n",
+           yyTracePrompt, yyTokenName[iLookAhead], yyTokenName[iFallback]);
       }
 #endif
-#ifdef YYWILDCARD
-      {
-        int j = i - iLookAhead + YYWILDCARD;
-        if( j>=0 && j<YY_SZ_ACTTAB && yy_lookahead[j]==YYWILDCARD ){
-#ifndef NDEBUG
-          if( yyTraceFILE ){
-            fprintf(yyTraceFILE, "%sWILDCARD %s => %s\n",
-               yyTracePrompt, yyTokenName[iLookAhead], yyTokenName[YYWILDCARD]);
-          }
-#endif /* NDEBUG */
-          return yy_action[j];
-        }
-      }
-#endif /* YYWILDCARD */
+      return yy_find_shift_action(pParser, iFallback);
     }
+#endif
     return yy_default[stateno];
   }else{
     return yy_action[i];
@@ -621,14 +611,14 @@ static int yy_find_shift_action(
 ** return YY_NO_ACTION.
 */
 static int yy_find_reduce_action(
-  int stateno,              /* Current state number */
-  YYCODETYPE iLookAhead     /* The look-ahead token */
+  yyParser *pParser,        /* The parser */
+  int iLookAhead            /* The look-ahead token */
 ){
   int i;
-  /* int stateno = pParser->yystack[pParser->yyidx].stateno; */
+  int stateno = pParser->yystack[pParser->yyidx].stateno;
  
-  if( stateno>YY_REDUCE_MAX ||
-      (i = yy_reduce_ofst[stateno])==YY_REDUCE_USE_DFLT ){
+  i = yy_reduce_ofst[stateno];
+  if( i==YY_REDUCE_USE_DFLT ){
     return yy_default[stateno];
   }
   if( iLookAhead==YYNOCODE ){
@@ -686,7 +676,7 @@ static void yy_shift(
 /* The following table contains information about every rule that
 ** is used during the reduce.
 */
-static const struct {
+static struct {
   YYCODETYPE lhs;         /* Symbol on the left-hand side of the rule */
   unsigned char nrhs;     /* Number of right-hand side symbols in the rule */
 } yyRuleInfo[] = {
@@ -736,23 +726,11 @@ static void yy_reduce(
   yymsp = &yypParser->yystack[yypParser->yyidx];
 #ifndef NDEBUG
   if( yyTraceFILE && yyruleno>=0 
-        && yyruleno<(int)(sizeof(yyRuleName)/sizeof(yyRuleName[0])) ){
+        && yyruleno<sizeof(yyRuleName)/sizeof(yyRuleName[0]) ){
     fprintf(yyTraceFILE, "%sReduce [%s].\n", yyTracePrompt,
       yyRuleName[yyruleno]);
   }
 #endif /* NDEBUG */
-
-#ifndef NDEBUG
-  /* Silence complaints from purify about yygotominor being uninitialized
-  ** in some cases when it is copied into the stack after the following
-  ** switch.  yygotominor is uninitialized when a rule reduces that does
-  ** not set the value of its left-hand side nonterminal.  Leaving the
-  ** value of the nonterminal uninitialized is utterly harmless as long
-  ** as the value is never used.  So really the only thing this code
-  ** accomplishes is to quieten purify.  
-  */
-  memset(&yygotominor, 0, sizeof(yygotominor));
-#endif
 
   switch( yyruleno ){
   /* Beginning here are the reduction cases.  A typical example
@@ -764,189 +742,174 @@ static void yy_reduce(
   **     break;
   */
       case 0:
-#line 223 "annotation/parser.lemon"
+#line 223 "parser.lemon"
 {
 	status->ret = yymsp[0].minor.yy36;
 }
-#line 773 "annotation/parser.c"
+#line 750 "parser.c"
         break;
       case 1:
       case 14:
       case 15:
-#line 229 "annotation/parser.lemon"
+#line 229 "parser.lemon"
 {
 	yygotominor.yy36 = yymsp[0].minor.yy36;
 }
-#line 782 "annotation/parser.c"
+#line 759 "parser.c"
         break;
       case 2:
-#line 235 "annotation/parser.lemon"
+#line 235 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_zval_list(yymsp[-1].minor.yy36, yymsp[0].minor.yy36);
 }
-#line 789 "annotation/parser.c"
+#line 766 "parser.c"
         break;
       case 3:
       case 8:
-#line 239 "annotation/parser.lemon"
+#line 239 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_zval_list(NULL, yymsp[0].minor.yy36);
 }
-#line 797 "annotation/parser.c"
+#line 774 "parser.c"
         break;
       case 4:
-#line 246 "annotation/parser.lemon"
+#line 246 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_annotation(yymsp[-3].minor.yy0, yymsp[-1].minor.yy36, status->scanner_state);
   yy_destructor(2,&yymsp[-4].minor);
   yy_destructor(4,&yymsp[-2].minor);
   yy_destructor(5,&yymsp[0].minor);
 }
-#line 807 "annotation/parser.c"
+#line 784 "parser.c"
         break;
       case 5:
-#line 250 "annotation/parser.lemon"
+#line 250 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_annotation(yymsp[-2].minor.yy0, NULL, status->scanner_state);
   yy_destructor(2,&yymsp[-3].minor);
   yy_destructor(4,&yymsp[-1].minor);
   yy_destructor(5,&yymsp[0].minor);
 }
-#line 817 "annotation/parser.c"
+#line 794 "parser.c"
         break;
       case 6:
-#line 254 "annotation/parser.lemon"
+#line 254 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_annotation(yymsp[0].minor.yy0, NULL, status->scanner_state);
   yy_destructor(2,&yymsp[-1].minor);
 }
-#line 825 "annotation/parser.c"
+#line 802 "parser.c"
         break;
       case 7:
-#line 260 "annotation/parser.lemon"
+#line 260 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_zval_list(yymsp[-2].minor.yy36, yymsp[0].minor.yy36);
   yy_destructor(1,&yymsp[-1].minor);
 }
-#line 833 "annotation/parser.c"
+#line 810 "parser.c"
         break;
       case 9:
-#line 270 "annotation/parser.lemon"
+#line 270 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_named_item(NULL, yymsp[0].minor.yy36);
 }
-#line 840 "annotation/parser.c"
+#line 817 "parser.c"
         break;
       case 10:
       case 12:
-#line 274 "annotation/parser.lemon"
+#line 274 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_named_item(yymsp[-2].minor.yy0, yymsp[0].minor.yy36);
   yy_destructor(7,&yymsp[-1].minor);
 }
-#line 849 "annotation/parser.c"
+#line 826 "parser.c"
         break;
       case 11:
       case 13:
-#line 278 "annotation/parser.lemon"
+#line 278 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_named_item(yymsp[-2].minor.yy0, yymsp[0].minor.yy36);
   yy_destructor(8,&yymsp[-1].minor);
 }
-#line 858 "annotation/parser.c"
+#line 835 "parser.c"
         break;
       case 16:
-#line 300 "annotation/parser.lemon"
+#line 300 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_IDENTIFIER, yymsp[0].minor.yy0);
 }
-#line 865 "annotation/parser.c"
+#line 842 "parser.c"
         break;
       case 17:
-#line 304 "annotation/parser.lemon"
+#line 304 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_INTEGER, yymsp[0].minor.yy0);
 }
-#line 872 "annotation/parser.c"
+#line 849 "parser.c"
         break;
       case 18:
-#line 308 "annotation/parser.lemon"
+#line 308 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_STRING, yymsp[0].minor.yy0);
 }
-#line 879 "annotation/parser.c"
+#line 856 "parser.c"
         break;
       case 19:
-#line 312 "annotation/parser.lemon"
+#line 312 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_DOUBLE, yymsp[0].minor.yy0);
 }
-#line 886 "annotation/parser.c"
+#line 863 "parser.c"
         break;
       case 20:
-#line 316 "annotation/parser.lemon"
+#line 316 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_NULL, NULL);
   yy_destructor(11,&yymsp[0].minor);
 }
-#line 894 "annotation/parser.c"
+#line 871 "parser.c"
         break;
       case 21:
-#line 320 "annotation/parser.lemon"
+#line 320 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_FALSE, NULL);
   yy_destructor(12,&yymsp[0].minor);
 }
-#line 902 "annotation/parser.c"
+#line 879 "parser.c"
         break;
       case 22:
-#line 324 "annotation/parser.lemon"
+#line 324 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_literal_zval(PHANNOT_T_TRUE, NULL);
   yy_destructor(13,&yymsp[0].minor);
 }
-#line 910 "annotation/parser.c"
+#line 887 "parser.c"
         break;
       case 23:
-#line 328 "annotation/parser.lemon"
+#line 328 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_array(yymsp[-1].minor.yy36);
   yy_destructor(14,&yymsp[-2].minor);
   yy_destructor(15,&yymsp[0].minor);
 }
-#line 919 "annotation/parser.c"
+#line 896 "parser.c"
         break;
       case 24:
-#line 332 "annotation/parser.lemon"
+#line 332 "parser.lemon"
 {
 	yygotominor.yy36 = phannot_ret_array(yymsp[-1].minor.yy36);
   yy_destructor(16,&yymsp[-2].minor);
   yy_destructor(17,&yymsp[0].minor);
 }
-#line 928 "annotation/parser.c"
+#line 905 "parser.c"
         break;
   };
   yygoto = yyRuleInfo[yyruleno].lhs;
   yysize = yyRuleInfo[yyruleno].nrhs;
   yypParser->yyidx -= yysize;
-  yyact = yy_find_reduce_action(yymsp[-yysize].stateno,yygoto);
+  yyact = yy_find_reduce_action(yypParser,yygoto);
   if( yyact < YYNSTATE ){
-#ifdef NDEBUG
-    /* If we are not debugging and the reduce action popped at least
-    ** one element off the stack, then we can push the new element back
-    ** onto the stack here, and skip the stack overflow test in yy_shift().
-    ** That gives a significant speed improvement. */
-    if( yysize ){
-      yypParser->yyidx++;
-      yymsp -= yysize-1;
-      yymsp->stateno = yyact;
-      yymsp->major = yygoto;
-      yymsp->minor = yygotominor;
-    }else
-#endif
-    {
-      yy_shift(yypParser,yyact,yygoto,&yygotominor);
-    }
+    yy_shift(yypParser,yyact,yygoto,&yygotominor);
   }else if( yyact == YYNSTATE + YYNRULE + 1 ){
     yy_accept(yypParser);
   }
@@ -980,7 +943,7 @@ static void yy_syntax_error(
 ){
   phannot_ARG_FETCH;
 #define TOKEN (yyminor.yy0)
-#line 151 "annotation/parser.lemon"
+#line 151 "parser.lemon"
 
 	if (status->scanner_state->start_length) {
 		{
@@ -1042,7 +1005,8 @@ static void yy_syntax_error(
 	}
 
 	status->status = PHANNOT_PARSING_FAILED;
-#line 1048 "annotation/parser.c"
+
+#line 1010 "parser.c"
   phannot_ARG_STORE; /* Suppress warning about unused %extra_argument variable */
 }
 
@@ -1098,7 +1062,7 @@ void phannot_(
   /* (re)initialize the parser, if necessary */
   yypParser = (yyParser*)yyp;
   if( yypParser->yyidx<0 ){
-    /* if( yymajor==0 ) return; // not sure why this was here... */
+    if( yymajor==0 ) return;
     yypParser->yyidx = 0;
     yypParser->yyerrcnt = -1;
     yypParser->yystack[0].stateno = 0;
@@ -1170,9 +1134,7 @@ void phannot_(
          while(
           yypParser->yyidx >= 0 &&
           yymx != YYERRORSYMBOL &&
-          (yyact = yy_find_reduce_action(
-                        yypParser->yystack[yypParser->yyidx].stateno,
-                        YYERRORSYMBOL)) >= YYNSTATE
+          (yyact = yy_find_shift_action(yypParser,YYERRORSYMBOL)) >= YYNSTATE
         ){
           yy_pop_parser_stack(yypParser);
         }
@@ -1214,4 +1176,445 @@ void phannot_(
     }
   }while( yymajor!=YYNOCODE && yypParser->yyidx>=0 );
   return;
+}
+
+/*
+  +------------------------------------------------------------------------+
+  | Phalcon Framework                                                      |
+  +------------------------------------------------------------------------+
+  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  +------------------------------------------------------------------------+
+  | This source file is subject to the New BSD License that is bundled     |
+  | with this package in the file docs/LICENSE.txt.                        |
+  |                                                                        |
+  | If you did not receive a copy of the license and are unable to         |
+  | obtain it through the world-wide-web, please send an email             |
+  | to license@phalconphp.com so we can send you a copy immediately.       |
+  +------------------------------------------------------------------------+
+  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
+  |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  +------------------------------------------------------------------------+
+*/
+
+const phannot_token_names phannot_tokens[] =
+{
+	{ "INTEGER",        PHANNOT_T_INTEGER },
+	{ "DOUBLE",         PHANNOT_T_DOUBLE },
+	{ "STRING",         PHANNOT_T_STRING },
+	{ "IDENTIFIER",     PHANNOT_T_IDENTIFIER },
+	{ "@",              PHANNOT_T_AT },
+	{ ",",              PHANNOT_T_COMMA },
+	{ "=",              PHANNOT_T_EQUALS },
+	{ ":",              PHANNOT_T_COLON },
+	{ "(",              PHANNOT_T_PARENTHESES_OPEN },
+	{ ")",              PHANNOT_T_PARENTHESES_CLOSE },
+	{ "{",              PHANNOT_T_BRACKET_OPEN },
+	{ "}",              PHANNOT_T_BRACKET_CLOSE },
+ 	{ "[",              PHANNOT_T_SBRACKET_OPEN },
+	{ "]",              PHANNOT_T_SBRACKET_CLOSE },
+	{ "ARBITRARY TEXT", PHANNOT_T_ARBITRARY_TEXT },
+	{ NULL, 0 }
+};
+
+/**
+ * Wrapper to alloc memory within the parser
+ */
+static void *phannot_wrapper_alloc(size_t bytes){
+	return emalloc(bytes);
+}
+
+/**
+ * Wrapper to free memory within the parser
+ */
+static void phannot_wrapper_free(void *pointer){
+	efree(pointer);
+}
+
+/**
+ * Creates a parser_token to be passed to the parser
+ */
+static void phannot_parse_with_token(void* phannot_parser, int opcode, int parsercode, phannot_scanner_token *token, phannot_parser_status *parser_status){
+
+	phannot_parser_token *pToken;
+
+	pToken = emalloc(sizeof(phannot_parser_token));
+	pToken->opcode = opcode;
+	pToken->token = token->value;
+	pToken->token_len = token->len;
+	pToken->free_flag = 1;
+
+	phannot_(phannot_parser, parsercode, pToken, parser_status);
+
+	token->value = NULL;
+	token->len = 0;
+}
+
+/**
+ * Creates an error message when it's triggered by the scanner
+ */
+static void phannot_scanner_error_msg(phannot_parser_status *parser_status, zval **error_msg TSRMLS_DC){
+
+	int error_length;
+	char *error, *error_part;
+	phannot_scanner_state *state = parser_status->scanner_state;
+
+	PHALCON_INIT_VAR(*error_msg);
+	if (state->start) {
+		error_length = 128 + state->start_length +  Z_STRLEN_P(state->active_file);
+		error = emalloc(sizeof(char) * error_length);
+		if (state->start_length > 16) {
+			error_part = estrndup(state->start, 16);
+			snprintf(error, 64 + state->start_length, "Scanning error before '%s...' in %s on line %d", error_part, Z_STRVAL_P(state->active_file), state->active_line);
+			efree(error_part);
+		} else {
+			snprintf(error, error_length - 1, "Scanning error before '%s' in %s on line %d", state->start, Z_STRVAL_P(state->active_file), state->active_line);
+		}
+		error[error_length - 1] = '\0';
+		ZVAL_STRING(*error_msg, error, 1);
+	} else {
+		error_length = sizeof(char) * (64 + Z_STRLEN_P(state->active_file));
+		error = emalloc(error_length);
+		snprintf(error, error_length - 1, "Scanning error near to EOF in %s", Z_STRVAL_P(state->active_file));
+		ZVAL_STRING(*error_msg, error, 1);
+		error[error_length - 1] = '\0';
+	}
+	efree(error);
+}
+
+/**
+ * Receives the comment tokenizes and parses it
+ */
+int phannot_parse_annotations(zval *result, zval *comment, zval *file_path, zval *line TSRMLS_DC){
+
+	zval *error_msg = NULL;
+
+	ZVAL_NULL(result);
+
+	if (Z_TYPE_P(comment) != IS_STRING) {
+        zend_throw_exception_ex(zend_exception_get_default(TSRMLS_C), ZEND_STRL("Comment must be a string"), 0 TSRMLS_CC);
+		return FAILURE;
+	}
+
+	if(phannot_internal_parse_annotations(&result, comment, file_path, line, &error_msg TSRMLS_CC) == FAILURE){
+		if (error_msg != NULL) {
+			// phalcon_throw_exception_string(phalcon_annotations_exception_ce, Z_STRVAL_P(error_msg), Z_STRLEN_P(error_msg), 1 TSRMLS_CC);
+            zend_throw_exception_ex(zend_exception_get_default(TSRMLS_C), Z_STRVAL_P(error_msg), Z_STRLEN_P(error_msg) , 0 TSRMLS_CC);
+		}
+		else {
+			// phalcon_throw_exception_string(phalcon_annotations_exception_ce, ZEND_STRL("There was an error parsing annotation"), 1 TSRMLS_CC);
+            zend_throw_exception_ex(zend_exception_get_default(TSRMLS_C), ZEND_STRL("There was an error parsing annotation") , 0 TSRMLS_CC);
+		}
+
+		return FAILURE;
+	}
+
+	return SUCCESS;
+}
+
+/**
+ * Remove comment separators from a docblock
+ */
+void phannot_remove_comment_separators(zval *return_value, char *comment, int length, int *start_lines) {
+
+	int start_mode = 1, j, i, open_parentheses;
+	smart_str processed_str = {0};
+	char ch;
+
+	(*start_lines) = 0;
+
+	for (i = 0; i < length; i++) {
+
+		ch = comment[i];
+
+		if (start_mode) {
+			if (ch == ' ' || ch == '*' || ch == '/' || ch == '\t' || ch == 11) {
+				continue;
+			}
+			start_mode = 0;
+		}
+
+		if (ch == '@') {
+
+			smart_str_appendc(&processed_str, ch);
+			i++;
+
+			open_parentheses = 0;
+			for (j = i; j < length; j++) {
+
+				ch = comment[j];
+
+				if (start_mode) {
+					if (ch == ' ' || ch == '*' || ch == '/' || ch == '\t' || ch == 11) {
+						continue;
+					}
+					start_mode = 0;
+				}
+
+				if (open_parentheses == 0) {
+
+					if (isalnum(ch) || '_' == ch || '\\' == ch) {
+						smart_str_appendc(&processed_str, ch);
+						continue;
+					}
+
+					if (ch == '(') {
+						smart_str_appendc(&processed_str, ch);
+						open_parentheses++;
+						continue;
+					}
+
+				} else {
+
+					smart_str_appendc(&processed_str, ch);
+
+					if (ch == '(') {
+						open_parentheses++;
+					} else if (ch == ')') {
+						open_parentheses--;
+					} else if (ch == '\n') {
+						(*start_lines)++;
+						start_mode = 1;
+					}
+
+					if (open_parentheses > 0) {
+						continue;
+					}
+				}
+
+				i = j;
+				smart_str_appendc(&processed_str, ' ');
+				break;
+			}
+		}
+
+		if (ch == '\n') {
+			(*start_lines)++;
+			start_mode = 1;
+		}
+	}
+
+	smart_str_0(&processed_str);
+
+	if (processed_str.len) {
+		RETURN_STRINGL(processed_str.c, processed_str.len, 0);
+	} else {
+		RETURN_EMPTY_STRING();
+	}
+}
+
+/**
+ * Parses a comment returning an intermediate array representation
+ */
+int phannot_internal_parse_annotations(zval **result, zval *comment, zval *file_path, zval *line, zval **error_msg TSRMLS_DC) {
+
+	char *error;
+	phannot_scanner_state *state;
+	phannot_scanner_token token;
+	int scanner_status, status = SUCCESS, start_lines, error_length;
+	phannot_parser_status *parser_status = NULL;
+	void* phannot_parser;
+	zval processed_comment;
+
+	/**
+	 * Check if the comment has content
+	 */
+	if (!Z_STRVAL_P(comment)) {
+		ZVAL_BOOL(*result, 0);
+		return FAILURE;
+	}
+
+	if (Z_STRLEN_P(comment) < 2) {
+		ZVAL_BOOL(*result, 0);
+		return SUCCESS;
+	}
+
+	/**
+	 * Remove comment separators
+	 */
+	phannot_remove_comment_separators(&processed_comment, Z_STRVAL_P(comment), Z_STRLEN_P(comment), &start_lines);
+
+	if (Z_STRLEN(processed_comment) < 2) {
+		ZVAL_BOOL(*result, 0);
+		efree(Z_STRVAL(processed_comment));
+		return SUCCESS;
+	}
+
+	/**
+	 * Start the reentrant parser
+	 */
+	phannot_parser = phannot_Alloc(phannot_wrapper_alloc);
+
+	parser_status = emalloc(sizeof(phannot_parser_status));
+	state = emalloc(sizeof(phannot_scanner_state));
+
+	parser_status->status = PHANNOT_PARSING_OK;
+	parser_status->scanner_state = state;
+	parser_status->ret = NULL;
+	parser_status->token = &token;
+	parser_status->syntax_error = NULL;
+
+	/**
+	 * Initialize the scanner state
+	 */
+	state->active_token = 0;
+	state->start = Z_STRVAL(processed_comment);
+	state->start_length = 0;
+	state->mode = PHANNOT_MODE_RAW;
+	state->active_file = file_path;
+
+	token.value = NULL;
+	token.len = 0;
+
+	/**
+	 * Possible start line
+	 */
+	if (Z_TYPE_P(line) == IS_LONG) {
+		state->active_line = Z_LVAL_P(line) - start_lines;
+	} else {
+		state->active_line = 1;
+	}
+
+	state->end = state->start;
+
+	while(0 <= (scanner_status = phannot_get_token(state, &token))) {
+
+		state->active_token = token.opcode;
+
+		state->start_length = (Z_STRVAL(processed_comment) + Z_STRLEN(processed_comment) - state->start);
+
+		switch (token.opcode) {
+
+			case PHANNOT_T_IGNORE:
+				break;
+
+			case PHANNOT_T_AT:
+				phannot_(phannot_parser, PHANNOT_AT, NULL, parser_status);
+				break;
+			case PHANNOT_T_COMMA:
+				phannot_(phannot_parser, PHANNOT_COMMA, NULL, parser_status);
+				break;
+			case PHANNOT_T_EQUALS:
+				phannot_(phannot_parser, PHANNOT_EQUALS, NULL, parser_status);
+				break;
+			case PHANNOT_T_COLON:
+				phannot_(phannot_parser, PHANNOT_COLON, NULL, parser_status);
+				break;
+
+			case PHANNOT_T_PARENTHESES_OPEN:
+				phannot_(phannot_parser, PHANNOT_PARENTHESES_OPEN, NULL, parser_status);
+				break;
+			case PHANNOT_T_PARENTHESES_CLOSE:
+				phannot_(phannot_parser, PHANNOT_PARENTHESES_CLOSE, NULL, parser_status);
+				break;
+
+			case PHANNOT_T_BRACKET_OPEN:
+				phannot_(phannot_parser, PHANNOT_BRACKET_OPEN, NULL, parser_status);
+				break;
+			case PHANNOT_T_BRACKET_CLOSE:
+				phannot_(phannot_parser, PHANNOT_BRACKET_CLOSE, NULL, parser_status);
+				break;
+
+			case PHANNOT_T_SBRACKET_OPEN:
+				phannot_(phannot_parser, PHANNOT_SBRACKET_OPEN, NULL, parser_status);
+				break;
+			case PHANNOT_T_SBRACKET_CLOSE:
+				phannot_(phannot_parser, PHANNOT_SBRACKET_CLOSE, NULL, parser_status);
+				break;
+
+			case PHANNOT_T_NULL:
+				phannot_(phannot_parser, PHANNOT_NULL, NULL, parser_status);
+				break;
+			case PHANNOT_T_TRUE:
+				phannot_(phannot_parser, PHANNOT_TRUE, NULL, parser_status);
+				break;
+			case PHANNOT_T_FALSE:
+				phannot_(phannot_parser, PHANNOT_FALSE, NULL, parser_status);
+				break;
+
+			case PHANNOT_T_INTEGER:
+				phannot_parse_with_token(phannot_parser, PHANNOT_T_INTEGER, PHANNOT_INTEGER, &token, parser_status);
+				break;
+			case PHANNOT_T_DOUBLE:
+				phannot_parse_with_token(phannot_parser, PHANNOT_T_DOUBLE, PHANNOT_DOUBLE, &token, parser_status);
+				break;
+			case PHANNOT_T_STRING:
+				phannot_parse_with_token(phannot_parser, PHANNOT_T_STRING, PHANNOT_STRING, &token, parser_status);
+				break;
+			case PHANNOT_T_IDENTIFIER:
+				phannot_parse_with_token(phannot_parser, PHANNOT_T_IDENTIFIER, PHANNOT_IDENTIFIER, &token, parser_status);
+				break;
+			/*case PHANNOT_T_ARBITRARY_TEXT:
+				phannot_parse_with_token(phannot_parser, PHANNOT_T_ARBITRARY_TEXT, PHANNOT_ARBITRARY_TEXT, &token, parser_status);
+				break;*/
+
+			default:
+				parser_status->status = PHANNOT_PARSING_FAILED;
+				if (!*error_msg) {
+					error_length = sizeof(char) * (48 + Z_STRLEN_P(state->active_file));
+					error = emalloc(error_length);
+					snprintf(error, error_length - 1, "Scanner: unknown opcode %d on in %s line %d", token.opcode, Z_STRVAL_P(state->active_file), state->active_line);
+					error[error_length - 1] = '\0';
+					PHALCON_INIT_VAR(*error_msg);
+					ZVAL_STRING(*error_msg, error, 1);
+					efree(error);
+				}
+				break;
+		}
+
+		if (parser_status->status != PHANNOT_PARSING_OK) {
+			status = FAILURE;
+			break;
+		}
+
+		state->end = state->start;
+	}
+
+	if (status != FAILURE) {
+		switch (scanner_status) {
+			case PHANNOT_SCANNER_RETCODE_ERR:
+			case PHANNOT_SCANNER_RETCODE_IMPOSSIBLE:
+				if (!*error_msg) {
+					phannot_scanner_error_msg(parser_status, error_msg TSRMLS_CC);
+				}
+				status = FAILURE;
+				break;
+			default:
+				phannot_(phannot_parser, 0, NULL, parser_status);
+		}
+	}
+
+	state->active_token = 0;
+	state->start = NULL;
+
+	if (parser_status->status != PHANNOT_PARSING_OK) {
+		status = FAILURE;
+		if (parser_status->syntax_error) {
+			if (!*error_msg) {
+				PHALCON_INIT_VAR(*error_msg);
+				ZVAL_STRING(*error_msg, parser_status->syntax_error, 1);
+			}
+			efree(parser_status->syntax_error);
+		}
+	}
+
+	phannot_Free(phannot_parser, phannot_wrapper_free);
+
+	if (status != FAILURE) {
+		if (parser_status->status == PHANNOT_PARSING_OK) {
+			if (parser_status->ret) {
+				ZVAL_ZVAL(*result, parser_status->ret, 0, 0);
+				ZVAL_NULL(parser_status->ret);
+				zval_ptr_dtor(&parser_status->ret);
+			} else {
+				array_init(*result);
+			}
+		}
+	}
+
+	efree(Z_STRVAL(processed_comment));
+
+	efree(parser_status);
+	efree(state);
+
+	return status;
 }

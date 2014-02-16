@@ -19,6 +19,9 @@
 #include "php_expandable_mux.h"
 #include "pux_controller.h"
 
+#include "annotation/scanner.h"
+#include "annotation/annot.h"
+
 zend_class_entry *ce_pux_controller;
 
 const zend_function_entry controller_methods[] = {
@@ -90,8 +93,31 @@ PHP_METHOD(Controller, getActionMethods)
 
             if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
                 const char *comment = mptr->op_array.doc_comment;
+                const char *filename = mptr->op_array.filename;
+                const int line_start = mptr->op_array.line_start;
+                const int line_end = mptr->op_array.line_end;
+
+                zval *z_comment;
+                ALLOC_ZVAL(z_comment);
+                ZVAL_STRING(z_comment, comment, 1);
+
+                zval *z_file;
+                ALLOC_ZVAL(z_file);
+                ZVAL_STRING(z_file, filename, 1);
+
+                zval *z_line;
+                ALLOC_ZVAL(z_line);
+                ZVAL_LONG(z_line, line_start);
+
+                zval *z_method_annotations;
+                ALLOC_ZVAL(z_method_annotations);
+                if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line TSRMLS_CC) == SUCCESS) {
+                    // TODO: save annotation info
+                    php_var_dump(&z_method_annotations, 1 TSRMLS_CC);
+                }
+                
                 // TODO parse the docblock comment
-                // php_printf( mptr->op_array.doc_comment);
+                php_printf( mptr->op_array.doc_comment);
             }
 
             // append the structure [method name, http method]
