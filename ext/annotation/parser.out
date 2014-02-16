@@ -1,0 +1,478 @@
+ State 0:
+          program ::= * annotation_language
+          annotation_language ::= * annotation_list
+          annotation_list ::= * annotation_list annotation
+          annotation_list ::= * annotation
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER
+
+                            AT shift  16
+                       program accept
+           annotation_language shift  23
+               annotation_list shift  9
+                    annotation shift  24
+
+State 1:
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= AT IDENTIFIER PARENTHESES_OPEN * argument_list PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= AT IDENTIFIER PARENTHESES_OPEN * PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER
+          argument_list ::= * argument_list COMMA argument_item
+          argument_list ::= * argument_item
+          argument_item ::= * expr
+          argument_item ::= * STRING EQUALS expr
+          argument_item ::= * STRING COLON expr
+          argument_item ::= * IDENTIFIER EQUALS expr
+          argument_item ::= * IDENTIFIER COLON expr
+          expr ::= * annotation
+          expr ::= * array
+          expr ::= * IDENTIFIER
+          expr ::= * INTEGER
+          expr ::= * STRING
+          expr ::= * DOUBLE
+          expr ::= * NULL
+          expr ::= * FALSE
+          expr ::= * TRUE
+          array ::= * BRACKET_OPEN argument_list BRACKET_CLOSE
+          array ::= * SBRACKET_OPEN argument_list SBRACKET_CLOSE
+
+                            AT shift  16
+                    IDENTIFIER shift  12
+             PARENTHESES_CLOSE shift  22
+                        STRING shift  14
+                       INTEGER shift  33
+                        DOUBLE shift  35
+                          NULL shift  36
+                         FALSE shift  37
+                          TRUE shift  38
+                  BRACKET_OPEN shift  2
+                 SBRACKET_OPEN shift  3
+                    annotation shift  30
+                 argument_list shift  10
+                 argument_item shift  17
+                          expr shift  28
+                         array shift  31
+
+State 2:
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER
+          argument_list ::= * argument_list COMMA argument_item
+          argument_list ::= * argument_item
+          argument_item ::= * expr
+          argument_item ::= * STRING EQUALS expr
+          argument_item ::= * STRING COLON expr
+          argument_item ::= * IDENTIFIER EQUALS expr
+          argument_item ::= * IDENTIFIER COLON expr
+          expr ::= * annotation
+          expr ::= * array
+          expr ::= * IDENTIFIER
+          expr ::= * INTEGER
+          expr ::= * STRING
+          expr ::= * DOUBLE
+          expr ::= * NULL
+          expr ::= * FALSE
+          expr ::= * TRUE
+          array ::= * BRACKET_OPEN argument_list BRACKET_CLOSE
+          array ::= BRACKET_OPEN * argument_list BRACKET_CLOSE
+          array ::= * SBRACKET_OPEN argument_list SBRACKET_CLOSE
+
+                            AT shift  16
+                    IDENTIFIER shift  12
+                        STRING shift  14
+                       INTEGER shift  33
+                        DOUBLE shift  35
+                          NULL shift  36
+                         FALSE shift  37
+                          TRUE shift  38
+                  BRACKET_OPEN shift  2
+                 SBRACKET_OPEN shift  3
+                    annotation shift  30
+                 argument_list shift  11
+                 argument_item shift  17
+                          expr shift  28
+                         array shift  31
+
+State 3:
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER
+          argument_list ::= * argument_list COMMA argument_item
+          argument_list ::= * argument_item
+          argument_item ::= * expr
+          argument_item ::= * STRING EQUALS expr
+          argument_item ::= * STRING COLON expr
+          argument_item ::= * IDENTIFIER EQUALS expr
+          argument_item ::= * IDENTIFIER COLON expr
+          expr ::= * annotation
+          expr ::= * array
+          expr ::= * IDENTIFIER
+          expr ::= * INTEGER
+          expr ::= * STRING
+          expr ::= * DOUBLE
+          expr ::= * NULL
+          expr ::= * FALSE
+          expr ::= * TRUE
+          array ::= * BRACKET_OPEN argument_list BRACKET_CLOSE
+          array ::= * SBRACKET_OPEN argument_list SBRACKET_CLOSE
+          array ::= SBRACKET_OPEN * argument_list SBRACKET_CLOSE
+
+                            AT shift  16
+                    IDENTIFIER shift  12
+                        STRING shift  14
+                       INTEGER shift  33
+                        DOUBLE shift  35
+                          NULL shift  36
+                         FALSE shift  37
+                          TRUE shift  38
+                  BRACKET_OPEN shift  2
+                 SBRACKET_OPEN shift  3
+                    annotation shift  30
+                 argument_list shift  13
+                 argument_item shift  17
+                          expr shift  28
+                         array shift  31
+
+State 4:
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER
+          argument_list ::= argument_list COMMA * argument_item
+          argument_item ::= * expr
+          argument_item ::= * STRING EQUALS expr
+          argument_item ::= * STRING COLON expr
+          argument_item ::= * IDENTIFIER EQUALS expr
+          argument_item ::= * IDENTIFIER COLON expr
+          expr ::= * annotation
+          expr ::= * array
+          expr ::= * IDENTIFIER
+          expr ::= * INTEGER
+          expr ::= * STRING
+          expr ::= * DOUBLE
+          expr ::= * NULL
+          expr ::= * FALSE
+          expr ::= * TRUE
+          array ::= * BRACKET_OPEN argument_list BRACKET_CLOSE
+          array ::= * SBRACKET_OPEN argument_list SBRACKET_CLOSE
+
+                            AT shift  16
+                    IDENTIFIER shift  12
+                        STRING shift  14
+                       INTEGER shift  33
+                        DOUBLE shift  35
+                          NULL shift  36
+                         FALSE shift  37
+                          TRUE shift  38
+                  BRACKET_OPEN shift  2
+                 SBRACKET_OPEN shift  3
+                    annotation shift  30
+                 argument_item shift  27
+                          expr shift  28
+                         array shift  31
+
+State 5:
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER
+          argument_item ::= STRING EQUALS * expr
+          expr ::= * annotation
+          expr ::= * array
+          expr ::= * IDENTIFIER
+          expr ::= * INTEGER
+          expr ::= * STRING
+          expr ::= * DOUBLE
+          expr ::= * NULL
+          expr ::= * FALSE
+          expr ::= * TRUE
+          array ::= * BRACKET_OPEN argument_list BRACKET_CLOSE
+          array ::= * SBRACKET_OPEN argument_list SBRACKET_CLOSE
+
+                            AT shift  16
+                    IDENTIFIER shift  32
+                        STRING shift  34
+                       INTEGER shift  33
+                        DOUBLE shift  35
+                          NULL shift  36
+                         FALSE shift  37
+                          TRUE shift  38
+                  BRACKET_OPEN shift  2
+                 SBRACKET_OPEN shift  3
+                    annotation shift  30
+                          expr shift  29
+                         array shift  31
+
+State 6:
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER
+          argument_item ::= IDENTIFIER EQUALS * expr
+          expr ::= * annotation
+          expr ::= * array
+          expr ::= * IDENTIFIER
+          expr ::= * INTEGER
+          expr ::= * STRING
+          expr ::= * DOUBLE
+          expr ::= * NULL
+          expr ::= * FALSE
+          expr ::= * TRUE
+          array ::= * BRACKET_OPEN argument_list BRACKET_CLOSE
+          array ::= * SBRACKET_OPEN argument_list SBRACKET_CLOSE
+
+                            AT shift  16
+                    IDENTIFIER shift  32
+                        STRING shift  34
+                       INTEGER shift  33
+                        DOUBLE shift  35
+                          NULL shift  36
+                         FALSE shift  37
+                          TRUE shift  38
+                  BRACKET_OPEN shift  2
+                 SBRACKET_OPEN shift  3
+                    annotation shift  30
+                          expr shift  18
+                         array shift  31
+
+State 7:
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER
+          argument_item ::= STRING COLON * expr
+          expr ::= * annotation
+          expr ::= * array
+          expr ::= * IDENTIFIER
+          expr ::= * INTEGER
+          expr ::= * STRING
+          expr ::= * DOUBLE
+          expr ::= * NULL
+          expr ::= * FALSE
+          expr ::= * TRUE
+          array ::= * BRACKET_OPEN argument_list BRACKET_CLOSE
+          array ::= * SBRACKET_OPEN argument_list SBRACKET_CLOSE
+
+                            AT shift  16
+                    IDENTIFIER shift  32
+                        STRING shift  34
+                       INTEGER shift  33
+                        DOUBLE shift  35
+                          NULL shift  36
+                         FALSE shift  37
+                          TRUE shift  38
+                  BRACKET_OPEN shift  2
+                 SBRACKET_OPEN shift  3
+                    annotation shift  30
+                          expr shift  21
+                         array shift  31
+
+State 8:
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER
+          argument_item ::= IDENTIFIER COLON * expr
+          expr ::= * annotation
+          expr ::= * array
+          expr ::= * IDENTIFIER
+          expr ::= * INTEGER
+          expr ::= * STRING
+          expr ::= * DOUBLE
+          expr ::= * NULL
+          expr ::= * FALSE
+          expr ::= * TRUE
+          array ::= * BRACKET_OPEN argument_list BRACKET_CLOSE
+          array ::= * SBRACKET_OPEN argument_list SBRACKET_CLOSE
+
+                            AT shift  16
+                    IDENTIFIER shift  32
+                        STRING shift  34
+                       INTEGER shift  33
+                        DOUBLE shift  35
+                          NULL shift  36
+                         FALSE shift  37
+                          TRUE shift  38
+                  BRACKET_OPEN shift  2
+                 SBRACKET_OPEN shift  3
+                    annotation shift  30
+                          expr shift  20
+                         array shift  31
+
+State 9:
+      (1) annotation_language ::= annotation_list *
+          annotation_list ::= annotation_list * annotation
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= * AT IDENTIFIER
+
+                            AT shift  16
+                    annotation shift  25
+                     {default} reduce 1
+
+State 10:
+          annotation ::= AT IDENTIFIER PARENTHESES_OPEN argument_list * PARENTHESES_CLOSE
+          argument_list ::= argument_list * COMMA argument_item
+
+                         COMMA shift  4
+             PARENTHESES_CLOSE shift  26
+
+State 11:
+          argument_list ::= argument_list * COMMA argument_item
+          array ::= BRACKET_OPEN argument_list * BRACKET_CLOSE
+
+                         COMMA shift  4
+                 BRACKET_CLOSE shift  39
+
+State 12:
+          argument_item ::= IDENTIFIER * EQUALS expr
+          argument_item ::= IDENTIFIER * COLON expr
+     (16) expr ::= IDENTIFIER *
+
+                        EQUALS shift  6
+                         COLON shift  8
+                     {default} reduce 16
+
+State 13:
+          argument_list ::= argument_list * COMMA argument_item
+          array ::= SBRACKET_OPEN argument_list * SBRACKET_CLOSE
+
+                         COMMA shift  4
+                SBRACKET_CLOSE shift  19
+
+State 14:
+          argument_item ::= STRING * EQUALS expr
+          argument_item ::= STRING * COLON expr
+     (18) expr ::= STRING *
+
+                        EQUALS shift  5
+                         COLON shift  7
+                     {default} reduce 18
+
+State 15:
+          annotation ::= AT IDENTIFIER * PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= AT IDENTIFIER * PARENTHESES_OPEN PARENTHESES_CLOSE
+      (6) annotation ::= AT IDENTIFIER *
+
+              PARENTHESES_OPEN shift  1
+                     {default} reduce 6
+
+State 16:
+          annotation ::= AT * IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE
+          annotation ::= AT * IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE
+          annotation ::= AT * IDENTIFIER
+
+                    IDENTIFIER shift  15
+
+State 17:
+      (8) argument_list ::= argument_item *
+
+                     {default} reduce 8
+
+State 18:
+     (12) argument_item ::= IDENTIFIER EQUALS expr *
+
+                     {default} reduce 12
+
+State 19:
+     (24) array ::= SBRACKET_OPEN argument_list SBRACKET_CLOSE *
+
+                     {default} reduce 24
+
+State 20:
+     (13) argument_item ::= IDENTIFIER COLON expr *
+
+                     {default} reduce 13
+
+State 21:
+     (11) argument_item ::= STRING COLON expr *
+
+                     {default} reduce 11
+
+State 22:
+      (5) annotation ::= AT IDENTIFIER PARENTHESES_OPEN PARENTHESES_CLOSE *
+
+                     {default} reduce 5
+
+State 23:
+      (0) program ::= annotation_language *
+
+                     {default} reduce 0
+
+State 24:
+      (3) annotation_list ::= annotation *
+
+                     {default} reduce 3
+
+State 25:
+      (2) annotation_list ::= annotation_list annotation *
+
+                     {default} reduce 2
+
+State 26:
+      (4) annotation ::= AT IDENTIFIER PARENTHESES_OPEN argument_list PARENTHESES_CLOSE *
+
+                     {default} reduce 4
+
+State 27:
+      (7) argument_list ::= argument_list COMMA argument_item *
+
+                     {default} reduce 7
+
+State 28:
+      (9) argument_item ::= expr *
+
+                     {default} reduce 9
+
+State 29:
+     (10) argument_item ::= STRING EQUALS expr *
+
+                     {default} reduce 10
+
+State 30:
+     (14) expr ::= annotation *
+
+                     {default} reduce 14
+
+State 31:
+     (15) expr ::= array *
+
+                     {default} reduce 15
+
+State 32:
+     (16) expr ::= IDENTIFIER *
+
+                     {default} reduce 16
+
+State 33:
+     (17) expr ::= INTEGER *
+
+                     {default} reduce 17
+
+State 34:
+     (18) expr ::= STRING *
+
+                     {default} reduce 18
+
+State 35:
+     (19) expr ::= DOUBLE *
+
+                     {default} reduce 19
+
+State 36:
+     (20) expr ::= NULL *
+
+                     {default} reduce 20
+
+State 37:
+     (21) expr ::= FALSE *
+
+                     {default} reduce 21
+
+State 38:
+     (22) expr ::= TRUE *
+
+                     {default} reduce 22
+
+State 39:
+     (23) array ::= BRACKET_OPEN argument_list BRACKET_CLOSE *
+
+                     {default} reduce 23
+
