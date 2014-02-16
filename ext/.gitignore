@@ -17,7 +17,6 @@ Makefile.objects
 acinclude.m4
 aclocal.m4
 annotation/.libs/
-annotation/annot.h
 annotation/base.loT
 autom4te.cache/
 configure
