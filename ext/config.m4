@@ -33,6 +33,7 @@ if test $PHP_PUX != "no"; then
         ct_helper.c \
         pux_functions.c \
         pux_persistent.c \
+        annotation/parser.c \
         hash.c \
         , $ext_shared)
 
