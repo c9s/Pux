@@ -15,23 +15,36 @@ class Controller {
     }
 
     public function getActionPaths() {
-        $pairs          = array();
+        $tuples         = array();
         $actionNames    = $this->getActionMethods();
 
         foreach ($actionNames as $actionName) {
+            $rmth   = new ReflectionMethod($this, $actionName);
+            $doc    = $rmth->getDocComment();
+
+            if(!$doc) {
+                continue;
+            }
+
             $camelUrlAction = substr($actionName, 0, -6);
-            if ($camelUrlAction === 'index') {
-                $path = '';
-            } else {
+            $path = $method = null;
+
+            if(preg_match('/^[\s*]*\@method (get|put|post|delete|head|patch|options)\s*$/im', $doc, $mmatch)) {
+                $method = array_pop($mmatch);
+            }
+
+            if(preg_match('/^[\s*]*\@uri ([^\s]+)\s*$/im', $doc, $umatch)) {
+                $path = ltrim(array_pop($umatch), '/');
+            } else if($camelUrlAction !== 'index') {
                 $path = preg_replace_callback('/[A-Z]/', function($regs) { 
                     return '/' . strtolower($regs[0]);
                 }, $camelUrlAction);
             }
 
-            $pairs[] = array(ltrim($path, '/'), $actionName);
+            $tuples[] = array(ltrim($path, '/'), $actionName, $method);
         }
 
-        return $pairs;
+        return $tuples;
     }
 
     public function expand() {
@@ -39,7 +52,9 @@ class Controller {
         $paths  = $this->getActionPaths();
 
         foreach ($paths as $path) {
-            $mux->add($path[0], array(get_class($this), $path[1]));
+            $opts = array();
+            isset($path[2]) && ($opts['method'] = $mux->getRequestMethodConstant($path[2]));
+            $mux->add($path[0], array(get_class($this), $path[1]), $opts);
         }
 
         $mux->sort();
