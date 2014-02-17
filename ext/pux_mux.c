@@ -37,6 +37,7 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, setRoutes, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getSubMux, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, getRequestMethodConstant, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, export, NULL, ZEND_ACC_PUBLIC)
 
   PHP_ME(Mux, get, NULL, ZEND_ACC_PUBLIC)
@@ -533,11 +534,18 @@ PHP_METHOD(Mux, mount) {
 
                 int new_pattern_len = pattern_len + Z_STRLEN_PP(z_route_pattern);
 
+                // Merge the mount options with the route options
+                zval *z_new_route_options;
+                MAKE_STD_ZVAL(z_new_route_options);
+                array_init(z_new_route_options);
+                php_array_merge(Z_ARRVAL_P(z_new_route_options), Z_ARRVAL_P(z_options), 0 TSRMLS_CC);
+                php_array_merge(Z_ARRVAL_P(z_new_route_options), Z_ARRVAL_P(*z_route_options), 0 TSRMLS_CC);
+
                 /* make the array: [ pcreFlag, pattern, callback, options ] */
                 add_index_bool(z_new_routes, 0 , 0); // pcre flag == false
                 add_index_stringl(z_new_routes, 1 , new_pattern , new_pattern_len, 1);
                 add_index_zval( z_new_routes, 2 , *z_route_callback);
-                add_index_zval( z_new_routes, 3 , *z_route_options);
+                add_index_zval( z_new_routes, 3 , z_new_route_options);
                 add_next_index_zval(z_routes, z_new_routes);
             }
         }
@@ -604,6 +612,36 @@ PHP_METHOD(Mux, getSubMux) {
         return;
     }
     RETURN_FALSE;
+}
+
+
+PHP_METHOD(Mux, getRequestMethodConstant) {
+    char *req_method = NULL;
+    int req_method_len;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &req_method, &req_method_len) != FAILURE) {
+        char *mthit, *mthp;
+        mthit = mthp = strdup(req_method);
+        while(*mthit++ = toupper(*mthit));
+
+        if (strcmp(mthp, "GET") == 0) {
+            RETURN_LONG(REQ_METHOD_GET);
+        } else if (strcmp(mthp, "POST") == 0) {
+            RETURN_LONG(REQ_METHOD_POST);
+        } else if (strcmp(mthp, "PUT") == 0) {
+            RETURN_LONG(REQ_METHOD_PUT);
+        } else if (strcmp(mthp, "DELETE") == 0) {
+            RETURN_LONG(REQ_METHOD_DELETE);
+        } else if (strcmp(mthp, "HEAD") == 0) {
+            RETURN_LONG(REQ_METHOD_HEAD);
+        } else if (strcmp(mthp, "OPTIONS") == 0) {
+            RETURN_LONG(REQ_METHOD_OPTIONS);
+        } else if (strcmp(mthp, "PATCH") == 0) {
+            RETURN_LONG(REQ_METHOD_PATCH);
+        }
+    }
+
+    RETURN_LONG(0);
 }
 
 PHP_METHOD(Mux, getRoute) {
