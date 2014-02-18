@@ -88,26 +88,27 @@ PHP_METHOD(Controller, getActionMethods)
             array_init(z_indexed_annotations);
 
             if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
-                const char *comment = mptr->op_array.doc_comment;
-                const char *filename = mptr->op_array.filename;
-                const int line_start = mptr->op_array.line_start;
-                const int line_end = mptr->op_array.line_end;
-
                 zval *z_comment;
                 ALLOC_ZVAL(z_comment);
-                ZVAL_STRING(z_comment, comment, 1);
+                ZVAL_STRING(z_comment, mptr->op_array.doc_comment, 1);
 
                 zval *z_file;
                 ALLOC_ZVAL(z_file);
-                ZVAL_STRING(z_file, filename, 1);
+                ZVAL_STRING(z_file, mptr->op_array.filename, 1);
 
-                zval *z_line;
-                ALLOC_ZVAL(z_line);
-                ZVAL_LONG(z_line, line_start);
+                zval *z_line_start;
+                ALLOC_ZVAL(z_line_start);
+                ZVAL_LONG(z_line_start, mptr->op_array.line_start);
+
+                /*
+                zval *z_line_end;
+                ALLOC_ZVAL(z_line_end);
+                ZVAL_LONG(z_line_start, mptr->op_array.line_end);
+                */
 
                 zval **z_doc_var;
 
-                if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line TSRMLS_CC) == SUCCESS) {
+                if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line_start TSRMLS_CC) == SUCCESS) {
                     zval **z_ann;
                     HashPosition annp;
                     for (
