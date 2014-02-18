@@ -125,12 +125,12 @@ PHP_METHOD(Controller, getActionMethods)
                                     || strncmp( Z_STRVAL_PP(z_doc_var), "uri",     strlen("uri")) == 0 
                                 ) {
                                     const char *doc_block = Z_STRVAL_P(z_comment);
-                                    char *doc_delim[ Z_STRLEN_PP(doc_var_len) + 2];
+                                    char * doc_delim[ Z_STRLEN_PP(z_doc_var) + 2];
                                     sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_doc_var));
 
                                     char *doc_var_substr_start  = strstr(doc_block, doc_delim) + strlen(doc_delim) + 1;
                                     int doc_var_val_len         = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
-                                    char *doc_var_val[doc_var_val_len + 1];
+                                    char * doc_var_val[doc_var_val_len + 1];
 
                                     strncpy(doc_var_val, doc_var_substr_start, doc_var_val_len);
                                     add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_doc_var), doc_var_val, strlen(doc_var_val), 1);
