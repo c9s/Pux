@@ -107,17 +107,18 @@ PHP_METHOD(Controller, getActionMethods)
 
                 if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line TSRMLS_CC) == SUCCESS) {
                     zval **z_ann;
-                    HashTable *annh = Z_ARRVAL_P(z_method_annotations);
                     HashPosition annp;
                     for (
-                        zend_hash_internal_pointer_reset_ex(annh, &annp);
-                        zend_hash_get_current_data_ex(annh, (void**)&z_ann, &annp) == SUCCESS; 
-                        zend_hash_move_forward_ex(annh, &annp)
+                        zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_method_annotations), &annp);
+                        zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
+                        zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
                     ) {
                         zval **z_doc_var;
+                        const char *doc_var;
+                        int doc_var_len;
                         if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_doc_var) == SUCCESS) {
-                            const char *doc_var = Z_STRVAL_PP(z_doc_var);
-                            int doc_var_len     = Z_STRLEN_PP(z_doc_var);
+                            doc_var     = Z_STRVAL_PP(z_doc_var);
+                            doc_var_len = Z_STRLEN_PP(z_doc_var);
 
                             if (doc_var && (
                                 strncmp(doc_var, "method",  strlen("method")) == 0 ||
@@ -198,7 +199,11 @@ PHP_METHOD(Controller, getActionPaths)
 
     HashTable *func_list = Z_ARRVAL_P(rv);
     HashPosition pointer;
-    zval **item = NULL;
+    zval **z_method_name;
+    zval **z_annotations;
+    zval **z_doc_method;
+    zval **z_doc_uri;
+    zval **item;
 
     array_init(return_value);
 
@@ -206,8 +211,6 @@ PHP_METHOD(Controller, getActionPaths)
             zend_hash_get_current_data_ex(func_list, (void**) &item, &pointer) == SUCCESS; 
             zend_hash_move_forward_ex(func_list, &pointer)) 
     {
-        zval **z_method_name;
-        zval **z_annotations;
 
         zend_hash_index_find(Z_ARRVAL_PP(item), 0, (void**)&z_method_name);
 
@@ -217,45 +220,38 @@ PHP_METHOD(Controller, getActionPaths)
         char *path              = NULL;
 
         if (zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**)&z_annotations) == SUCCESS) {
-            zval **z_doc_method;
-            zval **z_doc_uri;
-
             if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "method", sizeof("method"), (void**)&z_doc_method) != FAILURE) {
-                http_method = ecalloc(Z_STRLEN_PP(z_doc_method), sizeof(char));
+                http_method = estrndup(Z_STRVAL_PP(z_doc_method), Z_STRLEN_PP(z_doc_method));
                 strcpy(http_method, Z_STRVAL_PP(z_doc_method));
             }
 
             if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "uri", sizeof("uri"), (void**)&z_doc_uri) != FAILURE) {
-                path = ecalloc(Z_STRLEN_PP(z_doc_uri), sizeof(char));
+                path = estrndup(Z_STRVAL_PP(z_doc_uri), Z_STRLEN_PP(z_doc_uri));
                 strcpy(path, Z_STRVAL_PP(z_doc_uri));
             }
         }
 
         if (!path) {
             char *_path = translate_method_name_to_path(method_name);
-            path = ecalloc(strlen(_path), sizeof(char));
-            strcpy(path, _path);
+            path = estrndup(_path, strlen(_path));
         }
 
         if (!http_method) {
-            http_method = ecalloc(4, sizeof(char));
-            strcpy(http_method, "GET");
+            http_method = estrdup("GET");
         }
         
-        if (path) {
-            if (path[0] == '/') {
-                path++;
-            }
-
-            // return structure [ path, method name, http method ]
-            zval * new_item;
-            MAKE_STD_ZVAL(new_item);
-            array_init_size(new_item, 2);
-            add_next_index_string(new_item, path, 0);
-            add_next_index_stringl(new_item, method_name, method_name_len, 1);
-            add_next_index_stringl(new_item, http_method, strlen(http_method), 0);
-            add_next_index_zval(return_value, new_item);
+        if (path[0] == '/') {
+            path++;
         }
+
+        // return structure [ path, method name, http method ]
+        zval * new_item;
+        MAKE_STD_ZVAL(new_item);
+        array_init_size(new_item, 2);
+        add_next_index_string(new_item, path, 0);
+        add_next_index_stringl(new_item, method_name, method_name_len, 1);
+        add_next_index_stringl(new_item, http_method, strlen(http_method), 0);
+        add_next_index_zval(return_value, new_item);
     }
 
     return;
