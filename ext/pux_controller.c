@@ -75,28 +75,30 @@ PHP_METHOD(Controller, getActionMethods)
         if ( p != -1 && (size_t)p == (key_len - strlen("Action")) ) {
             // append the structure [method name, annotations]
             zval *new_item;
+            zval *z_method_annotations;
+            zval *z_indexed_annotations;
+
+            zval *z_comment;
+            zval *z_file;
+            zval *z_line_start;
+
             ALLOC_ZVAL(new_item);
             array_init(new_item);
             add_next_index_stringl(new_item, key, key_len, 1);
 
-            zval *z_method_annotations;
             ALLOC_INIT_ZVAL(z_method_annotations);
             array_init(z_method_annotations);
 
-            zval *z_indexed_annotations;
             ALLOC_INIT_ZVAL(z_indexed_annotations);
             array_init(z_indexed_annotations);
 
             if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
-                zval *z_comment;
                 ALLOC_ZVAL(z_comment);
                 ZVAL_STRING(z_comment, mptr->op_array.doc_comment, 1);
 
-                zval *z_file;
                 ALLOC_ZVAL(z_file);
                 ZVAL_STRING(z_file, mptr->op_array.filename, 1);
 
-                zval *z_line_start;
                 ALLOC_ZVAL(z_line_start);
                 ZVAL_LONG(z_line_start, mptr->op_array.line_start);
 
