@@ -130,9 +130,7 @@ PHP_METHOD(Controller, getActionMethods)
 
                                     char *doc_var_substr_start  = strstr(doc_block, doc_delim) + strlen(doc_delim) + 1;
                                     int doc_var_val_len         = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
-                                    char * doc_var_val[doc_var_val_len + 1];
-
-                                    strncpy(doc_var_val, doc_var_substr_start, doc_var_val_len);
+                                    char *doc_var_val           = estrndup(doc_var_substr_start, doc_var_val_len);
                                     add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_doc_var), doc_var_val, strlen(doc_var_val), 1);
                                 }
                             }
