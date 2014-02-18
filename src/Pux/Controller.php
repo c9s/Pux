@@ -44,12 +44,12 @@ class Controller {
             $doc    = $rmth->getDocComment();
             $opts   = array();
 
-            if($doc) {
-                if(preg_match('/^[\s*]*\@method (get|put|post|delete|head|patch|options)\s*$/im', $doc, $mmatch)) {
+            if ($doc) {
+                if (preg_match('/^[\s*]*\@method (get|put|post|delete|head|patch|options)\s*$/im', $doc, $mmatch)) {
                     $opts['method'] = $mux->getRequestMethodConstant(array_pop($mmatch));
                 }
 
-                if(preg_match('/^[\s*]*\@uri ([^\s]+)\s*$/im', $doc, $umatch)) {
+                if (preg_match('/^[\s*]*\@uri ([^\s]+)\s*$/im', $doc, $umatch)) {
                     $path[0] = ltrim(array_pop($umatch), '/');
                 }
             }
