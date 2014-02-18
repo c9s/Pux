@@ -79,9 +79,9 @@ class Mux
                 } else {
                     $this->routes[] = array(
                         false,
-                        $pattern . $route[1],
+                        rtrim($pattern, '/') . '/' . $route[1],
                         $route[2],
-                        $options,
+                        isset($route[3]) ? array_merge($options, $route[3]) : $options,
                     );
                 }
             }
@@ -226,23 +226,23 @@ class Mux
 
 
     public function getRequestMethodConstant($method) {
-        switch ($method) {
-        case "POST":
-            return REQ_METHOD_POST;
-        case "GET":
-            return REQ_METHOD_GET;
-        case "PUT":
-            return REQ_METHOD_PUT;
-        case "DELETE":
-            return REQ_METHOD_DELETE;
-        case "PATCH":
-            return REQ_METHOD_PATCH;
-        case "HEAD":
-            return REQ_METHOD_HEAD;
-        case "OPTIONS":
-            return REQ_METHOD_OPTIONS;
-        default:
-            return 0;
+        switch (strtoupper($method)) {
+            case "POST":
+                return REQ_METHOD_POST;
+            case "GET":
+                return REQ_METHOD_GET;
+            case "PUT":
+                return REQ_METHOD_PUT;
+            case "DELETE":
+                return REQ_METHOD_DELETE;
+            case "PATCH":
+                return REQ_METHOD_PATCH;
+            case "HEAD":
+                return REQ_METHOD_HEAD;
+            case "OPTIONS":
+                return REQ_METHOD_OPTIONS;
+            default:
+                return 0;
         }
     }
 

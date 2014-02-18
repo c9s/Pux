@@ -83,6 +83,10 @@ PHP_METHOD(Controller, getActionMethods)
             ALLOC_INIT_ZVAL(z_method_annotations);
             array_init(z_method_annotations);
 
+            zval *z_indexed_annotations;
+            ALLOC_INIT_ZVAL(z_indexed_annotations);
+            array_init(z_indexed_annotations);
+
             if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
                 const char *comment = mptr->op_array.doc_comment;
                 const char *filename = mptr->op_array.filename;
@@ -102,14 +106,41 @@ PHP_METHOD(Controller, getActionMethods)
                 ZVAL_LONG(z_line, line_start);
 
                 if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line TSRMLS_CC) == SUCCESS) {
-                    // TODO: save annotation info
-                    php_var_dump(&z_method_annotations, 1 TSRMLS_CC);
+                    zval **z_ann;
+                    HashPosition annp;
+                    for (
+                        zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_method_annotations), &annp);
+                        zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
+                        zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
+                    ) {
+                        zval **z_doc_var;
+                        const char *doc_var;
+                        int doc_var_len;
+                        if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_doc_var) == SUCCESS) {
+                            doc_var     = Z_STRVAL_PP(z_doc_var);
+                            doc_var_len = Z_STRLEN_PP(z_doc_var);
+
+                            if (doc_var && (
+                                strncmp(doc_var, "method",  strlen("method")) == 0 ||
+                                strncmp(doc_var, "uri",     strlen("uri")) == 0
+                            )) {
+                                const char *doc_block = Z_STRVAL_P(z_comment);
+                                char *doc_delim[doc_var_len + 2];
+                                sprintf(doc_delim, "@%s", doc_var);
+
+                                char *doc_var_substr_start  = strstr(doc_block, doc_delim) + strlen(doc_delim) + 1;
+                                int doc_var_val_len         = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
+                                char *doc_var_val[doc_var_val_len + 1];
+
+                                strncpy(doc_var_val, doc_var_substr_start, doc_var_val_len);
+                                add_assoc_stringl(z_indexed_annotations, doc_var, doc_var_val, strlen(doc_var_val), 1);
+                            }
+                        }
+                    }
                 }
             }
-            add_next_index_zval(new_item, z_method_annotations);
 
-
-
+            add_next_index_zval(new_item, z_indexed_annotations);
             add_next_index_zval(return_value, new_item);
         }
 
@@ -168,7 +199,11 @@ PHP_METHOD(Controller, getActionPaths)
 
     HashTable *func_list = Z_ARRVAL_P(rv);
     HashPosition pointer;
-    zval **item = NULL;
+    zval **z_method_name;
+    zval **z_annotations;
+    zval **z_doc_method;
+    zval **z_doc_uri;
+    zval **item;
 
     array_init(return_value);
 
@@ -176,29 +211,49 @@ PHP_METHOD(Controller, getActionPaths)
             zend_hash_get_current_data_ex(func_list, (void**) &item, &pointer) == SUCCESS; 
             zend_hash_move_forward_ex(func_list, &pointer)) 
     {
-        zval **z_method_name;
-        zval **z_annotations;
-        zend_hash_index_find(Z_ARRVAL_PP(item), 0, (void**) &z_method_name);
-        
-        if ( zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**) &z_annotations) == SUCCESS ) {
-            // TODO: read annotation here
 
-        }
+        zend_hash_index_find(Z_ARRVAL_PP(item), 0, (void**)&z_method_name);
 
         const char *method_name = Z_STRVAL_PP(z_method_name);
-        int         method_name_len = Z_STRLEN_PP(z_method_name);
+        int method_name_len     = Z_STRLEN_PP(z_method_name);
+        char *http_method       = NULL;
+        char *path              = NULL;
 
-        char * path = translate_method_name_to_path(method_name);
-        if ( path ) {
-            // return structure [ path, method name ]
-            zval * new_item;
-            MAKE_STD_ZVAL(new_item);
-            array_init_size(new_item, 2);
-            add_next_index_string(new_item, path, 0);
-            add_next_index_stringl(new_item, method_name, method_name_len , 1);
-            add_next_index_zval(return_value, new_item);
+        if (zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**)&z_annotations) == SUCCESS) {
+            if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "method", sizeof("method"), (void**)&z_doc_method) != FAILURE) {
+                http_method = estrndup(Z_STRVAL_PP(z_doc_method), Z_STRLEN_PP(z_doc_method));
+                strcpy(http_method, Z_STRVAL_PP(z_doc_method));
+            }
+
+            if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "uri", sizeof("uri"), (void**)&z_doc_uri) != FAILURE) {
+                path = estrndup(Z_STRVAL_PP(z_doc_uri), Z_STRLEN_PP(z_doc_uri));
+                strcpy(path, Z_STRVAL_PP(z_doc_uri));
+            }
         }
+
+        if (!path) {
+            char *_path = translate_method_name_to_path(method_name);
+            path = estrndup(_path, strlen(_path));
+        }
+
+        if (!http_method) {
+            http_method = estrdup("GET");
+        }
+        
+        if (path[0] == '/') {
+            path++;
+        }
+
+        // return structure [ path, method name, http method ]
+        zval * new_item;
+        MAKE_STD_ZVAL(new_item);
+        array_init_size(new_item, 2);
+        add_next_index_string(new_item, path, 0);
+        add_next_index_stringl(new_item, method_name, method_name_len, 1);
+        add_next_index_stringl(new_item, http_method, strlen(http_method), 0);
+        add_next_index_zval(return_value, new_item);
     }
+
     return;
 }
 
@@ -208,7 +263,6 @@ PHP_METHOD(Controller, expand)
     MAKE_STD_ZVAL(new_mux);
     object_init_ex(new_mux, ce_pux_mux);
     CALL_METHOD(Mux, __construct, new_mux, new_mux);
-
 
     zval *path_array = NULL;
     zend_call_method_with_0_params( &this_ptr, ce_pux_controller, NULL, "getactionpaths", &path_array );
@@ -222,22 +276,35 @@ PHP_METHOD(Controller, expand)
     zend_uint   class_name_len;
     int   dup = zend_get_object_classname(this_ptr, &class_name, &class_name_len TSRMLS_CC);
 
-    // php_printf("%s\n", class_name);
-
     HashPosition pointer;
     zval **path_entry = NULL;
-    for(zend_hash_internal_pointer_reset_ex( Z_ARRVAL_P(path_array), &pointer); 
-            zend_hash_get_current_data_ex( Z_ARRVAL_P(path_array), (void**) &path_entry, &pointer) == SUCCESS; 
-            zend_hash_move_forward_ex( Z_ARRVAL_P(path_array), &pointer)) 
-    {
+    for (
+        zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(path_array), &pointer); 
+        zend_hash_get_current_data_ex(Z_ARRVAL_P(path_array), (void**) &path_entry, &pointer) == SUCCESS; 
+        zend_hash_move_forward_ex(Z_ARRVAL_P(path_array), &pointer)
+    ) {
         zval **z_path;
         zval **z_method;
+        zval **z_http_method;
+        zval *z_options;
+
+        MAKE_STD_ZVAL(z_options);
+        array_init(z_options);
 
         if ( zend_hash_index_find(Z_ARRVAL_PP(path_entry), 0, (void**) &z_path) == FAILURE ) {
             continue;
         }
         if ( zend_hash_index_find(Z_ARRVAL_PP(path_entry), 1, (void**) &z_method) == FAILURE ) {
             continue;
+        }
+
+        if (zend_hash_index_find(Z_ARRVAL_PP(path_entry), 2, (void**) &z_http_method) != FAILURE) {
+            zval *retval = NULL;
+            zend_call_method_with_1_params(&new_mux, ce_pux_mux, NULL, "getrequestmethodconstant", &retval, *z_http_method);
+
+            if (retval != NULL) {
+                add_assoc_zval(z_options, "method", retval);
+            }
         }
 
         zval *z_callback;
@@ -247,7 +314,7 @@ PHP_METHOD(Controller, expand)
         add_next_index_zval(z_callback, *z_method);
 
         zval *rv = NULL;
-        zend_call_method_with_2_params(&new_mux, ce_pux_mux, NULL, "add", &rv, *z_path, z_callback );
+        zend_call_method_with_3_params(&new_mux, ce_pux_mux, NULL, "add", strlen("add"), &rv, 3, *z_path, z_callback, z_options TSRMLS_CC);
     }
 
     zval *rv = NULL;

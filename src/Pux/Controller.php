@@ -9,36 +9,54 @@ class Controller {
 
     public function getActionMethods() {
         $refObject = new ReflectionObject($this);
-        return array_map(function($m){ return $m->getName(); }, array_filter($refObject->getMethods(), function($m) { 
-            return preg_match('#Action$#', $m->getName() );
+        return array_map(function($m) { return $m->getName(); }, array_filter($refObject->getMethods(), function($m) { 
+            return preg_match('/Action$/', $m->getName());
         }));
     }
 
     public function getActionPaths() {
-        $actionNames = array_map(function($method) {
-            return preg_replace('#Action$#','', $method);
-        }, $this->getActionMethods() );
+        $pairs          = array();
+        $actionNames    = array_map(function($method) {
+            return preg_replace('/Action$/', '', $method);
+        }, $this->getActionMethods());
 
-        $pairs = array();
-        foreach( $actionNames as $actionName ) {
-            if ( $actionName == "index" ) {
+        foreach ($actionNames as $actionName) {
+            if ($actionName === 'index') {
                 $path = '';
             } else {
-                $path = '/' . preg_replace_callback('/[A-Z]/', function($regs) { 
-                    return '/' . strtolower($regs[0]);
+                $path = preg_replace_callback('/[A-Z]/', function($matches) {
+                    return '/' . strtolower($matches[0]);
                 }, $actionName);
             }
-            $pairs[] = array($path, $actionName);
+
+            $pairs[] = array(ltrim($path, '/'), $actionName . 'Action');
         }
+
         return $pairs;
     }
 
     public function expand() {
-        $mux = new Mux;
-        $paths = $this->getActionPaths();
-        foreach( $paths as $path ) {
-            $mux->add($path[0], array(get_class($this), $path[1]) );
+        $mux    = new Mux();
+        $paths  = $this->getActionPaths();
+        
+        foreach ($paths as $path) {
+            $rmth   = new ReflectionMethod($this, $path[1]);
+            $doc    = $rmth->getDocComment();
+            $opts   = array();
+
+            if ($doc) {
+                if (preg_match('/^[\s*]*\@method (get|put|post|delete|head|patch|options)\s*$/im', $doc, $mmatch)) {
+                    $opts['method'] = $mux->getRequestMethodConstant(array_pop($mmatch));
+                }
+
+                if (preg_match('/^[\s*]*\@uri ([^\s]+)\s*$/im', $doc, $umatch)) {
+                    $path[0] = ltrim(array_pop($umatch), '/');
+                }
+            }
+
+            $mux->add($path[0], array(get_class($this), $path[1]), $opts);
         }
+
         $mux->sort();
         return $mux;
     }

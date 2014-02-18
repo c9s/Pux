@@ -80,7 +80,8 @@ Features
 - PCRE pattern path support. (Sinatra-style)
 - Request method condition support.
 - Domain condition support.
-- https condition support.
+- HTTPS condition support.
+- Docblock parsing support.
 
 Routing Path Format
 ---------------------
@@ -329,7 +330,7 @@ $r = pux_persistent_dispatch('hello', 'hello_mux.php', '/hello');
 Controller
 --------------------
 
-Pux provides a simple fast controller in C extension, you can mount your controller methods to paths automatically:
+Pux provides the ability to map your controller methods to paths automatically, done either through a simple, fast controller in the C extension or its pure PHP counterpart:
 
 ```php
 class ProductController extends \Pux\Controller
@@ -352,8 +353,40 @@ $mux->dispatch('/product/add');   // ProductController->addAction
 $mux->dispatch('/product/del');   // ProductController->delAction
 ```
 
+You can also use `@method` and `@uri` Docblock variables to override the default `\Pux\Controller::expand()` functionality:
 
-- `Pux\Controller::expand()` returns an array with sub-path and method names.
+```php
+class ProductController extends \Pux\Controller
+{
+    /**
+     * @method GET
+     * @uri /all
+     */
+    public function indexAction() {
+        // now available via GET /all only
+    }
+    
+    /**
+     * @method POST
+     * @uri /create
+     */
+    public function addAction() {
+        // now available via POST /create only
+    }
+    
+    /**
+     * @method DELETE
+     * @uri /destroy
+     */
+    public function delAction() {
+        // now available via DELETE /destroy only
+    }
+}
+```
+
+This is especially helpful when you want to provide more specific or semantic (e.g., HTTP method-specific) actions.  Note that by default, expanded controller routes will be available via any HTTP method - specifying `@method` will restrict it to the provided method.
+
+- `Pux\Controller::expand()` returns an instance of `\Pux\Mux` that contains the controller's methods mapped to URIs, intended to be mounted as a sub mux in another instance of `\Pux\Mux`.
 
 
 MuxCompiler
