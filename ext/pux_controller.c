@@ -105,6 +105,8 @@ PHP_METHOD(Controller, getActionMethods)
                 ALLOC_ZVAL(z_line);
                 ZVAL_LONG(z_line, line_start);
 
+                zval **z_doc_var;
+
                 if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line TSRMLS_CC) == SUCCESS) {
                     zval **z_ann;
                     HashPosition annp;
@@ -113,27 +115,23 @@ PHP_METHOD(Controller, getActionMethods)
                         zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
                         zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
                     ) {
-                        zval **z_doc_var;
-                        const char *doc_var;
-                        int doc_var_len;
                         if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_doc_var) == SUCCESS) {
-                            doc_var     = Z_STRVAL_PP(z_doc_var);
-                            doc_var_len = Z_STRLEN_PP(z_doc_var);
+                            // should be type string 
+                            if ( Z_TYPE_PP(z_doc_var) == IS_STRING ) {
+                                if ( strncmp( Z_STRVAL_PP(z_doc_var), "method",  strlen("method")) == 0
+                                    || strncmp( Z_STRVAL_PP(z_doc_var), "uri",     strlen("uri")) == 0 
+                                ) {
+                                    const char *doc_block = Z_STRVAL_P(z_comment);
+                                    char *doc_delim[ Z_STRLEN_PP(doc_var_len) + 2];
+                                    sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_doc_var));
 
-                            if (doc_var && (
-                                strncmp(doc_var, "method",  strlen("method")) == 0 ||
-                                strncmp(doc_var, "uri",     strlen("uri")) == 0
-                            )) {
-                                const char *doc_block = Z_STRVAL_P(z_comment);
-                                char *doc_delim[doc_var_len + 2];
-                                sprintf(doc_delim, "@%s", doc_var);
+                                    char *doc_var_substr_start  = strstr(doc_block, doc_delim) + strlen(doc_delim) + 1;
+                                    int doc_var_val_len         = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
+                                    char *doc_var_val[doc_var_val_len + 1];
 
-                                char *doc_var_substr_start  = strstr(doc_block, doc_delim) + strlen(doc_delim) + 1;
-                                int doc_var_val_len         = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
-                                char *doc_var_val[doc_var_val_len + 1];
-
-                                strncpy(doc_var_val, doc_var_substr_start, doc_var_val_len);
-                                add_assoc_stringl(z_indexed_annotations, doc_var, doc_var_val, strlen(doc_var_val), 1);
+                                    strncpy(doc_var_val, doc_var_substr_start, doc_var_val_len);
+                                    add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_doc_var), doc_var_val, strlen(doc_var_val), 1);
+                                }
                             }
                         }
                     }
