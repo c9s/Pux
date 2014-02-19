@@ -1,15 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="test/bootstrap.php"
-         backupGlobals="false"
-         colors="true"
-         verbose="true">
-  <testsuites>
-    <testsuite name="PP">
-       <directory suffix="Test.php">test/Pux</directory>
-    </testsuite>
-
-    <testsuite name="Extension">
-       <directory suffix="Test.php">test/ExtensionOnly</directory>
-    </testsuite>
-  </testsuites>
-</phpunit>
+../phpunit.xml

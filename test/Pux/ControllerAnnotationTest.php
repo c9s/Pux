@@ -3,7 +3,7 @@ use Pux\Mux;
 use Pux\Executor;
 use Pux\Controller;
 
-class ControllerTest extends PHPUnit_Framework_TestCase
+class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
 {
     public function testAnnotations()
     {

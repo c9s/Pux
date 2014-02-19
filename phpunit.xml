@@ -4,8 +4,19 @@
          colors="true"
          verbose="true">
   <testsuites>
+
     <testsuite name="PP">
        <directory suffix="Test.php">test/Pux</directory>
+    </testsuite>
+
+    <testsuite name="Mux">
+      <file>test/Pux/MuxTest.php</file>
+      <file>test/Pux/BasicMuxTest.php</file>
+    </testsuite>
+
+    <testsuite name="Controller">
+      <file>test/Pux/ControllerAnnotationTest.php</file>
+      <file>test/Pux/ControllerTest.php</file>
     </testsuite>
 
     <testsuite name="Extension">
