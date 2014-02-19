@@ -75,6 +75,11 @@ int strpos(const char *haystack, char *needle)
    return -1;
 }
 
+
+
+/**
+ * Returns [ method, annotations ]
+ */
 PHP_METHOD(Controller, getActionMethods)
 {
     // get function table hash
