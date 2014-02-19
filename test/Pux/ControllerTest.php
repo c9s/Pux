@@ -3,7 +3,7 @@
 class ControllerTest extends PHPUnit_Framework_TestCase
 {
 
-    public function test()
+    public function testAnnotations()
     {
         if (defined('HHVM_VERSION')) {
             echo "HHVM does not support Reflection to expand controller action methods";
@@ -19,15 +19,21 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         $mux->mount('/product', $controller->expand());
         ok($mux);
 
-        // var_dump( $mux->getRoutes() ); 
+        $paths = array(
+            '/product/delete' => 'DELETE',
+            '/product/update' => 'PUT' ,
+            '/product/add'    => 'POST' ,
+            '/product/foo/bar' => null,
+            '/product/item' => 'GET',
+            '/product' => null,
+        );
 
-        ok( $mux->dispatch('/product/del') );
-        ok( $mux->dispatch('/product/add') );
-        ok( $mux->dispatch('/product/foo/bar') );
-        ok( $mux->dispatch('/product/item') );
-        ok( $mux->dispatch('/product') );
-
-        
+        foreach( $paths as $path => $method ) {
+            if ( $method ) {
+                $_SERVER['REQUEST_METHOD'] = $method;
+            }
+            ok( $mux->dispatch($path) , $path);
+        }
     }
 }
 

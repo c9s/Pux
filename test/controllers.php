@@ -33,8 +33,16 @@ class ProductController
 
 class ExpandableProductController extends Pux\Controller
 {
+
+
+
+
     public function indexAction() { }
 
+
+    /**
+     * @Method("GET")
+     */
     public function itemAction() { }
 
 

@@ -532,13 +532,6 @@ PHP_METHOD(Mux, mount) {
                 char new_pattern[120] = { 0 };
                 strncat(new_pattern, pattern, pattern_len);
 
-                if (new_pattern[strlen(new_pattern) - 1] == '/') {
-                    new_pattern[strlen(new_pattern) - 1] = '\0';
-                }
-
-                strncat(new_pattern, "/", 1);
-                pattern_len++;
-
                 strncat(new_pattern, Z_STRVAL_PP(z_route_pattern), Z_STRLEN_PP(z_route_pattern) );
 
                 int new_pattern_len = pattern_len + Z_STRLEN_PP(z_route_pattern);

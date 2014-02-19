@@ -49,15 +49,12 @@ PHP_METHOD(Controller, __construct) {
 }
 
 
-inline ZEND_RESULT_CODE phannot_fetch_argument_value(zval **arg, zval **value) {
+inline ZEND_RESULT_CODE phannot_fetch_argument_value(zval **arg, zval** value) {
     zval **expr;
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
         return FAILURE;
     }
-    if (zend_hash_find(Z_ARRVAL_PP(expr), "value", sizeof("value"), (void**)&value) == FAILURE ) {
-        return FAILURE;
-    }
-    return SUCCESS;
+    return zend_hash_find(Z_ARRVAL_PP(expr), "value", sizeof("value"), (void**) value);
 }
 
 inline ZEND_RESULT_CODE phannot_fetch_argument_type(zval **arg, zval **type) {
@@ -65,10 +62,7 @@ inline ZEND_RESULT_CODE phannot_fetch_argument_type(zval **arg, zval **type) {
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
         return FAILURE;
     }
-    if (zend_hash_find(Z_ARRVAL_PP(expr), "type", sizeof("type"), (void**)&type) == FAILURE ) {
-        return FAILURE;
-    }
-    return SUCCESS;
+    return zend_hash_find(Z_ARRVAL_PP(expr), "type", sizeof("type"), (void**)&type);
 }
 
 
@@ -149,7 +143,7 @@ PHP_METHOD(Controller, getActionMethods)
             ALLOC_ZVAL(z_line_end);
             ZVAL_LONG(z_line_start, mptr->op_array.line_end);
             */
-            zval **z_ann = NULL, **z_ann_name = NULL, **z_ann_arguments = NULL, **z_ann_argument = NULL, *z_ann_argument_value = NULL;
+            zval **z_ann = NULL, **z_ann_name = NULL, **z_ann_arguments = NULL, **z_ann_argument = NULL, **z_ann_argument_value = NULL;
 
             // TODO: make phannot_parse_annotations reads comment variable in char* type, so we don't need to create extra zval(s)
             if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line_start TSRMLS_CC) == SUCCESS) {
@@ -216,14 +210,12 @@ PHP_METHOD(Controller, getActionMethods)
                         continue;
                     }
 
-
                     // read the first argument (we only support for one argument currently, and should support complex syntax later.)
-                    if ( zend_hash_index_find(Z_ARRVAL_PP(z_ann_arguments), 0, (void**) &z_ann_argument) == FAILURE ) {
-                        if ( phannot_fetch_argument_value(z_ann_argument, &z_ann_argument_value) == SUCCESS ) {
-                            add_assoc_zval(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), z_ann_argument_value);
+                    if ( zend_hash_index_find(Z_ARRVAL_PP(z_ann_arguments), 0, (void**) &z_ann_argument) == SUCCESS ) {
+                        if ( phannot_fetch_argument_value(z_ann_argument, (zval**) &z_ann_argument_value) == SUCCESS ) {
+                            add_assoc_zval(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), *z_ann_argument_value);
                         }
                     }
-                    // php_var_dump(&z_method_annotations,1 TSRMLS_CC);
                 }
             }
         }
@@ -244,13 +236,13 @@ char * translate_method_name_to_path(const char *method_name)
         return NULL;
     }
 
-    char * new_path;
     if ( strncmp(method_name, "indexAction", strlen("indexAction") ) == 0 ) {
-        new_path = ecalloc( 1 , sizeof(char) );
-        // memcpy(new_path, "", 1);
-        return new_path;
+        // returns empty string as its path
+        return strndup("",sizeof("")-1);
     }
+    char * new_path;
 
+    // XXX: this might overflow..
     new_path = ecalloc( 128 , sizeof(char) );
 
     int    len = p - method_name;
@@ -303,30 +295,23 @@ PHP_METHOD(Controller, getActionPaths)
 
         const char *method_name = Z_STRVAL_PP(z_method_name);
         int method_name_len     = Z_STRLEN_PP(z_method_name);
-        char *http_method       = NULL;
         char *path              = NULL;
 
-        if (zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**)&z_annotations) == SUCCESS) {
-            if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "Method", sizeof("Method"), (void**)&z_doc_method) != FAILURE) {
-                http_method = estrndup(Z_STRVAL_PP(z_doc_method), Z_STRLEN_PP(z_doc_method));
-            }
+        zval *z_route_options;
+        MAKE_STD_ZVAL(z_route_options);
+        array_init(z_route_options);
 
-            if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "Route", sizeof("Route"), (void**)&z_doc_uri) != FAILURE) {
+        if ( zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**)&z_annotations) == SUCCESS ) {
+            if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "Route", sizeof("Route"), (void**)&z_doc_uri) == SUCCESS) {
                 path = estrndup(Z_STRVAL_PP(z_doc_uri), Z_STRLEN_PP(z_doc_uri));
+            }
+            if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "Method", sizeof("Method"), (void**)&z_doc_method) == SUCCESS) {
+                add_assoc_zval(z_route_options, "method", *z_doc_method);
             }
         }
 
         if (!path) {
-            char *_path = translate_method_name_to_path(method_name);
-            path = estrndup(_path, strlen(_path));
-        }
-
-        if (!http_method) {
-            http_method = estrdup("GET");
-        }
-        
-        if (path[0] == '/') {
-            path++;
+            path = translate_method_name_to_path(method_name);
         }
 
         // return structure [ path, method name, http method ]
@@ -334,8 +319,10 @@ PHP_METHOD(Controller, getActionPaths)
         MAKE_STD_ZVAL(new_item);
         array_init_size(new_item, 2);
         add_next_index_string(new_item, path, 0);
-        add_next_index_stringl(new_item, method_name, method_name_len, 1);
-        add_next_index_stringl(new_item, http_method, strlen(http_method), 0);
+        add_next_index_stringl(new_item, method_name, method_name_len, 0);
+        add_next_index_zval(new_item, z_route_options);
+
+        // append to the result array
         add_next_index_zval(return_value, new_item);
     }
 
@@ -370,11 +357,8 @@ PHP_METHOD(Controller, expand)
     ) {
         zval **z_path;
         zval **z_method;
-        zval **z_http_method;
-        zval *z_options;
+        zval **z_options = NULL;
 
-        MAKE_STD_ZVAL(z_options);
-        array_init(z_options);
 
         if ( zend_hash_index_find(Z_ARRVAL_PP(path_entry), 0, (void**) &z_path) == FAILURE ) {
             continue;
@@ -383,14 +367,7 @@ PHP_METHOD(Controller, expand)
             continue;
         }
 
-        if (zend_hash_index_find(Z_ARRVAL_PP(path_entry), 2, (void**) &z_http_method) != FAILURE) {
-            zval *retval = NULL;
-            zend_call_method_with_1_params(&new_mux, ce_pux_mux, NULL, "getrequestmethodconstant", &retval, *z_http_method);
-
-            if (retval != NULL) {
-                add_assoc_zval(z_options, "method", retval);
-            }
-        }
+        zend_hash_index_find(Z_ARRVAL_PP(path_entry), 2, (void**) &z_options);
 
         zval *z_callback;
         MAKE_STD_ZVAL(z_callback);
@@ -399,7 +376,7 @@ PHP_METHOD(Controller, expand)
         add_next_index_zval(z_callback, *z_method);
 
         zval *rv = NULL;
-        zend_call_method_with_3_params(&new_mux, ce_pux_mux, NULL, "add", strlen("add"), &rv, 3, *z_path, z_callback, z_options TSRMLS_CC);
+        zend_call_method_with_3_params(&new_mux, ce_pux_mux, NULL, "add", strlen("add"), &rv, 3, *z_path, z_callback, *z_options TSRMLS_CC);
     }
 
     zval *rv = NULL;
