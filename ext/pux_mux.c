@@ -632,7 +632,7 @@ PHP_METHOD(Mux, getRequestMethodConstant) {
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &req_method, &req_method_len) != FAILURE) {
         char *mthit, *mthp;
         mthit = mthp = estrndup(req_method, strlen(req_method));
-        while(*mthit++ = toupper(*mthit));
+        while(( *mthit++ = toupper(*mthit))) ;
 
         if (strcmp(mthp, "GET") == 0) {
             req_method_const = REQ_METHOD_GET;
