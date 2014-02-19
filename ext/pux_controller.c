@@ -77,6 +77,7 @@ PHP_METHOD(Controller, getActionMethods)
         p      = strpos(fn, "Action");
 
         if ( p == -1 || (size_t)p != (fn_len - strlen("Action"))  ) {
+            zend_hash_move_forward_ex(function_table, &pos);
             continue;
         }
 
@@ -93,7 +94,14 @@ PHP_METHOD(Controller, getActionMethods)
         array_init(new_item);
         add_next_index_stringl(new_item, fn, fn_len, 1);
 
-        // if there no annotation, we pass an empty array.
+        /* 
+         * @var 
+         *
+         * if there no annotation, we pass an empty array.
+         *
+         * The method annotation structure
+         *
+         */
         ALLOC_INIT_ZVAL(z_method_annotations);
         array_init(z_method_annotations);
 
@@ -126,7 +134,10 @@ PHP_METHOD(Controller, getActionMethods)
                     zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
                     zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
                 ) {
-                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_doc_var) == FAILURE ||  Z_TYPE_PP(z_doc_var) != IS_STRING ) {
+                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_doc_var) == FAILURE ) {
+                        continue;
+                    }
+                    if ( Z_TYPE_PP(z_doc_var) != IS_STRING ) {
                         continue;
                     }
 
