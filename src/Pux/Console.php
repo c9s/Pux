@@ -5,7 +5,7 @@ use CLIFramework\Application;
 class Console extends Application
 {
     const NAME = 'phpux';
-    const VERSION = "1.4.1";
+    const VERSION = "1.5.0";
 
     public function init()
     {
