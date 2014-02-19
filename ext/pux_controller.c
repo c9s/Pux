@@ -114,7 +114,7 @@ PHP_METHOD(Controller, getActionMethods)
         zval *z_file;
         zval *z_line_start;
 
-        ALLOC_ZVAL(new_item);
+        ALLOC_INIT_ZVAL(new_item);
         array_init(new_item);
         add_next_index_stringl(new_item, fn, fn_len, 1);
 
@@ -298,7 +298,7 @@ PHP_METHOD(Controller, getActionRoutes)
         char *path              = NULL;
 
         zval *z_route_options;
-        MAKE_STD_ZVAL(z_route_options);
+        ALLOC_INIT_ZVAL(z_route_options);
         array_init(z_route_options);
 
         if ( zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**)&z_annotations) == SUCCESS ) {
@@ -317,8 +317,8 @@ PHP_METHOD(Controller, getActionRoutes)
         // return structure [ path, method name, http method ]
         zval * new_item;
         MAKE_STD_ZVAL(new_item);
-        array_init_size(new_item, 2);
-        add_next_index_string(new_item, path, 0);
+        array_init_size(new_item, 3);
+        add_next_index_string(new_item, path, 1);
         add_next_index_stringl(new_item, method_name, method_name_len, 0);
         add_next_index_zval(new_item, z_route_options);
 
