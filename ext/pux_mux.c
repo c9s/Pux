@@ -521,6 +521,11 @@ PHP_METHOD(Mux, mount) {
                 zend_hash_quick_update( Z_ARRVAL_P(z_compiled_route), "pattern", sizeof("pattern"), zend_inline_hash_func(ZEND_STRS("pattern")), &z_new_pattern, sizeof(zval *), NULL);
 
 
+                Z_ADDREF_PP(z_compiled_route_pattern);
+                Z_ADDREF_PP(z_route_callback);
+                Z_ADDREF_P(z_compiled_route);
+                Z_ADDREF_P(z_new_routes);
+
                 // create new route and append to mux->routes
                 add_index_bool(z_new_routes, 0 , 1); // pcre flag == false
                 add_index_zval(z_new_routes, 1, *z_compiled_route_pattern);
@@ -550,6 +555,10 @@ PHP_METHOD(Mux, mount) {
                 array_init(z_new_route_options);
                 php_array_merge(Z_ARRVAL_P(z_new_route_options), Z_ARRVAL_P(z_options), 0 TSRMLS_CC);
                 php_array_merge(Z_ARRVAL_P(z_new_route_options), Z_ARRVAL_P(*z_route_options), 0 TSRMLS_CC);
+
+                Z_ADDREF_PP(z_route_callback);
+                Z_ADDREF_P(z_new_route_options);
+                Z_ADDREF_P(z_new_routes);
 
                 /* make the array: [ pcreFlag, pattern, callback, options ] */
                 add_index_bool(z_new_routes, 0 , 0); // pcre flag == false
@@ -595,9 +604,8 @@ PHP_METHOD(Mux, mount) {
                 strlen("add"), &z_retval, 3, z_pattern, z_mux_id, z_options TSRMLS_CC);
 
 
-
         zval *z_submux_array = zend_read_property( ce_pux_mux, this_ptr , "submux", sizeof("submux") - 1, 1 TSRMLS_CC);
-        add_index_zval( z_submux_array, Z_LVAL_P(z_mux_id) , z_mux);
+        add_index_zval(z_submux_array, Z_LVAL_P(z_mux_id) , z_mux);
 
         // release zvals
         zval_ptr_dtor(&z_mux_id);
