@@ -2,7 +2,6 @@
 #include "ctype.h"
 #include "php.h"
 #include "main/php_main.h"
-#include "Zend/zend.h"
 #include "Zend/zend_API.h"
 #include "Zend/zend_variables.h"
 #include "zend_exceptions.h"
@@ -49,8 +48,12 @@ void pux_init_controller(TSRMLS_D) {
 PHP_METHOD(Controller, __construct) {
 }
 
+typedef enum {
+  SUCCESS =  0,
+  FAILURE = -1,		/* this MUST stay a negative number, or it may affect functions! */
+} ZEND_RESULT_CODE;
 
-inline ZEND_RESULT_CODE phannot_fetch_argument_value(zval **arg, zval** value) {
+inline char phannot_fetch_argument_value(zval **arg, zval** value) {
     zval **expr;
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
         return FAILURE;
@@ -58,7 +61,7 @@ inline ZEND_RESULT_CODE phannot_fetch_argument_value(zval **arg, zval** value) {
     return zend_hash_find(Z_ARRVAL_PP(expr), "value", sizeof("value"), (void**) value);
 }
 
-inline ZEND_RESULT_CODE phannot_fetch_argument_type(zval **arg, zval **type) {
+inline char phannot_fetch_argument_type(zval **arg, zval **type) {
     zval **expr;
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
         return FAILURE;
