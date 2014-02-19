@@ -88,22 +88,6 @@ class MuxTest extends MuxTestCase
         ok( empty($r[3]) , 'route options is empty'); 
     }
 
-    public function testMuxGetMethod() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        $mux->get('/news', [ 'NewsController','listAction' ]);
-        $mux->get('/news_item', [ 'NewsController','itemAction' ], []);
-
-        $routes = $mux->getRoutes();
-        ok($routes);
-        count_ok(2, $routes);
-        is( 2, $mux->length() );
-
-        $_SERVER['REQUEST_METHOD'] = "GET";
-        ok( $mux->dispatch('/news_item') );
-        ok( $mux->dispatch('/news') );
-    }
-
     public function testBasicRoutes() {
         $mux = new \Pux\Mux;
         ok($mux);
@@ -129,20 +113,6 @@ class MuxTest extends MuxTestCase
         $mux->sort();
     }
 
-    public function testRouteWithDomainCondition() {
-        $mux = new \Pux\Mux;
-        $mux->expand = false;
-        ok($mux, "got mux");
-        $mux->add('/foo', [ 'HelloController2','indexAction' ], [ 'domain' => 'test.dev' ]);
-        $_SERVER['HTTP_HOST'] = 'test.dev';
-        $route = $mux->dispatch('/foo');
-        ok($route);
-
-        $_SERVER['HTTP_HOST'] = 'github.com';
-        $route = $mux->dispatch('/foo');
-        ok(! $route);
-    }
-
     public function testRouteWithId() {
         $mux = new \Pux\Mux;
         $mux->add('/hello/:name', [ 'HelloController2','indexAction' ], [ 'id' => 'hello-name' ]);
@@ -156,11 +126,10 @@ class MuxTest extends MuxTestCase
     }
 
 
-    public function testMuxDispatch() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
-        $mux->add('/product', [ 'ProductController','listAction' ]);
+    /**
+     * @depends testBasicRoutes
+     */
+    public function testMuxDispatch($mux) {
         $route = $mux->dispatch('/product');
         ok($route);
         ok($route[0] == false);
@@ -168,11 +137,10 @@ class MuxTest extends MuxTestCase
         is( "/product", $route[1] );
     }
 
-    public function testMuxPcreDispatch() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
-        $mux->add('/product', [ 'ProductController','listAction' ]);
+    /**
+     * @depends testBasicRoutes
+     */
+    public function testMuxPcreDispatch($mux) {
         $route = $mux->dispatch('/product/10');
         ok($route,"found route");
         ok($route[0], "is a pcre route");
@@ -191,9 +159,7 @@ class MuxTest extends MuxTestCase
         }
         $this->fail('Expecting error.');
     }
-     */
-
-
+    */
 
 }
 
