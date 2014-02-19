@@ -17,7 +17,7 @@ script:
   - bash -x test/run-pp-tests
   - bash -x test/run-ext-tests
 cache:
-  apc: true
+  apt: true
   directories:
   - vendor
   - composer.lock
