@@ -156,19 +156,20 @@ PHP_METHOD(Controller, getActionMethods)
                         continue;
                     }
 
+                    if ( strncmp( Z_STRVAL_PP(z_ann_name), "method",  strlen("method")) != 0 
+                            && strncmp( Z_STRVAL_PP(z_ann_name), "uri",   strlen("uri")) != 0 ) 
+                    {
+                        continue;
+                    }
+
                     // php_var_dump(&z_method_annotations,1 TSRMLS_CC);
 
-                    // should be type string 
-                    if ( strncmp( Z_STRVAL_PP(z_ann_name), "method",  strlen("method")) == 0
-                        || strncmp( Z_STRVAL_PP(z_ann_name), "uri",   strlen("uri")) == 0 
-                    ) {
-                        char doc_delim[ Z_STRLEN_PP(z_ann_name) + 2];
-                        sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_ann_name));
+                    char doc_delim[ Z_STRLEN_PP(z_ann_name) + 2];
+                    sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_ann_name));
 
-                        char *doc_var_substr_start  = strstr(mptr->op_array.doc_comment, doc_delim) + strlen(doc_delim) + 1;
-                        int  doc_var_val_len        = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
-                        add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), doc_var_substr_start, doc_var_val_len, 1);
-                    }
+                    char *doc_var_substr_start  = strstr(mptr->op_array.doc_comment, doc_delim) + strlen(doc_delim) + 1;
+                    int  doc_var_val_len        = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
+                    add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), doc_var_substr_start, doc_var_val_len, 1);
                 }
             }
         }
