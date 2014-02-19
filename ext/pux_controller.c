@@ -125,7 +125,7 @@ PHP_METHOD(Controller, getActionMethods)
                                     || strncmp( Z_STRVAL_PP(z_doc_var), "uri",     strlen("uri")) == 0 
                                 ) {
                                     const char *doc_block = Z_STRVAL_P(z_comment);
-                                    char * doc_delim[ Z_STRLEN_PP(z_doc_var) + 2];
+                                    char doc_delim[ Z_STRLEN_PP(z_doc_var) + 2];
                                     sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_doc_var));
 
                                     char *doc_var_substr_start  = strstr(doc_block, doc_delim) + strlen(doc_delim) + 1;
