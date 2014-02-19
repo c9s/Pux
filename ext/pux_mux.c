@@ -624,32 +624,35 @@ PHP_METHOD(Mux, getSubMux) {
 
 
 PHP_METHOD(Mux, getRequestMethodConstant) {
-    char *req_method = NULL;
-    int req_method_len;
+    char *req_method        = NULL;
+    long req_method_const   = 0;
+    long req_method_len;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &req_method, &req_method_len) != FAILURE) {
         char *mthit, *mthp;
-        mthit = mthp = strdup(req_method);
+        mthit = mthp = estrndup(req_method, strlen(req_method));
         while(*mthit++ = toupper(*mthit));
 
         if (strcmp(mthp, "GET") == 0) {
-            RETURN_LONG(REQ_METHOD_GET);
+            req_method_const = REQ_METHOD_GET;
         } else if (strcmp(mthp, "POST") == 0) {
-            RETURN_LONG(REQ_METHOD_POST);
+            req_method_const = REQ_METHOD_POST;
         } else if (strcmp(mthp, "PUT") == 0) {
-            RETURN_LONG(REQ_METHOD_PUT);
+            req_method_const = REQ_METHOD_PUT;
         } else if (strcmp(mthp, "DELETE") == 0) {
-            RETURN_LONG(REQ_METHOD_DELETE);
+            req_method_const = REQ_METHOD_DELETE;
         } else if (strcmp(mthp, "HEAD") == 0) {
-            RETURN_LONG(REQ_METHOD_HEAD);
+            req_method_const = REQ_METHOD_HEAD;
         } else if (strcmp(mthp, "OPTIONS") == 0) {
-            RETURN_LONG(REQ_METHOD_OPTIONS);
+            req_method_const = REQ_METHOD_OPTIONS;
         } else if (strcmp(mthp, "PATCH") == 0) {
-            RETURN_LONG(REQ_METHOD_PATCH);
+            req_method_const = REQ_METHOD_PATCH;
         }
+
+        efree(req_method);
     }
 
-    RETURN_LONG(0);
+    RETURN_LONG(req_method_const);
 }
 
 PHP_METHOD(Mux, getRoute) {
