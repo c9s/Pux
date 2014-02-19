@@ -413,6 +413,8 @@ PHP_METHOD(Mux, mount) {
         RETURN_FALSE;
     }
 
+    Z_ADDREF_P(z_mux);
+
     if ( z_options == NULL ) {
         MAKE_STD_ZVAL(z_options);
         array_init(z_options);
@@ -595,7 +597,6 @@ PHP_METHOD(Mux, mount) {
 
 
         zval *z_submux_array = zend_read_property( ce_pux_mux, this_ptr , "submux", sizeof("submux") - 1, 1 TSRMLS_CC);
-        Z_ADDREF_P(z_mux);
         add_index_zval( z_submux_array, Z_LVAL_P(z_mux_id) , z_mux);
 
         // release zvals

@@ -5,7 +5,6 @@ use Pux\Controller;
 
 class ControllerTest extends PHPUnit_Framework_TestCase
 {
-
     public function testAnnotations()
     {
         if (defined('HHVM_VERSION')) {
@@ -19,7 +18,13 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         ok( is_array( $controller->getActionMethods() ) );
 
         $mux = new Pux\Mux;
-        $mux->mount('/product', $controller->expand());
+
+        // works fine
+        // $submux = $controller->expand();
+        // $mux->mount('/product', $submux );
+
+        // gc scan bug
+        $mux->mount('/product', $controller->expand() );
         ok($mux);
 
         $paths = array(

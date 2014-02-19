@@ -113,7 +113,7 @@ PHP_METHOD(Controller, getActionMethods)
         zval *z_file;
         zval *z_line_start;
 
-        ALLOC_INIT_ZVAL(new_item);
+        MAKE_STD_ZVAL(new_item);
         array_init(new_item);
         add_next_index_stringl(new_item, fn, fn_len, 1);
 
@@ -125,11 +125,11 @@ PHP_METHOD(Controller, getActionMethods)
          * The method annotation structure
          *
          */
-        ALLOC_INIT_ZVAL(z_method_annotations);
+        MAKE_STD_ZVAL(z_method_annotations);
         array_init(z_method_annotations);
 
         // simplified annotation information is saved to this variable.
-        ALLOC_INIT_ZVAL(z_indexed_annotations);
+        MAKE_STD_ZVAL(z_indexed_annotations);
         array_init(z_indexed_annotations);
 
         if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
@@ -297,7 +297,7 @@ PHP_METHOD(Controller, getActionRoutes)
         char *path              = NULL;
 
         zval *z_route_options;
-        ALLOC_INIT_ZVAL(z_route_options);
+        MAKE_STD_ZVAL(z_route_options);
         array_init(z_route_options);
 
         if ( zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**)&z_annotations) == SUCCESS ) {
@@ -334,6 +334,9 @@ PHP_METHOD(Controller, expand)
     MAKE_STD_ZVAL(new_mux);
     object_init_ex(new_mux, ce_pux_mux);
     CALL_METHOD(Mux, __construct, new_mux, new_mux);
+
+    Z_ADDREF_P(new_mux); // add reference
+
 
     zval *path_array = NULL;
     zend_call_method_with_0_params( &this_ptr, ce_pux_controller, NULL, "getactionroutes", &path_array );
