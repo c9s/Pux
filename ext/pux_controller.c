@@ -48,6 +48,32 @@ void pux_init_controller(TSRMLS_D) {
 PHP_METHOD(Controller, __construct) {
 }
 
+
+inline ZEND_RESULT_CODE phannot_fetch_argument_value(zval **arg, zval **value) {
+    zval **expr;
+    if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
+        return FAILURE;
+    }
+    if (zend_hash_find(Z_ARRVAL_PP(expr), "value", sizeof("value"), (void**)&value) == FAILURE ) {
+        return FAILURE;
+    }
+    return SUCCESS;
+}
+
+inline ZEND_RESULT_CODE phannot_fetch_argument_type(zval **arg, zval **type) {
+    zval **expr;
+    zval **type;
+    if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
+        return FAILURE;
+    }
+    if (zend_hash_find(Z_ARRVAL_PP(expr), "type", sizeof("type"), (void**)&type) == FAILURE ) {
+        return FAILURE;
+    }
+    return SUCCESS;
+}
+
+
+
 int strpos(const char *haystack, char *needle)
 {
    char *p = strstr(haystack, needle);
@@ -124,7 +150,7 @@ PHP_METHOD(Controller, getActionMethods)
             ALLOC_ZVAL(z_line_end);
             ZVAL_LONG(z_line_start, mptr->op_array.line_end);
             */
-            zval **z_ann = NULL, **z_ann_name = NULL, **z_ann_arguments = NULL;
+            zval **z_ann = NULL, **z_ann_name = NULL, **z_ann_arguments = NULL, **z_ann_argument = NULL, *z_ann_argument_value = NULL;
 
             // TODO: make phannot_parse_annotations reads comment variable in char* type, so we don't need to create extra zval(s)
             if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line_start TSRMLS_CC) == SUCCESS) {
@@ -137,6 +163,34 @@ PHP_METHOD(Controller, getActionMethods)
                  *      { name => ... , type => ... , arguments => ... , file => , line =>  },
                  *      { name => ... , type => ... , arguments => ... , file => , line =>  },
                  *    ]
+                 *
+                 * the actuall structure:
+                 *
+                 *    array(2) {
+                 *        [0]=>
+                 *        array(5) {
+                 *            ["type"]=>
+                 *            int(300)
+                 *            ["name"]=>
+                 *            string(5) "Route"
+                 *            ["arguments"]=>
+                 *            array(1) {
+                 *            [0]=>
+                 *            array(1) {
+                 *                ["expr"]=>
+                 *                array(2) {
+                 *                ["type"]=>
+                 *                int(303)
+                 *                ["value"]=>
+                 *                string(7) "/delete"
+                 *                }
+                 *            }
+                 *            }
+                 *            ["file"]=> string(48) "...."
+                 *            ["line"]=> int(54)
+                 *        },
+                 *        .....
+                 *    }
                  */
                 HashPosition annp;
                 for (
@@ -156,23 +210,25 @@ PHP_METHOD(Controller, getActionMethods)
                         continue;
                     }
 
-                    if ( strncmp( Z_STRVAL_PP(z_ann_name), "method",  strlen("method")) != 0 
-                            && strncmp( Z_STRVAL_PP(z_ann_name), "uri",   strlen("uri")) != 0 ) 
+
+                    if (    strncmp( Z_STRVAL_PP(z_ann_name), "Method",  sizeof("Method") - 1 ) != 0 
+                         && strncmp( Z_STRVAL_PP(z_ann_name), "Route",   sizeof("Route") - 1 ) != 0 ) 
                     {
                         continue;
                     }
 
+
+                    // read the first argument (we only support for one argument currently, and should support complex syntax later.)
+                    if ( zend_hash_index_find(Z_ARRVAL_PP(z_ann_arguments), 0, (void**) &z_ann_argument) == FAILURE ) {
+                        if ( phannot_fetch_argument_value(z_ann_argument, &z_ann_argument_value) == SUCCESS ) {
+                            add_assoc_zval(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), z_ann_argument_value);
+                        }
+                    }
                     // php_var_dump(&z_method_annotations,1 TSRMLS_CC);
-
-                    char doc_delim[ Z_STRLEN_PP(z_ann_name) + 2];
-                    sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_ann_name));
-
-                    char *doc_var_substr_start  = strstr(mptr->op_array.doc_comment, doc_delim) + strlen(doc_delim) + 1;
-                    int  doc_var_val_len        = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
-                    add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), doc_var_substr_start, doc_var_val_len, 1);
                 }
             }
         }
+
         add_next_index_zval(new_item, z_indexed_annotations);
         add_next_index_zval(return_value, new_item);
 
@@ -252,11 +308,11 @@ PHP_METHOD(Controller, getActionPaths)
         char *path              = NULL;
 
         if (zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**)&z_annotations) == SUCCESS) {
-            if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "method", sizeof("method"), (void**)&z_doc_method) != FAILURE) {
+            if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "Method", sizeof("Method"), (void**)&z_doc_method) != FAILURE) {
                 http_method = estrndup(Z_STRVAL_PP(z_doc_method), Z_STRLEN_PP(z_doc_method));
             }
 
-            if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "uri", sizeof("uri"), (void**)&z_doc_uri) != FAILURE) {
+            if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "Route", sizeof("Route"), (void**)&z_doc_uri) != FAILURE) {
                 path = estrndup(Z_STRVAL_PP(z_doc_uri), Z_STRLEN_PP(z_doc_uri));
             }
         }
