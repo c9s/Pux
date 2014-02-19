@@ -19,11 +19,15 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         $mux->mount('/product', $controller->expand());
         ok($mux);
 
+        var_dump( $mux->getRoutes() ); 
+
         ok( $mux->dispatch('/product/del') );
         ok( $mux->dispatch('/product/add') );
         ok( $mux->dispatch('/product/foo/bar') );
         ok( $mux->dispatch('/product/item') );
         ok( $mux->dispatch('/product') );
+
+        
     }
 }
 
