@@ -14,7 +14,7 @@ class Controller {
         }));
     }
 
-    public function getActionPaths() {
+    public function getActionRoutes() {
         $pairs          = array();
         $actionNames    = array_map(function($method) {
             return preg_replace('/Action$/', '', $method);
@@ -37,7 +37,7 @@ class Controller {
 
     public function expand() {
         $mux    = new Mux();
-        $paths  = $this->getActionPaths();
+        $paths  = $this->getActionRoutes();
         
         foreach ($paths as $path) {
             $rmth   = new ReflectionMethod($this, $path[1]);

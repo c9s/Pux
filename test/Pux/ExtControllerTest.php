@@ -31,7 +31,7 @@ class ExtControllerTest extends PHPUnit_Framework_TestCase
         ok( is_array($actions), 'is array' );
         count_ok( 3, $actions);
 
-        $paths = $controller->getActionPaths();
+        $paths = $controller->getActionRoutes();
         ok($paths);
         count_ok(3, $paths);
         ok( is_array($paths[0]) );
