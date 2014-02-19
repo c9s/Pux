@@ -124,10 +124,20 @@ PHP_METHOD(Controller, getActionMethods)
             ALLOC_ZVAL(z_line_end);
             ZVAL_LONG(z_line_start, mptr->op_array.line_end);
             */
-            zval **z_doc_var = NULL, **z_ann = NULL;
+            zval **z_doc_var = NULL, **z_ann = NULL, **z_ann_arguments;
 
             // TODO: make phannot_parse_annotations reads comment variable in char* type, so we don't need to create extra zval(s)
             if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line_start TSRMLS_CC) == SUCCESS) {
+
+                /*
+                 * z_method_annotations is an indexed array, which contains a structure like this:
+                 *
+                 *    [ 
+                 *      { name => ... , type => ... , arguments => ... , file => , line =>  },
+                 *      { name => ... , type => ... , arguments => ... , file => , line =>  },
+                 *      { name => ... , type => ... , arguments => ... , file => , line =>  },
+                 *    ]
+                 */
                 HashPosition annp;
                 for (
                     zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_method_annotations), &annp);
@@ -140,6 +150,8 @@ PHP_METHOD(Controller, getActionMethods)
                     if ( Z_TYPE_PP(z_doc_var) != IS_STRING ) {
                         continue;
                     }
+
+                    php_var_dump(&z_method_annotations,1 TSRMLS_CC);
 
                     // should be type string 
                     if ( strncmp( Z_STRVAL_PP(z_doc_var), "method",  strlen("method")) == 0
