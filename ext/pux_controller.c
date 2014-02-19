@@ -198,12 +198,7 @@ PHP_METHOD(Controller, getActionMethods)
                         continue;
                     }
 
-                    // safety check
-                    if ( Z_TYPE_PP(z_ann_name) != IS_STRING ) {
-                        continue;
-                    }
-
-
+                    // We currenly only support "@Method()" and "@Route"
                     if (    strncmp( Z_STRVAL_PP(z_ann_name), "Method",  sizeof("Method") - 1 ) != 0 
                          && strncmp( Z_STRVAL_PP(z_ann_name), "Route",   sizeof("Route") - 1 ) != 0 ) 
                     {
