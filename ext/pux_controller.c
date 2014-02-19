@@ -62,7 +62,7 @@ inline ZEND_RESULT_CODE phannot_fetch_argument_type(zval **arg, zval **type) {
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
         return FAILURE;
     }
-    return zend_hash_find(Z_ARRVAL_PP(expr), "type", sizeof("type"), (void**)&type);
+    return zend_hash_find(Z_ARRVAL_PP(expr), "type", sizeof("type"), (void**)type);
 }
 
 
