@@ -3,8 +3,8 @@ set -e
 echo "Testing pux extension..."
 cd ext
 bash compile -cp || exit 1
-bash run-test -- --debug || exit 1
+bash run-test -- --testsuite PP --debug || exit 1
 
 echo "Stress testing on extension..."
-bash run-test -- --repeat 100 || exit 1
+bash run-test -- --testsuite PP --repeat 100 || exit 1
 cd ..
