@@ -7,9 +7,10 @@ class MuxConditionTest extends MuxTestCase
 
     public function testRouteWithDomainCondition() {
         $mux = new \Pux\Mux;
-        $mux->expand = false;
         ok($mux, "got mux");
         $mux->add('/foo', [ 'HelloController2','indexAction' ], [ 'domain' => 'test.dev' ]);
+
+
         $_SERVER['HTTP_HOST'] = 'test.dev';
         $route = $mux->dispatch('/foo');
         ok($route);

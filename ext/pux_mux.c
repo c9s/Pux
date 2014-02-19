@@ -867,6 +867,8 @@ PHP_METHOD(Mux, dispatch) {
     zval *z_submux_array = NULL;
     zval **z_submux = NULL;
 
+    zval *z_retval = NULL;
+
     // dispatch to submux if the callback is an ID.
     if ( Z_TYPE_PP(z_callback) == IS_LONG ) {
         z_submux_array = zend_read_property( ce_pux_mux, this_ptr, "submux", sizeof("submux")-1, 1 TSRMLS_CC);
@@ -894,7 +896,6 @@ PHP_METHOD(Mux, dispatch) {
         if ( Z_BVAL_PP(z_pcre) ) {
             zval **z_route_vars = NULL;
             zval **z_route_vars_0 = NULL;
-            zval *retval = NULL;
             zval *z_substr;
 
             if ( zend_hash_quick_find( Z_ARRVAL_PP(z_options) , "vars", sizeof("vars"), zend_inline_hash_func(ZEND_STRS("vars")), (void**) &z_route_vars ) == FAILURE ) {
@@ -909,11 +910,12 @@ PHP_METHOD(Mux, dispatch) {
             MAKE_STD_ZVAL(z_substr);
             ZVAL_STRING(z_substr, path + Z_STRLEN_PP(z_route_vars_0), 1);
 
-            retval = call_mux_method( *z_submux, "dispatch" , sizeof("dispatch"), 1 , z_substr, NULL, NULL TSRMLS_CC);
+            z_retval = call_mux_method( *z_submux, "dispatch" , sizeof("dispatch"), 1 , z_substr, NULL, NULL TSRMLS_CC);
             zval_ptr_dtor(&z_substr);
 
-            if (retval) {
-                *return_value = *retval;
+            if (z_retval) {
+                Z_ADDREF_P(z_retval);
+                *return_value = *z_retval;
                 zval_copy_ctor(return_value);
             }
             // zval_ptr_dtor(&z_return_route);
@@ -930,7 +932,7 @@ PHP_METHOD(Mux, dispatch) {
             //         substr($path, strlen($route[1]))
             //     );
 
-            zval * z_retval = call_mux_method( *z_submux, "dispatch" , sizeof("dispatch"), 1 , z_substr, NULL, NULL TSRMLS_CC);
+            z_retval = call_mux_method( *z_submux, "dispatch" , sizeof("dispatch"), 1 , z_substr, NULL, NULL TSRMLS_CC);
             zval_ptr_dtor(&z_substr);
 
             if ( z_retval ) {
