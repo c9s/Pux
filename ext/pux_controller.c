@@ -124,7 +124,7 @@ PHP_METHOD(Controller, getActionMethods)
             ALLOC_ZVAL(z_line_end);
             ZVAL_LONG(z_line_start, mptr->op_array.line_end);
             */
-            zval **z_doc_var = NULL, **z_ann = NULL, **z_ann_arguments;
+            zval **z_ann_name = NULL, **z_ann = NULL, **z_ann_arguments;
 
             // TODO: make phannot_parse_annotations reads comment variable in char* type, so we don't need to create extra zval(s)
             if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line_start TSRMLS_CC) == SUCCESS) {
@@ -144,25 +144,25 @@ PHP_METHOD(Controller, getActionMethods)
                     zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
                     zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
                 ) {
-                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_doc_var) == FAILURE ) {
+                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_ann_name) == FAILURE ) {
                         continue;
                     }
-                    if ( Z_TYPE_PP(z_doc_var) != IS_STRING ) {
+                    if ( Z_TYPE_PP(z_ann_name) != IS_STRING ) {
                         continue;
                     }
 
                     php_var_dump(&z_method_annotations,1 TSRMLS_CC);
 
                     // should be type string 
-                    if ( strncmp( Z_STRVAL_PP(z_doc_var), "method",  strlen("method")) == 0
-                        || strncmp( Z_STRVAL_PP(z_doc_var), "uri",   strlen("uri")) == 0 
+                    if ( strncmp( Z_STRVAL_PP(z_ann_name), "method",  strlen("method")) == 0
+                        || strncmp( Z_STRVAL_PP(z_ann_name), "uri",   strlen("uri")) == 0 
                     ) {
-                        char doc_delim[ Z_STRLEN_PP(z_doc_var) + 2];
-                        sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_doc_var));
+                        char doc_delim[ Z_STRLEN_PP(z_ann_name) + 2];
+                        sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_ann_name));
 
                         char *doc_var_substr_start  = strstr(mptr->op_array.doc_comment, doc_delim) + strlen(doc_delim) + 1;
                         int  doc_var_val_len        = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
-                        add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_doc_var), doc_var_substr_start, doc_var_val_len, 1);
+                        add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), doc_var_substr_start, doc_var_val_len, 1);
                     }
                 }
             }
