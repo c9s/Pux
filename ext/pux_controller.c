@@ -38,17 +38,7 @@ const zend_function_entry controller_methods[] = {
   PHP_FE_END
 };
 
-void pux_init_controller(TSRMLS_D) {
-    zend_class_entry ce;
-    INIT_CLASS_ENTRY(ce, "Pux\\Controller", controller_methods);
-    ce_pux_controller = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_class_implements(ce_pux_controller TSRMLS_CC, 1, ce_pux_expandable_mux);
-}
-
-PHP_METHOD(Controller, __construct) {
-}
-
-inline zend_bool phannot_fetch_argument_value(zval **arg, zval** value) {
+zend_bool phannot_fetch_argument_value(zval **arg, zval** value TSRMLS_DC) {
     zval **expr;
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
         return FAILURE;
@@ -56,15 +46,13 @@ inline zend_bool phannot_fetch_argument_value(zval **arg, zval** value) {
     return zend_hash_find(Z_ARRVAL_PP(expr), "value", sizeof("value"), (void**) value);
 }
 
-inline zend_bool phannot_fetch_argument_type(zval **arg, zval **type) {
+zend_bool phannot_fetch_argument_type(zval **arg, zval **type TSRMLS_DC) {
     zval **expr;
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
         return FAILURE;
     }
     return zend_hash_find(Z_ARRVAL_PP(expr), "type", sizeof("type"), (void**)type);
 }
-
-
 
 int strpos(const char *haystack, char *needle)
 {
@@ -74,6 +62,18 @@ int strpos(const char *haystack, char *needle)
    return -1;
 }
 
+
+
+
+void pux_init_controller(TSRMLS_D) {
+    zend_class_entry ce;
+    INIT_CLASS_ENTRY(ce, "Pux\\Controller", controller_methods);
+    ce_pux_controller = zend_register_internal_class(&ce TSRMLS_CC);
+    zend_class_implements(ce_pux_controller TSRMLS_CC, 1, ce_pux_expandable_mux);
+}
+
+PHP_METHOD(Controller, __construct) {
+}
 
 
 /**
@@ -211,7 +211,7 @@ PHP_METHOD(Controller, getActionMethods)
 
                     // read the first argument (we only support for one argument currently, and should support complex syntax later.)
                     if ( zend_hash_index_find(Z_ARRVAL_PP(z_ann_arguments), 0, (void**) &z_ann_argument) == SUCCESS ) {
-                        if ( phannot_fetch_argument_value(z_ann_argument, (zval**) &z_ann_argument_value) == SUCCESS ) {
+                        if ( phannot_fetch_argument_value(z_ann_argument, (zval**) &z_ann_argument_value TSRMLS_CC) == SUCCESS ) {
                             add_assoc_zval(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), *z_ann_argument_value);
                         }
                     }
