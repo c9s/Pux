@@ -124,7 +124,7 @@ PHP_METHOD(Controller, getActionMethods)
             ALLOC_ZVAL(z_line_end);
             ZVAL_LONG(z_line_start, mptr->op_array.line_end);
             */
-            zval **z_ann_name = NULL, **z_ann = NULL, **z_ann_arguments;
+            zval **z_ann = NULL, **z_ann_name = NULL, **z_ann_arguments = NULL;
 
             // TODO: make phannot_parse_annotations reads comment variable in char* type, so we don't need to create extra zval(s)
             if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line_start TSRMLS_CC) == SUCCESS) {
@@ -144,14 +144,19 @@ PHP_METHOD(Controller, getActionMethods)
                     zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
                     zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
                 ) {
-                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_ann_name) == FAILURE ) {
+                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", sizeof("name"), (void**)&z_ann_name) == FAILURE ) {
                         continue;
                     }
+                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "arguments", sizeof("arguments"), (void**)&z_ann_arguments) == FAILURE ) {
+                        continue;
+                    }
+
+                    // safety check
                     if ( Z_TYPE_PP(z_ann_name) != IS_STRING ) {
                         continue;
                     }
 
-                    php_var_dump(&z_method_annotations,1 TSRMLS_CC);
+                    // php_var_dump(&z_method_annotations,1 TSRMLS_CC);
 
                     // should be type string 
                     if ( strncmp( Z_STRVAL_PP(z_ann_name), "method",  strlen("method")) == 0
