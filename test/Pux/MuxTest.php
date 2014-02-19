@@ -88,18 +88,6 @@ class MuxTest extends PHPUnit_Framework_TestCase
         ok( empty($r[3]) , 'route options is empty'); 
     }
 
-    public function testMuxAddPCRERoute() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
-        $mux->add('/product', [ 'ProductController','listAction' ]);
-
-        $routes = $mux->getRoutes();
-        ok($routes);
-        count_ok(2, $routes);
-        is( 2, $mux->length() );
-    }
-
     public function testMuxGetMethod() {
         $mux = new \Pux\Mux;
         ok($mux);
@@ -117,19 +105,36 @@ class MuxTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testSort() {
+    public function testBasicRoutes() {
         $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
         $mux->add('/product', [ 'ProductController','listAction' ]);
+        return $mux;
+    }
+
+    /**
+     * @depends testBasicRoutes
+     */
+    public function testMuxAddPCRERoute($mux) {
+        $routes = $mux->getRoutes();
+        ok($routes);
+        count_ok(2, $routes);
+        is( 2, $mux->length() );
+    }
+
+    /**
+     * @depends testBasicRoutes
+     */
+    public function testSort($mux) {
         $mux->sort();
     }
 
-    public function testMuxExport() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
-        $mux->add('/product', [ 'ProductController','listAction' ]);
+
+    /**
+     * @depends testBasicRoutes
+     */
+    public function testExport($mux) {
         $code = $mux->export();
         ok($code);
         eval('$newMux = ' . $code . ';');
@@ -307,7 +312,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
 
         return;
 
-        // XXX: a gc bug here
+        // XXX: seems like a gc bug here
         $cb = function() use ($mux) {
             $r = $mux->dispatch('/product/23');
             Executor::execute($r);
