@@ -2,7 +2,7 @@
 use Pux\Mux;
 use Pux\Executor;
 
-class BasicMuxTest extends PHPUnit_Framework_TestCase
+class MuxBasicTest extends PHPUnit_Framework_TestCase
 {
 
     public function testSubMuxExpand() 

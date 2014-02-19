@@ -8,7 +8,7 @@ class FooController
     }
 }
 
-class MuxCompilerTest extends PHPUnit_Framework_TestCase
+class MuxCompilerTest extends MuxTestCase
 {
     public function testMuxCompiler()
     {
@@ -47,5 +47,38 @@ class MuxCompilerTest extends PHPUnit_Framework_TestCase
         unlink("hello_mux.php");
         unlink("bye_mux.php");
     }
+
+    public function testMuxCompile() {
+        $mux = new \Pux\Mux;
+        ok($mux);
+        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
+        $mux->add('/product', [ 'ProductController','listAction' ]);
+        $mux->add('/foo', [ 'ProductController','fooAction' ]);
+        $mux->add('/bar', [ 'ProductController','barAction' ]);
+        $mux->add('/', [ 'ProductController','indexAction' ]);
+
+        $ret = $mux->compile("_test_mux.php");
+        ok($ret, "compile successfully");
+
+        $newMux = require "_test_mux.php";
+        ok($newMux);
+
+        ok( $r = $newMux->dispatch("/foo") );
+        $this->assertNonPcreRoute($r, "/foo");
+
+        ok( $r = $newMux->dispatch("/product") );
+        $this->assertNonPcreRoute($r, "/product");
+
+        ok( $r = $newMux->dispatch('/') );
+        $this->assertNonPcreRoute($r, '/');
+
+        ok( $r = $newMux->dispatch('/bar') );
+        $this->assertNonPcreRoute($r, '/bar');
+
+        ok( $r = $newMux->dispatch('/product/10') );
+        $this->assertPcreRoute($r, '/product/:id');
+    }
+
+
 }
 
