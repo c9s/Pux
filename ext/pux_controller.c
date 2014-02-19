@@ -307,7 +307,7 @@ PHP_METHOD(Controller, getActionRoutes)
                 path = estrndup(Z_STRVAL_PP(z_doc_uri), Z_STRLEN_PP(z_doc_uri));
             }
             if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "Method", sizeof("Method"), (void**)&z_doc_method) == SUCCESS) {
-                Z_ADDREF_P(z_doc_method);
+                Z_ADDREF_PP(z_doc_method);
                 add_assoc_zval(z_route_options, "method", *z_doc_method);
             }
         }
