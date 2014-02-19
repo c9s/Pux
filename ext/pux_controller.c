@@ -124,22 +124,20 @@ PHP_METHOD(Controller, getActionMethods)
                     zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
                     zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
                 ) {
-                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_doc_var) == FAILURE) {
+                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_doc_var) == FAILURE ||  Z_TYPE_PP(z_doc_var) != IS_STRING ) {
                         continue;
                     }
 
                     // should be type string 
-                    if ( Z_TYPE_PP(z_doc_var) == IS_STRING ) {
-                        if ( strncmp( Z_STRVAL_PP(z_doc_var), "method",  strlen("method")) == 0
-                            || strncmp( Z_STRVAL_PP(z_doc_var), "uri",   strlen("uri")) == 0 
-                        ) {
-                            char doc_delim[ Z_STRLEN_PP(z_doc_var) + 2];
-                            sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_doc_var));
+                    if ( strncmp( Z_STRVAL_PP(z_doc_var), "method",  strlen("method")) == 0
+                        || strncmp( Z_STRVAL_PP(z_doc_var), "uri",   strlen("uri")) == 0 
+                    ) {
+                        char doc_delim[ Z_STRLEN_PP(z_doc_var) + 2];
+                        sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_doc_var));
 
-                            char *doc_var_substr_start  = strstr(mptr->op_array.doc_comment, doc_delim) + strlen(doc_delim) + 1;
-                            int  doc_var_val_len        = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
-                            add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_doc_var), doc_var_substr_start, doc_var_val_len, 1);
-                        }
+                        char *doc_var_substr_start  = strstr(mptr->op_array.doc_comment, doc_delim) + strlen(doc_delim) + 1;
+                        int  doc_var_val_len        = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
+                        add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_doc_var), doc_var_substr_start, doc_var_val_len, 1);
                     }
                 }
             }
