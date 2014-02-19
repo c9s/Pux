@@ -48,11 +48,6 @@ void pux_init_controller(TSRMLS_D) {
 PHP_METHOD(Controller, __construct) {
 }
 
-typedef enum {
-  SUCCESS =  0,
-  FAILURE = -1,		/* this MUST stay a negative number, or it may affect functions! */
-} ZEND_RESULT_CODE;
-
 inline zend_bool phannot_fetch_argument_value(zval **arg, zval** value) {
     zval **expr;
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
