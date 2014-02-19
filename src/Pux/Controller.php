@@ -49,7 +49,7 @@ class Controller {
                 }
 
                 if (preg_match('/^[\s*]*\@Route\("([^\s]+)"\)/im', $doc, $umatch)) {
-                    $path[0] = ltrim(array_pop($umatch), '/');
+                    $path[0] = array_pop($umatch);
                 }
             }
 
