@@ -23,8 +23,7 @@ class BasicMuxTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    public function testSubMuxExport()
-    {
+    public function testMuxMounting() {
         $mainMux = new Mux;
         $mainMux->expand = false;
 
@@ -45,8 +44,17 @@ class BasicMuxTest extends PHPUnit_Framework_TestCase
             $r = $mainMux->dispatch($p);
             ok($r, "Matched route for $p");
         }
+        return $mainMux;
+    }
 
+
+    /**
+     * @depends testMuxMounting
+     */
+    public function testSubMuxExport($mainMux)
+    {
         $code = '$newMux = ' . $mainMux->export() . ';';
+        ok($code, 'code');
         eval($code);
         ok($newMux);
 

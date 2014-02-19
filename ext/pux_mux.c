@@ -181,19 +181,24 @@ PHP_METHOD(Mux, __set_state) {
         zend_update_property(ce_pux_mux, return_value, "id", sizeof("id")-1, *z_id TSRMLS_CC);
     }
 
+
     if ( zend_hash_quick_find(Z_ARRVAL_P(z_array), "routes", sizeof("routes"), zend_inline_hash_func(ZEND_STRS("routes")), (void**)&z_routes) == SUCCESS ) {
+        Z_ADDREF_PP(z_routes);
         zend_update_property(ce_pux_mux, return_value, "routes", sizeof("routes")-1, *z_routes TSRMLS_CC);
     }
 
     if ( zend_hash_quick_find(Z_ARRVAL_P(z_array), "staticRoutes", sizeof("staticRoutes"), zend_inline_hash_func(ZEND_STRS("staticRoutes")), (void**)&z_static_routes) == SUCCESS ) {
+        Z_ADDREF_PP(z_static_routes);
         zend_update_property(ce_pux_mux, return_value, "staticRoutes", sizeof("staticRoutes")-1, *z_static_routes TSRMLS_CC);
     }
 
     if ( zend_hash_quick_find(Z_ARRVAL_P(z_array), "routesById", sizeof("routesById"), zend_inline_hash_func(ZEND_STRS("routesById")), (void**)&z_routes_by_id) == SUCCESS ) {
+        Z_ADDREF_PP(z_routes_by_id);
         zend_update_property(ce_pux_mux, return_value, "routesById", sizeof("routesById")-1, *z_routes_by_id TSRMLS_CC);
     }
 
     if ( zend_hash_quick_find(Z_ARRVAL_P(z_array), "submux", sizeof("submux"), zend_inline_hash_func(ZEND_STRS("submux")), (void**)&z_submux) == SUCCESS ) {
+        Z_ADDREF_PP(z_submux);
         zend_update_property(ce_pux_mux, return_value, "submux", sizeof("submux")-1, *z_submux TSRMLS_CC);
     }
 
