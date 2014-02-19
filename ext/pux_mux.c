@@ -925,6 +925,7 @@ PHP_METHOD(Mux, dispatch) {
             zval_ptr_dtor(&z_substr);
 
             if ( z_retval ) {
+                Z_ADDREF_P(z_retval);
                 *return_value = *z_retval;
                 zval_copy_ctor(return_value);
             }
