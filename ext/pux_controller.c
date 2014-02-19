@@ -212,6 +212,7 @@ PHP_METHOD(Controller, getActionMethods)
                     // read the first argument (we only support for one argument currently, and should support complex syntax later.)
                     if ( zend_hash_index_find(Z_ARRVAL_PP(z_ann_arguments), 0, (void**) &z_ann_argument) == SUCCESS ) {
                         if ( phannot_fetch_argument_value(z_ann_argument, (zval**) &z_ann_argument_value TSRMLS_CC) == SUCCESS ) {
+                            Z_ADDREF_PP(z_ann_argument_value);
                             add_assoc_zval(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), *z_ann_argument_value);
                         }
                     }
@@ -219,6 +220,7 @@ PHP_METHOD(Controller, getActionMethods)
             }
         }
 
+        Z_ADDREF_P(z_indexed_annotations);
         add_next_index_zval(new_item, z_indexed_annotations);
         add_next_index_zval(return_value, new_item);
 
@@ -305,6 +307,7 @@ PHP_METHOD(Controller, getActionRoutes)
                 path = estrndup(Z_STRVAL_PP(z_doc_uri), Z_STRLEN_PP(z_doc_uri));
             }
             if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "Method", sizeof("Method"), (void**)&z_doc_method) == SUCCESS) {
+                Z_ADDREF_P(z_doc_method);
                 add_assoc_zval(z_route_options, "method", *z_doc_method);
             }
         }
@@ -319,6 +322,8 @@ PHP_METHOD(Controller, getActionRoutes)
         array_init_size(new_item, 3);
         add_next_index_string(new_item, path, 1);
         add_next_index_stringl(new_item, method_name, method_name_len, 0);
+
+        Z_ADDREF_P(z_route_options);
         add_next_index_zval(new_item, z_route_options);
 
         // append to the result array
@@ -374,6 +379,10 @@ PHP_METHOD(Controller, expand)
         zval *z_callback;
         MAKE_STD_ZVAL(z_callback);
         array_init_size(z_callback, 2);
+
+        Z_ADDREF_P(z_callback);
+        Z_ADDREF_P(z_method);
+
         add_next_index_stringl(z_callback, class_name, class_name_len, 1);
         add_next_index_zval(z_callback, *z_method);
 
