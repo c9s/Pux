@@ -2,7 +2,7 @@
 use Pux\Mux;
 use Pux\Executor;
 
-class MuxTest extends PHPUnit_Framework_TestCase
+class MuxTest extends MuxTestCase
 {
     public function testMuxRouteRouteDefine() {
         $mux = new Mux;
@@ -104,7 +104,6 @@ class MuxTest extends PHPUnit_Framework_TestCase
         ok( $mux->dispatch('/news') );
     }
 
-
     public function testBasicRoutes() {
         $mux = new \Pux\Mux;
         ok($mux);
@@ -128,29 +127,6 @@ class MuxTest extends PHPUnit_Framework_TestCase
      */
     public function testSort($mux) {
         $mux->sort();
-    }
-
-
-    /**
-     * @depends testBasicRoutes
-     */
-    public function testExport($mux) {
-        $code = $mux->export();
-        ok($code);
-        eval('$newMux = ' . $code . ';');
-        ok($newMux);
-
-        $routes = $newMux->getRoutes();
-        ok($routes); 
-        count_ok( 2, $routes );
-        is( 2,  $newMux->length() ); 
-    }
-
-    public function testMuxMountEmpty() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        $submux = new \Pux\Mux;
-        $mux->mount( '/sub' , $submux);
     }
 
     public function testRouteWithDomainCondition() {
@@ -179,78 +155,6 @@ class MuxTest extends PHPUnit_Framework_TestCase
         ok($mux->getRoute('hello-name'), 'should return hello-name route');
     }
 
-    public function testMuxMountNoExpand() {
-        $mux = new \Pux\Mux;
-        $mux->expand = false;
-        ok($mux, "got mux");
-        $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
-        $submux->any('/foo', [ 'HelloController2','indexAction' ]);
-        $mux->mount( '/sub' , $submux);
-    }
-
-    public function testMuxMountNoExpandAndDispatchToSubMux() 
-    {
-        $mux = new \Pux\Mux;
-        $mux->expand = false;
-        ok($mux);
-
-        $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
-        $submux->any('/foo', [ 'HelloController2','indexAction' ]);
-        $mux->mount( '/sub' , $submux);
-
-        ok($submux, 'submux');
-        ok($submux->getRoutes(), 'submux routes');
-
-        ok($mux->getRoutes(), 'mux routes');
-
-        $submux2 = $mux->getSubMux($submux->getId());
-        ok($submux2, 'submux2');
-        ok($submux2->getRoutes(), 'submux2 routes');
-
-        $r = $mux->dispatch('/sub/hello/John');
-        ok($r);
-        $this->assertPcreRoute($r, '/hello/:name');
-
-        $r = $mux->dispatch('/sub/foo');
-        $this->assertNonPcreRoute($r, '/foo');
-    }
-
-    public function testSubmuxPcreRouteNotFound() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        is(0, $mux->length());
-
-        $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
-        ok($submux);
-        ok($routes = $submux->getRoutes());
-        is(1, $submux->length());
-        is(0, $mux->length());
-        $mux->mount( '/sub' , $submux);
-
-        ok( ! $mux->dispatch('/sub/foo') );
-        ok( ! $mux->dispatch('/sub/hello') );
-        ok( ! $mux->dispatch('/foo') );
-    }
-
-    public function testSubmuxPcreRouteFound() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        is(0, $mux->length());
-
-        $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
-        ok($submux);
-        ok($routes = $submux->getRoutes());
-        is(1, $submux->length());
-        is(0, $mux->length());
-        $mux->mount( '/sub' , $submux);
-        $r = $mux->dispatch('/sub/hello/John');
-        ok($r);
-        $this->assertPcreRoute($r, '/sub/hello/:name');
-    }
 
     public function testMuxDispatch() {
         $mux = new \Pux\Mux;
@@ -364,44 +268,7 @@ class MuxTest extends PHPUnit_Framework_TestCase
         $this->assertPcreRoute($r, '/product/:id');
     }
 
-    public function assertNonPcreRoute($route, $path = null) {
-        $this->assertFalse($route[0], "Should be Non PCRE Route, Got: {$route[1]}");
-        if ( $path ) {
-            $this->assertSame($path, $route[1], "Should be $path, Got {$route[1]}");
-        }
-    }
 
-    public function assertPcreRoute($route, $path = null) {
-        $this->assertTrue($route[0], "Should be PCRE Route, Got: {$route[1]}" );
-        if ( $path ) {
-            $this->assertSame($path, $route[3]['pattern'], "Should be $path, Got {$route[1]}");
-        }
-    }
-
-    public function testNullStaticRoutes() {
-        $mux = Mux::__set_state(array(
-            'id' => NULL,
-            'routes' =>
-            array (
-                0 =>
-                    array (
-                        0 => false,
-                        1 => '/hello',
-                        2 =>
-                        array (
-                            0 => 'HelloController2',
-                            1 => 'helloAction',
-                        ),
-                        3 => array (),
-                ),
-            ),
-            'submux' => array(),
-            'staticRoutes' => array(),
-            'routesById' => array(),
-            'expand' => true,
-        ));
-        ok($mux);
-    }
 
 }
 
