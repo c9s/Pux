@@ -381,7 +381,7 @@ PHP_METHOD(Controller, expand)
         array_init_size(z_callback, 2);
 
         Z_ADDREF_P(z_callback);
-        Z_ADDREF_P(z_method);
+        Z_ADDREF_PP(z_method);
 
         add_next_index_stringl(z_callback, class_name, class_name_len, 1);
         add_next_index_zval(z_callback, *z_method);
