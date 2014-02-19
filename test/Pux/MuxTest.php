@@ -310,9 +310,11 @@ class MuxTest extends PHPUnit_Framework_TestCase
         ok( $r = $mux->dispatch('/bar') );
         is('bar', Executor::execute($r));
 
-        return;
 
         // XXX: seems like a gc bug here
+        return;
+
+
         $cb = function() use ($mux) {
             $r = $mux->dispatch('/product/23');
             Executor::execute($r);
