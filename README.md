@@ -353,30 +353,30 @@ $mux->dispatch('/product/add');   // ProductController->addAction
 $mux->dispatch('/product/del');   // ProductController->delAction
 ```
 
-You can also use `@method` and `@uri` Docblock variables to override the default `\Pux\Controller::expand()` functionality:
+You can also use `@Route` and `@Method` annotations to override the default `\Pux\Controller::expand()` functionality:
 
 ```php
 class ProductController extends \Pux\Controller
 {
     /**
-     * @method GET
-     * @uri /all
+     * @Route("/all")
+     * @Method("GET")
      */
     public function indexAction() {
         // now available via GET /all only
     }
     
     /**
-     * @method POST
-     * @uri /create
+     * @Route("/create")
+     * @Method("POST")
      */
     public function addAction() {
         // now available via POST /create only
     }
     
     /**
-     * @method DELETE
-     * @uri /destroy
+     * @Route("/destroy")
+     * @Method("DELETE")
      */
     public function delAction() {
         // now available via DELETE /destroy only
@@ -384,9 +384,14 @@ class ProductController extends \Pux\Controller
 }
 ```
 
-This is especially helpful when you want to provide more specific or semantic (e.g., HTTP method-specific) actions.  Note that by default, expanded controller routes will be available via any HTTP method - specifying `@method` will restrict it to the provided method.
+This is especially helpful when you want to provide more specific or semantic
+(e.g., HTTP method-specific) actions.  Note that by default, expanded
+controller routes will be available via any HTTP method - specifying `@Method`
+will restrict it to the provided method.
 
-- `Pux\Controller::expand()` returns an instance of `\Pux\Mux` that contains the controller's methods mapped to URIs, intended to be mounted as a sub mux in another instance of `\Pux\Mux`.
+- `Pux\Controller::expand()` returns an instance of `\Pux\Mux` that contains
+  the controller's methods mapped to URIs, intended to be mounted as a sub mux
+  in another instance of `\Pux\Mux`.
 
 
 MuxCompiler
