@@ -93,9 +93,11 @@ PHP_METHOD(Controller, getActionMethods)
         array_init(new_item);
         add_next_index_stringl(new_item, fn, fn_len, 1);
 
+        // if there no annotation, we pass an empty array.
         ALLOC_INIT_ZVAL(z_method_annotations);
         array_init(z_method_annotations);
 
+        // simplified annotation information is saved to this variable.
         ALLOC_INIT_ZVAL(z_indexed_annotations);
         array_init(z_indexed_annotations);
 
