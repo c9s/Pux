@@ -53,7 +53,7 @@ typedef enum {
   FAILURE = -1,		/* this MUST stay a negative number, or it may affect functions! */
 } ZEND_RESULT_CODE;
 
-inline char phannot_fetch_argument_value(zval **arg, zval** value) {
+inline zend_bool phannot_fetch_argument_value(zval **arg, zval** value) {
     zval **expr;
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
         return FAILURE;
@@ -61,7 +61,7 @@ inline char phannot_fetch_argument_value(zval **arg, zval** value) {
     return zend_hash_find(Z_ARRVAL_PP(expr), "value", sizeof("value"), (void**) value);
 }
 
-inline char phannot_fetch_argument_type(zval **arg, zval **type) {
+inline zend_bool phannot_fetch_argument_type(zval **arg, zval **type) {
     zval **expr;
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
         return FAILURE;
