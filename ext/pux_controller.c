@@ -2,6 +2,7 @@
 #include "ctype.h"
 #include "php.h"
 #include "main/php_main.h"
+#include "Zend/zend.h"
 #include "Zend/zend_API.h"
 #include "Zend/zend_variables.h"
 #include "zend_exceptions.h"
