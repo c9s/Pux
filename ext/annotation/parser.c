@@ -1292,18 +1292,18 @@ int phannot_parse_annotations(zval *result, zval *comment, zval *file_path, zval
 	ZVAL_NULL(result);
 
 	if (Z_TYPE_P(comment) != IS_STRING) {
-        zend_throw_exception_ex(zend_exception_get_default(TSRMLS_C), ZEND_STRL("Comment must be a string"), 0 TSRMLS_CC);
+        zend_throw_exception(zend_exception_get_default(TSRMLS_C), "Comment must be a string", 0 TSRMLS_CC);
 		return FAILURE;
 	}
 
 	if(phannot_internal_parse_annotations(&result, comment, file_path, line, &error_msg TSRMLS_CC) == FAILURE){
 		if (error_msg != NULL) {
 			// phalcon_throw_exception_string(phalcon_annotations_exception_ce, Z_STRVAL_P(error_msg), Z_STRLEN_P(error_msg), 1 TSRMLS_CC);
-            zend_throw_exception_ex(zend_exception_get_default(TSRMLS_C), Z_STRVAL_P(error_msg), Z_STRLEN_P(error_msg) , 0 TSRMLS_CC);
+            zend_throw_exception(zend_exception_get_default(TSRMLS_C), Z_STRVAL_P(error_msg) , 0 TSRMLS_CC);
 		}
 		else {
 			// phalcon_throw_exception_string(phalcon_annotations_exception_ce, ZEND_STRL("There was an error parsing annotation"), 1 TSRMLS_CC);
-            zend_throw_exception_ex(zend_exception_get_default(TSRMLS_C), ZEND_STRL("There was an error parsing annotation") , 0 TSRMLS_CC);
+            zend_throw_exception(zend_exception_get_default(TSRMLS_C), "There was an error parsing annotation" , 0 TSRMLS_CC);
 		}
 
 		return FAILURE;
