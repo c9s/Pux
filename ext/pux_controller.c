@@ -67,13 +67,16 @@ PHP_METHOD(Controller, getActionMethods)
     zend_function *mptr;
     zend_hash_internal_pointer_reset_ex(function_table, &pos);
 
+    const char *fn;
+    size_t fn_len;
+    int p;
+
     while (zend_hash_get_current_data_ex(function_table, (void **) &mptr, &pos) == SUCCESS) {
+        fn     = mptr->common.function_name;
+        fn_len = strlen(mptr->common.function_name);
+        p      = strpos(fn, "Action");
 
-        const char * key = mptr->common.function_name;
-        size_t   key_len = strlen(mptr->common.function_name);
-        int p = strpos(key, "Action");
-
-        if ( p == -1 || (size_t)p != (key_len - strlen("Action"))  ) {
+        if ( p == -1 || (size_t)p != (fn_len - strlen("Action"))  ) {
             continue;
         }
 
@@ -88,7 +91,7 @@ PHP_METHOD(Controller, getActionMethods)
 
         ALLOC_ZVAL(new_item);
         array_init(new_item);
-        add_next_index_stringl(new_item, key, key_len, 1);
+        add_next_index_stringl(new_item, fn, fn_len, 1);
 
         ALLOC_INIT_ZVAL(z_method_annotations);
         array_init(z_method_annotations);
