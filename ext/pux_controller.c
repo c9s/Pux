@@ -72,75 +72,77 @@ PHP_METHOD(Controller, getActionMethods)
         const char * key = mptr->common.function_name;
         size_t   key_len = strlen(mptr->common.function_name);
         int p = strpos(key, "Action");
-        if ( p != -1 && (size_t)p == (key_len - strlen("Action")) ) {
-            // append the structure [method name, annotations]
-            zval *new_item;
-            zval *z_method_annotations;
-            zval *z_indexed_annotations;
 
-            zval *z_comment;
-            zval *z_file;
-            zval *z_line_start;
+        if ( p == -1 || (size_t)p != (key_len - strlen("Action"))  ) {
+            continue;
+        }
 
-            ALLOC_ZVAL(new_item);
-            array_init(new_item);
-            add_next_index_stringl(new_item, key, key_len, 1);
+        // append the structure [method name, annotations]
+        zval *new_item;
+        zval *z_method_annotations;
+        zval *z_indexed_annotations;
 
-            ALLOC_INIT_ZVAL(z_method_annotations);
-            array_init(z_method_annotations);
+        zval *z_comment;
+        zval *z_file;
+        zval *z_line_start;
 
-            ALLOC_INIT_ZVAL(z_indexed_annotations);
-            array_init(z_indexed_annotations);
+        ALLOC_ZVAL(new_item);
+        array_init(new_item);
+        add_next_index_stringl(new_item, key, key_len, 1);
 
-            if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
-                ALLOC_ZVAL(z_comment);
-                ZVAL_STRING(z_comment, mptr->op_array.doc_comment, 1);
+        ALLOC_INIT_ZVAL(z_method_annotations);
+        array_init(z_method_annotations);
 
-                ALLOC_ZVAL(z_file);
-                ZVAL_STRING(z_file, mptr->op_array.filename, 1);
+        ALLOC_INIT_ZVAL(z_indexed_annotations);
+        array_init(z_indexed_annotations);
 
-                ALLOC_ZVAL(z_line_start);
-                ZVAL_LONG(z_line_start, mptr->op_array.line_start);
+        if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
+            ALLOC_ZVAL(z_comment);
+            ZVAL_STRING(z_comment, mptr->op_array.doc_comment, 1);
 
-                /*
-                zval *z_line_end;
-                ALLOC_ZVAL(z_line_end);
-                ZVAL_LONG(z_line_start, mptr->op_array.line_end);
-                */
-                zval **z_doc_var = NULL, **z_ann = NULL;
+            ALLOC_ZVAL(z_file);
+            ZVAL_STRING(z_file, mptr->op_array.filename, 1);
 
-                // TODO: make phannot_parse_annotations reads comment variable in char* type, so we don't need to create extra zval(s)
-                if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line_start TSRMLS_CC) == SUCCESS) {
-                    HashPosition annp;
-                    for (
-                        zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_method_annotations), &annp);
-                        zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
-                        zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
-                    ) {
-                        if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_doc_var) == FAILURE) {
-                            continue;
-                        }
+            ALLOC_ZVAL(z_line_start);
+            ZVAL_LONG(z_line_start, mptr->op_array.line_start);
 
-                        // should be type string 
-                        if ( Z_TYPE_PP(z_doc_var) == IS_STRING ) {
-                            if ( strncmp( Z_STRVAL_PP(z_doc_var), "method",  strlen("method")) == 0
-                                || strncmp( Z_STRVAL_PP(z_doc_var), "uri",   strlen("uri")) == 0 
-                            ) {
-                                char doc_delim[ Z_STRLEN_PP(z_doc_var) + 2];
-                                sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_doc_var));
+            /*
+            zval *z_line_end;
+            ALLOC_ZVAL(z_line_end);
+            ZVAL_LONG(z_line_start, mptr->op_array.line_end);
+            */
+            zval **z_doc_var = NULL, **z_ann = NULL;
 
-                                char *doc_var_substr_start  = strstr(mptr->op_array.doc_comment, doc_delim) + strlen(doc_delim) + 1;
-                                int  doc_var_val_len        = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
-                                add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_doc_var), doc_var_substr_start, doc_var_val_len, 1);
-                            }
+            // TODO: make phannot_parse_annotations reads comment variable in char* type, so we don't need to create extra zval(s)
+            if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line_start TSRMLS_CC) == SUCCESS) {
+                HashPosition annp;
+                for (
+                    zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_method_annotations), &annp);
+                    zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
+                    zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
+                ) {
+                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", 5, (void**)&z_doc_var) == FAILURE) {
+                        continue;
+                    }
+
+                    // should be type string 
+                    if ( Z_TYPE_PP(z_doc_var) == IS_STRING ) {
+                        if ( strncmp( Z_STRVAL_PP(z_doc_var), "method",  strlen("method")) == 0
+                            || strncmp( Z_STRVAL_PP(z_doc_var), "uri",   strlen("uri")) == 0 
+                        ) {
+                            char doc_delim[ Z_STRLEN_PP(z_doc_var) + 2];
+                            sprintf(doc_delim, "@%s", Z_STRVAL_PP(z_doc_var));
+
+                            char *doc_var_substr_start  = strstr(mptr->op_array.doc_comment, doc_delim) + strlen(doc_delim) + 1;
+                            int  doc_var_val_len        = strstr(doc_var_substr_start, " ") - doc_var_substr_start - 1;
+                            add_assoc_stringl(z_indexed_annotations, Z_STRVAL_PP(z_doc_var), doc_var_substr_start, doc_var_val_len, 1);
                         }
                     }
                 }
             }
-
-            add_next_index_zval(new_item, z_indexed_annotations);
-            add_next_index_zval(return_value, new_item);
         }
+        add_next_index_zval(new_item, z_indexed_annotations);
+        add_next_index_zval(return_value, new_item);
 
         zend_hash_move_forward_ex(function_table, &pos);
     }
