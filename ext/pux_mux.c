@@ -168,6 +168,7 @@ PHP_METHOD(Mux, __set_state) {
     }
 
     object_init_ex(return_value, ce_pux_mux);
+    // XXX: put this back if we have problem
     // CALL_METHOD(Mux, __construct, return_value, return_value);
 
     zval **z_id = NULL;
