@@ -75,17 +75,42 @@ Features
 - Zero dependency.
 - Low memory footprint (only 6KB with simple routes and extension installed) .
 - High performance of dispatching routes.
-- PCRE pattern path support. (Sinatra-style)
+- PCRE pattern path support. (Sinatra-style syntax)
 - Request method condition support.
 - Domain condition support.
 - HTTPS condition support.
-- Docblock parsing support.
+- Controller auto-mounting - you mount a controller automatically without specifying paths for each action.
+- Controller annotation support - you may override the default path from controller through the annotations.
+- Route with optional pattern.
+
+Pros & Cons
+-----------------
+An idea of matching routes is to compile all patterns into one pattern, however
+this approach does not work if you have optional group or named capturing
+group. And since you compile all patterns into one, you can't compare with
+other same patterns with different conditions, for example:
+
+    /users  # GET
+    /users  # POST
+    /users  # with HTTP_HOST=somedomain
+
+The trade off in Pux is to compare routes in sequence because the same pattern
+might be in different HTTP method or different host name.
+
 
 Routing Path Format
 ---------------------
 
+Static route:
+
     /post
+
+PCRE route:
+
     /post/:id                  => matches /post/33
+
+PCRE route with optional pattern:
+
     /post/:id(/:title)         => matches /post/33, /post/33/post%20title
     /post/:id(\.:format)       => matches /post/33, /post/33.json .. /post/33.xml
 
