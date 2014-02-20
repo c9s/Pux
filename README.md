@@ -127,7 +127,7 @@ You can install Pux with composer by defining the following requirement in your 
 ```json
 {
     "require": {
-        "corneltek/pux": "~1.3"
+        "corneltek/pux": "~1.5"
     }
 }
 ```
