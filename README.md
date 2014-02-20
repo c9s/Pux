@@ -65,7 +65,7 @@ routing component consumes a lot of computation time and the request number
 will decrease quite a few. (and it does nothing, all it does is ... just
 routing!)
 
-So Pux tries to reduce the overheads of loading PHP classes and the runtime
+So Pux reduces the overheads of loading PHP classes and the runtime
 method/function calls, and you can run your application faster without the overheads.
 
 
