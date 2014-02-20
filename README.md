@@ -85,10 +85,15 @@ Features
 
 Pros & Cons
 -----------------
-An idea of matching routes is to compile all patterns into one pattern, however
-this approach does not work if you have optional group or named capturing
-group. And since you compile all patterns into one, you can't compare with
-other same patterns with different conditions, for example:
+An idea of matching routes is to combine all patterns into one pattern and
+compare the given path with `pcre_match` in one time.
+
+However this approach does not work if you have optional group or named
+capturing group, the `pcre_match` does not return detailed information about
+what pattern is matched. 
+
+And since you compile all patterns into one, you can't compare with other same
+patterns with different conditions, for example:
 
     /users  # GET
     /users  # POST
@@ -96,6 +101,10 @@ other same patterns with different conditions, for example:
 
 The trade off in Pux is to compare routes in sequence because the same pattern
 might be in different HTTP method or different host name.
+
+The best approach is to merge & compile the regexp patterns into a FSM (Finate
+state machine), complex conditions can also be merged into this FSM, and let
+this FSM to dispatch routes. And this is the long-term target of Pux.
 
 
 Routing Path Format
