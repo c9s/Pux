@@ -48,7 +48,7 @@ class Controller {
                     $opts['method'] = $mux->getRequestMethodConstant(array_pop($mmatch));
                 }
 
-                if (preg_match('/^[\s*]*\@Route\("([^\s]+)"\)/im', $doc, $umatch)) {
+                if (preg_match('/^[\s*]*\@Route\("([^\s]*)"\)/im', $doc, $umatch)) {
                     $path[0] = array_pop($umatch);
                 }
             }
