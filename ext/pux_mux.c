@@ -414,14 +414,9 @@ PHP_METHOD(Mux, mount) {
     }
 
     if ( Z_TYPE_P(z_mux) == IS_OBJECT ) {
-        zend_class_entry *ce = Z_OBJCE_P(z_mux);
-        if ( instanceof_function(ce, ce_pux_controller TSRMLS_CC) ) {
+        if ( instanceof_function( Z_OBJCE_P(z_mux), ce_pux_controller TSRMLS_CC) ) {
             zval *rv;
             zend_call_method(&z_mux, ce_pux_controller, NULL, "expand", strlen("expand"), &rv, 0, NULL, NULL TSRMLS_CC );
-
-            zval *t = z_mux;
-            zval_ptr_dtor(&t);
-
             z_mux = rv;
         }
     }
@@ -1105,8 +1100,8 @@ inline void mux_add_route(INTERNAL_FUNCTION_PARAMETERS)
             array_init(rv);
             php_explode(delim, z_callback, rv, 2);
 
-            *z_callback = *rv;
-            zval_copy_ctor(z_callback);
+            z_callback = rv;
+            // zval_copy_ctor(z_callback);
             zval_ptr_dtor(&delim);
         }
     }
