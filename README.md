@@ -83,8 +83,8 @@ Features
 - Controller annotation support - you may override the default path from controller through the annotations.
 - Route with optional pattern.
 
-Pros & Cons
------------------
+Pros & Cons of Grouped Matching Strategy
+----------------------------------------
 An idea of matching routes is to combine all patterns into one pattern and
 compare the given path with `pcre_match` in one time.
 
@@ -217,6 +217,9 @@ $mux = new Mux;
 $mux->get('/get', ['HelloController','helloAction']);
 $mux->post('/post', ['HelloController','helloAction']);
 $mux->put('/put', ['HelloController','helloAction']);
+
+$mux->mount('/hello', new HelloController);
+
 $route = $mux->dispatch( $_SERVER['PATH_INFO'] );
 echo Executor::execute($route);
 ```
@@ -263,6 +266,9 @@ $mainMux->expand = true;
 $pageMux = new Mux;
 $pageMux->add('/page1', [ 'PageController', 'page1' ]);
 $pageMux->add('/page2', [ 'PageController', 'page2' ]);
+
+// short-hand syntax
+$pageMux->add('/page2', 'PageController:page2'  );
 
 $mainMux->mount('/sub', $pageMux);
 
@@ -378,7 +384,11 @@ class ProductController extends \Pux\Controller
 }
 
 $mux = new Pux\Mux;
-$mux->mount( '/product' , $controller->expand() );
+$submux = $controller->expand();
+$mux->mount( '/product' , $submux );
+
+// or even simpler
+$mux->mount( '/product' , $controller);
 
 $mux->dispatch('/product');       // ProductController->indexAction
 $mux->dispatch('/product/add');   // ProductController->addAction
