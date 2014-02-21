@@ -102,7 +102,7 @@ patterns with different conditions, for example:
 The trade off in Pux is to compare routes in sequence because the same pattern
 might be in different HTTP method or different host name.
 
-The best approach is to merge & compile the regexp patterns into a FSM (Finate
+The best approach is to merge & compile the regexp patterns into a FSM (Finite
 state machine), complex conditions can also be merged into this FSM, and let
 this FSM to dispatch routes. And this is the long-term target of Pux.
 
