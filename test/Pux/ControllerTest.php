@@ -71,10 +71,20 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         ok( $controller->toJson(array('foo' => 1) ) );
     }
 
+
+    /**
+     * @depends testControllerConstructor
+     */
+    public function testMountControllerObject($controller) {
+        $m = new Mux;
+        $m->mount( '/product' , $controller );
+    }
+
     /**
      * @depends testControllerConstructor
      */
     public function testMount($controller) {
+        ok($controller);
         $mainMux = new Mux;
         $mainMux->mount( '/product' , $controller->expand() );
         ok( $mainMux->getRoutes() ); 

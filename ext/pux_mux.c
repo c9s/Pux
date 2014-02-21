@@ -16,6 +16,7 @@
 #include "php_pux.h"
 #include "ct_helper.h"
 #include "pux_functions.h"
+#include "pux_controller.h"
 #include "pux_mux.h"
 
 zend_class_entry *ce_pux_mux;
@@ -408,10 +409,23 @@ PHP_METHOD(Mux, mount) {
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz|a", &pattern, &pattern_len, &z_mux, &z_options) == FAILURE) {
         RETURN_FALSE;
     }
-
     if ( Z_TYPE_P(z_mux) == IS_NULL ) {
         RETURN_FALSE;
     }
+
+    if ( Z_TYPE_P(z_mux) == IS_OBJECT ) {
+        zend_class_entry *ce = Z_OBJCE_P(z_mux);
+        if ( instanceof_function(ce, ce_pux_controller TSRMLS_CC) ) {
+            zval *rv;
+            zend_call_method(&z_mux, ce_pux_controller, NULL, "expand", strlen("expand"), &rv, 0, NULL, NULL TSRMLS_CC );
+
+            zval *t = z_mux;
+            zval_ptr_dtor(&t);
+
+            z_mux = rv;
+        }
+    }
+
 
     Z_ADDREF_P(z_mux);
 
@@ -1092,7 +1106,7 @@ inline void mux_add_route(INTERNAL_FUNCTION_PARAMETERS)
             php_explode(delim, z_callback, rv, 2);
 
             *z_callback = *rv;
-            zval_copy_ctor(&z_callback);
+            zval_copy_ctor(z_callback);
             zval_ptr_dtor(&delim);
         }
     }

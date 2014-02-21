@@ -66,6 +66,10 @@ class Mux
 
     public function mount($pattern, $mux, $options = array())
     {
+        if ( $mux instanceof \Pux\Controller ) {
+            $mux = $mux->expand();
+        }
+
         if ( $this->expand ) {
             // rewrite submux routes
             foreach( $mux->routes as $route ) {
