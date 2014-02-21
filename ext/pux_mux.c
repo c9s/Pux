@@ -1056,7 +1056,7 @@ PHP_METHOD(Mux, appendPCRERoute) {
 }
 
 
-static void mux_add_route(INTERNAL_FUNCTION_PARAMETERS)
+inline void mux_add_route(INTERNAL_FUNCTION_PARAMETERS)
 {
     char *pattern;
     int  pattern_len;
@@ -1077,6 +1077,24 @@ static void mux_add_route(INTERNAL_FUNCTION_PARAMETERS)
     } else if ( Z_TYPE_P(z_options) == IS_NULL ) {
         // make it as an array
         array_init(z_options);
+    }
+
+    // Generalize callback variable
+    if ( Z_TYPE_P(z_callback) == IS_STRING ) {
+        if ( strpos( Z_STRVAL_P(z_callback), ":" ) != -1 ) {
+            zval *delim;
+            MAKE_STD_ZVAL(delim);
+            ZVAL_STRINGL(delim, ":" , 1 , 1);
+
+            zval *rv;
+            MAKE_STD_ZVAL(rv);
+            array_init(rv);
+            php_explode(delim, z_callback, rv, 2);
+
+            *z_callback = *rv;
+            zval_copy_ctor(&z_callback);
+            zval_ptr_dtor(&delim);
+        }
     }
 
 

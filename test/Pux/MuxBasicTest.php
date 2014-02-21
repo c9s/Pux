@@ -5,6 +5,21 @@ use Pux\Executor;
 class MuxBasicTest extends PHPUnit_Framework_TestCase
 {
 
+    public function testCallbackGeneralize() 
+    {
+        $m = new Mux;
+        $m->add('/', 'PageController:page1');
+        ok($m);
+        $routes = $m->getRoutes();
+        ok($routes);
+        ok( is_array($routes) );
+        $route = $routes[0];
+        list($pcre, $pattern, $callback, $options) = $route;
+        ok( ! $pcre);
+        ok( is_array($callback) );
+        same_ok( array('PageController','page1') , $callback );
+    }
+
     public function testSubMuxExpand() 
     {
         $mainMux = new Mux;

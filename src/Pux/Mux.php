@@ -142,6 +142,10 @@ class Mux
 
     public function add($pattern, $callback, $options = array())
     {
+        if ( is_string($callback) && strpos($callback,':') !== false ) {
+            $callback = explode(':', $callback);
+        }
+
         // compile place holder to patterns
         $pcre = strpos($pattern,':') !== false;
         if ( $pcre ) {

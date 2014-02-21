@@ -23,6 +23,8 @@ zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry 
 
 extern inline zval * call_mux_method(zval * object , char * method_name , int method_name_len, int param_count, zval* arg1, zval* arg2, zval* arg3 TSRMLS_DC);
 
+extern inline void mux_add_route(INTERNAL_FUNCTION_PARAMETERS);
+
 
 PHP_METHOD(Mux, __construct);
 PHP_METHOD(Mux, __destruct);
