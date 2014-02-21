@@ -89,8 +89,8 @@ An idea of matching routes is to combine all patterns into one pattern and
 compare the given path with `pcre_match` in one time.
 
 However this approach does not work if you have optional group or named
-capturing group, the `pcre_match` does not return detailed information about
-what pattern is matched. 
+capturing group, the `pcre_match` can not return detailed information about
+what pattern is matched if you use one of them.
 
 And since you compile all patterns into one, you can't compare with other same
 patterns with different conditions, for example:
