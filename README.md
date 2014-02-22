@@ -436,6 +436,46 @@ will restrict it to the provided method.
   in another instance of `\Pux\Mux`.
 
 
+Route Executor
+--------------------
+`Pux\Executor` executes your route by creating the controller object, and
+calling the controller action method.
+
+Route executor take the returned route as its parameter, you simply pass the
+route to executor the controller and get the execution result.
+
+Here the simplest example of the usage:
+
+```php
+use Pux\Executor;
+$mux = new Pux\Mux;
+$mux->any('/product/:id', ['ProductController','itemAction']);
+$route = $mux->dispatch('/product/1');
+$result = Executor::execute($route);
+```
+
+You can also define the arguments to the controller's constructor method:
+
+```php
+
+class ProductController extends Pux\Controller {
+    public function __construct($param1, $param2) {
+        // do something you want
+    }
+    public function itemAction($id) {
+        return "Product $id";
+    }
+}
+
+use Pux\Executor;
+$mux = new Pux\Mux;
+$mux->any('/product/:id', ['ProductController','itemAction'], [ 
+    'constructor_args' => [ 'param1', 'param2' ],
+]);
+$route = $mux->dispatch('/product/1');
+$result = Executor::execute($route); // returns "Product 1"
+```
+
 MuxCompiler
 --------------------
 
@@ -446,7 +486,6 @@ In your route definition file `hello_routes.php`, you simply return the Mux obje
 // load your composer autoload if it's needed
 // require '../vendor/autoload.php';
 use Pux\Mux;
-use Pux\Executor;
 $mux = new Mux;
 $mux->get('/hello', ['HelloController','helloAction']);
 return $mux;
