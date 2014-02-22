@@ -12,17 +12,20 @@ class Executor
      */
     public static function execute($route) 
     {
-        $cb = $route[2]; /* get callback */
+        list($pcre,$pattern,$cb,$options) = $route;
 
         // create the reflection class
         $rc = new ReflectionClass( $cb[0] );
 
-        $args = null;
+        $constructArgs = null;
+        if ( isset($options['constructor_args']) ) {
+            $constructArgs = $options['constructor_args'];
+        }
 
         // if the first argument is a class name string, 
         // then create the controller object.
         if( is_string($cb[0]) ) {
-            $cb[0] = $controller = $args ? $rc->newInstanceArgs($args) : $rc->newInstance();
+            $cb[0] = $controller = $constructArgs ? $rc->newInstanceArgs($constructArgs) : $rc->newInstance();
         } else {
             $controller = $cb[0];
         }
@@ -40,8 +43,8 @@ class Executor
 
         // XXX:
 
-        $vars = isset($route[3]['vars'])
-                ? $route[3]['vars']
+        $vars = isset($options['vars'])
+                ? $options['vars']
                 : array()
                 ;
 
