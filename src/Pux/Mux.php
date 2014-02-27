@@ -280,7 +280,7 @@ class Mux
                 }
             } else {
                 // if ( strcmp($route[1] , $path) === 0 ) {
-                if ( strncmp($route[1] , $path, strlen($route[1]) ) === 0 ) {
+                if ( strcmp($route[1] , $path ) === 0 ) {
                     // validate request method
                     if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod )
                         continue;
