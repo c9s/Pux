@@ -99,11 +99,18 @@ class ControllerTest extends PHPUnit_Framework_TestCase
     public function testMountNoExpand($controller) {
         $mainMux = new Mux;
         $mainMux->expand = false;
-        $mainMux->mount( '/product' , $controller->expand() );
+        $mainMux->mount( '/product' , $controller);
+
         ok( $mainMux->getRoutes() ); 
-        ok( $r = $mainMux->dispatch('/product') );
+        count_ok( 1,  $mainMux->getRoutes(), 'route count should be 1' );
+        ok( $r = $mainMux->dispatch('/product') , 'matched /product' ); // match indexAction
+        $this->assertSame( array('CRUDProductController','indexAction'), $r[2] );
+
         ok( $r = $mainMux->dispatch('/product/add') );
+        $this->assertSame( array('CRUDProductController','addAction'), $r[2] );
+
         ok( $r = $mainMux->dispatch('/product/del') );
+        $this->assertSame( array('CRUDProductController','delAction'), $r[2] );
     }
 
 }

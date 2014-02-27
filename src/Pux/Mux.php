@@ -78,7 +78,6 @@ class Mux
                     $newPattern = $pattern . $route[3]['pattern'];
                     $routeArgs = PatternCompiler::compile($newPattern, 
                         array_merge_recursive($route[3], $options) );
-
                     $this->appendPCRERoute( $routeArgs, $route[2] );
                 } else {
                     $this->routes[] = array(
@@ -261,7 +260,6 @@ class Mux
         $reqmethod = $this->getRequestMethodConstant(@$_SERVER['REQUEST_METHOD']);
 
         foreach( $this->routes as $route ) {
-
             if ( $route[0] ) {
                 if ( preg_match($route[1], $path , $regs ) ) {
                     $route[3]['vars'] = $regs;
@@ -273,14 +271,13 @@ class Mux
                         continue;
                     if ( isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"] )
                         continue;
-
                     return $route;
                 } else {
                     continue;
                 }
             } else {
-                // if ( strcmp($route[1] , $path) === 0 ) {
-                if ( strcmp($route[1] , $path ) === 0 ) {
+                // prefix match is used when expanding is not enabled.
+                if ( strncmp($route[1], $path, strlen($route[1]) ) === 0 ) {
                     // validate request method
                     if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod )
                         continue;
@@ -297,21 +294,19 @@ class Mux
     }
 
     public function dispatch($path) {
-        // $path = rtrim($path, '/');
         if ( $route = $this->match($path) ) {
             if ( is_int($route[2]) ) {
                 $submux = $this->submux[ $route[2] ];
 
-                // sub path and call submux to dispatch
+                // sub-path and call submux to dispatch
                 // for pcre pattern?
                 if ($route[0]) { 
                     $matchedString = $route[3]['vars'][0];
-                    return $submux->dispatch( 
-                        substr($path, strlen($matchedString))
-                    );
+                    return $submux->dispatch( substr($path, strlen($matchedString)) );
                 } else {
+                    $s = substr($path, strlen($route[1]));
                     return $submux->dispatch(
-                        substr($path, strlen($route[1]))
+                        substr($path, strlen($route[1])) ?: '' 
                     );
                 }
             } else {

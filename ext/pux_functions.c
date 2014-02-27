@@ -701,7 +701,7 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
         } else {
             // normal string comparison
             // pattern-prefix match
-            if ( strncmp(Z_STRVAL_PP( z_pattern_pp ), path, Z_STRLEN_PP( z_pattern_pp )) == 0 ) {
+            if ( strncmp(Z_STRVAL_PP( z_pattern_pp ), path, Z_STRLEN_PP(z_pattern_pp) ) == 0 ) {
                 // check conditions
                 if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 3, (void**) &z_route_options_pp) == SUCCESS ) {
                     if ( zend_hash_num_elements(Z_ARRVAL_PP(z_route_options_pp)) ) {

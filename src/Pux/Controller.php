@@ -24,7 +24,7 @@ class Controller {
             if ($actionName === 'index') {
                 $path = '';
             } else {
-                $path = preg_replace_callback('/[A-Z]/', function($matches) {
+                $path = '/' . preg_replace_callback('/[A-Z]/', function($matches) {
                     return '/' . strtolower($matches[0]);
                 }, $actionName);
             }
