@@ -612,7 +612,7 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
 
     zval **z_is_pcre_pp; // route[0]
     zval **z_pattern_pp; // route[1]
-    // callback @ route[2]
+    zval **z_callback_pp; // callback @ route[2]
     zval **z_route_options_pp; // route[3]
 
     pcre_cache_entry *pce;              /* Compiled regular expression */
@@ -701,7 +701,11 @@ inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC) 
         } else {
             // normal string comparison
             // pattern-prefix match
-            if ( strncmp(Z_STRVAL_PP( z_pattern_pp ), path, Z_STRLEN_PP(z_pattern_pp) ) == 0 ) {
+            zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 2, (void**) &z_callback_pp);
+            if ( ( Z_TYPE_PP(z_callback_pp) == IS_LONG && strncmp(Z_STRVAL_PP( z_pattern_pp ), path, Z_STRLEN_PP(z_pattern_pp) ) == 0 )
+                 || strcmp(Z_STRVAL_PP( z_pattern_pp ), path ) == 0 ) 
+            {
+
                 // check conditions
                 if ( zend_hash_index_find( Z_ARRVAL_PP(z_route_pp), 3, (void**) &z_route_options_pp) == SUCCESS ) {
                     if ( zend_hash_num_elements(Z_ARRVAL_PP(z_route_options_pp)) ) {
