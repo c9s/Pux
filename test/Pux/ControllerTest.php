@@ -100,9 +100,10 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         $mainMux = new Mux;
         $mainMux->expand = false;
         $mainMux->mount( '/product' , $controller);
+        $mainMux->any( '/' , array('ProductController', 'indexAction') );
 
         ok( $mainMux->getRoutes() ); 
-        count_ok( 1,  $mainMux->getRoutes(), 'route count should be 1' );
+        count_ok( 2,  $mainMux->getRoutes(), 'route count should be 2' );
         ok( $r = $mainMux->dispatch('/product') , 'matched /product' ); // match indexAction
         $this->assertSame( array('CRUDProductController','indexAction'), $r[2] );
 
@@ -111,6 +112,9 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 
         ok( $r = $mainMux->dispatch('/product/del') );
         $this->assertSame( array('CRUDProductController','delAction'), $r[2] );
+
+        ok( null == $mainMux->dispatch('/foo') );
+        ok( null == $mainMux->dispatch('/bar') );
     }
 
 }

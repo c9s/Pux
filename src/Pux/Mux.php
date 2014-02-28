@@ -261,23 +261,22 @@ class Mux
 
         foreach( $this->routes as $route ) {
             if ( $route[0] ) {
-                if ( preg_match($route[1], $path , $regs ) ) {
-                    $route[3]['vars'] = $regs;
-
-                    // validate request method
-                    if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod )
-                        continue;
-                    if ( isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"] )
-                        continue;
-                    if ( isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"] )
-                        continue;
-                    return $route;
-                } else {
+                if ( ! preg_match($route[1], $path , $regs ) ) {
                     continue;
                 }
+                $route[3]['vars'] = $regs;
+
+                // validate request method
+                if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod )
+                    continue;
+                if ( isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"] )
+                    continue;
+                if ( isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"] )
+                    continue;
+                return $route;
             } else {
                 // prefix match is used when expanding is not enabled.
-                if ( strncmp($route[1], $path, strlen($route[1]) ) === 0 ) {
+                if ( ( is_int($route[2]) && strncmp($route[1], $path, strlen($route[1]) ) === 0 ) || $route[1] == $path ) {
                     // validate request method
                     if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod )
                         continue;
