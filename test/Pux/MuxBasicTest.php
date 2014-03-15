@@ -26,13 +26,13 @@ class MuxBasicTest extends PHPUnit_Framework_TestCase
         $mainMux->expand = true;
 
         $pageMux = new Mux;
-        $pageMux->add('/page1', [ 'PageController', 'page1' ]);
-        $pageMux->add('/page2', [ 'PageController', 'page2' ]);
+        $pageMux->add('/page1', array( 'PageController', 'page1' ));
+        $pageMux->add('/page2', array( 'PageController', 'page2' ));
         // $pageMux->add('/post/:id', [ 'PageController', 'page2' ]);
 
         $mainMux->mount('/sub', $pageMux);
 
-        foreach( ['/sub/page1', '/sub/page2'] as $p ) {
+        foreach( array('/sub/page1', '/sub/page2') as $p ) {
             $r = $mainMux->dispatch($p);
             ok($r, "Matched route for $p");
         }
@@ -43,19 +43,19 @@ class MuxBasicTest extends PHPUnit_Framework_TestCase
         $mainMux->expand = false;
 
         $pageMux = new Mux;
-        $pageMux->add('/page1', [ 'PageController', 'page1' ]);
-        $pageMux->add('/page2', [ 'PageController', 'page2' ]);
+        $pageMux->add('/page1', array( 'PageController', 'page1' ));
+        $pageMux->add('/page2', array( 'PageController', 'page2' ));
         $mainMux->mount('/sub', $pageMux);
 
         $pageMux2 = new Mux;
-        $pageMux2->add('/bar', [ 'PageController', 'page1' ]);
-        $pageMux2->add('/zoo', [ 'PageController', 'page2' ]);
+        $pageMux2->add('/bar', array( 'PageController', 'page1' ));
+        $pageMux2->add('/zoo', array( 'PageController', 'page2' ));
         is( 2, $pageMux2->length());
 
         $mainMux->mount('/foo', $pageMux2);
         is( 2, $mainMux->length());
 
-        foreach( ['/sub/page1', '/sub/page2', '/foo/bar', '/foo/zoo'] as $p ) {
+        foreach( array('/sub/page1', '/sub/page2', '/foo/bar', '/foo/zoo') as $p ) {
             $r = $mainMux->dispatch($p);
             ok($r, "Matched route for $p");
         }

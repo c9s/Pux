@@ -15,7 +15,15 @@
       ),
     ),
   ),
-   'submux' => array(),
+   'staticRoutes' => 
+  array (
+  ),
+   'routesById' => 
+  array (
+  ),
+   'submux' => 
+  array (
+  ),
    'id' => NULL,
    'expand' => true,
 )); /* version */
