@@ -1,33 +1,22 @@
 <?php
+// vim:fdm=marker:
 use Pux\Mux;
 use Pux\Executor;
 use Pux\Controller;
 
+
+// /* CRUDProductController {{{*/
 class CRUDProductController extends Controller
 {
-    public function indexAction() 
-    {
-
-    }
-
-    public function addAction() {
-
-    }
-
-    public function delAction() {
-
-    }
-
+    public function indexAction() { }
+    public function addAction() { } 
+    public function delAction() { }
 }
+/*}}}*/
 
 class ControllerTest extends PHPUnit_Framework_TestCase
 {
 
-    public function testControllerConstructor() {
-        $controller = new CRUDProductController;
-        ok($controller);
-        return $controller;
-    }
 
     /**
      * @depends testControllerConstructor
@@ -115,6 +104,12 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 
         ok( null == $mainMux->dispatch('/foo') );
         ok( null == $mainMux->dispatch('/bar') );
+    }
+
+    public function testControllerConstructor() {
+        $controller = new CRUDProductController;
+        ok($controller);
+        return $controller;
     }
 
 }

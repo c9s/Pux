@@ -1,7 +1,7 @@
 language: php
 php:
   - 5.4
-  - 5.5
+    #  - 5.5
 install:
   - sudo apt-get install php5-dev php-pear
   - composer install --dev

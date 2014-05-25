@@ -3,8 +3,33 @@ use Pux\Mux;
 use Pux\Executor;
 use Pux\Controller;
 
+class ParentController extends Controller {
+
+    /**
+     *
+     * @Route("/update")
+     * @Method("GET")
+     */
+    public function pageAction() {  }
+}
+
+class ChildController extends ParentController { 
+    // we should override this action.
+    public function pageAction() {  }
+
+    public function subpageAction() {  }
+
+}
+
+
 class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
 {
+
+    public function testInheritedAnnotations()
+    {
+
+    }
+
     public function testAnnotations()
     {
         if (defined('HHVM_VERSION')) {
