@@ -73,13 +73,14 @@ void pux_init_controller(TSRMLS_D) {
 }
 
 
+static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval);
+
 static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval) {
     HashTable *func_table;
     zend_function *mptr; // prepare zend_function mptr for iterating hash 
     HashPosition pos;
 
     zend_class_entry *parent_ce;
-    HashTable *parent_func_table;
 
     const char *fn;
     size_t fn_len;
@@ -87,9 +88,8 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval) {
 
     if (ce->parent) {
         parent_ce = ce->parent;
-        parent_func_table = &ce->parent->function_table;
+        zend_parse_action_annotations(parent_ce, retval);
     }
-
 
     func_table = &ce->function_table;
     zend_hash_internal_pointer_reset_ex(func_table, &pos);
@@ -259,10 +259,7 @@ PHP_METHOD(Controller, __construct) {
 PHP_METHOD(Controller, getActionMethods)
 {
     // Get function table hash from the current object.
-    zend_class_entry *ce;
-    HashTable *func_table;
-
-    ce = Z_OBJCE_P(this_ptr);
+    zend_class_entry *ce = Z_OBJCE_P(this_ptr);
 
     array_init(return_value);
 
