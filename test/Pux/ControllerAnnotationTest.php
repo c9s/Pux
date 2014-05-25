@@ -34,7 +34,10 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
         ok( isset($map[0]), 'one path' );
         is( 1, count($map), 'count of map' );
         is( 'pageAction', $map[0][0], 'pageAction');
-        is([ 'Route' => '/update', 'Method' => 'GET' ], $map[0][1] );
+        is([ 'Route' => '/update', 'Method' => 'GET',
+            'class' => 'ParentController',
+            'is_parent' => true,
+        ], $map[0][1] );
     }
 
 

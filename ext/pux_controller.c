@@ -135,6 +135,13 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
         MAKE_STD_ZVAL(z_indexed_annotations);
         array_init(z_indexed_annotations);
 
+        // we put the attributes in lower-case letter key to avoid the name
+        // collision of the annotation attribute names.
+        //
+        // perhaps we should put them in the third assoc array.
+        add_assoc_stringl(z_indexed_annotations, "class", ce->name, ce->name_length, 1);
+        add_assoc_bool(z_indexed_annotations, "is_parent", 1);
+
         if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
             MAKE_STD_ZVAL(z_comment);
             ZVAL_STRING(z_comment, mptr->op_array.doc_comment, 1);
