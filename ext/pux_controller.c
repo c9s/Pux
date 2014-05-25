@@ -111,6 +111,7 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
         zval *new_item;
         zval *z_method_annotations;
         zval *z_indexed_annotations;
+        zval *z_route_meta;
 
         zval *z_comment;
         zval *z_file;
@@ -120,27 +121,32 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
         array_init(new_item);
         add_next_index_stringl(new_item, fn, fn_len, 1);
 
-        /* 
+        /**
          * @var 
          *
          * if there no annotation, we pass an empty array.
          *
          * The method annotation structure
-         *
          */
         MAKE_STD_ZVAL(z_method_annotations);
         array_init(z_method_annotations);
+
 
         // simplified annotation information is saved to this variable.
         MAKE_STD_ZVAL(z_indexed_annotations);
         array_init(z_indexed_annotations);
 
+        MAKE_STD_ZVAL(z_route_meta);
+        array_init(z_route_meta);
+
         // we put the attributes in lower-case letter key to avoid the name
         // collision of the annotation attribute names.
         //
         // perhaps we should put them in the third assoc array.
-        add_assoc_stringl(z_indexed_annotations, "class", ce->name, ce->name_length, 1);
-        add_assoc_bool(z_indexed_annotations, "is_parent", 1);
+        add_assoc_stringl(z_route_meta, "class", ce->name, ce->name_length, 1);
+        if ( parent ) {
+            add_assoc_bool(z_route_meta, "is_parent", 1);
+        }
 
         if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
             MAKE_STD_ZVAL(z_comment);
@@ -232,6 +238,7 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
 
         Z_ADDREF_P(z_indexed_annotations);
         add_next_index_zval(new_item, z_indexed_annotations);
+        add_next_index_zval(new_item, z_route_meta);
         add_next_index_zval(retval, new_item);
 
         zend_hash_move_forward_ex(func_table, &pos);
@@ -319,7 +326,10 @@ PHP_METHOD(Controller, getActionRoutes)
     if ( zend_hash_quick_find( &ce_pux_controller->function_table, "getactionmethods", sizeof("getactionmethods"), zend_inline_hash_func(ZEND_STRS("getactionmethods")), (void **) &fe) == FAILURE ) {
         php_error(E_ERROR, "getActionMethods method not found");
     }
-    // call export method
+
+    // call the getActionMethods to return the array of paths, 
+    //    [ [path, [ annotations...] ], [ path2, [ annotations...] ],..... ]
+    //
     zval *rv = NULL;
     zend_call_method_with_0_params( &this_ptr, ce_pux_controller, &fe, "getactionmethods", &rv );
 
