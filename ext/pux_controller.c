@@ -261,10 +261,12 @@ PHP_METHOD(Controller, __construct) {
  *
  * [
  *      [
- *          'pageAction', [
+ *          'pageAction', 
+ *          [
  *              'Route' => '/update',
  *              'Method' => 'GET',
  *          ],
+ *          [ 'class' => ..., 'is_parent' => true ]
  *      ], ....
  * ]
  *

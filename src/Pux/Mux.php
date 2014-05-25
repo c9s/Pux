@@ -232,7 +232,7 @@ class Mux
     }
 
 
-    public function getRequestMethodConstant($method) {
+    public static function getRequestMethodConstant($method) {
         switch (strtoupper($method)) {
             case "POST":
                 return REQ_METHOD_POST;
@@ -257,7 +257,7 @@ class Mux
         if ( isset($this->staticRoutes[$path]) ) {
             return $this->staticRoutes[$path];
         }
-        $reqmethod = $this->getRequestMethodConstant(@$_SERVER['REQUEST_METHOD']);
+        $reqmethod = self::getRequestMethodConstant(@$_SERVER['REQUEST_METHOD']);
 
         foreach( $this->routes as $route ) {
             if ( $route[0] ) {

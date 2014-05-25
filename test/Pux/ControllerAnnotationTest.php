@@ -82,7 +82,21 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
         $controller = new ExpandableProductController;
         ok($controller);
 
-        ok( is_array( $controller->getActionMethods() ) );
+        ok( is_array( $map = $controller->getActionMethods() ) );
+
+        count_ok( 6, $map);
+        is('indexAction', $map[0][0], 'the method name');
+        is(array(),       $map[0][1], 'annotation info');
+        is(array('class' => 'ExpandableProductController'), $map[0][2], 'meta');
+
+        is('fooBarAction', $map[5][0], 'the method name');
+        is(array(),       $map[5][1], 'annotation info');
+        is(array('class' => 'ExpandableProductController'), $map[5][2], 'meta');
+
+        $routes = $controller->getActionRoutes();
+        is('', $routes[0][0], 'the path');
+        is('indexAction', $routes[0][1], 'the mapping method');
+        ok( is_array($routes) );
 
         $mux = new Pux\Mux;
 
@@ -106,6 +120,8 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
         foreach( $paths as $path => $method ) {
             if ( $method ) {
                 $_SERVER['REQUEST_METHOD'] = $method;
+            } else {
+                $_SERVER['REQUEST_METHOD'] = 'GET';
             }
             ok( $mux->dispatch($path) , $path);
         }
