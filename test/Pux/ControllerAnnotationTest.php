@@ -70,13 +70,7 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
             ),
         );
         is( $expectedMap, $map );
-        /*
-        is( 'pageAction', $map[0][0], 'pageAction');
-        is([ 'Route' => '/update', 'Method' => 'GET' ], $map[0][1] );
-         */
     }
-
-
 
     public function testAnnotations()
     {
