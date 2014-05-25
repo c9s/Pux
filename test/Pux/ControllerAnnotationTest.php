@@ -25,11 +25,10 @@ class ChildController extends ParentController {
 class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
 {
 
-    public function testInheritedAnnotations()
+    public function testAnnotationForGetActionMethods()
     {
         $parent = new ParentController;
         ok($parent);
-
         ok( $map = $parent->getActionMethods() );
         ok( is_array($map), 'map is an array' );
         ok( isset($map[0]), 'one path' );
@@ -37,6 +36,23 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
         is( 'pageAction', $map[0][0], 'pageAction');
         is([ 'Route' => '/update', 'Method' => 'GET' ], $map[0][1] );
     }
+
+
+    public function testInheritedActions() 
+    {
+        $con = new ChildController;
+        ok($con);
+        ok( $map = $con->getActionMethods() );
+        ok( is_array($map), 'map is an array' );
+        /*
+        ok( isset($map[0]), 'one path' );
+        is( 1, count($map), 'count of map' );
+        is( 'pageAction', $map[0][0], 'pageAction');
+        is([ 'Route' => '/update', 'Method' => 'GET' ], $map[0][1] );
+         */
+    }
+
+
 
     public function testAnnotations()
     {

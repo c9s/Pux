@@ -72,52 +72,18 @@ void pux_init_controller(TSRMLS_D) {
     zend_class_implements(ce_pux_controller TSRMLS_CC, 1, ce_pux_expandable_mux);
 }
 
-PHP_METHOD(Controller, __construct) {
-}
 
-
-/**
- * Returns [ method, annotations ]
- *
- * This method returns a map of path => route info 
- *
- * [
- *      [
- *          'pageAction', [
- *              'Route' => '/update',
- *              'Method' => 'GET',
- *          ],
- *      ], ....
- * ]
- *
- *
- */
-PHP_METHOD(Controller, getActionMethods)
-{
-    // Get function table hash from the current object.
-    zend_class_entry *ce;
-    zend_class_entry *parent_ce;
+static void zend_parse_action_methods(zend_class_entry *ce, zval *retval) {
     HashTable *func_table;
-    HashTable *parent_func_table;
+    zend_function *mptr; // prepare zend_function mptr for iterating hash 
     HashPosition pos;
-
-
-    ce = Z_OBJCE_P(this_ptr);
-    func_table = &ce->function_table;
-
-    if (ce->parent) {
-        // RETURN_STRINGL(ce->parent->name, ce->parent->name_length, 1);
-        parent_func_table = &ce->parent->function_table;
-    }
-
-    array_init(return_value);
-
-    zend_function *mptr;
-    zend_hash_internal_pointer_reset_ex(func_table, &pos);
 
     const char *fn;
     size_t fn_len;
     int p;
+
+    func_table = &ce->function_table;
+    zend_hash_internal_pointer_reset_ex(func_table, &pos);
 
     while (zend_hash_get_current_data_ex(func_table, (void **) &mptr, &pos) == SUCCESS) {
         fn     = mptr->common.function_name;
@@ -247,11 +213,68 @@ PHP_METHOD(Controller, getActionMethods)
 
         Z_ADDREF_P(z_indexed_annotations);
         add_next_index_zval(new_item, z_indexed_annotations);
-        add_next_index_zval(return_value, new_item);
+        add_next_index_zval(retval, new_item);
 
         zend_hash_move_forward_ex(func_table, &pos);
     }
-    return;
+
+
+}
+
+
+
+PHP_METHOD(Controller, __construct) {
+}
+
+
+
+/**
+ * Returns [ method, annotations ]
+ *
+ * This method returns a map of path => route info 
+ *
+ * [
+ *      [
+ *          'pageAction', [
+ *              'Route' => '/update',
+ *              'Method' => 'GET',
+ *          ],
+ *      ], ....
+ * ]
+ *
+ *
+ */
+PHP_METHOD(Controller, getActionMethods)
+{
+    // Get function table hash from the current object.
+    zend_class_entry *ce;
+    zend_class_entry *parent_ce;
+    HashTable *func_table;
+    HashTable *parent_func_table;
+    HashPosition pos;
+
+
+    ce = Z_OBJCE_P(this_ptr);
+    func_table = &ce->function_table;
+
+    if (ce->parent) {
+        // RETURN_STRINGL(ce->parent->name, ce->parent->name_length, 1);
+        parent_func_table = &ce->parent->function_table;
+    }
+
+    array_init(return_value);
+
+    zend_function *mptr;
+    zend_hash_internal_pointer_reset_ex(func_table, &pos);
+
+    const char *fn;
+    size_t fn_len;
+    int p;
+
+
+    // looping in the parent class function table if we have one.
+    // so we can override with our current class later.
+    zend_parse_action_methods(ce, return_value);
 }
 
 
