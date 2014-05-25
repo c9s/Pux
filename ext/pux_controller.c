@@ -78,14 +78,37 @@ PHP_METHOD(Controller, __construct) {
 
 /**
  * Returns [ method, annotations ]
+ *
+ * This method returns a map of path => route info 
+ *
+ * [
+ *      [
+ *          'pageAction', [
+ *              'Route' => '/update',
+ *              'Method' => 'GET',
+ *          ],
+ *      ], ....
+ * ]
+ *
+ *
  */
 PHP_METHOD(Controller, getActionMethods)
 {
     // Get function table hash from the current object.
-    HashTable *func_table = &Z_OBJCE_P(this_ptr)->function_table;
+    zend_class_entry *ce;
+    zend_class_entry *parent_ce;
+    HashTable *func_table;
+    HashTable *parent_func_table;
     HashPosition pos;
 
-    // HashTable *parent_class_function_table
+
+    ce = Z_OBJCE_P(this_ptr);
+    func_table = &ce->function_table;
+
+    if (ce->parent) {
+        // RETURN_STRINGL(ce->parent->name, ce->parent->name_length, 1);
+        parent_func_table = &ce->parent->function_table;
+    }
 
     array_init(return_value);
 

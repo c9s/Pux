@@ -27,7 +27,14 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
 
     public function testInheritedAnnotations()
     {
+        $parent = new ParentController;
+        ok($parent);
 
+        ok( $map = $parent->getActionMethods() );
+        ok( is_array($map), 'map is an array' );
+        ok( isset($map[0]), 'one path' );
+        is( 'pageAction', $map[0][0], 'pageAction');
+        is([ 'Route' => '/update', 'Method' => 'GET' ], $map[0][1] );
     }
 
     public function testAnnotations()

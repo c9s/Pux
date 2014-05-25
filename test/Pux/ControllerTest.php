@@ -16,6 +16,11 @@ class CRUDProductController extends Controller
 
 class ControllerTest extends PHPUnit_Framework_TestCase
 {
+    public function testControllerConstructor() {
+        $controller = new CRUDProductController;
+        ok($controller);
+        return $controller;
+    }
 
 
     /**
@@ -106,11 +111,6 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         ok( null == $mainMux->dispatch('/bar') );
     }
 
-    public function testControllerConstructor() {
-        $controller = new CRUDProductController;
-        ok($controller);
-        return $controller;
-    }
 
 }
 
