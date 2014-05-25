@@ -73,9 +73,9 @@ void pux_init_controller(TSRMLS_D) {
 }
 
 
-static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval);
+static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, int parent);
 
-static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval) {
+static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, int parent) {
     HashTable *func_table;
     zend_function *mptr; // prepare zend_function mptr for iterating hash 
     HashPosition pos;
@@ -88,7 +88,7 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval) {
 
     if (ce->parent) {
         parent_ce = ce->parent;
-        zend_parse_action_annotations(parent_ce, retval);
+        zend_parse_action_annotations(parent_ce, retval, 1);
     }
 
     func_table = &ce->function_table;
@@ -265,7 +265,7 @@ PHP_METHOD(Controller, getActionMethods)
 
     // looping in the parent class function table if we have one.
     // so we can override with our current class later.
-    zend_parse_action_annotations(ce, return_value);
+    zend_parse_action_annotations(ce, return_value, 0);
 }
 
 

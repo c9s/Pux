@@ -44,9 +44,14 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
         ok($con);
         ok( $map = $con->getActionMethods() );
         ok( is_array($map), 'map is an array' );
+
+        is( 3, count($map), 'count of map should contain parent and child methods' );
+
+        ok( is_array($map[0]), 'first path' );
+        ok( is_array($map[1]), 'second path' );
+        ok( is_array($map[2]), 'third path' );
+        
         /*
-        ok( isset($map[0]), 'one path' );
-        is( 1, count($map), 'count of map' );
         is( 'pageAction', $map[0][0], 'pageAction');
         is([ 'Route' => '/update', 'Method' => 'GET' ], $map[0][1] );
          */
