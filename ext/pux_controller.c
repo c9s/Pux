@@ -82,25 +82,27 @@ PHP_METHOD(Controller, __construct) {
 PHP_METHOD(Controller, getActionMethods)
 {
     // Get function table hash from the current object.
-    HashTable *function_table = &Z_OBJCE_P(this_ptr)->function_table;
+    HashTable *func_table = &Z_OBJCE_P(this_ptr)->function_table;
     HashPosition pos;
+
+    // HashTable *parent_class_function_table
 
     array_init(return_value);
 
     zend_function *mptr;
-    zend_hash_internal_pointer_reset_ex(function_table, &pos);
+    zend_hash_internal_pointer_reset_ex(func_table, &pos);
 
     const char *fn;
     size_t fn_len;
     int p;
 
-    while (zend_hash_get_current_data_ex(function_table, (void **) &mptr, &pos) == SUCCESS) {
+    while (zend_hash_get_current_data_ex(func_table, (void **) &mptr, &pos) == SUCCESS) {
         fn     = mptr->common.function_name;
         fn_len = strlen(mptr->common.function_name);
         p      = strpos(fn, "Action");
 
         if ( p == -1 || (size_t)p != (fn_len - strlen("Action"))  ) {
-            zend_hash_move_forward_ex(function_table, &pos);
+            zend_hash_move_forward_ex(func_table, &pos);
             continue;
         }
 
@@ -224,7 +226,7 @@ PHP_METHOD(Controller, getActionMethods)
         add_next_index_zval(new_item, z_indexed_annotations);
         add_next_index_zval(return_value, new_item);
 
-        zend_hash_move_forward_ex(function_table, &pos);
+        zend_hash_move_forward_ex(func_table, &pos);
     }
     return;
 }
