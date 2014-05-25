@@ -81,7 +81,7 @@ PHP_METHOD(Controller, __construct) {
  */
 PHP_METHOD(Controller, getActionMethods)
 {
-    // get function table hash
+    // Get function table hash from the current object.
     HashTable *function_table = &Z_OBJCE_P(this_ptr)->function_table;
     HashPosition pos;
 
@@ -133,18 +133,18 @@ PHP_METHOD(Controller, getActionMethods)
         array_init(z_indexed_annotations);
 
         if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
-            ALLOC_ZVAL(z_comment);
+            MAKE_STD_ZVAL(z_comment);
             ZVAL_STRING(z_comment, mptr->op_array.doc_comment, 1);
 
-            ALLOC_ZVAL(z_file);
+            MAKE_STD_ZVAL(z_file);
             ZVAL_STRING(z_file, mptr->op_array.filename, 1);
 
-            ALLOC_ZVAL(z_line_start);
+            MAKE_STD_ZVAL(z_line_start);
             ZVAL_LONG(z_line_start, mptr->op_array.line_start);
 
             /*
             zval *z_line_end;
-            ALLOC_ZVAL(z_line_end);
+            MAKE_STD_ZVAL(z_line_end);
             ZVAL_LONG(z_line_start, mptr->op_array.line_end);
             */
             zval **z_ann = NULL, **z_ann_name = NULL, **z_ann_arguments = NULL, **z_ann_argument = NULL, **z_ann_argument_value = NULL;
