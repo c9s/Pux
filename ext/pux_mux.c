@@ -458,9 +458,9 @@ PHP_METHOD(Mux, mount) {
 
 
         // iterate mux
-        for(zend_hash_internal_pointer_reset_ex(mux_routes_hash, &route_pointer); 
-                zend_hash_get_current_data_ex(mux_routes_hash, (void**) &z_mux_route, &route_pointer) == SUCCESS; 
-                zend_hash_move_forward_ex(mux_routes_hash, &route_pointer)) 
+        for(zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_mux_routes), &route_pointer); 
+                zend_hash_get_current_data_ex(Z_ARRVAL_P(z_mux_routes), (void**) &z_mux_route, &route_pointer) == SUCCESS; 
+                zend_hash_move_forward_ex(Z_ARRVAL_P(z_mux_routes), &route_pointer)) 
         {
             // zval for new route
             zval *z_new_routes;
@@ -473,19 +473,19 @@ PHP_METHOD(Mux, mount) {
             zval **z_route_original_pattern; // for PCRE pattern
 
             if ( zend_hash_index_find( Z_ARRVAL_PP(z_mux_route), 0, (void**) &z_is_pcre) == FAILURE ) {
-                zend_hash_move_forward_ex(mux_routes_hash, &route_pointer);
+                zend_hash_move_forward_ex(Z_ARRVAL_P(z_mux_routes), &route_pointer);
                 continue;
             }
             if ( zend_hash_index_find( Z_ARRVAL_PP(z_mux_route), 1, (void**) &z_route_pattern) == FAILURE ) {
-                zend_hash_move_forward_ex(mux_routes_hash, &route_pointer);
+                zend_hash_move_forward_ex(Z_ARRVAL_P(z_mux_routes), &route_pointer);
                 continue;
             }
             if ( zend_hash_index_find( Z_ARRVAL_PP(z_mux_route), 2, (void**) &z_route_callback) == FAILURE ) {
-                zend_hash_move_forward_ex(mux_routes_hash, &route_pointer);
+                zend_hash_move_forward_ex(Z_ARRVAL_P(z_mux_routes), &route_pointer);
                 continue;
             }
             if ( zend_hash_index_find( Z_ARRVAL_PP(z_mux_route), 3, (void**) &z_route_options) == FAILURE ) {
-                zend_hash_move_forward_ex(mux_routes_hash, &route_pointer);
+                zend_hash_move_forward_ex(Z_ARRVAL_P(z_mux_routes), &route_pointer);
                 continue;
             }
 
@@ -513,14 +513,13 @@ PHP_METHOD(Mux, mount) {
 
                 zval *z_new_pattern = NULL;
                 MAKE_STD_ZVAL(z_new_pattern);
-                ZVAL_STRINGL(z_new_pattern, new_pattern, new_pattern_len, 1);
+                ZVAL_STRINGL(z_new_pattern, new_pattern, new_pattern_len, 0);
 
                 // TODO: merge options
 
                 // $routeArgs = PatternCompiler::compile($newPattern, 
                 //     array_merge_recursive($route[3], $options) );
                 zval *z_compiled_route = compile_route_pattern(z_new_pattern, *z_route_options, ce_pattern_compiler TSRMLS_CC);
-
 
                 if ( z_compiled_route == NULL || Z_TYPE_P(z_compiled_route) == IS_NULL ) {
                     php_error( E_ERROR, "Cannot compile pattern: %s", new_pattern);
@@ -549,19 +548,20 @@ PHP_METHOD(Mux, mount) {
 
             } else {
 
-
                 //  $this->routes[] = array(
                 //      false,
                 //      $pattern . $route[1],
                 //      $route[2],
                 //      $options,
                 //  );
-                char new_pattern[120] = { 0 };
-                strncat(new_pattern, pattern, pattern_len);
+                char *new_pattern = NULL;
+                int  new_pattern_len;
 
-                strncat(new_pattern, Z_STRVAL_PP(z_route_pattern), Z_STRLEN_PP(z_route_pattern) );
+                new_pattern_len = pattern_len + Z_STRLEN_PP(z_route_pattern);
+                new_pattern = (char*) ecalloc( sizeof(char), new_pattern_len );
 
-                int new_pattern_len = pattern_len + Z_STRLEN_PP(z_route_pattern);
+                strncat( new_pattern, pattern , pattern_len );
+                strncat( new_pattern, Z_STRVAL_PP(z_route_pattern) , Z_STRLEN_PP(z_route_pattern) );
 
                 // Merge the mount options with the route options
                 zval *z_new_route_options;
@@ -576,7 +576,7 @@ PHP_METHOD(Mux, mount) {
 
                 /* make the array: [ pcreFlag, pattern, callback, options ] */
                 add_index_bool(z_new_routes, 0 , 0); // pcre flag == false
-                add_index_stringl(z_new_routes, 1 , new_pattern , new_pattern_len, 1);
+                add_index_stringl(z_new_routes, 1 , new_pattern , new_pattern_len, 0);
                 add_index_zval( z_new_routes, 2 , *z_route_callback);
                 add_index_zval( z_new_routes, 3 , z_new_route_options);
                 add_next_index_zval(z_routes, z_new_routes);
@@ -693,6 +693,7 @@ PHP_METHOD(Mux, getRoute) {
     if ( zend_hash_find( Z_ARRVAL_P(z_routes_by_id) , route_id, route_id_len + 1, (void**) &z_route ) == SUCCESS ) {
         *return_value = **z_route;
         zval_copy_ctor(return_value);
+        INIT_PZVAL(return_value);
         return;
     }
     RETURN_NULL();
@@ -712,6 +713,7 @@ PHP_METHOD(Mux, getRoutes) {
     z_routes = zend_read_property(ce_pux_mux, this_ptr, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     *return_value = *z_routes;
     zval_copy_ctor(return_value);
+    INIT_PZVAL(return_value);
 }
 
 PHP_METHOD(Mux, export) {
@@ -994,6 +996,7 @@ PHP_METHOD(Mux, match) {
     if ( z_route != NULL ) {
         *return_value = *z_route;
         zval_copy_ctor(return_value);
+        INIT_PZVAL(return_value);
         Z_ADDREF_P(z_route);
         return;
     }

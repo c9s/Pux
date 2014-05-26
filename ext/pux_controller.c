@@ -211,6 +211,7 @@ static int zend_parse_method_annotations(zend_function *mptr, zval * z_indexed_a
             }
         }
     }
+    // zval_ptr_dtor(&z_file);
 
     // return SUCCESS if there are annotations
     return zend_hash_num_elements( Z_ARRVAL_P(z_indexed_annotations) );
@@ -330,8 +331,7 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
         add_next_index_zval(new_item, z_indexed_annotations);
         add_next_index_zval(new_item, z_route_meta);
 
-        add_assoc_zval_ex(retval, fn, fn_len + 1, new_item);
-        // add_assoc_zval(retval, fn, new_item);
+        add_assoc_zval_ex(retval, fn, fn_len + 1, new_item); // use null-terminated string for the key
 
         // add_next_index_zval(retval, new_item);
         zend_hash_move_forward_ex(func_table, &pos);
@@ -441,7 +441,6 @@ PHP_METHOD(Controller, getActionRoutes)
                 // add_assoc_zval(z_route_options, "method", *z_doc_method);
             }
         }
-        // php_printf("%s (%lu)\n", method_name, strlen(method_name) );
 
         if (!path) {
             path = translate_method_name_to_path(method_name, &path_len);

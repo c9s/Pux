@@ -51,7 +51,6 @@ class RESTfulControllerTest extends PHPUnit_Framework_TestCase
 
         $methods = $con->getActionMethods();
         ok($methods);
-
         $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.
         ok($productMux);
 
