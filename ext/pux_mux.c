@@ -598,6 +598,9 @@ PHP_METHOD(Mux, mount) {
     zval *z_retval = NULL;
     zend_call_method_with_3_params( &this_ptr, ce_pux_mux, &fe_add, "add", sizeof("add")-1, &z_retval, 3, z_pattern, z_mux_id, z_options TSRMLS_CC);
 
+    zval_ptr_dtor(&z_pattern);
+
+
 
     zval *z_submux_array = zend_read_property( ce_pux_mux, this_ptr , "submux", sizeof("submux") - 1, 1 TSRMLS_CC);
     add_index_zval(z_submux_array, Z_LVAL_P(z_mux_id) , z_mux);
@@ -617,6 +620,7 @@ PHP_METHOD(Mux, getSubMux) {
     if ( zend_hash_index_find( Z_ARRVAL_P(z_submux_array),  submux_id , (void**) &z_submux) == SUCCESS ) {
         *return_value = **z_submux;
         zval_copy_ctor(return_value);
+        INIT_PZVAL(return_value);
         return;
     }
     RETURN_FALSE;
@@ -681,6 +685,7 @@ PHP_METHOD(Mux, setRoutes) {
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &routes ) == FAILURE) {
         RETURN_FALSE;
     }
+    Z_ADDREF_P(routes);
     zend_update_property(ce_pux_mux , this_ptr, "routes", sizeof("routes")-1, routes TSRMLS_CC);
     RETURN_TRUE;
 }
@@ -908,10 +913,15 @@ PHP_METHOD(Mux, dispatch) {
                 *return_value = *z_retval;
                 zval_copy_ctor(return_value);
                 INIT_PZVAL(return_value);
+
+                zval_ptr_dtor(&z_path);
+                zval_ptr_dtor(&z_return_route);
+                return;
             }
-            // zval_ptr_dtor(&z_return_route);
+
+            zval_ptr_dtor(&z_path);
+            zval_ptr_dtor(&z_return_route);
             RETURN_FALSE;
-            return;
 
         } else {
             zval *z_substr;
@@ -930,10 +940,15 @@ PHP_METHOD(Mux, dispatch) {
                 *return_value = *z_retval;
                 zval_copy_ctor(return_value);
                 INIT_PZVAL(return_value);
-            }
-            // zval_ptr_dtor(&z_return_route);
-            return;
 
+                zval_ptr_dtor(&z_path);
+                zval_ptr_dtor(&z_return_route);
+                return;
+            }
+
+            zval_ptr_dtor(&z_path);
+            zval_ptr_dtor(&z_return_route);
+            return;
         }
     }
 

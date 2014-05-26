@@ -32,7 +32,6 @@ if test $PHP_PUX != "no"; then
         pux_controller.c \
         ct_helper.c \
         pux_functions.c \
-        pux_persistent.c \
         annotation/parser.c \
         annotation/scanner.c \
         hash.c \
