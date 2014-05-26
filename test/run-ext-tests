@@ -5,6 +5,6 @@ cd ext
 bash compile -cp || exit 1
 bash run-test -- --tap --testsuite PP --debug || exit 1
 
-echo "Stress testing on extension..."
-bash run-test -- --testsuite PP --repeat 20 || exit 1
+# echo "Stress testing on extension..."
+# bash run-test -- --testsuite PP --repeat 20 || exit 1
 cd ..
