@@ -22,18 +22,18 @@
 #include "pux_mux.h"
 #include "pux_functions.h"
 
-extern inline zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
-extern inline int get_current_request_method_const(HashTable * server_vars_hash TSRMLS_DC);
-extern inline int get_current_https(HashTable * server_vars_hash TSRMLS_DC);
-extern inline HashTable * fetch_server_vars_hash(TSRMLS_D);
-extern inline zval * fetch_server_var(HashTable *server_vars_hash, char *key , int key_len TSRMLS_DC);
-extern inline zval * get_current_http_host(HashTable * server_vars_hash TSRMLS_DC);
-extern inline zval * get_current_request_uri(HashTable * server_vars_hash TSRMLS_DC);
-extern inline zval * get_current_request_method(HashTable * server_vars_hash TSRMLS_DC);
+extern zval * php_pux_match(zval *z_routes, char *path, int path_len TSRMLS_DC);
+extern int get_current_request_method_const(HashTable * server_vars_hash TSRMLS_DC);
+extern int get_current_https(HashTable * server_vars_hash TSRMLS_DC);
+extern HashTable * fetch_server_vars_hash(TSRMLS_D);
+extern zval * fetch_server_var(HashTable *server_vars_hash, char *key , int key_len TSRMLS_DC);
+extern zval * get_current_http_host(HashTable * server_vars_hash TSRMLS_DC);
+extern zval * get_current_request_uri(HashTable * server_vars_hash TSRMLS_DC);
+extern zval * get_current_request_method(HashTable * server_vars_hash TSRMLS_DC);
 
-extern inline int validate_request_method(zval **z_route_options_pp, int current_request_method TSRMLS_DC);
-extern inline int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC);
-extern inline int validate_https(zval **z_route_options_pp, int https TSRMLS_DC);
+extern int validate_request_method(zval **z_route_options_pp, int current_request_method TSRMLS_DC);
+extern int validate_domain(zval **z_route_options_pp, zval * http_host TSRMLS_DC);
+extern int validate_https(zval **z_route_options_pp, int https TSRMLS_DC);
 
 #if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION > 2)) || (PHP_MAJOR_VERSION > 5)
 #define PUX_STORE_EG_ENVIRON() \
@@ -88,6 +88,6 @@ PHP_FUNCTION(pux_delete_mux);
 PHP_FUNCTION(pux_persistent_dispatch);
 
 
-extern int method_str_to_method_const(char * c_request_method );
+int method_str_to_method_const(char * c_request_method );
 
 #endif

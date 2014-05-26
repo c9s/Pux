@@ -22,6 +22,7 @@ class MuxMountTest extends MuxTestCase
         $submux = new \Pux\Mux;
         $mux->mount( '/sub' , $submux);
     }
+    */
 
     public function testMuxMountNoExpandAndDispatchToSubMux() 
     {
@@ -33,12 +34,9 @@ class MuxMountTest extends MuxTestCase
         $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
         $submux->any('/foo', [ 'HelloController2','indexAction' ]);
         $mux->mount( '/sub' , $submux);
-
         ok($submux, 'submux');
         ok($submux->getRoutes(), 'submux routes');
-
         ok($mux->getRoutes(), 'mux routes');
-
         $submux2 = $mux->getSubMux($submux->getId());
         ok($submux2, 'submux2');
         ok($submux2->getRoutes(), 'submux2 routes');
@@ -50,7 +48,6 @@ class MuxMountTest extends MuxTestCase
         $r = $mux->dispatch('/sub/foo');
         $this->assertNonPcreRoute($r, '/foo');
     }
-    */
 
     public function testConstruct() {
         $submux = new \Pux\Mux;
@@ -69,6 +66,7 @@ class MuxMountTest extends MuxTestCase
         $submux = new \Pux\Mux;
         $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
         ok($submux);
+
         ok($routes = $submux->getRoutes() );
         ok(is_array($routes));
         count_ok(1, $routes);
@@ -77,7 +75,6 @@ class MuxMountTest extends MuxTestCase
     public function testMountEmptyRoutes()
     {
         $mux = new \Pux\Mux;
-        ok($mux);
         ok($mux);
         is(0, $mux->length());
         $submux = new \Pux\Mux;
@@ -90,6 +87,14 @@ class MuxMountTest extends MuxTestCase
         $submux = new \Pux\Mux;
         ok($submux);
         $submux->any('/hello/:name', [ 'HelloController2','indexAction' ]);
+        $mux->mount( '/sub' , $submux);
+    }
+
+    public function testMountStrRoutes() {
+        $mux = new \Pux\Mux;
+        $submux = new \Pux\Mux;
+        ok($submux);
+        $submux->any('/hello/str', [ 'HelloController2','indexAction' ]);
         $mux->mount( '/sub' , $submux);
     }
 

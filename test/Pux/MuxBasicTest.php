@@ -72,7 +72,6 @@ class MuxBasicTest extends PHPUnit_Framework_TestCase
         ok($code, 'code');
         eval($code);
         ok($newMux);
-
         foreach( ['/sub/page1', '/sub/page2', '/foo/bar', '/foo/zoo'] as $p ) {
             $r = $newMux->dispatch($p);
             ok($r, "Matched route for $p");

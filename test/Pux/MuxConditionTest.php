@@ -10,7 +10,6 @@ class MuxConditionTest extends MuxTestCase
         ok($mux, "got mux");
         $mux->add('/foo', [ 'HelloController2','indexAction' ], [ 'domain' => 'test.dev' ]);
 
-
         $_SERVER['HTTP_HOST'] = 'test.dev';
         $route = $mux->dispatch('/foo');
         ok($route);
