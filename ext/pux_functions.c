@@ -776,19 +776,19 @@ inline zval * get_current_request_method(HashTable * server_vars_hash TSRMLS_DC)
 
 inline int method_str_to_method_const(char * c_request_method ) {
     if ( strncmp("GET", c_request_method , sizeof("GET") ) == 0 ) {
-        return REQ_METHOD_GET;
+        return REQUEST_METHOD_GET;
     } else if ( strncmp("POST", c_request_method , sizeof("POST") ) == 0 ) {
-        return REQ_METHOD_POST;
+        return REQUEST_METHOD_POST;
     } else if ( strncmp("PUT" , c_request_method , sizeof("PUT") ) == 0 ) {
-        return REQ_METHOD_PUT;
+        return REQUEST_METHOD_PUT;
     } else if ( strncmp("DELETE", c_request_method, sizeof("DELETE")  ) == 0 ) {
-        return REQ_METHOD_DELETE;
+        return REQUEST_METHOD_DELETE;
     } else if ( strncmp("HEAD", c_request_method, sizeof("HEAD")  ) == 0 ) {
-        return REQ_METHOD_HEAD;
+        return REQUEST_METHOD_HEAD;
     } else if ( strncmp("PATCH", c_request_method, sizeof("PATCH")  ) == 0 ) {
-        return REQ_METHOD_HEAD;
+        return REQUEST_METHOD_HEAD;
     } else if ( strncmp("OPTIONS", c_request_method, sizeof("OPTIONS")  ) == 0 ) {
-        return REQ_METHOD_OPTIONS;
+        return REQUEST_METHOD_OPTIONS;
     }
     return 0;
 }

@@ -247,8 +247,8 @@ PHP_METHOD(Mux, get) {
         array_init_size(z_options, 1);
     }
 
-    // $options['method'] = REQ_METHOD_GET;
-    add_assoc_long(z_options, "method", REQ_METHOD_GET);
+    // $options['method'] = REQUEST_METHOD_GET;
+    add_assoc_long(z_options, "method", REQUEST_METHOD_GET);
 
     // $this->add($pattern, $callback, $options);
     zval * z_retval = call_mux_method( this_ptr, "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
@@ -275,7 +275,7 @@ PHP_METHOD(Mux, put) {
         array_init_size(z_options, 1);
     }
 
-    add_assoc_long(z_options, "method", REQ_METHOD_PUT);
+    add_assoc_long(z_options, "method", REQUEST_METHOD_PUT);
 
     // $this->add($pattern, $callback, $options);
     zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
@@ -298,7 +298,7 @@ PHP_METHOD(Mux, delete) {
         array_init_size(z_options, 1);
     }
 
-    add_assoc_long(z_options, "method", REQ_METHOD_DELETE);
+    add_assoc_long(z_options, "method", REQUEST_METHOD_DELETE);
 
     // $this->add($pattern, $callback, $options);
     zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
@@ -322,7 +322,7 @@ PHP_METHOD(Mux, post) {
         array_init_size(z_options, 1);
     }
 
-    add_assoc_long(z_options, "method", REQ_METHOD_POST);
+    add_assoc_long(z_options, "method", REQUEST_METHOD_POST);
 
     // $this->add($pattern, $callback, $options);
     zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
@@ -345,7 +345,7 @@ PHP_METHOD(Mux, patch) {
         array_init_size(z_options, 1);
     }
 
-    add_assoc_long(z_options, "method", REQ_METHOD_PATCH);
+    add_assoc_long(z_options, "method", REQUEST_METHOD_PATCH);
 
     // $this->add($pattern, $callback, $options);
     zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
@@ -367,7 +367,7 @@ PHP_METHOD(Mux, head) {
         array_init_size(z_options, 1);
     }
 
-    add_assoc_long(z_options, "method", REQ_METHOD_HEAD);
+    add_assoc_long(z_options, "method", REQUEST_METHOD_HEAD);
 
     // $this->add($pattern, $callback, $options);
     zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
@@ -389,7 +389,7 @@ PHP_METHOD(Mux, options) {
         array_init_size(z_options, 1);
     }
 
-    add_assoc_long(z_options, "method", REQ_METHOD_OPTIONS);
+    add_assoc_long(z_options, "method", REQUEST_METHOD_OPTIONS);
 
     // $this->add($pattern, $callback, $options);
     zval * z_retval = call_mux_method( getThis(), "add" , sizeof("add"), 3 , z_pattern, z_callback, z_options TSRMLS_CC);
@@ -651,19 +651,19 @@ PHP_METHOD(Mux, getRequestMethodConstant) {
         while(( *mthit = toupper(*mthit))) mthit++;
 
         if (strcmp(mthp, "GET") == 0) {
-            req_method_const = REQ_METHOD_GET;
+            req_method_const = REQUEST_METHOD_GET;
         } else if (strcmp(mthp, "POST") == 0) {
-            req_method_const = REQ_METHOD_POST;
+            req_method_const = REQUEST_METHOD_POST;
         } else if (strcmp(mthp, "PUT") == 0) {
-            req_method_const = REQ_METHOD_PUT;
+            req_method_const = REQUEST_METHOD_PUT;
         } else if (strcmp(mthp, "DELETE") == 0) {
-            req_method_const = REQ_METHOD_DELETE;
+            req_method_const = REQUEST_METHOD_DELETE;
         } else if (strcmp(mthp, "HEAD") == 0) {
-            req_method_const = REQ_METHOD_HEAD;
+            req_method_const = REQUEST_METHOD_HEAD;
         } else if (strcmp(mthp, "OPTIONS") == 0) {
-            req_method_const = REQ_METHOD_OPTIONS;
+            req_method_const = REQUEST_METHOD_OPTIONS;
         } else if (strcmp(mthp, "PATCH") == 0) {
-            req_method_const = REQ_METHOD_PATCH;
+            req_method_const = REQUEST_METHOD_PATCH;
         }
 
         efree(req_method);

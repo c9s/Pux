@@ -58,7 +58,7 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
         list($path, $method, $options) = $routeMap[0];
         is('/page', $path);
         is('pageAction', $method);
-        is( array( 'method' => REQ_METHOD_GET ) , $options);
+        is( array( 'method' => REQUEST_METHOD_GET ) , $options);
     }
 
 

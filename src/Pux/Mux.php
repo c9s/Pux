@@ -4,13 +4,13 @@ namespace Pux;
 use Pux\PatternCompiler;
 use Exception;
 
-define('REQ_METHOD_GET', 1);
-define('REQ_METHOD_POST', 2);
-define('REQ_METHOD_PUT', 3);
-define('REQ_METHOD_DELETE', 4);
-define('REQ_METHOD_PATCH', 5);
-define('REQ_METHOD_HEAD', 6);
-define('REQ_METHOD_OPTIONS', 7);
+define('REQUEST_METHOD_GET', 1);
+define('REQUEST_METHOD_POST', 2);
+define('REQUEST_METHOD_PUT', 3);
+define('REQUEST_METHOD_DELETE', 4);
+define('REQUEST_METHOD_PATCH', 5);
+define('REQUEST_METHOD_HEAD', 6);
+define('REQUEST_METHOD_OPTIONS', 7);
 
 class Mux
 {
@@ -97,45 +97,45 @@ class Mux
 
     public function delete($pattern, $callback, $options = array()) 
     {
-        $options['method'] = REQ_METHOD_DELETE;
+        $options['method'] = REQUEST_METHOD_DELETE;
         $this->add($pattern, $callback, $options);
     }
 
     public function put($pattern, $callback, $options = array()) 
     {
-        $options['method'] = REQ_METHOD_PUT;
+        $options['method'] = REQUEST_METHOD_PUT;
         $this->add($pattern, $callback, $options);
     }
 
     public function get($pattern, $callback, $options = array()) 
     {
-        $options['method'] = REQ_METHOD_GET;
+        $options['method'] = REQUEST_METHOD_GET;
         $this->add($pattern, $callback, $options);
     }
 
     public function post($pattern, $callback, $options = array())
     {
-        $options['method'] = REQ_METHOD_POST;
+        $options['method'] = REQUEST_METHOD_POST;
         $this->add($pattern, $callback, $options);
     }
 
     public function patch($pattern, $callback, $options = array())
     {
-        $options['method'] = REQ_METHOD_PATCH;
+        $options['method'] = REQUEST_METHOD_PATCH;
         $this->add($pattern, $callback, $options);
     }
 
 
     public function head($pattern, $callback, $options = array())
     {
-        $options['method'] = REQ_METHOD_HEAD;
+        $options['method'] = REQUEST_METHOD_HEAD;
         $this->add($pattern, $callback, $options);
     }
 
 
     public function options($pattern, $callback, $options = array())
     {
-        $options['method'] = REQ_METHOD_OPTIONS;
+        $options['method'] = REQUEST_METHOD_OPTIONS;
         $this->add($pattern, $callback, $options);
     }
 
@@ -235,19 +235,19 @@ class Mux
     public static function getRequestMethodConstant($method) {
         switch (strtoupper($method)) {
             case "POST":
-                return REQ_METHOD_POST;
+                return REQUEST_METHOD_POST;
             case "GET":
-                return REQ_METHOD_GET;
+                return REQUEST_METHOD_GET;
             case "PUT":
-                return REQ_METHOD_PUT;
+                return REQUEST_METHOD_PUT;
             case "DELETE":
-                return REQ_METHOD_DELETE;
+                return REQUEST_METHOD_DELETE;
             case "PATCH":
-                return REQ_METHOD_PATCH;
+                return REQUEST_METHOD_PATCH;
             case "HEAD":
-                return REQ_METHOD_HEAD;
+                return REQUEST_METHOD_HEAD;
             case "OPTIONS":
-                return REQ_METHOD_OPTIONS;
+                return REQUEST_METHOD_OPTIONS;
             default:
                 return 0;
         }
