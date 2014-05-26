@@ -7,37 +7,42 @@ use Pux\Mux;
 
 class Controller {
 
+    protected function parseMethodAnnotation($method) {
 
-    protected function parseMethodAnnotation($refObject, & $args, $parent = 0) {
+        $annotations = array();
+        $doc = $method->getDocComment();
+        if ($doc) {
+            if (preg_match('/^[\s*]*\@Method\("(get|put|post|delete|head|patch|options)"\)/im', $doc, $mmatch)) {
+                $annotations['Method'] = array_pop($mmatch);
+            }
+            if (preg_match('/^[\s*]*\@Route\("([^\s]*)"\)/im', $doc, $umatch)) {
+                $annotations['Route'] = array_pop($umatch);
+            }
+        }
+        return $annotations;
+    }
+
+    protected function parseMethods($refObject, & $args, $parent = 0) {
         if ($pClassRef = $refObject->getParentClass()) {
-            $this->parseMethodAnnotation($pClassRef, $args, 1);
+            $this->parseMethods($pClassRef, $args, 1);
         }
 
         $methods = $refObject->getMethods();
         foreach( $methods as $method ) {
             if ( ! preg_match('/Action$/', $method->getName()) ) {
-                continue;
+                return;
             }
 
-            // $rmth   = new ReflectionMethod($this, $path[1]);
-            $doc    = $method->getDocComment();
-            $annotations = array();
             $meta = array( 'class' => $refObject->getName() );
-
-            if ($parent) {
-                $meta['is_parent'] = true;
-            }
-
-            if ($doc) {
-                if (preg_match('/^[\s*]*\@Method\("(get|put|post|delete|head|patch|options)"\)/im', $doc, $mmatch)) {
-                    $annotations['Method'] = array_pop($mmatch);
-                }
-                if (preg_match('/^[\s*]*\@Route\("([^\s]*)"\)/im', $doc, $umatch)) {
-                    $annotations['Route'] = array_pop($umatch);
+            $anns = $this->parseMethodAnnotation($method);
+            if (empty($anns)) {
+                // get parent method annotations
+                if (isset($args[ $method->getName() ]) ) {
+                    $anns = $args[$method->getName()][0];
                 }
             }
-
-            $args[] = array( $method->getName(), $annotations, $meta);
+            // override
+            $args[ $method->getName() ] = array( $anns, $meta );
         }
     }
 
@@ -46,7 +51,7 @@ class Controller {
     public function getActionMethods() {
         $refObject = new ReflectionObject($this);
         $args = array();
-        $this->parseMethodAnnotation($refObject, $args, 0);
+        $this->parseMethods($refObject, $args, 0);
         return $args;
     }
 
@@ -66,8 +71,8 @@ class Controller {
         $pairs          = array();
         $actions    = $this->getActionMethods();
 
-        foreach ($actions as $actionInfo) {
-            list($actionName, $annotations, $meta) = $actionInfo;
+        foreach ($actions as $actionName => $actionInfo) {
+            list($annotations, $meta) = $actionInfo;
 
             if ( isset($annotations['Route']) ) {
                 $path = $annotations['Route'];
