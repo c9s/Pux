@@ -822,6 +822,7 @@ PHP_METHOD(Mux, compile) {
     if (retval) {
         *return_value = *retval;
         zval_copy_ctor(return_value);
+        INIT_PZVAL(return_value);
     }
 }
 
