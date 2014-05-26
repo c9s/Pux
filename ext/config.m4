@@ -21,6 +21,8 @@ if test $PHP_PUX != "no"; then
 if test "$PHP_PUX_DEBUG" != "no"; then
     AC_DEFINE(PUX_DEBUG, 1, [ ])
     CFLAGS="$CFLAGS -O0 -g3 -ggdb -fprofile-arcs"
+else
+    CFLAGS="$CFLAGS -static -O2 -Wall"
 fi
 
 PHP_SUBST(PUX_SHARED_LIBADD)
