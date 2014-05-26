@@ -84,7 +84,7 @@ static char * translate_method_name_to_path(const char *method_name, int * path_
         return NULL;
     }
 
-    if ( strncmp(method_name, "indexAction", strlen("indexAction") ) == 0 ) {
+    if ( strncmp(method_name, "indexAction", sizeof("indexAction")-1 ) == 0 ) {
         // returns empty string as its path
         return strndup("",sizeof("")-1);
     }
@@ -261,7 +261,7 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
         fn_len = strlen(mptr->common.function_name);
         p      = strpos(fn, "Action");
 
-        if ( p == -1 || (size_t)p != (fn_len - strlen("Action"))  ) {
+        if ( p == -1 || (size_t)p != (fn_len - (sizeof("Action")-1) )  ) {
             zend_hash_move_forward_ex(func_table, &pos);
             continue;
         }
@@ -519,7 +519,7 @@ PHP_METHOD(Controller, expand)
         add_next_index_zval(z_callback, *z_method);
 
         zval *rv = NULL;
-        zend_call_method_with_3_params(&new_mux, ce_pux_mux, NULL, "add", strlen("add"), &rv, 3, *z_path, z_callback, *z_options TSRMLS_CC);
+        zend_call_method_with_3_params(&new_mux, ce_pux_mux, NULL, "add", sizeof("add")-1, &rv, 3, *z_path, z_callback, *z_options TSRMLS_CC);
     }
 
     zval *rv = NULL;

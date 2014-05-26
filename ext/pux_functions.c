@@ -351,6 +351,7 @@ int mux_loader(char *path, zval *result TSRMLS_DC)
             file_handle.opened_path = path;
         }
 
+        // the key of hash is null-terminated string
         zend_hash_add(&EG(included_files), file_handle.opened_path, strlen(file_handle.opened_path)+1, (void *)&dummy, sizeof(int), NULL);
     }
     zend_destroy_file_handle(&file_handle TSRMLS_CC);

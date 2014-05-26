@@ -59,18 +59,18 @@ void pux_init_mux(TSRMLS_D) {
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce, "Pux\\Mux", mux_methods);
     ce_pux_mux = zend_register_internal_class(&ce TSRMLS_CC);
-    zend_declare_property_null(ce_pux_mux, "id", strlen("id"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(ce_pux_mux, "routes", strlen("routes"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(ce_pux_mux, "routesById", strlen("routesById"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(ce_pux_mux, "staticRoutes", strlen("staticRoutes"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_null(ce_pux_mux, "submux", strlen("submux"), ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_bool(ce_pux_mux, "expand", strlen("expand"), 1, ZEND_ACC_PUBLIC TSRMLS_CC);
-    zend_declare_property_long(ce_pux_mux, "id_counter", strlen("id_counter"), 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
+    zend_declare_property_null(ce_pux_mux, "id", sizeof("id")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(ce_pux_mux, "routes", sizeof("routes")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(ce_pux_mux, "routesById", sizeof("routesById")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(ce_pux_mux, "staticRoutes", sizeof("staticRoutes")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_null(ce_pux_mux, "submux", sizeof("submux")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_bool(ce_pux_mux, "expand", sizeof("expand")-1, 1, ZEND_ACC_PUBLIC TSRMLS_CC);
+    zend_declare_property_long(ce_pux_mux, "id_counter", sizeof("id_counter")-1, 0, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
 }
 
 zend_class_entry ** get_pattern_compiler_ce(TSRMLS_D) {
     zend_class_entry **ce_pattern_compiler = NULL;
-    if ( zend_lookup_class( "Pux\\PatternCompiler", strlen("Pux\\PatternCompiler") , &ce_pattern_compiler TSRMLS_CC) == FAILURE ) {
+    if ( zend_lookup_class( "Pux\\PatternCompiler", sizeof("Pux\\PatternCompiler")-1 , &ce_pattern_compiler TSRMLS_CC) == FAILURE ) {
         php_error(E_ERROR, "Class Pux\\PatternCompiler not found.");
         return NULL;
     }
@@ -93,7 +93,7 @@ zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry 
     }
 
     zval *z_compiled_route = NULL; // will be an array
-    zend_call_method( NULL, *ce_pattern_compiler, NULL, "compile", strlen("compile"), &z_compiled_route, 2, z_pattern, z_options TSRMLS_CC );
+    zend_call_method( NULL, *ce_pattern_compiler, NULL, "compile", sizeof("compile")-1, &z_compiled_route, 2, z_pattern, z_options TSRMLS_CC );
 
     if ( z_compiled_route == NULL ) {
         return NULL;
@@ -153,7 +153,7 @@ PHP_METHOD(Mux, __destruct) {
 PHP_METHOD(Mux, generate_id) {
     zval * z_counter = NULL;
     long counter = 0;
-    z_counter = zend_read_static_property(ce_pux_mux, "id_counter", strlen("id_counter") , 0 TSRMLS_CC);
+    z_counter = zend_read_static_property(ce_pux_mux, "id_counter", sizeof("id_counter")-1, 0 TSRMLS_CC);
     if ( z_counter != NULL ) {
         counter = Z_LVAL_P(z_counter);
     }
@@ -416,13 +416,12 @@ PHP_METHOD(Mux, mount) {
     if ( Z_TYPE_P(z_mux) == IS_OBJECT ) {
         if ( instanceof_function( Z_OBJCE_P(z_mux), ce_pux_controller TSRMLS_CC) ) {
             zval *rv;
-            zend_call_method(&z_mux, ce_pux_controller, NULL, "expand", strlen("expand"), &rv, 0, NULL, NULL TSRMLS_CC );
+            zend_call_method(&z_mux, ce_pux_controller, NULL, "expand", sizeof("expand")-1, &rv, 0, NULL, NULL TSRMLS_CC );
             z_mux = rv;
         }
     }
-
-
     Z_ADDREF_P(z_mux);
+
 
     if ( z_options == NULL ) {
         MAKE_STD_ZVAL(z_options);
@@ -452,10 +451,7 @@ PHP_METHOD(Mux, mount) {
         z_mux_routes = zend_read_property( ce_pux_mux, z_mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
         HashPosition route_pointer;
-        HashTable    *mux_routes_hash;
-        mux_routes_hash = Z_ARRVAL_P(z_mux_routes);
         zval **z_mux_route;
-
 
         // iterate mux
         for(zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_mux_routes), &route_pointer); 
@@ -504,6 +500,8 @@ PHP_METHOD(Mux, mount) {
                 char *new_pattern = NULL;
                 int  new_pattern_len;
 
+                // php_printf("%s (%d)\n", pattern, pattern_len);
+
                 new_pattern_len = pattern_len + Z_STRLEN_PP(z_route_original_pattern);
                 new_pattern = (char*) ecalloc( sizeof(char), ( pattern_len +  Z_STRLEN_PP(z_route_original_pattern) ) );
 
@@ -514,6 +512,7 @@ PHP_METHOD(Mux, mount) {
                 zval *z_new_pattern = NULL;
                 MAKE_STD_ZVAL(z_new_pattern);
                 ZVAL_STRINGL(z_new_pattern, new_pattern, new_pattern_len, 0);
+
 
                 // TODO: merge options
 
@@ -602,7 +601,7 @@ PHP_METHOD(Mux, mount) {
         // zval *z_mux_id = call_mux_method(z_mux, "getid", sizeof("getid") ,  );
 
         zval *z_mux_id = NULL;
-        zend_call_method( &z_mux, ce_pux_mux, &fe_getid, "getid", strlen("getid"), &z_mux_id, 0, NULL, NULL TSRMLS_CC );
+        zend_call_method( &z_mux, ce_pux_mux, &fe_getid, "getid", sizeof("getid")-1, &z_mux_id, 0, NULL, NULL TSRMLS_CC );
 
         if ( z_mux_id == NULL || Z_TYPE_P(z_mux_id) == IS_NULL ) {
             php_error(E_ERROR, "Mux id is required. got NULL.");
@@ -614,8 +613,7 @@ PHP_METHOD(Mux, mount) {
         ZVAL_STRINGL(z_pattern, pattern, pattern_len, 1); // duplicate
 
         zval *z_retval = NULL;
-        zend_call_method_with_3_params( &this_ptr, ce_pux_mux, &fe_add, "add",
-                strlen("add"), &z_retval, 3, z_pattern, z_mux_id, z_options TSRMLS_CC);
+        zend_call_method_with_3_params( &this_ptr, ce_pux_mux, &fe_add, "add", sizeof("add")-1, &z_retval, 3, z_pattern, z_mux_id, z_options TSRMLS_CC);
 
 
         zval *z_submux_array = zend_read_property( ce_pux_mux, this_ptr , "submux", sizeof("submux") - 1, 1 TSRMLS_CC);
@@ -652,7 +650,7 @@ PHP_METHOD(Mux, getRequestMethodConstant) {
     long req_method_len;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &req_method, &req_method_len) != FAILURE) {
-        mthit = mthp = estrndup(req_method, strlen(req_method));
+        mthit = mthp = estrndup(req_method, req_method_len);
         while(( *mthit = toupper(*mthit))) mthit++;
 
         if (strcmp(mthp, "GET") == 0) {
@@ -734,7 +732,7 @@ PHP_METHOD(Mux, getId) {
     }
 
     zval *rv = NULL;
-    zend_call_method( NULL, ce_pux_mux, NULL, "generate_id", strlen("generate_id"), &rv, 0, NULL, NULL TSRMLS_CC );
+    zend_call_method( NULL, ce_pux_mux, NULL, "generate_id", sizeof("generate_id")-1, &rv, 0, NULL, NULL TSRMLS_CC );
 
     if ( rv ) {
         counter = Z_LVAL_P(rv);
@@ -764,7 +762,7 @@ PHP_METHOD(Mux, sort) {
     ZVAL_STRING( z_sort_callback, "pux_sort_routes" , 1 );
 
     Z_SET_ISREF_P(z_routes);
-    zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &retval_ptr, 2, 
+    zend_call_method( NULL, NULL, NULL, "usort", sizeof("usort")-1, &retval_ptr, 2, 
             z_routes, z_sort_callback TSRMLS_CC );
     zval_ptr_dtor(&z_sort_callback);
     if (retval_ptr) {
@@ -792,7 +790,7 @@ PHP_METHOD(Mux, compile) {
         MAKE_STD_ZVAL(z_sort_callback);
         ZVAL_STRING( z_sort_callback, "pux_sort_routes" , 1 );
 
-        zend_call_method( NULL, NULL, NULL, "usort", strlen("usort"), &rv, 2, 
+        zend_call_method( NULL, NULL, NULL, "usort", sizeof("usort")-1, &rv, 2, 
                 z_routes, z_sort_callback TSRMLS_CC );
         zval_ptr_dtor(&z_sort_callback); // recycle sort callback zval
         // php_error(E_ERROR,"route sort failed.");
@@ -809,7 +807,7 @@ PHP_METHOD(Mux, compile) {
 
     // call export method
     zval *compiled_code = NULL;
-    zend_call_method( &this_ptr, Z_OBJCE_P(this_ptr) , &fe_export, "export", strlen("export"), &compiled_code, 0, NULL, NULL TSRMLS_CC );
+    zend_call_method( &this_ptr, Z_OBJCE_P(this_ptr) , &fe_export, "export", sizeof("export")-1, &compiled_code, 0, NULL, NULL TSRMLS_CC );
 
     if ( compiled_code == NULL || Z_TYPE_P(compiled_code) == IS_NULL ) {
         php_error(E_ERROR, "Cannot compile routes.");
@@ -834,7 +832,7 @@ PHP_METHOD(Mux, compile) {
     // CHECK_ZVAL_STRING(z_code);
     ZVAL_STRINGL(z_filename, filename, filename_len, 1);
 
-    zend_call_method( NULL, NULL, NULL, "file_put_contents", strlen("file_put_contents"), &retval, 2, z_filename, z_code TSRMLS_CC );
+    zend_call_method( NULL, NULL, NULL, "file_put_contents", sizeof("file_put_contents")-1, &retval, 2, z_filename, z_code TSRMLS_CC );
     zval_ptr_dtor(&z_filename);
     zval_ptr_dtor(&z_code);
     zval_ptr_dtor(&compiled_code);
@@ -861,7 +859,7 @@ PHP_METHOD(Mux, dispatch) {
 
     zend_function *fe; // method entry
     zend_hash_quick_find( &ce_pux_mux->function_table, "match",    sizeof("match"), zend_inline_hash_func(ZEND_STRS("match")),    (void **) &fe);
-    zend_call_method( &this_ptr, ce_pux_mux, &fe, "match", strlen("match"), &z_return_route, 1, z_path, NULL TSRMLS_CC );
+    zend_call_method( &this_ptr, ce_pux_mux, &fe, "match", sizeof("match")-1, &z_return_route, 1, z_path, NULL TSRMLS_CC );
 
     if ( ! z_return_route || Z_TYPE_P(z_return_route) == IS_NULL ) {
         zval_ptr_dtor(&z_path);
