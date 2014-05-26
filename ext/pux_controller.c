@@ -38,6 +38,10 @@ const zend_function_entry controller_methods[] = {
   PHP_FE_END
 };
 
+static char * translate_method_name_to_path(const char *method_name);
+
+static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, int parent);
+
 zend_bool phannot_fetch_argument_value(zval **arg, zval** value TSRMLS_DC) {
     zval **expr;
     if (zend_hash_find(Z_ARRVAL_PP(arg), "expr", sizeof("expr"), (void**)&expr) == FAILURE ) {
@@ -73,7 +77,44 @@ void pux_init_controller(TSRMLS_D) {
 }
 
 
-static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, int parent);
+static char * translate_method_name_to_path(const char *method_name)
+{
+    char *p = strstr(method_name, "Action");
+    if ( p == NULL ) {
+        return NULL;
+    }
+
+    if ( strncmp(method_name, "indexAction", strlen("indexAction") ) == 0 ) {
+        // returns empty string as its path
+        return strndup("",sizeof("")-1);
+    }
+    char * new_path;
+
+    // XXX: this might overflow..
+    new_path = ecalloc( 128 , sizeof(char) );
+
+    int    len = p - method_name;
+    char * c = (char*) method_name;
+    int    x = 0;
+    new_path[x++] = '/';
+    int    new_path_len = 1;
+    while( len-- ) {
+        if ( isupper(*c) ) {
+            new_path[x++] = '/';
+            new_path[x++] = tolower(*c);
+            new_path_len += 2;
+        } else {
+            new_path[x++] = *c;
+            new_path_len ++;
+        }
+        c++;
+    }
+    return new_path;
+}
+
+
+
+
 
 static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, int parent) {
     HashTable *func_table;
@@ -93,8 +134,6 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
 
     func_table = &ce->function_table;
     zend_hash_internal_pointer_reset_ex(func_table, &pos);
-
-
 
 
     while (zend_hash_get_current_data_ex(func_table, (void **) &mptr, &pos) == SUCCESS) {
@@ -285,40 +324,6 @@ PHP_METHOD(Controller, getActionMethods)
 }
 
 
-char * translate_method_name_to_path(const char *method_name)
-{
-    char *p = strstr(method_name, "Action");
-    if ( p == NULL ) {
-        return NULL;
-    }
-
-    if ( strncmp(method_name, "indexAction", strlen("indexAction") ) == 0 ) {
-        // returns empty string as its path
-        return strndup("",sizeof("")-1);
-    }
-    char * new_path;
-
-    // XXX: this might overflow..
-    new_path = ecalloc( 128 , sizeof(char) );
-
-    int    len = p - method_name;
-    char * c = (char*) method_name;
-    int    x = 0;
-    new_path[x++] = '/';
-    int    new_path_len = 1;
-    while( len-- ) {
-        if ( isupper(*c) ) {
-            new_path[x++] = '/';
-            new_path[x++] = tolower(*c);
-            new_path_len += 2;
-        } else {
-            new_path[x++] = *c;
-            new_path_len ++;
-        }
-        c++;
-    }
-    return new_path;
-}
 
 // return path => path pairs
 // structure: [[ path, method name ], [ ... ], [ ... ], ... ]

@@ -18,7 +18,6 @@ extern zend_class_entry *ce_pux_controller;
 
 void pux_init_controller(TSRMLS_D);
 
-char * translate_method_name_to_path(const char *method_name);
 zend_bool phannot_fetch_argument_value(zval **arg, zval** value TSRMLS_DC);
 zend_bool phannot_fetch_argument_type(zval **arg, zval **type TSRMLS_DC);
 int strpos(const char *haystack, char *needle);
