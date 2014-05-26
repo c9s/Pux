@@ -12,11 +12,11 @@ class Controller {
         $annotations = array();
         $doc = $method->getDocComment();
         if ($doc) {
-            if (preg_match('/^[\s*]*\@Method\("(get|put|post|delete|head|patch|options)"\)/im', $doc, $mmatch)) {
-                $annotations['Method'] = array_pop($mmatch);
+            if (preg_match('/^[\s*]*\@Method\("(get|put|post|delete|head|patch|options)"\)/im', $doc, $regs)) {
+                $annotations['Method'] = $regs[1];
             }
-            if (preg_match('/^[\s*]*\@Route\("([^\s]*)"\)/im', $doc, $umatch)) {
-                $annotations['Route'] = array_pop($umatch);
+            if (preg_match('/^[\s*]*\@Route\("([^\s]*)"\)/im', $doc, $regs)) {
+                $annotations['Route'] = $regs[1];
             }
         }
         return $annotations;
