@@ -38,7 +38,7 @@ const zend_function_entry controller_methods[] = {
   PHP_FE_END
 };
 
-static char * translate_method_name_to_path(const char *method_name);
+static char * translate_method_name_to_path(const char *method_name, int * path_len);
 
 static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, int parent TSRMLS_DC);
 
@@ -77,7 +77,7 @@ void pux_init_controller(TSRMLS_D) {
 }
 
 
-static char * translate_method_name_to_path(const char *method_name)
+static char * translate_method_name_to_path(const char *method_name, int * path_len)
 {
     char *p = strstr(method_name, "Action");
     if ( p == NULL ) {
@@ -105,10 +105,11 @@ static char * translate_method_name_to_path(const char *method_name)
             new_path_len += 2;
         } else {
             new_path[x++] = *c;
-            new_path_len ++;
+            new_path_len++;
         }
         c++;
     }
+    *path_len = new_path_len;
     return new_path;
 }
 
@@ -212,7 +213,7 @@ static int zend_parse_method_annotations(zend_function *mptr, zval * z_indexed_a
     }
 
     // return SUCCESS if there are annotations
-    return zend_hash_has_more_elements( Z_ARRVAL_P(z_indexed_annotations) );
+    return zend_hash_num_elements( Z_ARRVAL_P(z_indexed_annotations) );
 }
 
 
@@ -245,6 +246,15 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
     zend_hash_internal_pointer_reset_ex(func_table, &pos);
 
     while (zend_hash_get_current_data_ex(func_table, (void **) &mptr, &pos) == SUCCESS) {
+
+        if ( mptr->type != ZEND_USER_FUNCTION ) {
+            zend_hash_move_forward_ex(func_table, &pos);
+            continue;
+        }
+
+
+
+
         // the function name
         fn     = mptr->common.function_name;
         fn_len = strlen(mptr->common.function_name);
@@ -257,28 +267,11 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
 
         // append the structure [method name, annotations]
         zval *new_item;
-        zval *z_method_annotations;
         zval *z_indexed_annotations;
         zval *z_route_meta;
 
-        zval *z_comment;
-        zval *z_file;
-        zval *z_line_start;
-
         MAKE_STD_ZVAL(new_item);
         array_init(new_item);
-        add_next_index_stringl(new_item, fn, fn_len, 1);
-
-        /**
-         * @var 
-         *
-         * if there no annotation, we pass an empty array.
-         *
-         * The method annotation structure
-         */
-        MAKE_STD_ZVAL(z_method_annotations);
-        array_init(z_method_annotations);
-
 
         // simplified annotation information is saved to this variable.
         MAKE_STD_ZVAL(z_indexed_annotations);
@@ -297,28 +290,54 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
             add_assoc_bool(z_route_meta, "is_parent", 1);
         }
 
+
+
+        int found_annotations = 0;
+
         // if we found there is a doc comment block,
         // use annotation parser to parse the annotations
-        if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
-            if ( SUCCESS == zend_parse_method_annotations(mptr, z_indexed_annotations TSRMLS_CC) ) {
+        //
+        // method comment with "/** */" are doc_comment, others are not.
+        if ( mptr->op_array.doc_comment ) {
+            found_annotations = zend_parse_method_annotations(mptr, z_indexed_annotations TSRMLS_CC);
+        }
+        // php_printf("%s %d %s comment: %s\n", fn, found_annotations, " annotation", mptr->op_array.doc_comment);
 
-            }
 
-            // if the annotation is not found, we lookup the parent annotations
-            /*
-            zval **z_ann;
-            if (zend_hash_find(annotations_by_name, "", 0, (void**)&z_ann) == SUCCESS) {
+        if ( found_annotations == 0 ) {
+            // lookup parent parent annotations
+            // php_printf("==> lookup parent parent annotations\n");
+            zval **method_meta;
+            zval **method_ann;
+            // php_var_dump(&retval, 0 TSRMLS_CC);
+
+            if (zend_hash_find(Z_ARRVAL_P(retval), fn, fn_len + 1, (void**)&method_meta) == SUCCESS) {
+                // php_printf("==> found parent method declaration\n");
+                // php_var_dump(method_meta, 0 TSRMLS_CC);
+
+
+                if ( zend_hash_index_find( Z_ARRVAL_PP(method_meta), 0, (void**)&method_ann) == SUCCESS ) {
+                    // php_printf("==> found parent method annotations\n");
+                    // php_var_dump(method_ann, 0 TSRMLS_CC);
+                    MAKE_COPY_ZVAL(method_ann, z_indexed_annotations);
+                }
             }
-            */
         }
 
         Z_ADDREF_P(z_indexed_annotations);
+        Z_ADDREF_P(z_route_meta);
+        Z_ADDREF_P(new_item);
         add_next_index_zval(new_item, z_indexed_annotations);
         add_next_index_zval(new_item, z_route_meta);
-        add_next_index_zval(retval, new_item);
 
+        add_assoc_zval_ex(retval, fn, fn_len + 1, new_item);
+        // add_assoc_zval(retval, fn, new_item);
+
+        // add_next_index_zval(retval, new_item);
         zend_hash_move_forward_ex(func_table, &pos);
     }
+
+    // php_var_dump(&retval, 0 TSRMLS_CC);
 }
 
 
@@ -376,7 +395,7 @@ PHP_METHOD(Controller, getActionRoutes)
     zend_call_method_with_0_params( &this_ptr, ce_pux_controller, &fe, "getactionmethods", &rv );
 
     HashTable *func_list = Z_ARRVAL_P(rv);
-    HashPosition pointer;
+    HashPosition pos;
     zval **z_method_name;
     zval **z_annotations;
     zval **z_doc_method;
@@ -385,41 +404,55 @@ PHP_METHOD(Controller, getActionRoutes)
 
     array_init(return_value);
 
-    for(zend_hash_internal_pointer_reset_ex(func_list, &pointer); 
-            zend_hash_get_current_data_ex(func_list, (void**) &item, &pointer) == SUCCESS; 
-            zend_hash_move_forward_ex(func_list, &pointer)) 
+    for(zend_hash_internal_pointer_reset_ex( Z_ARRVAL_P(rv) , &pos); 
+            zend_hash_get_current_data_ex(Z_ARRVAL_P(rv), (void**) &item, &pos) == SUCCESS; 
+            zend_hash_move_forward_ex(Z_ARRVAL_P(rv), &pos)) 
     {
+        char * method_name = NULL;
+        uint   method_name_len; // this method_name_len contains \0 charactar
+        ulong  index;
 
-        zend_hash_index_find(Z_ARRVAL_PP(item), 0, (void**)&z_method_name);
+        // use zend_hash_get_current_key to get method name from the return-value array, well it should be string key, not ulong key
+        if (zend_hash_get_current_key_ex( Z_ARRVAL_P(rv), &method_name, &method_name_len, &index, 0, &pos) != HASH_KEY_IS_STRING) {
+            zend_hash_move_forward_ex(Z_ARRVAL_P(rv), &pos);
+            continue;
+        }
 
-        const char *method_name = Z_STRVAL_PP(z_method_name);
-        int method_name_len     = Z_STRLEN_PP(z_method_name);
+        // zend_hash_index_find(Z_ARRVAL_PP(item), 0, (void**)&z_method_name);
+
         char *path              = NULL;
+        int   path_len = 0;
+
 
         zval *z_route_options;
         MAKE_STD_ZVAL(z_route_options);
         array_init(z_route_options);
 
-        if ( zend_hash_index_find(Z_ARRVAL_PP(item), 1, (void**)&z_annotations) == SUCCESS ) {
+        if ( zend_hash_index_find(Z_ARRVAL_PP(item), 0, (void**)&z_annotations) == SUCCESS ) {
             if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "Route", sizeof("Route"), (void**)&z_doc_uri) == SUCCESS) {
                 path = estrndup(Z_STRVAL_PP(z_doc_uri), Z_STRLEN_PP(z_doc_uri));
+                path_len = Z_STRLEN_PP(z_doc_uri);
             }
             if (zend_hash_find(Z_ARRVAL_PP(z_annotations), "Method", sizeof("Method"), (void**)&z_doc_method) == SUCCESS) {
                 Z_ADDREF_PP(z_doc_method);
-                add_assoc_zval(z_route_options, "method", *z_doc_method);
+
+                // string_to_method_const
+                add_assoc_long(z_route_options, "method", method_str_to_method_const(Z_STRVAL_PP(z_doc_method)) );
+                // add_assoc_zval(z_route_options, "method", *z_doc_method);
             }
         }
+        // php_printf("%s (%lu)\n", method_name, strlen(method_name) );
 
         if (!path) {
-            path = translate_method_name_to_path(method_name);
+            path = translate_method_name_to_path(method_name, &path_len);
         }
 
         // return structure [ path, method name, http method ]
         zval * new_item;
         MAKE_STD_ZVAL(new_item);
         array_init_size(new_item, 3);
-        add_next_index_string(new_item, path, 1);
-        add_next_index_stringl(new_item, method_name, method_name_len, 0);
+        add_next_index_stringl(new_item, path, path_len, 1);
+        add_next_index_stringl(new_item, method_name, method_name_len - 1, 1); // duplicate it
 
         Z_ADDREF_P(z_route_options);
         add_next_index_zval(new_item, z_route_options);

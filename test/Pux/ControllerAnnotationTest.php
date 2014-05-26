@@ -7,70 +7,60 @@ class ParentController extends Controller {
 
     /**
      *
-     * @Route("/update")
+     * @Route("/page")
      * @Method("GET")
      */
     public function pageAction() {  }
+
+
+    /**
+     * @Route("/post")
+     * @Method("POST")
+     */
+    public function postAction() { }
+
+
 }
 
 class ChildController extends ParentController { 
-    // we should override this action.
+    // we should override this action but use the parent annotations
     public function pageAction() {  }
 
     public function subpageAction() {  }
-
 }
 
 
 class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
 {
 
+
     public function testAnnotationForGetActionMethods()
-    {
-        $parent = new ParentController;
-        ok($parent);
-        ok( $map = $parent->getActionMethods() );
-        ok( is_array($map), 'map is an array' );
-        ok( isset($map[0]), 'one path' );
-        is( 1, count($map), 'count of map' );
-        is( 'pageAction', $map[0][0], 'pageAction');
-        is([ 'Route' => '/update', 'Method' => 'GET' ], $map[0][1] );
-        is([ 'class' => 'ParentController' ], $map[0][2] );
-    }
-
-
-    public function testInheritedActions() 
     {
         $con = new ChildController;
         ok($con);
         ok( $map = $con->getActionMethods() );
-        ok( is_array($map), 'map is an array' );
+        ok( is_array($map) );
 
-        is( 3, count($map), 'count of map should contain parent and child methods' );
+        ok( isset($map['postAction']) );
+        ok( isset($map['pageAction']) );
+        ok( isset($map['subpageAction']) );
 
-        ok( is_array($map[0]), 'first path' );
-        ok( is_array($map[1]), 'second path' );
-        ok( is_array($map[2]), 'third path' );
-        
-        $expectedMap = array (
-            array(
-                'pageAction', array (
-                    'Route' => '/update',
-                    'Method' => 'GET',
-                ), array(
-                    'class' => 'ParentController',
-                    'is_parent' => true,
-                ),
-            ),
-            array(
-                'pageAction', array(), array( 'class' => 'ChildController' ),
-            ),
-            array(
-                'subpageAction', array(), array( 'class' => 'ChildController' ),
-            ),
-        );
-        is( $expectedMap, $map );
+        is( array(array(
+            "Route" => "/post",
+            "Method" => "POST"
+        ),array(
+            "class" => "ChildController"
+        )), $map['postAction'] );
+
+        $routeMap = $con->getActionRoutes();
+        count_ok( 3, $routeMap );
+
+        list($path, $method, $options) = $routeMap[0];
+        is('/page', $path);
+        is('pageAction', $method);
+        is( array( 'method' => REQ_METHOD_GET ) , $options);
     }
+
 
     public function testAnnotations()
     {
@@ -83,15 +73,6 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
         ok($controller);
 
         ok( is_array( $map = $controller->getActionMethods() ) );
-
-        count_ok( 6, $map);
-        is('indexAction', $map[0][0], 'the method name');
-        is(array(),       $map[0][1], 'annotation info');
-        is(array('class' => 'ExpandableProductController'), $map[0][2], 'meta');
-
-        is('fooBarAction', $map[5][0], 'the method name');
-        is(array(),       $map[5][1], 'annotation info');
-        is(array('class' => 'ExpandableProductController'), $map[5][2], 'meta');
 
         $routes = $controller->getActionRoutes();
         is('', $routes[0][0], 'the path');
@@ -126,7 +107,5 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
             ok( $mux->dispatch($path) , $path);
         }
     }
-
-
 }
 
