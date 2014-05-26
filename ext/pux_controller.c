@@ -40,7 +40,7 @@ const zend_function_entry controller_methods[] = {
 
 static char * translate_method_name_to_path(const char *method_name);
 
-static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, int parent TSRMLS_DC);
+static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, zval *annotations_by_path, int parent TSRMLS_DC);
 
 zend_bool phannot_fetch_argument_value(zval **arg, zval** value TSRMLS_DC) {
     zval **expr;
@@ -116,7 +116,7 @@ static char * translate_method_name_to_path(const char *method_name)
 
 
 
-static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, int parent TSRMLS_DC) {
+static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, zval * annotations_by_path, int parent TSRMLS_DC) {
     HashTable *func_table;
     zend_function *mptr; // prepare zend_function mptr for iterating hash 
     HashPosition pos;
@@ -129,7 +129,7 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, in
 
     if (ce->parent) {
         parent_ce = ce->parent;
-        zend_parse_action_annotations(parent_ce, retval, 1 TSRMLS_CC);
+        zend_parse_action_annotations(parent_ce, retval, annotations_by_path, 1 TSRMLS_CC);
     }
 
     func_table = &ce->function_table;
@@ -318,9 +318,13 @@ PHP_METHOD(Controller, getActionMethods)
 
     array_init(return_value);
 
+    zval *annotations_by_path;
+    MAKE_STD_ZVAL(annotations_by_path);
+    array_init(annotations_by_path);
+
     // looping in the parent class function table if we have one.
     // so we can override with our current class later.
-    zend_parse_action_annotations(ce, return_value, 0 TSRMLS_CC);
+    zend_parse_action_annotations(ce, return_value, annotations_by_path, 0 TSRMLS_CC);
 }
 
 
