@@ -444,13 +444,11 @@ PHP_METHOD(Mux, mount) {
     z_routes = zend_read_property( ce_pux_mux, getThis(), "routes", sizeof("routes")-1, 1 TSRMLS_CC);
     z_expand = zend_read_property( ce_pux_mux, getThis(), "expand", sizeof("expand")-1, 1 TSRMLS_CC);
 
-
     // TODO: merge routesById and staticRoutes properties
 
 
     if ( Z_BVAL_P(z_expand) ) {
         // fetch routes from $mux
-        //
         z_mux_routes = zend_read_property( ce_pux_mux, z_mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
 
         HashPosition route_pointer;
@@ -475,15 +473,19 @@ PHP_METHOD(Mux, mount) {
             zval **z_route_original_pattern; // for PCRE pattern
 
             if ( zend_hash_index_find( Z_ARRVAL_PP(z_mux_route), 0, (void**) &z_is_pcre) == FAILURE ) {
+                zend_hash_move_forward_ex(mux_routes_hash, &route_pointer);
                 continue;
             }
             if ( zend_hash_index_find( Z_ARRVAL_PP(z_mux_route), 1, (void**) &z_route_pattern) == FAILURE ) {
+                zend_hash_move_forward_ex(mux_routes_hash, &route_pointer);
                 continue;
             }
             if ( zend_hash_index_find( Z_ARRVAL_PP(z_mux_route), 2, (void**) &z_route_callback) == FAILURE ) {
+                zend_hash_move_forward_ex(mux_routes_hash, &route_pointer);
                 continue;
             }
             if ( zend_hash_index_find( Z_ARRVAL_PP(z_mux_route), 3, (void**) &z_route_options) == FAILURE ) {
+                zend_hash_move_forward_ex(mux_routes_hash, &route_pointer);
                 continue;
             }
 
@@ -499,12 +501,15 @@ PHP_METHOD(Mux, mount) {
                     php_error( E_ERROR, "Can not compile pattern, original pattern not found");
                 }
 
-                char new_pattern[120] = { 0 };
+                char *new_pattern = NULL;
                 int  new_pattern_len;
+
+                new_pattern_len = pattern_len + Z_STRLEN_PP(z_route_original_pattern);
+                new_pattern = (char*) ecalloc( sizeof(char), ( pattern_len +  Z_STRLEN_PP(z_route_original_pattern) ) );
+
                 strncat( new_pattern, pattern , pattern_len );
                 strncat( new_pattern, Z_STRVAL_PP(z_route_original_pattern) , Z_STRLEN_PP(z_route_original_pattern) );
 
-                new_pattern_len = pattern_len + Z_STRLEN_PP(z_route_original_pattern);
 
                 zval *z_new_pattern = NULL;
                 MAKE_STD_ZVAL(z_new_pattern);
@@ -973,6 +978,8 @@ PHP_METHOD(Mux, match) {
 
     zval **z_route_pp = NULL;
     zval *z_route = NULL;
+    // XXX: not to match static routes for now because we might have different methods for the same url
+    /*
     if ( zend_hash_find( Z_ARRVAL_P( zend_read_property(ce_pux_mux, this_ptr, "staticRoutes", sizeof("staticRoutes") - 1, 1 TSRMLS_CC) ), path, path_len, (void**)&z_route_pp) == SUCCESS ) {
         if ( Z_TYPE_PP(z_route_pp) != IS_NULL ) {
             *return_value = **z_route_pp;
@@ -981,6 +988,8 @@ PHP_METHOD(Mux, match) {
             return;
         }
     }
+    */
+
     z_route = php_pux_match(zend_read_property(ce_pux_mux , this_ptr , "routes", sizeof("routes")-1, 1 TSRMLS_CC), path, path_len TSRMLS_CC);
     if ( z_route != NULL ) {
         *return_value = *z_route;

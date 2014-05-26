@@ -172,9 +172,6 @@ class Mux
                 $callback,
                 $options,
             );
-            if ( empty($options) ) {
-                $this->staticRoutes[$pattern] = $route;
-            }
             if ( isset($options['id']) ) {
                 $this->routesById[ $options['id'] ] = $route;
             }
@@ -254,9 +251,6 @@ class Mux
     }
 
     public function match($path) {
-        if ( isset($this->staticRoutes[$path]) ) {
-            return $this->staticRoutes[$path];
-        }
         $reqmethod = self::getRequestMethodConstant(@$_SERVER['REQUEST_METHOD']);
 
         foreach( $this->routes as $route ) {

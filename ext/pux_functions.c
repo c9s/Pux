@@ -533,34 +533,36 @@ PHP_FUNCTION(pux_sort_routes)
         RETURN_FALSE;
     }
 
-    zval **a_pcre;
-    zval **a_pattern;
-    zval **a_compiled_pattern;
-    zval **a_options;
+    zval **a_pcre = NULL;
+    zval **a_pattern = NULL;
+    zval **a_compiled_pattern = NULL;
+    zval **a_options = NULL;
 
-    zval **b_pcre;
-    zval **b_pattern;
-    zval **b_compiled_pattern;
-    zval **b_options;
+    zval **b_pcre = NULL;
+    zval **b_pattern = NULL;
+    zval **b_compiled_pattern = NULL;
+    zval **b_options = NULL;
 
 
-    zend_hash_index_find( Z_ARRVAL_P(a) , 0, (void**)&a_pcre);
-    zend_hash_index_find( Z_ARRVAL_P(b) , 0, (void**)&b_pcre);
-
-    zend_hash_index_find( Z_ARRVAL_P(a) , 1, (void**)&a_pattern);
-    zend_hash_index_find( Z_ARRVAL_P(b) , 1, (void**)&b_pattern);
-
-    zend_hash_index_find( Z_ARRVAL_P(a) , 3, (void**)&a_options);
-    zend_hash_index_find( Z_ARRVAL_P(b) , 3, (void**)&b_options);
-    
+    if (zend_hash_index_find( Z_ARRVAL_P(a) , 0, (void**)&a_pcre) == FAILURE
+        || zend_hash_index_find( Z_ARRVAL_P(b) , 0, (void**)&b_pcre) == FAILURE 
+        || zend_hash_index_find( Z_ARRVAL_P(a) , 1, (void**)&a_pattern) == FAILURE 
+        || zend_hash_index_find( Z_ARRVAL_P(b) , 1, (void**)&b_pattern) == FAILURE 
+        || zend_hash_index_find( Z_ARRVAL_P(a) , 3, (void**)&a_options) == FAILURE 
+        || zend_hash_index_find( Z_ARRVAL_P(b) , 3, (void**)&b_options) == FAILURE 
+        )
+    {
+        RETURN_LONG(0);
+    }
 
     // return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
     if ( Z_BVAL_PP(a_pcre) && Z_BVAL_PP(b_pcre) ) {
-        zend_hash_quick_find( Z_ARRVAL_PP(a_options) , "compiled", strlen("compiled"), zend_inline_hash_func(ZEND_STRS("compiled")), (void**)&a_compiled_pattern);
-        zend_hash_quick_find( Z_ARRVAL_PP(b_options) , "compiled", strlen("compiled"), zend_inline_hash_func(ZEND_STRS("compiled")), (void**)&b_compiled_pattern);
+        zend_hash_quick_find( Z_ARRVAL_PP(a_options) , "compiled", sizeof("compiled"), zend_inline_hash_func(ZEND_STRS("compiled")), (void**)&a_compiled_pattern);
+        zend_hash_quick_find( Z_ARRVAL_PP(b_options) , "compiled", sizeof("compiled"), zend_inline_hash_func(ZEND_STRS("compiled")), (void**)&b_compiled_pattern);
 
         int a_len = Z_STRLEN_PP(a_compiled_pattern);
         int b_len = Z_STRLEN_PP(b_compiled_pattern);
+        // php_printf("%lu vs %lu\n", a_len, b_len);
         if ( a_len == b_len ) {
             RETURN_LONG(0);
         } else if ( a_len > b_len ) {
@@ -575,6 +577,7 @@ PHP_FUNCTION(pux_sort_routes)
     else if ( Z_BVAL_PP(b_pcre) ) {
         RETURN_LONG(1);
     }
+
 
     int a_len = Z_STRLEN_PP(a_pattern);
     int b_len = Z_STRLEN_PP(b_pattern);

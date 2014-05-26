@@ -88,6 +88,6 @@ PHP_FUNCTION(pux_delete_mux);
 PHP_FUNCTION(pux_persistent_dispatch);
 
 
-extern inline int method_str_to_method_const(char * c_request_method );
+extern int method_str_to_method_const(char * c_request_method );
 
 #endif

@@ -41,10 +41,7 @@ zend_class_entry *ce_pux_exception;
 static const zend_function_entry pux_functions[] = {
     PHP_FE(pux_match, NULL)
     PHP_FE(pux_sort_routes, NULL)
-    PHP_FE(pux_fetch_mux, NULL)
-    PHP_FE(pux_store_mux, NULL)
     PHP_FE(pux_delete_mux, NULL)
-    PHP_FE(pux_persistent_dispatch, NULL)
     PHP_FE_END
 };
 

@@ -499,9 +499,11 @@ PHP_METHOD(Controller, expand)
 
 
         if ( zend_hash_index_find(Z_ARRVAL_PP(path_entry), 0, (void**) &z_path) == FAILURE ) {
+            zend_hash_move_forward_ex(Z_ARRVAL_P(path_array), &pointer);
             continue;
         }
         if ( zend_hash_index_find(Z_ARRVAL_PP(path_entry), 1, (void**) &z_method) == FAILURE ) {
+            zend_hash_move_forward_ex(Z_ARRVAL_P(path_array), &pointer);
             continue;
         }
 
@@ -522,7 +524,7 @@ PHP_METHOD(Controller, expand)
     }
 
     zval *rv = NULL;
-    zend_call_method_with_0_params(&new_mux, ce_pux_mux, NULL, "sort", &rv );
+    zend_call_method_with_0_params(&new_mux, ce_pux_mux, NULL, "sort", &rv);
 
     *return_value = *new_mux;
     zval_copy_ctor(return_value);
