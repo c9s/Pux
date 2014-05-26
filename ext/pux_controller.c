@@ -320,7 +320,7 @@ PHP_METHOD(Controller, getActionMethods)
 
     // looping in the parent class function table if we have one.
     // so we can override with our current class later.
-    zend_parse_action_annotations(ce, return_value, 0);
+    zend_parse_action_annotations(ce, return_value, 0 TSRMLS_CC);
 }
 
 
