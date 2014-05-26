@@ -564,10 +564,6 @@ PHP_METHOD(Mux, mount) {
                 php_array_merge(Z_ARRVAL_P(z_new_route_options), Z_ARRVAL_P(z_options), 0 TSRMLS_CC);
                 php_array_merge(Z_ARRVAL_P(z_new_route_options), Z_ARRVAL_P(*z_route_options), 0 TSRMLS_CC);
 
-                Z_ADDREF_PP(z_route_callback);
-                Z_ADDREF_P(z_new_route_options);
-                Z_ADDREF_P(z_new_routes);
-
                 // make the array: [ pcreFlag, pattern, callback, options ]
                 add_index_bool(z_new_routes, 0 , 0); // pcre flag == false
                 add_index_stringl(z_new_routes, 1 , new_pattern , new_pattern_len, 0);
@@ -922,9 +918,9 @@ PHP_METHOD(Mux, dispatch) {
             zval_ptr_dtor(&z_substr);
 
             if (z_retval) {
-                Z_ADDREF_P(z_retval);
                 *return_value = *z_retval;
                 zval_copy_ctor(return_value);
+                INIT_PZVAL(return_value);
             }
             // zval_ptr_dtor(&z_return_route);
             RETURN_FALSE;
@@ -944,9 +940,9 @@ PHP_METHOD(Mux, dispatch) {
             zval_ptr_dtor(&z_substr);
 
             if ( z_retval ) {
-                Z_ADDREF_P(z_retval);
                 *return_value = *z_retval;
                 zval_copy_ctor(return_value);
+                INIT_PZVAL(return_value);
             }
             // zval_ptr_dtor(&z_return_route);
             return;
