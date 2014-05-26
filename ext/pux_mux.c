@@ -19,6 +19,8 @@
 #include "pux_controller.h"
 #include "pux_mux.h"
 
+#include "r3/r3.h"
+
 zend_class_entry *ce_pux_mux;
 
 const zend_function_entry mux_methods[] = {
