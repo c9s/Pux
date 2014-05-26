@@ -773,28 +773,35 @@ inline zval * get_current_request_method(HashTable * server_vars_hash TSRMLS_DC)
     return fetch_server_var(server_vars_hash, "REQUEST_METHOD", sizeof("REQUEST_METHOD") TSRMLS_CC);
 }
 
-/* get request method type in constant value. {{{
+
+inline int method_str_to_method_const(char * c_request_method ) {
+    if ( strncmp("GET", c_request_method , sizeof("GET") ) == 0 ) {
+        return REQ_METHOD_GET;
+    } else if ( strncmp("POST", c_request_method , sizeof("POST") ) == 0 ) {
+        return REQ_METHOD_POST;
+    } else if ( strncmp("PUT" , c_request_method , sizeof("PUT") ) == 0 ) {
+        return REQ_METHOD_PUT;
+    } else if ( strncmp("DELETE", c_request_method, sizeof("DELETE")  ) == 0 ) {
+        return REQ_METHOD_DELETE;
+    } else if ( strncmp("HEAD", c_request_method, sizeof("HEAD")  ) == 0 ) {
+        return REQ_METHOD_HEAD;
+    } else if ( strncmp("PATCH", c_request_method, sizeof("PATCH")  ) == 0 ) {
+        return REQ_METHOD_HEAD;
+    } else if ( strncmp("OPTIONS", c_request_method, sizeof("OPTIONS")  ) == 0 ) {
+        return REQ_METHOD_OPTIONS;
+    }
+    return 0;
+}
+
+/*
+ * get request method type in constant value. {{{
  */
 inline int get_current_request_method_const(HashTable * server_vars_hash TSRMLS_DC) {
     char *c_request_method;
     zval *z_request_method = get_current_request_method(server_vars_hash TSRMLS_CC);
     if ( z_request_method ) {
         c_request_method = Z_STRVAL_P(z_request_method);
-        if ( strncmp("GET", c_request_method , sizeof("GET") ) == 0 ) {
-            return REQ_METHOD_GET;
-        } else if ( strncmp("POST", c_request_method , sizeof("POST") ) == 0 ) {
-            return REQ_METHOD_POST;
-        } else if ( strncmp("PUT" , c_request_method , sizeof("PUT") ) == 0 ) {
-            return REQ_METHOD_PUT;
-        } else if ( strncmp("DELETE", c_request_method, sizeof("DELETE")  ) == 0 ) {
-            return REQ_METHOD_DELETE;
-        } else if ( strncmp("HEAD", c_request_method, sizeof("HEAD")  ) == 0 ) {
-            return REQ_METHOD_HEAD;
-        } else if ( strncmp("PATCH", c_request_method, sizeof("PATCH")  ) == 0 ) {
-            return REQ_METHOD_HEAD;
-        } else if ( strncmp("OPTIONS", c_request_method, sizeof("OPTIONS")  ) == 0 ) {
-            return REQ_METHOD_OPTIONS;
-        }
+        return method_str_to_method_const(c_request_method);
     }
     return 0;
 }
