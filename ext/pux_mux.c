@@ -533,11 +533,6 @@ PHP_METHOD(Mux, mount) {
                 zend_hash_quick_update( Z_ARRVAL_P(z_compiled_route), "pattern", sizeof("pattern"), zend_inline_hash_func(ZEND_STRS("pattern")), &z_new_pattern, sizeof(zval *), NULL);
 
 
-                Z_ADDREF_PP(z_compiled_route_pattern);
-                Z_ADDREF_PP(z_route_callback);
-                Z_ADDREF_P(z_compiled_route);
-                Z_ADDREF_P(z_new_routes);
-
                 // create new route and append to mux->routes
                 add_index_bool(z_new_routes, 0 , 1); // pcre flag == false
                 add_index_zval(z_new_routes, 1, *z_compiled_route_pattern);
@@ -573,7 +568,7 @@ PHP_METHOD(Mux, mount) {
                 Z_ADDREF_P(z_new_route_options);
                 Z_ADDREF_P(z_new_routes);
 
-                /* make the array: [ pcreFlag, pattern, callback, options ] */
+                // make the array: [ pcreFlag, pattern, callback, options ]
                 add_index_bool(z_new_routes, 0 , 0); // pcre flag == false
                 add_index_stringl(z_new_routes, 1 , new_pattern , new_pattern_len, 0);
                 add_index_zval( z_new_routes, 2 , *z_route_callback);
@@ -581,7 +576,6 @@ PHP_METHOD(Mux, mount) {
                 add_next_index_zval(z_routes, z_new_routes);
             }
         }
-
     } else {
         zend_function *fe_getid = NULL; // method entry
         zend_function *fe_add   = NULL; // method entry
