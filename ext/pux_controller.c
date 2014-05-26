@@ -40,7 +40,7 @@ const zend_function_entry controller_methods[] = {
 
 static char * translate_method_name_to_path(const char *method_name);
 
-static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, zval *annotations_by_path, int parent TSRMLS_DC);
+static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, int parent TSRMLS_DC);
 
 zend_bool phannot_fetch_argument_value(zval **arg, zval** value TSRMLS_DC) {
     zval **expr;
@@ -113,10 +113,115 @@ static char * translate_method_name_to_path(const char *method_name)
 }
 
 
+static int zend_parse_method_annotations(zend_function *mptr, zval * z_indexed_annotations TSRMLS_DC)
+{
+    zval *z_comment;
+    zval *z_file;
+    zval *z_line_start;
+
+    MAKE_STD_ZVAL(z_comment);
+    ZVAL_STRING(z_comment, mptr->op_array.doc_comment, 1);
+
+    MAKE_STD_ZVAL(z_file);
+    ZVAL_STRING(z_file, mptr->op_array.filename, 1);
+
+    MAKE_STD_ZVAL(z_line_start);
+    ZVAL_LONG(z_line_start, mptr->op_array.line_start);
+
+    // This isfor the end line number
+    /*
+    zval *z_line_end;
+    MAKE_STD_ZVAL(z_line_end);
+    ZVAL_LONG(z_line_start, mptr->op_array.line_end);
+    */
+
+
+    /**
+     * This variable is used for phannot_parse_annotations function to return
+     * annotation results.
+     *
+     * if there no annotation, we pass an empty array.
+     */
+    zval *z_method_annotations;
+    MAKE_STD_ZVAL(z_method_annotations);
+    array_init(z_method_annotations);
+
+
+    zval **z_ann = NULL, **z_ann_name = NULL, **z_ann_arguments = NULL, **z_ann_argument = NULL, **z_ann_argument_value = NULL;
+
+    // TODO: make phannot_parse_annotations reads comment variable in char* type, so we don't need to create extra zval(s)
+    if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line_start TSRMLS_CC) == SUCCESS) {
+
+        /*
+            * z_method_annotations is an indexed array, which contains a structure like this:
+            *
+            *    [ 
+            *      { name => ... , type => ... , arguments => ... , file => , line =>  },
+            *      { name => ... , type => ... , arguments => ... , file => , line =>  },
+            *      { name => ... , type => ... , arguments => ... , file => , line =>  },
+            *    ]
+            *
+            * the actuall structure in PHP:
+            *
+            [
+                {
+                        "type"=> int(300)
+                        "name"=> "Route"
+                        "arguments"=> [
+                        {
+                            "expr"=> {
+                                "type" => int(303)
+                                "value" => string(7) "/delete"
+                            }
+                        }
+                        ]
+                        "file" => string(48) "...."
+                        "line" => int(54)
+                    },
+                    .....
+            ]
+            */
+        HashPosition annp;
+        for (
+            zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_method_annotations), &annp);
+            zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
+            zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
+        ) {
+            if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", sizeof("name"), (void**)&z_ann_name) == FAILURE ) {
+                continue;
+            }
+            if (zend_hash_find(Z_ARRVAL_P(*z_ann), "arguments", sizeof("arguments"), (void**)&z_ann_arguments) == FAILURE ) {
+                continue;
+            }
+
+            // We currenly only support "@Method()" and "@Route"
+            if (    strncmp( Z_STRVAL_PP(z_ann_name), "Method",  sizeof("Method") - 1 ) != 0 
+                    && strncmp( Z_STRVAL_PP(z_ann_name), "Route",   sizeof("Route") - 1 ) != 0 ) 
+            {
+                continue;
+            }
+
+            // read the first argument (we only support for one argument currently, and should support complex syntax later.)
+            if ( zend_hash_index_find(Z_ARRVAL_PP(z_ann_arguments), 0, (void**) &z_ann_argument) == SUCCESS ) {
+                if ( phannot_fetch_argument_value(z_ann_argument, (zval**) &z_ann_argument_value TSRMLS_CC) == SUCCESS ) {
+                    Z_ADDREF_PP(z_ann_argument_value);
+                    add_assoc_zval(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), *z_ann_argument_value);
+                }
+            }
+        }
+    }
+
+    // return SUCCESS if there are annotations
+    return zend_hash_has_more_elements( Z_ARRVAL_P(z_indexed_annotations) );
+}
 
 
 
-static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, zval * annotations_by_path, int parent TSRMLS_DC) {
+
+
+
+
+static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, int parent TSRMLS_DC) {
     HashTable *func_table;
     zend_function *mptr; // prepare zend_function mptr for iterating hash 
     HashPosition pos;
@@ -127,16 +232,20 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, zv
     size_t fn_len;
     int p;
 
+
+    // we parse the annotations from top level parent class,
+    // so in the child controller class, these child class methods can inherit
+    // the annotations from parent.
     if (ce->parent) {
         parent_ce = ce->parent;
-        zend_parse_action_annotations(parent_ce, retval, annotations_by_path, 1 TSRMLS_CC);
+        zend_parse_action_annotations(parent_ce, retval, 1 TSRMLS_CC);
     }
 
     func_table = &ce->function_table;
     zend_hash_internal_pointer_reset_ex(func_table, &pos);
 
-
     while (zend_hash_get_current_data_ex(func_table, (void **) &mptr, &pos) == SUCCESS) {
+        // the function name
         fn     = mptr->common.function_name;
         fn_len = strlen(mptr->common.function_name);
         p      = strpos(fn, "Action");
@@ -178,6 +287,7 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, zv
         MAKE_STD_ZVAL(z_route_meta);
         array_init(z_route_meta);
 
+        // Create the route meta info
         // we put the attributes in lower-case letter key to avoid the name
         // collision of the annotation attribute names.
         //
@@ -187,92 +297,19 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, zv
             add_assoc_bool(z_route_meta, "is_parent", 1);
         }
 
+        // if we found there is a doc comment block,
+        // use annotation parser to parse the annotations
         if ( mptr->type == ZEND_USER_FUNCTION && mptr->op_array.doc_comment ) {
-            MAKE_STD_ZVAL(z_comment);
-            ZVAL_STRING(z_comment, mptr->op_array.doc_comment, 1);
+            if ( SUCCESS == zend_parse_method_annotations(mptr, z_indexed_annotations TSRMLS_CC) ) {
 
-            MAKE_STD_ZVAL(z_file);
-            ZVAL_STRING(z_file, mptr->op_array.filename, 1);
-
-            MAKE_STD_ZVAL(z_line_start);
-            ZVAL_LONG(z_line_start, mptr->op_array.line_start);
-
-            /*
-            zval *z_line_end;
-            MAKE_STD_ZVAL(z_line_end);
-            ZVAL_LONG(z_line_start, mptr->op_array.line_end);
-            */
-            zval **z_ann = NULL, **z_ann_name = NULL, **z_ann_arguments = NULL, **z_ann_argument = NULL, **z_ann_argument_value = NULL;
-
-            // TODO: make phannot_parse_annotations reads comment variable in char* type, so we don't need to create extra zval(s)
-            if (phannot_parse_annotations(z_method_annotations, z_comment, z_file, z_line_start TSRMLS_CC) == SUCCESS) {
-
-                /*
-                 * z_method_annotations is an indexed array, which contains a structure like this:
-                 *
-                 *    [ 
-                 *      { name => ... , type => ... , arguments => ... , file => , line =>  },
-                 *      { name => ... , type => ... , arguments => ... , file => , line =>  },
-                 *      { name => ... , type => ... , arguments => ... , file => , line =>  },
-                 *    ]
-                 *
-                 * the actuall structure:
-                 *
-                 *    array(2) {
-                 *        [0]=>
-                 *        array(5) {
-                 *            ["type"]=>
-                 *            int(300)
-                 *            ["name"]=>
-                 *            string(5) "Route"
-                 *            ["arguments"]=>
-                 *            array(1) {
-                 *            [0]=>
-                 *            array(1) {
-                 *                ["expr"]=>
-                 *                array(2) {
-                 *                ["type"]=>
-                 *                int(303)
-                 *                ["value"]=>
-                 *                string(7) "/delete"
-                 *                }
-                 *            }
-                 *            }
-                 *            ["file"]=> string(48) "...."
-                 *            ["line"]=> int(54)
-                 *        },
-                 *        .....
-                 *    }
-                 */
-                HashPosition annp;
-                for (
-                    zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(z_method_annotations), &annp);
-                    zend_hash_get_current_data_ex(Z_ARRVAL_P(z_method_annotations), (void**)&z_ann, &annp) == SUCCESS; 
-                    zend_hash_move_forward_ex(Z_ARRVAL_P(z_method_annotations), &annp)
-                ) {
-                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "name", sizeof("name"), (void**)&z_ann_name) == FAILURE ) {
-                        continue;
-                    }
-                    if (zend_hash_find(Z_ARRVAL_P(*z_ann), "arguments", sizeof("arguments"), (void**)&z_ann_arguments) == FAILURE ) {
-                        continue;
-                    }
-
-                    // We currenly only support "@Method()" and "@Route"
-                    if (    strncmp( Z_STRVAL_PP(z_ann_name), "Method",  sizeof("Method") - 1 ) != 0 
-                         && strncmp( Z_STRVAL_PP(z_ann_name), "Route",   sizeof("Route") - 1 ) != 0 ) 
-                    {
-                        continue;
-                    }
-
-                    // read the first argument (we only support for one argument currently, and should support complex syntax later.)
-                    if ( zend_hash_index_find(Z_ARRVAL_PP(z_ann_arguments), 0, (void**) &z_ann_argument) == SUCCESS ) {
-                        if ( phannot_fetch_argument_value(z_ann_argument, (zval**) &z_ann_argument_value TSRMLS_CC) == SUCCESS ) {
-                            Z_ADDREF_PP(z_ann_argument_value);
-                            add_assoc_zval(z_indexed_annotations, Z_STRVAL_PP(z_ann_name), *z_ann_argument_value);
-                        }
-                    }
-                }
             }
+
+            // if the annotation is not found, we lookup the parent annotations
+            /*
+            zval **z_ann;
+            if (zend_hash_find(annotations_by_name, "", 0, (void**)&z_ann) == SUCCESS) {
+            }
+            */
         }
 
         Z_ADDREF_P(z_indexed_annotations);
@@ -282,8 +319,6 @@ static void zend_parse_action_annotations(zend_class_entry *ce, zval *retval, zv
 
         zend_hash_move_forward_ex(func_table, &pos);
     }
-
-
 }
 
 
@@ -318,13 +353,9 @@ PHP_METHOD(Controller, getActionMethods)
 
     array_init(return_value);
 
-    zval *annotations_by_path;
-    MAKE_STD_ZVAL(annotations_by_path);
-    array_init(annotations_by_path);
-
     // looping in the parent class function table if we have one.
     // so we can override with our current class later.
-    zend_parse_action_annotations(ce, return_value, annotations_by_path, 0 TSRMLS_CC);
+    zend_parse_action_annotations(ce, return_value, 0 TSRMLS_CC);
 }
 
 
