@@ -105,7 +105,6 @@ zval * compile_route_pattern(zval *z_pattern, zval *z_options, zend_class_entry 
         zval_ptr_dtor(&z_compiled_route);
         return NULL;
     }
-    zval_copy_ctor(&z_compiled_route);
     INIT_PZVAL(z_compiled_route); // set ref = 1
     return z_compiled_route;
 }
@@ -1089,8 +1088,7 @@ inline void mux_add_route(INTERNAL_FUNCTION_PARAMETERS)
             php_explode(delim, z_callback, rv, 2);
 
             *z_callback = *rv;
-            zval_copy_ctor(&z_callback);
-
+            zval_copy_ctor(z_callback);
             zval_ptr_dtor(&delim);
         }
     }

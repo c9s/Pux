@@ -11,11 +11,15 @@
 
     <testsuite name="Mux">
       <file>test/Pux/MuxTest.php</file>
-      <file>test/Pux/SubMuxTest.php</file>
       <file>test/Pux/BasicMuxTest.php</file>
       <file>test/Pux/MuxExportTest.php</file>
       <file>test/Pux/MuxSetStateTest.php</file>
       <file>test/Pux/MuxCompilerTest.php</file>
+    </testsuite>
+
+    <testsuite name="SubMux">
+      <file>test/Pux/MuxMountTest.php</file>
+      <file>test/Pux/MuxNoExpandMountTest.php</file>
     </testsuite>
 
     <testsuite name="Controller">
