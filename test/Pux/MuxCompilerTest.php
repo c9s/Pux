@@ -13,11 +13,11 @@ class MuxCompilerTest extends MuxTestCase
     public function testMuxCompiler()
     {
         $mux = new Mux;
-        $mux->add('/hello/:name', [ 'FooController', 'index' ]);
+        $mux->add('/hello/:name', array( 'FooController', 'index' ));
         $mux->compile("hello_mux.php");
 
         $mux2 = new Mux;
-        $mux2->add('/bye/:name', [ 'FooController', 'index' ]);
+        $mux2->add('/bye/:name', array( 'FooController', 'index' ));
         $mux2->compile("bye_mux.php");
 
         $compiler = new MuxCompiler;
@@ -51,11 +51,11 @@ class MuxCompilerTest extends MuxTestCase
     public function testMuxCompile() {
         $mux = new \Pux\Mux;
         ok($mux);
-        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
-        $mux->add('/product', [ 'ProductController','listAction' ]);
-        $mux->add('/foo', [ 'ProductController','fooAction' ]);
-        $mux->add('/bar', [ 'ProductController','barAction' ]);
-        $mux->add('/', [ 'ProductController','indexAction' ]);
+        $mux->add('/product/:id', array( 'ProductController','itemAction' ));
+        $mux->add('/product', array( 'ProductController','listAction' ));
+        $mux->add('/foo', array( 'ProductController','fooAction' ));
+        $mux->add('/bar', array( 'ProductController','barAction' ));
+        $mux->add('/', array( 'ProductController','indexAction' ));
 
         $ret = $mux->compile("_test_mux.php");
         ok($ret, "compile successfully");

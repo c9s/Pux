@@ -47,7 +47,7 @@ class ExtensionOnlyMuxTest extends PHPUnit_Framework_TestCase
         ok( $r[3] , "Got route options" );
         ok( $r[3]['vars'] , "Got route vars" );
         ok( $r[3]['vars']['id'] , "Got id" );
-        $this->assertSame([ 'ProductController', 'itemAction' ] , $r[2], 'Same callback');
+        $this->assertSame(array( 'ProductController', 'itemAction' ) , $r[2], 'Same callback');
     }
 
     public function testPcreDispatch() {
@@ -73,14 +73,14 @@ class ExtensionOnlyMuxTest extends PHPUnit_Framework_TestCase
         ok( $r[3] , "Got route options" );
         ok( $r[3]['vars'] , "Got route vars" );
         ok( $r[3]['vars']['id'] , "Got id" );
-        $this->assertSame([ 'ProductController', 'itemAction' ] , $r[2], 'Same callback');
+        $this->assertSame(array( 'ProductController', 'itemAction' ) , $r[2], 'Same callback');
     }
 
     public function testStringDispatch() {
 
         $routes = array(
-            array( false, '/product/item', ['ProductController', 'itemAction'], [] ),
-            array( false, '/product', ['ProductController', 'listAction'], [] ),
+            array( false, '/product/item', array('ProductController', 'itemAction'), array() ),
+            array( false, '/product', array('ProductController', 'listAction'), array() ),
         );
         $r = pux_match($routes, '/product');
         ok($r, "Found route");
