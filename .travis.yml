@@ -8,6 +8,7 @@ matrix:
     - php: 5.3
     - php: 5.5
 install:
+  - sudo apt-get update
   - sudo apt-get install php5-dev php-pear
   - composer install --dev
   - pear channel-discover pear.corneltek.com
