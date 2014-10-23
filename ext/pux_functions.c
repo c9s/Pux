@@ -226,7 +226,7 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
         php_error(E_ERROR, "Can not clone HashTable");
         return FAILURE;
     }
-    pux_persistent_store( name, "routes", le_mux_hash_table, (void*) routes TSRMLS_CC);
+    // pux_persistent_store( name, "routes", le_mux_hash_table, (void*) routes TSRMLS_CC);
     return SUCCESS;
 
 
@@ -236,7 +236,7 @@ int _pux_store_mux(char *name, zval * mux TSRMLS_DC)
         php_error(E_ERROR, "Can not clone HashTable");
         return FAILURE;
     }
-    pux_persistent_store(name, "static_routes", le_mux_hash_table, (void *) static_routes TSRMLS_CC) ;
+    // pux_persistent_store(name, "static_routes", le_mux_hash_table, (void *) static_routes TSRMLS_CC) ;
 
     
     // copy ID
@@ -274,17 +274,18 @@ zval * _pux_fetch_mux(char *name TSRMLS_DC)
     HashTable *static_routes_hash;
 
     // fetch related hash to this mux object.
-    routes_hash = (HashTable*) pux_persistent_fetch(name, "routes" TSRMLS_CC);
+    // routes_hash = (HashTable*) pux_persistent_fetch(name, "routes" TSRMLS_CC);
     if ( ! routes_hash  ) {
         return NULL;
     }
 
-    static_routes_hash = (HashTable*) pux_persistent_fetch(name, "static_routes" TSRMLS_CC);
+    // static_routes_hash = (HashTable*) pux_persistent_fetch(name, "static_routes" TSRMLS_CC);
     if ( ! static_routes_hash ) {
         return NULL;
     }
+    return NULL;
 
-    z_id = (zval*) pux_persistent_fetch(name, "id" TSRMLS_CC);
+    // z_id = (zval*) pux_persistent_fetch(name, "id" TSRMLS_CC);
     MAKE_STD_ZVAL(z_routes);
     MAKE_STD_ZVAL(z_static_routes);
     MAKE_STD_ZVAL(z_routes_by_id);
