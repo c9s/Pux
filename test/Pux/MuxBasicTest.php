@@ -72,7 +72,7 @@ class MuxBasicTest extends PHPUnit_Framework_TestCase
         ok($code, 'code');
         eval($code);
         ok($newMux);
-        foreach( ['/sub/page1', '/sub/page2', '/foo/bar', '/foo/zoo'] as $p ) {
+        foreach( array('/sub/page1', '/sub/page2', '/foo/bar', '/foo/zoo') as $p ) {
             $r = $newMux->dispatch($p);
             ok($r, "Matched route for $p");
         }
@@ -84,7 +84,7 @@ class MuxBasicTest extends PHPUnit_Framework_TestCase
         $mux = new Mux;
         ok($mux);
 
-        $mux->add('/hello/show', [ 'HelloController', 'show' ]);
+        $mux->add('/hello/show', array( 'HelloController', 'show' ));
 
         $route = $mux->dispatch('/hello/show');
         ok($route, 'Found route');
@@ -96,7 +96,7 @@ class MuxBasicTest extends PHPUnit_Framework_TestCase
     {
         $mux = new Mux;
         ok($mux);
-        $mux->add('/', [ 'HelloController', 'index' ]);
+        $mux->add('/', array( 'HelloController', 'index' ));
         $route = $mux->dispatch('/');
         ok($route);
     }
@@ -105,9 +105,9 @@ class MuxBasicTest extends PHPUnit_Framework_TestCase
     {
         $mux = new Mux;
         ok($mux);
-        $mux->add('/hello/:name', [ 'HelloController', 'index' ], [
-            'require' => [ 'name' => '\w+' ],
-        ]);
+        $mux->add('/hello/:name', array( 'HelloController', 'index' ), array(
+            'require' => array( 'name' => '\w+' ),
+        ));
         $route = $mux->dispatch('/hello/john');
         ok($route);
     }
@@ -118,7 +118,7 @@ class MuxBasicTest extends PHPUnit_Framework_TestCase
         $mux = new Mux;
         ok($mux);
 
-        $mux->add('/hello/:name', [ 'HelloController', 'index' ]);
+        $mux->add('/hello/:name', array( 'HelloController', 'index' ));
 
         $mux->compile("_cache.php");
 

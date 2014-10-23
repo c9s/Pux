@@ -120,7 +120,7 @@ class MuxCompiler
                     );
                     if ( $refParam->isDefaultValueAvailable() ) {
                         $param['default'] = $refParam->getDefaultValue();
-                        if ( $refParam->isDefaultValueConstant() ) {
+                        if ( PHP_VERSION_ID >= 50406 && $refParam->isDefaultValueConstant() ) {
                             $param['constant'] = $refParam->getDefaultValueConstantName();
                         }
                     }
@@ -138,7 +138,7 @@ class MuxCompiler
      */
     public function compile($outFile) {
         // compile routes to php file as a cache.
-        usort($this->mux->routes, [ 'Pux\\MuxCompiler' , 'sort_routes' ]);
+        usort($this->mux->routes, array( 'Pux\\MuxCompiler' , 'sort_routes' ));
 
         $code = $this->mux->export();
         return file_put_contents($outFile, "<?php return " . $code . "; /* version */" );

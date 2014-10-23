@@ -8,14 +8,14 @@ class MuxExecutorTest extends MuxTestCase
     public function testExecutor() {
         $mux = new \Pux\Mux;
         ok($mux);
-        $mux->add('/hello/:name', [ 'HelloController2','helloAction' ], [
-            'require' => [ 'name' => '\w+' ]
-        ]);
-        $mux->add('/product/:id', [ 'ProductController','itemAction' ]);
-        $mux->add('/product', [ 'ProductController','listAction' ]);
-        $mux->add('/foo', [ 'ProductController','fooAction' ]);
-        $mux->add('/bar', [ 'ProductController','barAction' ]);
-        $mux->add('/', [ 'ProductController','indexAction' ]);
+        $mux->add('/hello/:name', array( 'HelloController2','helloAction' ), array(
+            'require' => array( 'name' => '\w+' )
+        ));
+        $mux->add('/product/:id', array( 'ProductController','itemAction' ));
+        $mux->add('/product', array( 'ProductController','listAction' ));
+        $mux->add('/foo', array( 'ProductController','fooAction' ));
+        $mux->add('/bar', array( 'ProductController','barAction' ));
+        $mux->add('/', array( 'ProductController','indexAction' ));
 
         ok( $r = $mux->dispatch('/') );
         is('index',Executor::execute($r));

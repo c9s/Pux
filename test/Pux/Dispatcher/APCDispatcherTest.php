@@ -12,7 +12,7 @@ class APCDispatcherTest extends PHPUnit_Framework_TestCase
         }
 
         $mux = new Mux;
-        $mux->add('/product/add', ['ProductController', 'addAction']);
+        $mux->add('/product/add', array('ProductController', 'addAction'));
         $dispatcher = new APCDispatcher($mux, array(
             'namespace' => 'tests',
             'expiry' => 10,
