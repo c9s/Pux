@@ -86,7 +86,8 @@ static char * translate_method_name_to_path(const char *method_name, int * path_
 
     if ( strncmp(method_name, "indexAction", sizeof("indexAction")-1 ) == 0 ) {
         // returns empty string as its path
-        return strndup("",sizeof("")-1);
+	*path_len = 0;
+        return estrndup("",sizeof("")-1);
     }
     char * new_path;
 
@@ -458,6 +459,10 @@ PHP_METHOD(Controller, getActionRoutes)
 
         // append to the result array
         add_next_index_zval(return_value, new_item);
+
+	if( path ) {
+		efree(path);
+	}
     }
 
     return;
