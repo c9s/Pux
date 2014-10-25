@@ -4,6 +4,7 @@ set -o xtrace
 
 gdb=0
 lldb=0
+vlgrd=0
 
 usage()
 {
@@ -11,13 +12,16 @@ usage()
     exit 1
 }
 
-while getopts "gl" o; do
+while getopts "glm" o; do
     case "${o}" in
         g)
             gdb=1
             ;;
         l)
             lldb=1
+            ;;
+        m)
+            vlgrd=1
             ;;
         *)
             usage
@@ -71,6 +75,11 @@ END
     gdb
 elif [[ $lldb == 1 ]] ; then
     lldb -- $PHP \
+        -c $PWD/php.ini \
+        -d extension=$PWD/modules/$EXTENSION.so \
+        -n $EXTRA $PHPUNIT $*
+elif [[ $vlgrd == 1 ]] ; then
+    valgrind --leak-check=full -- $PHP \
         -c $PWD/php.ini \
         -d extension=$PWD/modules/$EXTENSION.so \
         -n $EXTRA $PHPUNIT $*
