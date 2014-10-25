@@ -47,7 +47,7 @@ else
 fi
 
 # add the json extension if it's not compiled in
-ORIG_EXTENSION_DIR=`php -i | grep extension_dir | awk '{ print $3 }'`
+ORIG_EXTENSION_DIR=`$PHP -i | grep extension_dir | awk '{ print $3 }'`
 EXTRA=
 if [[ -f "$ORIG_EXTENSION_DIR/json.so" ]] ; then
     EXTRA="$EXTRA -d extension=$ORIG_EXTENSION_DIR/json.so"
