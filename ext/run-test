@@ -46,6 +46,13 @@ else
     PHPUNIT=$(command which phpunit)
 fi
 
+# add the json extension if it's not compiled in
+ORIG_EXTENSION_DIR=`php -i | grep extension_dir | awk '{ print $3 }'`
+EXTRA=
+if [[ -f "$ORIG_EXTENSION_DIR/json.so" ]] ; then
+    EXTRA="$EXTRA -d extension=$ORIG_EXTENSION_DIR/json.so"
+fi
+
 if [[ $gdb == 1 ]] ; then
     # write .gdbinit, here is the template
     cat <<END > .gdbinit
@@ -74,12 +81,11 @@ set args \\
     -d 'ignore_repeated_errors=0' \\
     -d 'precision=14' \\
     -d 'memory_limit=128M' \\
-    -d "extension_dir=$PWD/modules/" \\
     -d 'session.auto_start=0' \\
     -d 'zlib.output_compression=Off' \\
     -d 'mbstring.func_overload=0' \\
-    -d "extension=$EXTENSION.so" \\
-    -n $PHPUNIT $*
+    -d "extension=$PWD/modules/$EXTENSION.so" \\
+    -n $EXTRA $PHPUNIT $*
 END
     for file in .gdbinit.* ; do
         echo "source $file" >> .gdbinit
@@ -111,12 +117,11 @@ elif [[ $lldb == 1 ]] ; then
         -d 'ignore_repeated_errors=0' \
         -d 'precision=14' \
         -d 'memory_limit=128M' \
-        -d extension_dir=$PWD/modules/ \
         -d 'session.auto_start=0' \
         -d 'zlib.output_compression=Off' \
         -d 'mbstring.func_overload=0' \
-        -d extension=$EXTENSION.so \
-        -n $PHPUNIT $*
+        -d extension=$PWD/modules/$EXTENSION.so \
+        -n $EXTRA $PHPUNIT $*
 else
 
     $PHP -d 'output_handler=' \
@@ -140,10 +145,10 @@ else
         -d 'ignore_repeated_errors=0' \
         -d 'precision=14' \
         -d 'memory_limit=128M' \
-        -d "extension_dir=$PWD/modules/" \
         -d 'session.auto_start=0' \
         -d 'zlib.output_compression=Off' \
         -d 'mbstring.func_overload=0' \
-        -d "extension=$EXTENSION.so" -n $PHPUNIT $*
+        -d "extension=$PWD/modules/$EXTENSION.so" \
+        -n $EXTRA $PHPUNIT $*
 
 fi
