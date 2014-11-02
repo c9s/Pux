@@ -77,7 +77,7 @@ zval* my_copy_zval(zval* dst, const zval* src, int persistent TSRMLS_DC)
         break;
 
     case IS_ARRAY:
-    case IS_CONSTANT_ARRAY:
+    case IS_CONSTANT_AST:
         dst->value.ht = my_copy_hashtable(NULL, src->value.ht, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *), persistent TSRMLS_CC);
         break;
 
@@ -120,7 +120,7 @@ void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
             }
             break;
         case IS_ARRAY:
-        case IS_CONSTANT_ARRAY: {
+        case IS_CONSTANT_AST: {
                 zval *tmp;
                 HashTable *original_ht = zvalue->value.ht;
                 HashTable *tmp_ht = NULL;
@@ -176,7 +176,7 @@ void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC)
             break;
 
         case IS_ARRAY:
-        case IS_CONSTANT_ARRAY: {
+        case IS_CONSTANT_AST: {
                 zval *tmp;
                 HashTable *original_ht = zvalue->value.ht;
                 HashTable *tmp_ht = NULL;
