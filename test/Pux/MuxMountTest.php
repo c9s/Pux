@@ -98,4 +98,37 @@ class MuxMountTest extends MuxTestCase
         $this->assertPcreRoute($r, '/sub/hello/:name');
     }
 
+    public function testSubmuxMergeOptions() {
+        $mux = new \Pux\Mux;
+        ok($mux);
+        is(0, $mux->length());
+
+        $submux = new \Pux\Mux;
+        $submux->any('/hello/static', array( 'HelloController2', 'indexAction' ), array(
+            'method' => Mux::getRequestMethodConstant('POST') // force POST
+        ));
+        $submux->any('/hello/:name', array( 'HelloController2', 'indexAction' ), array(
+            'require' => array( 'name' => '[a-zA-Z]*' ) // allow a-z and A-Z
+        ));
+        ok($submux);
+        ok($routes = $submux->getRoutes());
+        is(2, $submux->length());
+        is(0, $mux->length());
+        $mux->mount( '/sub', $submux, array(
+            'require' => array( 'name' => '[a-z]*' ), // only allow a-z
+            'method' => Mux::getRequestMethodConstant('GET') // force GET
+        ));
+        is(2, $mux->length());
+
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $r = $mux->dispatch('/sub/hello/John'); // uppercase J fails if it would still be a-z
+        ok($r);
+        $this->assertPcreRoute($r, '/sub/hello/:name');
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $r = $mux->dispatch('/sub/hello/static'); // POST would fail if it would still be GET
+        ok($r);
+        $this->assertNonPcreRoute($r, '/sub/hello/static');
+    }
+
 }
