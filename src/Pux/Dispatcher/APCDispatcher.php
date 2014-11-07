@@ -36,7 +36,8 @@ class APCDispatcher
 
     public function dispatch($path) 
     {
-        $key = $this->getNamespace() . ':' . $path;
+        $key = $this->buildKey($path);
+
         if ( ($route = apc_fetch($key)) !== false ) {
             apc_inc('hits:'.$key); // record the hits
             return $route;
@@ -47,6 +48,16 @@ class APCDispatcher
         }
         apc_store($key, false, $this->expiry);
         return false;
+    }
+
+    protected function buildKey($path) {
+        $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+        $host = isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : '';
+        $https = isset($_SERVER["HTTPS"]) ? $_SERVER["HTTPS"] : '';
+
+        $key = $this->getNamespace() . ':' . (string)$https . (string)$host . ':' . (string)$method . ':' . $path;
+
+        return $key;
     }
 }
 
