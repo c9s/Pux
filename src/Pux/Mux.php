@@ -78,8 +78,8 @@ class Mux
                 // process for pcre
                 if ( $route[0] ) {
                     $newPattern = $pattern . $route[3]['pattern'];
-                    $routeArgs = PatternCompiler::compile($newPattern, 
-                        array_merge_recursive($route[3], $options) );
+                    $routeArgs = PatternCompiler::compile($newPattern,
+                        array_replace($options, $route[3]) );
                     $this->appendPCRERoute( $routeArgs, $route[2] );
                 } else {
                     $this->routes[] = array(
