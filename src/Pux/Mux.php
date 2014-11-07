@@ -68,6 +68,8 @@ class Mux
     {
         if ( $mux instanceof \Pux\Controller ) {
             $mux = $mux->expand();
+        } else if ((!is_object($mux) || !($mux instanceof Mux)) && is_callable($mux)) {
+            $mux($mux = new Mux());
         }
 
         if ( $this->expand ) {
