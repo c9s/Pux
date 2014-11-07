@@ -105,7 +105,7 @@ class MuxMountTest extends MuxTestCase
 
         $submux = new \Pux\Mux;
         $submux->any('/hello/static', array( 'HelloController2', 'indexAction' ), array(
-            'method' => Mux::getRequestMethodConstant('POST') // force POST
+            'method' => REQUEST_METHOD_POST // force POST
         ));
         $submux->any('/hello/:name', array( 'HelloController2', 'indexAction' ), array(
             'require' => array( 'name' => '[a-zA-Z]*' ) // allow a-z and A-Z
@@ -116,7 +116,7 @@ class MuxMountTest extends MuxTestCase
         is(0, $mux->length());
         $mux->mount( '/sub', $submux, array(
             'require' => array( 'name' => '[a-z]*' ), // only allow a-z
-            'method' => Mux::getRequestMethodConstant('GET') // force GET
+            'method' => REQUEST_METHOD_GET // force GET
         ));
         is(2, $mux->length());
 
