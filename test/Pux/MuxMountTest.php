@@ -98,4 +98,22 @@ class MuxMountTest extends MuxTestCase
         $this->assertPcreRoute($r, '/sub/hello/:name');
     }
 
+    public function testCallableSubMux() {
+        $mux = new \Pux\Mux;
+        $mux->mount('/test', function(Mux $submux) {
+            $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
+            $submux->any('/hello/static', array( 'HelloController2','indexAction' ));
+        });
+
+        ok($mux);
+
+        ok($routes = $mux->getRoutes());
+        ok(is_array($routes));
+        count_ok(2, $routes);
+
+        ok($routes[0][1] == '#^    /test/hello
+    /(?P<name>[^/]+?)
+$#xs');
+        ok($routes[1][1] == '/test/hello/static');
+    }
 }
