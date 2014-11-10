@@ -81,14 +81,14 @@ class Mux
                 if ( $route[0] || $pcre ) {
                     $newPattern = $pattern . ( $route[0] ? $route[3]['pattern'] : $route[1] );
                     $routeArgs = PatternCompiler::compile($newPattern, 
-                        array_merge_recursive($route[3], $options) );
+                        array_replace_recursive($options, $route[3]) );
                     $this->appendPCRERoute( $routeArgs, $route[2] );
                 } else {
                     $this->routes[] = array(
                         false,
                         $pattern . $route[1],
                         $route[2],
-                        isset($route[3]) ? array_merge($options, $route[3]) : $options,
+                        isset($route[3]) ? array_replace_recursive($options, $route[3]) : $options,
                     );
                 }
             }
@@ -231,7 +231,6 @@ class Mux
             return $this->submux[ $id ];
         }
     }
-
 
     public static function getRequestMethodConstant($method) {
         switch (strtoupper($method)) {
