@@ -121,14 +121,40 @@ class MuxMountTest extends MuxTestCase
         is(0, $mux->length());
 
         $submux = new \Pux\Mux;
-        $submux->any('/hello/there', array( 'HelloController2','indexAction' ));
+        $submux->any('/hello/there', array('HelloController2', 'indexAction'));
         ok($submux);
         ok($routes = $submux->getRoutes());
         is(1, $submux->length());
         is(0, $mux->length());
-        $mux->mount( '/sub/:country' , $submux);
+        $mux->mount('/sub/:country', $submux);
         $r = $mux->dispatch('/sub/UK/hello/there');
         ok($r);
         $this->assertPcreRoute($r, '/sub/:country/hello/there');
+    }
+
+    public function testCallableSubMux() {
+        $mux = new \Pux\Mux;
+        $mux->mount('/test', function (Mux $submux) {
+            $submux->any('/hello/static', array('HelloController2', 'indexAction'));
+            $submux->any('/hello/:name', array('HelloController2', 'indexAction'));
+        });
+
+        ok($mux);
+
+        ok($routes = $mux->getRoutes());
+        ok(is_array($routes));
+        count_ok(2, $routes);
+
+        ok($routes[0][1] == '/test/hello/static');
+        ok($routes[1][1] == '#^    /test/hello
+    /(?P<name>[^/]+?)
+$#xs');
+
+        $r = $mux->dispatch('/test/hello/John');
+        ok($r);
+        $this->assertPcreRoute($r, '/test/hello/:name');
+
+        $r = $mux->dispatch('/test/hello/static');
+        $this->assertNonPcreRoute($r, '/test/hello/static');
     }
 }

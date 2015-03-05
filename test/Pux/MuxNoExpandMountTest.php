@@ -49,4 +49,25 @@ class MuxNoExpandMountTest extends MuxTestCase
         $this->assertNonPcreRoute($r, '/foo');
     }
 
+    public function testMuxMountNoExpandAndDispatchToCallableSubMux() {
+        $mux = new \Pux\Mux;
+        $mux->expand = false;
+        $mux->mount('/test', function (Mux $submux) {
+            $submux->any('/hello/static', array('HelloController2', 'indexAction'));
+            $submux->any('/hello/:name', array('HelloController2', 'indexAction'));
+        });
+
+        ok($mux);
+
+        ok($routes = $mux->getRoutes());
+
+        $r = $mux->dispatch('/test/hello/John');
+        ok($r);
+        $this->assertPcreRoute($r, '/hello/:name');
+        
+        $r = $mux->dispatch('/test/hello/static');
+        ok($r);
+        $this->assertNonPcreRoute($r, '/hello/static');
+    }
+
 }
