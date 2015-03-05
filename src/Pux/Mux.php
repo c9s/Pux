@@ -73,11 +73,13 @@ class Mux
         }
 
         if ( $this->expand ) {
+            $pcre = strpos($pattern,':') !== false;
+
             // rewrite submux routes
             foreach( $mux->routes as $route ) {
                 // process for pcre
-                if ( $route[0] ) {
-                    $newPattern = $pattern . $route[3]['pattern'];
+                if ( $route[0] || $pcre ) {
+                    $newPattern = $pattern . ( $route[0] ? $route[3]['pattern'] : $route[1] );
                     $routeArgs = PatternCompiler::compile($newPattern, 
                         array_merge_recursive($route[3], $options) );
                     $this->appendPCRERoute( $routeArgs, $route[2] );
