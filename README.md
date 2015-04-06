@@ -85,7 +85,7 @@ Features
 - Controller annotation support - you may override the default path from controller through the annotations.
 - Route with optional pattern.
 
-Pros & Cons of Grouped Pattern Matchting Strategy
+Pros & Cons of Grouped Pattern Matching Strategy
 ----------------------------------------
 An idea of matching routes is to combine all patterns into one pattern and
 compare the given path with `pcre_match` in one time.
