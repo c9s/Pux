@@ -29,10 +29,10 @@ class Mux
      * When expand is enabled, all mounted Mux will expand the routes to the parent mux.
      * This improves the dispatch performance when you have a lot of sub mux to dispatch.
      *
-     * When expand is enabled, the pattern comparison strategy for 
+     * When expand is enabled, the pattern comparison strategy for
      * strings will match the full string.
      *
-     * When expand is disabled, the pattern comparison strategy for 
+     * When expand is disabled, the pattern comparison strategy for
      * strings will match the prefix.
      */
     public $expand = true;
@@ -56,7 +56,7 @@ class Mux
     }
 
     public function appendPCRERoute($routeArgs, $callback) {
-        $this->routes[] = array( 
+        $this->routes[] = array(
             true, // PCRE
             $routeArgs['compiled'],
             $callback,
@@ -80,7 +80,7 @@ class Mux
                 // process for pcre
                 if ( $route[0] || $pcre ) {
                     $newPattern = $pattern . ( $route[0] ? $route[3]['pattern'] : $route[1] );
-                    $routeArgs = PatternCompiler::compile($newPattern, 
+                    $routeArgs = PatternCompiler::compile($newPattern,
                         array_merge_recursive($route[3], $options) );
                     $this->appendPCRERoute( $routeArgs, $route[2] );
                 } else {
@@ -99,19 +99,19 @@ class Mux
         }
     }
 
-    public function delete($pattern, $callback, $options = array()) 
+    public function delete($pattern, $callback, $options = array())
     {
         $options['method'] = REQUEST_METHOD_DELETE;
         $this->add($pattern, $callback, $options);
     }
 
-    public function put($pattern, $callback, $options = array()) 
+    public function put($pattern, $callback, $options = array())
     {
         $options['method'] = REQUEST_METHOD_PUT;
         $this->add($pattern, $callback, $options);
     }
 
-    public function get($pattern, $callback, $options = array()) 
+    public function get($pattern, $callback, $options = array())
     {
         $options['method'] = REQUEST_METHOD_GET;
         $this->add($pattern, $callback, $options);
@@ -159,7 +159,7 @@ class Mux
             $routeArgs = PatternCompiler::compile($pattern, $options);
 
             // generate a pcre pattern route
-            $route = array( 
+            $route = array(
                 true, // PCRE
                 $routeArgs['compiled'],
                 $callback,
@@ -191,7 +191,7 @@ class Mux
 
     }
 
-    public function sort() 
+    public function sort()
     {
         usort($this->routes, array('Pux\\MuxCompiler','sort_routes'));
     }
@@ -255,7 +255,12 @@ class Mux
     }
 
     public function match($path) {
-        $reqmethod = self::getRequestMethodConstant(@$_SERVER['REQUEST_METHOD']);
+
+        $requestMethod = @$_SERVER['REQUEST_METHOD'];
+        if ('POST' === $requestMethod) {
+            $requestMethod = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']) ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] : $requestMethod;
+        }
+        $reqmethod = self::getRequestMethodConstant($requestMethod);
 
         foreach( $this->routes as $route ) {
             if ( $route[0] ) {
@@ -297,13 +302,13 @@ class Mux
 
                 // sub-path and call submux to dispatch
                 // for pcre pattern?
-                if ($route[0]) { 
+                if ($route[0]) {
                     $matchedString = $route[3]['vars'][0];
                     return $submux->dispatch( substr($path, strlen($matchedString)) );
                 } else {
                     $s = substr($path, strlen($route[1]));
                     return $submux->dispatch(
-                        substr($path, strlen($route[1])) ?: '' 
+                        substr($path, strlen($route[1])) ?: ''
                     );
                 }
             } else {
@@ -312,12 +317,12 @@ class Mux
         }
     }
 
-    public function length() 
+    public function length()
     {
         return count($this->routes);
     }
 
-    public function getRoutes() 
+    public function getRoutes()
     {
         return $this->routes;
     }
@@ -344,5 +349,3 @@ class Mux
     }
 
 }
-
-
