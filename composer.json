@@ -13,8 +13,8 @@
         "corneltek\/universal": "dev-master"
     },
     "autoload": {
-        "psr-0": {
-            "Pux": "src"
+        "psr-4": {
+            "Pux\\": "src/Pux/"
         }
     },
     "version": "1.5.2"
