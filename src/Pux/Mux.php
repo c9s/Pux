@@ -21,12 +21,18 @@ class Mux
 
     public $routesById = array();
 
+
+    /**
+     * @var Mux[id]
+     */
     public $submux = array();
 
     public $id;
 
 
     /**
+     * @var boolean expand routes to parent mux.
+     *
      * When expand is enabled, all mounted Mux will expand the routes to the parent mux.
      * This improves the dispatch performance when you have a lot of sub mux to dispatch.
      *
@@ -52,12 +58,14 @@ class Mux
         return $this->id = self::generate_id();
     }
 
-    public function appendRoute($pattern, $callback, $options = array() ) {
+    public function appendRoute($pattern, $callback, $options = array() )
+    {
         $this->routes[] = array( false, $pattern, $callback, $options );
     }
 
-    public function appendPCRERoute($routeArgs, $callback) {
-        $this->routes[] = array( 
+    public function appendPCRERoute($routeArgs, $callback)
+    {
+        $this->routes[] = array(
             true, // PCRE
             $routeArgs['compiled'],
             $callback,
@@ -100,7 +108,7 @@ class Mux
         }
     }
 
-    public function delete($pattern, $callback, $options = array()) 
+    public function delete($pattern, $callback, $options = array())
     {
         $options['method'] = REQUEST_METHOD_DELETE;
         $this->add($pattern, $callback, $options);
@@ -192,12 +200,13 @@ class Mux
 
     }
 
-    public function sort() 
+    public function sort()
     {
         usort($this->routes, array('Pux\\MuxCompiler','sort_routes'));
     }
 
-    static public function sort_routes($a, $b) {
+    static public function sort_routes($a, $b)
+    {
         if ( $a[0] && $b[0] ) {
             return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
         } elseif ( $a[0] ) {
@@ -233,7 +242,8 @@ class Mux
         }
     }
 
-    public static function getRequestMethodConstant($method) {
+    public static function getRequestMethodConstant($method)
+    {
         switch (strtoupper($method)) {
             case "POST":
                 return REQUEST_METHOD_POST;
@@ -254,8 +264,12 @@ class Mux
         }
     }
 
-    public function match($path) {
-        $reqmethod = self::getRequestMethodConstant(@$_SERVER['REQUEST_METHOD']);
+    public function match($path)
+    {
+        $requestMethod = null;
+        if (isset($_SERVER['REQUEST_METHOD'])) {
+            $requestMethod = self::getRequestMethodConstant($_SERVER['REQUEST_METHOD']);
+        }
 
         foreach( $this->routes as $route ) {
             if ( $route[0] ) {
@@ -265,7 +279,7 @@ class Mux
                 $route[3]['vars'] = $regs;
 
                 // validate request method
-                if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod )
+                if ( isset($route[3]['method']) && $route[3]['method'] != $requestMethod )
                     continue;
                 if ( isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"] )
                     continue;
@@ -276,7 +290,7 @@ class Mux
                 // prefix match is used when expanding is not enabled.
                 if ( ( is_int($route[2]) && strncmp($route[1], $path, strlen($route[1]) ) === 0 ) || $route[1] == $path ) {
                     // validate request method
-                    if ( isset($route[3]['method']) && $route[3]['method'] != $reqmethod )
+                    if ( isset($route[3]['method']) && $route[3]['method'] != $requestMethod )
                         continue;
                     if ( isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"] )
                         continue;
@@ -290,7 +304,8 @@ class Mux
         }
     }
 
-    public function dispatch($path) {
+    public function dispatch($path)
+    {
         if ( $route = $this->match($path) ) {
             if ( is_int($route[2]) ) {
                 $submux = $this->submux[ $route[2] ];
@@ -331,7 +346,8 @@ class Mux
         return var_export($this, true);
     }
 
-    public static function __set_state($array) {
+    public static function __set_state($array)
+    {
         $mux = new self;
         $mux->routes = $array['routes'];
         $mux->submux = $array['submux'];
