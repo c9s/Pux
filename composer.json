@@ -8,9 +8,9 @@
         }
     ],
     "require-dev": {
-        "corneltek\/phpunit-testmore": "dev-master",
-        "corneltek\/cliframework": "dev-master",
-        "corneltek\/universal": "dev-master"
+        "corneltek/phpunit-testmore": "dev-master",
+        "corneltek/cliframework": "dev-master",
+        "corneltek/universal": "dev-master"
     },
     "autoload": {
         "psr-4": {
