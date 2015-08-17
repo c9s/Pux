@@ -46,7 +46,8 @@ class MuxCompilerTest extends MuxTestCase
         unlink("bye_mux.php");
     }
 
-    public function testMuxCompile() {
+    public function testMuxCompile()
+    {
         $mux = new Mux;
         $mux->add('/product/:id', array( 'ProductController','itemAction' ));
         $mux->add('/product', array( 'ProductController','listAction' ));
