@@ -7,9 +7,12 @@
             "email": "cornelius.howl@gmail.com"
         }
     ],
+    "require": {
+        "corneltek/cliframework": "^2",
+        "corneltek/codegen": "^2.1"
+    },
     "require-dev": {
         "corneltek/phpunit-testmore": "dev-master",
-        "corneltek/cliframework": "dev-master",
         "corneltek/universal": "dev-master"
     },
     "autoload": {
@@ -17,8 +20,5 @@
             "Pux\\": "src/Pux/"
         }
     },
-    "version": "1.5.2",
-    "require": {
-        "corneltek/codegen": "^2.1"
-    }
+    "version": "1.5.2"
 }
