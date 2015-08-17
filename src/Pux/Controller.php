@@ -24,7 +24,7 @@ class Controller
         return $annotations;
     }
 
-    protected function parseMethods($refObject, & $args, $parent = 0)
+    protected function parseMethods(ReflectionClass $refObject, & $args, $parent = 0)
     {
         if ($pClassRef = $refObject->getParentClass()) {
             $this->parseMethods($pClassRef, $args, 1);
@@ -52,12 +52,22 @@ class Controller
 
     public function getActionMethods()
     {
-        $refObject = new ReflectionObject($this);
+        $refObject = new ReflectionClass($this);
         $args = array();
         $this->parseMethods($refObject, $args, 0);
         return $args;
     }
 
+    /**
+     * Translate action method name into route path
+     *
+     * Upper case letters will be translated into slash + lower letter, e.g.
+     *
+     *      pageUpdateAction => /page/update
+     *      fooAction => /foo
+     *
+     * @return string path
+     */
     protected function translatePath($methodName)
     {
         $methodName = preg_replace('/Action$/', '', $methodName);
