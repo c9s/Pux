@@ -22,7 +22,7 @@ class MuxConditionTest extends MuxTestCase
 
     public function testMuxGetMethod()
     {
-        $mux = new \Pux\Mux;
+        $mux = new Mux;
         $this->assertNotNull($mux);
 
         $mux->get('/news', array( 'NewsController','listAction' ));
