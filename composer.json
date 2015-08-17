@@ -1,5 +1,5 @@
 {
-    "name": "corneltek\/pux",
+    "name": "corneltek/pux",
     "description": "Fast PHP router",
     "authors": [
         {
@@ -20,5 +20,5 @@
             "Pux\\": "src/Pux/"
         }
     },
-    "version": "1.5.2"
+    "version": "1.6.0"
 }
