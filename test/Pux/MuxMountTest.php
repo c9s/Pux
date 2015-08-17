@@ -157,4 +157,42 @@ $#xs');
         $r = $mux->dispatch('/test/hello/static');
         $this->assertNonPcreRoute($r, '/test/hello/static');
     }
+
+    public function testSubmuxMergeOptions()
+    {
+        $mux = new \Pux\Mux;
+        ok($mux);
+        is(0, $mux->length());
+
+        $submux = new \Pux\Mux;
+        $submux->any('/foo', array( 'HelloController2', 'indexAction' ), array(
+            'default' => array('suffix' => 'csv'),
+        ));
+        $submux->any('/hello/:name', array( 'HelloController2', 'indexAction' ), array(
+            'default' => array('suffix' => 'json')
+        ));
+        ok($submux);
+        ok($routes = $submux->getRoutes());
+        is(2, $submux->length());
+        is(0, $mux->length());
+        $mux->mount( '/sub', $submux, array(
+            'default' => array('suffix' => 'xml', 'prefix' => 'v1'),
+            'require' => array('suffix' => '[a-z]{3,4}')
+        ));
+        is(2, $mux->length());
+
+        $r = $mux->dispatch('/sub/hello/John');
+        ok($r);
+        ok($r[3]['default']['suffix'] == 'json');
+        ok($r[3]['default']['prefix'] == 'v1');
+        ok($r[3]['require']['suffix'] == '[a-z]{3,4}');
+        $this->assertPcreRoute($r, '/sub/hello/:name');
+
+        $r = $mux->dispatch('/sub/foo');
+        ok($r);
+        ok($r[3]['default']['suffix'] == 'csv');
+        ok($r[3]['default']['prefix'] == 'v1');
+        ok($r[3]['require']['suffix'] == '[a-z]{3,4}');
+        $this->assertNonPcreRoute($r, '/sub/foo');
+    }
 }
