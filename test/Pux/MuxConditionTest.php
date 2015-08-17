@@ -5,34 +5,36 @@ use Pux\Executor;
 class MuxConditionTest extends MuxTestCase
 {
 
-    public function testRouteWithDomainCondition() {
-        $mux = new \Pux\Mux;
-        ok($mux, "got mux");
+    public function testRouteWithDomainCondition() 
+    {
+        $mux = new Mux;
+        $this->assertNotNull($mux);
         $mux->add('/foo', array( 'HelloController2','indexAction' ), array( 'domain' => 'test.dev' ));
 
         $_SERVER['HTTP_HOST'] = 'test.dev';
         $route = $mux->dispatch('/foo');
-        ok($route);
+        $this->assertNotNull($mux);
 
         $_SERVER['HTTP_HOST'] = 'github.com';
         $route = $mux->dispatch('/foo');
-        ok(! $route);
+        $this->assertNull($route);
     }
 
-    public function testMuxGetMethod() {
+    public function testMuxGetMethod()
+    {
         $mux = new \Pux\Mux;
-        ok($mux);
+        $this->assertNotNull($mux);
+
         $mux->get('/news', array( 'NewsController','listAction' ));
         $mux->get('/news_item', array( 'NewsController','itemAction' ), array());
 
         $routes = $mux->getRoutes();
-        ok($routes);
-        count_ok(2, $routes);
-        is( 2, $mux->length() );
+        $this->assertCount(2, $routes);
+        $this->assertEquals(2, $mux->length());
 
         $_SERVER['REQUEST_METHOD'] = "GET";
-        ok( $mux->dispatch('/news_item') );
-        ok( $mux->dispatch('/news') );
+        $this->assertNotNull($mux->dispatch('/news_item') );
+        $this->assertNotNull( $mux->dispatch('/news') );
     }
 
 
