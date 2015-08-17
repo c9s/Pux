@@ -307,8 +307,8 @@ class Mux
 
     public function dispatch($path)
     {
-        if ( $route = $this->match($path) ) {
-            if ( is_int($route[2]) ) {
+        if ($route = $this->match($path) ) {
+            if (is_int($route[2])) {
                 $submux = $this->submux[ $route[2] ];
 
                 // sub-path and call submux to dispatch
@@ -322,9 +322,8 @@ class Mux
                         substr($path, strlen($route[1])) ?: ''
                     );
                 }
-            } else {
-                return $route;
             }
+            return $route;
         }
     }
 
