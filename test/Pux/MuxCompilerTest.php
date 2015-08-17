@@ -26,22 +26,20 @@ class MuxCompilerTest extends MuxTestCase
 
         $compiler->compileReflectionParameters();
 
-        ok( $compiler->compile("merged_mux.php") );
-
+        $compiler->compile("merged_mux.php");
 
         path_ok( "merged_mux.php" );
 
         $mux = require "merged_mux.php";
-        ok($mux);
+        $this->assertNotNull($mux);
 
         $routes = $mux->getRoutes();
-        ok($routes);
+        $this->assertNotNull($routes);
 
+        $this->assertCount(2, $routes);
 
-        count_ok(2, $routes);
-
-        ok( $mux->dispatch('/hello/John') );
-        ok( $mux->dispatch('/bye/John') );
+        $this->assertNotNull($mux->dispatch('/hello/John'));
+        $this->assertNotNull( $mux->dispatch('/bye/John') );
 
         unlink("merged_mux.php");
         unlink("hello_mux.php");
