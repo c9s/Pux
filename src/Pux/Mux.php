@@ -342,9 +342,44 @@ class Mux
         $this->routes = $routes;
     }
 
-    public function export() {
+    public function export()
+    {
         return var_export($this, true);
     }
+
+
+    /**
+     * url method generates the related URL for a route
+     *
+     * XXX: Untested
+     *
+     * @see https://github.com/c9s/Pux/issues/4
+     *
+     * @param string $id route id
+     * @param array $params the parameters for an url
+     *
+     * @return string
+     */
+    public function url($id, array $params = array())
+    {
+        $route = $this->getRoute($id);
+
+        if (! isset($route)) {
+            throw new \RuntimeException('Named route not found for id: ' . $id);
+        }
+
+        $search = array();
+        foreach ($params as $key => $value) {
+            // try to match ':{key}' fragments and replace it with value
+            $search[] = '#:' . preg_quote($key, '#') . '\+?(?!\w)#';
+        }
+
+        $pattern = preg_replace($search, $params, $route[3]['pattern']);
+
+        // Remove remnants of unpopulated, trailing optional pattern segments, escaped special characters
+        return preg_replace('#\(/?:.+\)|\(|\)|\\\\#', '', $pattern);
+    }
+
 
     public static function __set_state($array)
     {
