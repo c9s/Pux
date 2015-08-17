@@ -16,7 +16,7 @@ before_script:
   - bash test/travis-setup.sh
 script:
   - bash test/run-pp-tests
-  - bash test/run-ext-tests
+  # - bash test/run-ext-tests
 cache:
   apt: true
   directories:
