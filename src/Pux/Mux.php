@@ -58,12 +58,12 @@ class Mux
         return $this->id = self::generate_id();
     }
 
-    public function appendRoute($pattern, $callback, $options = array() )
+    public function appendRoute($pattern, $callback, array $options = array())
     {
         $this->routes[] = array( false, $pattern, $callback, $options );
     }
 
-    public function appendPCRERoute($routeArgs, $callback)
+    public function appendPCRERoute(array $routeArgs, $callback)
     {
         $this->routes[] = array(
             true, // PCRE
@@ -73,7 +73,7 @@ class Mux
         );
     }
 
-    public function mount($pattern, $mux, $options = array())
+    public function mount($pattern, $mux, array $options = array())
     {
         if ($mux instanceof Controller) {
             $mux = $mux->expand();
@@ -108,55 +108,56 @@ class Mux
         }
     }
 
-    public function delete($pattern, $callback, $options = array())
+    public function delete($pattern, $callback, array $options = array())
     {
         $options['method'] = REQUEST_METHOD_DELETE;
         $this->add($pattern, $callback, $options);
     }
 
-    public function put($pattern, $callback, $options = array()) 
+    public function put($pattern, $callback, array $options = array())
     {
         $options['method'] = REQUEST_METHOD_PUT;
         $this->add($pattern, $callback, $options);
     }
 
-    public function get($pattern, $callback, $options = array()) 
+    public function get($pattern, $callback, array $options = array())
     {
         $options['method'] = REQUEST_METHOD_GET;
         $this->add($pattern, $callback, $options);
     }
 
-    public function post($pattern, $callback, $options = array())
+    public function post($pattern, $callback, array $options = array())
     {
         $options['method'] = REQUEST_METHOD_POST;
         $this->add($pattern, $callback, $options);
     }
 
-    public function patch($pattern, $callback, $options = array())
+    public function patch($pattern, $callback, array $options = array())
     {
         $options['method'] = REQUEST_METHOD_PATCH;
         $this->add($pattern, $callback, $options);
     }
 
 
-    public function head($pattern, $callback, $options = array())
+    public function head($pattern, $callback, array $options = array())
     {
         $options['method'] = REQUEST_METHOD_HEAD;
         $this->add($pattern, $callback, $options);
     }
 
 
-    public function options($pattern, $callback, $options = array())
+    public function options($pattern, $callback, array $options = array())
     {
         $options['method'] = REQUEST_METHOD_OPTIONS;
         $this->add($pattern, $callback, $options);
     }
 
-    public function any($pattern, $callback, $options = array()) {
+    public function any($pattern, $callback, array $options = array())
+    {
         $this->add($pattern, $callback, $options);
     }
 
-    public function add($pattern, $callback, $options = array())
+    public function add($pattern, $callback, array $options = array())
     {
         if ( is_string($callback) && strpos($callback,':') !== false ) {
             $callback = explode(':', $callback);
@@ -318,7 +319,7 @@ class Mux
                 } else {
                     $s = substr($path, strlen($route[1]));
                     return $submux->dispatch(
-                        substr($path, strlen($route[1])) ?: '' 
+                        substr($path, strlen($route[1])) ?: ''
                     );
                 }
             } else {
@@ -327,12 +328,12 @@ class Mux
         }
     }
 
-    public function length() 
+    public function length()
     {
         return count($this->routes);
     }
 
-    public function getRoutes() 
+    public function getRoutes()
     {
         return $this->routes;
     }

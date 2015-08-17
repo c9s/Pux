@@ -22,13 +22,13 @@ class PatternCompiler
      * @param string $pattern
      * @param array $options
      */
-    static function compilePattern($pattern, $options = array() ) 
+    static function compilePattern($pattern, array $options = array())
     {
 
         $len = strlen($pattern);
         /**
          * contains:
-         *   
+         *
          *   array( 'text', $text ),
          *   array( 'variable', $match[0][0][0], $regexp, $var);
          *
@@ -220,7 +220,7 @@ class PatternCompiler
      *
      * @return array compiled route info, with newly added 'compiled' key.
      */
-    static function compile($pattern, $options = array())
+    static function compile($pattern, array $options = array())
     {
         $route = self::compilePattern($pattern, $options);
 

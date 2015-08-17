@@ -52,10 +52,10 @@ class RESTfulControllerTest extends PHPUnit_Framework_TestCase
         $methods = $con->getActionMethods();
         $this->assertNotEmpty($methods);
         $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.
-        ok($productMux);
+        $this->assertNotEmpty($productMux);
 
         $root = new Mux;
-        $root->mount('/product', $con->expand() );
+        $root->mount('/product', $con->expand());
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $this->assertNotNull($root->dispatch('/product/10'));
