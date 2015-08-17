@@ -17,5 +17,8 @@
             "Pux\\": "src/Pux/"
         }
     },
-    "version": "1.5.2"
+    "version": "1.5.2",
+    "require": {
+        "corneltek/codegen": "^2.1"
+    }
 }
