@@ -8,6 +8,9 @@ use Pux\Mux;
 class Controller
 {
 
+    /**
+     * @return array Annotation info
+     */
     protected function parseMethodAnnotation($method)
     {
 
