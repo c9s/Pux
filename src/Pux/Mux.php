@@ -2,6 +2,7 @@
 // vim:et:sw=4:ts=4:sts=4:
 namespace Pux;
 use Pux\PatternCompiler;
+use Pux\Controller;
 use Exception;
 
 define('REQUEST_METHOD_GET', 1);
@@ -66,17 +67,17 @@ class Mux
 
     public function mount($pattern, $mux, $options = array())
     {
-        if ( $mux instanceof \Pux\Controller ) {
+        if ($mux instanceof Controller) {
             $mux = $mux->expand();
         } else if ((!is_object($mux) || !($mux instanceof Mux)) && is_callable($mux)) {
             $mux($mux = new Mux());
         }
 
-        if ( $this->expand ) {
+        if ($this->expand) {
             $pcre = strpos($pattern,':') !== false;
 
             // rewrite submux routes
-            foreach( $mux->routes as $route ) {
+            foreach ($mux->routes as $route) {
                 // process for pcre
                 if ( $route[0] || $pcre ) {
                     $newPattern = $pattern . ( $route[0] ? $route[3]['pattern'] : $route[1] );
