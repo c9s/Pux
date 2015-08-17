@@ -8,7 +8,6 @@ class MuxConditionTest extends MuxTestCase
     public function testRouteWithDomainCondition() 
     {
         $mux = new Mux;
-        $this->assertNotNull($mux);
         $mux->add('/foo', array( 'HelloController2','indexAction' ), array( 'domain' => 'test.dev' ));
 
         $_SERVER['HTTP_HOST'] = 'test.dev';
@@ -23,8 +22,6 @@ class MuxConditionTest extends MuxTestCase
     public function testMuxGetMethod()
     {
         $mux = new Mux;
-        $this->assertNotNull($mux);
-
         $mux->get('/news', array( 'NewsController','listAction' ));
         $mux->get('/news_item', array( 'NewsController','itemAction' ), array());
 
