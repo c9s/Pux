@@ -30,10 +30,10 @@ class Mux
      * When expand is enabled, all mounted Mux will expand the routes to the parent mux.
      * This improves the dispatch performance when you have a lot of sub mux to dispatch.
      *
-     * When expand is enabled, the pattern comparison strategy for 
+     * When expand is enabled, the pattern comparison strategy for
      * strings will match the full string.
      *
-     * When expand is disabled, the pattern comparison strategy for 
+     * When expand is disabled, the pattern comparison strategy for
      * strings will match the prefix.
      */
     public $expand = true;
