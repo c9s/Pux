@@ -5,8 +5,9 @@
          verbose="true">
   <testsuites>
 
-    <testsuite name="PP">
+    <testsuite name="All">
        <directory suffix="Test.php">test/Pux</directory>
+       <exclude>test/ExtensionOnly</exclude>
     </testsuite>
 
     <testsuite name="Mux">
@@ -27,9 +28,11 @@
       <file>test/Pux/ControllerTest.php</file>
     </testsuite>
 
+    <!--
     <testsuite name="Extension">
        <directory suffix="Test.php">test/ExtensionOnly</directory>
     </testsuite>
+    -->
   </testsuites>
 
   <!--
