@@ -3,7 +3,9 @@
 namespace Pux;
 use Pux\PatternCompiler;
 use Pux\Controller;
+use Closure;
 use Exception;
+use LogicException;
 
 define('REQUEST_METHOD_GET', 1);
 define('REQUEST_METHOD_POST', 2);
@@ -85,7 +87,21 @@ class Mux implements PathDispatcher
     public function mount($pattern, $mux, array $options = array())
     {
         if ($mux instanceof Controller) {
+
             $mux = $mux->expand();
+
+        } else if ($mux instanceof Closure) {
+
+            // we pass newly created Mux object to the closure to let it initialize it.
+            $ret = $mux($mux = new Mux);
+            if ($ret) {
+                if ($ret instanceof Mux) {
+                    $mux = $ret;
+                } else {
+                    throw new LogicException("Invalid object returned from Closure.");
+                }
+            }
+
         } else if ((!is_object($mux) || !($mux instanceof Mux)) && is_callable($mux)) {
             $mux($mux = new Mux());
         }
