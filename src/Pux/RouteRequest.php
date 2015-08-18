@@ -47,8 +47,8 @@ class RouteRequest implements RouteRequestMatcher
     {
         foreach ($constraints as $constraint) {
             $result = true;
-            if (isset($constraints['host_pattern'])) {
-                $result = $result && $this->matchHost($constraints['host_pattern']);
+            if (isset($constraints['host_like'])) {
+                $result = $result && $this->matchHost($constraints['host_like']);
             }
 
             if (isset($constraints['host'])) {
@@ -59,8 +59,8 @@ class RouteRequest implements RouteRequestMatcher
                 $result = $result && $this->matchRequestMethod($constraints['request_method']);
             }
 
-            if (isset($constraints['path_pattern'])) {
-                $result = $result && $this->matchPath($constraints['path_pattern']);
+            if (isset($constraints['path_like'])) {
+                $result = $result && $this->matchPath($constraints['path_like']);
             }
 
             if (isset($constraints['path'])) {
@@ -71,6 +71,7 @@ class RouteRequest implements RouteRequestMatcher
             if ($result) {
                 return true;
             }
+            // try next one
         }
         return false;
     }
