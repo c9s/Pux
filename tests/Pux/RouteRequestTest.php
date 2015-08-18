@@ -5,7 +5,7 @@ class RouteRequestTest extends PHPUnit_Framework_TestCase
 {
     public function testCreateFromGlobals()
     {
-        $request = RouteRequest::createFromGlobals();
+        $request = RouteRequest::createFromGlobals('GET', '/foo/bar');
         $this->assertNotNull($request);
     }
 }

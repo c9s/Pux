@@ -1,7 +1,10 @@
 <?php
 use Pux\Controller\RESTfulController;
+use Pux\Controller;
+use Pux\Mux;
 
-class ProductResourceController extends RESTfulController
+// class ProductResourceController extends RESTfulController
+class ProductResourceController extends Controller
 {
     /**
      * @Method("POST")
@@ -39,7 +42,7 @@ class ProductResourceController extends RESTfulController
 
 class RESTfulControllerTest extends PHPUnit_Framework_TestCase
 {
-    public function test()
+    public function testRESTfulDispatch()
     {
         $con = new ProductResourceController;
         $routes = $con->getActionRoutes();
