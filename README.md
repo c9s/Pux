@@ -11,7 +11,7 @@ Symfony/Routing, although the RouteCompiler of Symfony/Routing caches the
 compiled patterns, but there are still a lot of function call and class
 loading from your application code. however, function calls are pretty slow in PHP). 
 
-[![Build Status](https://travis-ci.org/c9s/Pux.png?branch=master)](https://travis-ci.org/c9s/Pux)
+[![Build Status](https://travis-ci.org/c9s/Pux.svg?branch=master)](https://travis-ci.org/c9s/Pux)
 
 Why It's Faster
 ---------------
