@@ -51,12 +51,19 @@ abstract class RESTfulController extends Controller
     public function expand()
     {
         $mux    = new Mux();
-        $paths  = $this->getActionRoutes();
-        foreach ($paths as $path) {
-            $mux->add($path[0], array(get_class($this), $path[1]), $path[2]);
-        }
-        $mux->sort();
+        $class = $this->getClass();
+        $mux->add('/:id', [$class, 'updateAction'], [ 'method' => 'POST' ]);
+        $mux->add('/:id', [$class, 'getAction'], [ 'method' => 'GET' ]);
+        $mux->add('/:id', [$class, 'deleteAction'], [ 'method' => 'DELETE' ]);
+        $mux->add('', [$class, 'createAction'], [ 'method' => 'POST' ]);
+        $mux->add('', [$class, 'getCollectionAction'], [ 'method' => 'GET' ]);
         return $mux;
+    }
+
+
+    public function code($code)
+    {
+        http_response_code($code);
     }
 
 
