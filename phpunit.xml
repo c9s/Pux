@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="test/bootstrap.php"
-         backupGlobals="false"
+<phpunit bootstrap="tests/bootstrap.php"
+         backupGlobals="true"
          colors="true"
          verbose="true">
   <testsuites>
 
     <testsuite name="All">
-       <directory suffix="Test.php">test/Pux</directory>
-       <exclude>test/ExtensionOnly</exclude>
+       <directory suffix="Test.php">tests/Pux</directory>
+       <exclude>tests/ExtensionOnly</exclude>
     </testsuite>
 
     <testsuite name="Mux">
-      <file>test/Pux/MuxTest.php</file>
-      <file>test/Pux/BasicMuxTest.php</file>
-      <file>test/Pux/MuxExportTest.php</file>
-      <file>test/Pux/MuxSetStateTest.php</file>
-      <file>test/Pux/MuxCompilerTest.php</file>
+      <file>tests/Pux/MuxTest.php</file>
+      <file>tests/Pux/BasicMuxTest.php</file>
+      <file>tests/Pux/MuxExportTest.php</file>
+      <file>tests/Pux/MuxSetStateTest.php</file>
+      <file>tests/Pux/MuxCompilerTest.php</file>
     </testsuite>
 
     <testsuite name="SubMux">
-      <file>test/Pux/MuxMountTest.php</file>
-      <file>test/Pux/MuxNoExpandMountTest.php</file>
+      <file>tests/Pux/MuxMountTest.php</file>
+      <file>tests/Pux/MuxNoExpandMountTest.php</file>
     </testsuite>
 
     <testsuite name="Controller">
-      <file>test/Pux/ControllerAnnotationTest.php</file>
-      <file>test/Pux/ControllerTest.php</file>
+      <file>tests/Pux/ControllerAnnotationTest.php</file>
+      <file>tests/Pux/ControllerTest.php</file>
     </testsuite>
 
     <!--
     <testsuite name="Extension">
-       <directory suffix="Test.php">test/ExtensionOnly</directory>
+       <directory suffix="Test.php">tests/ExtensionOnly</directory>
     </testsuite>
     -->
   </testsuites>
