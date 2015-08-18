@@ -272,7 +272,7 @@ class Mux
             $requestMethod = self::getRequestMethodConstant($_SERVER['REQUEST_METHOD']);
         }
 
-        foreach( $this->routes as $route ) {
+        foreach ($this->routes as $route) {
             if ( $route[0] ) {
                 if ( ! preg_match($route[1], $path , $regs ) ) {
                     continue;
@@ -289,7 +289,7 @@ class Mux
                 return $route;
             } else {
                 // prefix match is used when expanding is not enabled.
-                if ( ( is_int($route[2]) && strncmp($route[1], $path, strlen($route[1]) ) === 0 ) || $route[1] == $path ) {
+                if (( is_int($route[2]) && strncmp($route[1], $path, strlen($route[1]) ) === 0 ) || $route[1] == $path) {
                     // validate request method
                     if ( isset($route[3]['method']) && $route[3]['method'] != $requestMethod )
                         continue;
@@ -305,9 +305,9 @@ class Mux
         }
     }
 
-    public function dispatch($path)
+    public function dispatch($path, $request = null)
     {
-        if ($route = $this->match($path) ) {
+        if ($route = $this->match($path)) {
             if (is_int($route[2])) {
                 $submux = $this->submux[ $route[2] ];
 
