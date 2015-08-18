@@ -23,5 +23,26 @@ class RouteRequestTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($request->matchRequestMethod('GET'));
         $this->assertFalse($request->matchRequestMethod('POST'));
     }
+
+    public function testContainsPath()
+    {
+        $request = RouteRequest::createFromGlobals('GET', '/foo/bar');
+        $this->assertNotNull($request);
+        $this->assertTrue( $request->containsPath('/foo') );
+        $this->assertTrue( $request->containsPath('/bar') );
+    }
+
+    public function testMatchPathSuffix()
+    {
+        $request = RouteRequest::createFromGlobals('GET', '/foo/bar.json');
+        $this->assertNotNull($request);
+        $this->assertTrue( $request->matchPathSuffix('.json') );
+        $this->assertFalse( $request->matchPathSuffix('.js') );
+        $this->assertFalse( $request->matchPathSuffix('.xml') );
+    }
+
+
+
+
 }
 

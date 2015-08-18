@@ -42,6 +42,22 @@ class RouteRequest implements RouteRequestMatcher
         return false;
     }
 
+
+    public function containsPath($path)
+    {
+        return strpos($this->path, $path) !== FALSE;
+    }
+
+
+    public function matchPathSuffix($suffix)
+    {
+        $p = strrpos($this->path, $suffix);
+        return ($p == strlen($this->path) - strlen($suffix));
+    }
+
+
+
+
     public function matchPath($pattern, & $matches = array())
     {
         return preg_match($pattern, $this->path, $matches) !== FALSE;
@@ -52,6 +68,8 @@ class RouteRequest implements RouteRequestMatcher
         if (isset($this->server['HTTP_HOST'])) {
             return preg_match($host, $this->server['HTTP_HOST'], $matches) !== FALSE;
         }
+        // the HTTP HOST is not defined.
+        return false;
     }
 
     /**
