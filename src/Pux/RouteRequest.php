@@ -2,6 +2,12 @@
 namespace Pux;
 use Pux\RouteRequestMatcher;
 
+/**
+ * RouteRequest defines request information for routing.
+ *
+ * You can use RouteRequest's constraint methods to check if a request matches
+ * your logics.
+ */
 class RouteRequest implements RouteRequestMatcher
 {
 
