@@ -96,6 +96,10 @@ class RouteRequest implements RouteRequestMatcher
         return ($p == strlen($this->path) - strlen($suffix));
     }
 
+    public function matchQueryString($pattern, & $matches = array())
+    {
+        return preg_match($pattern, $this->server['QUERY_STRING'], $matches) !== FALSE;
+    }
 
     /**
      * Check if the request host is in the list of host.
