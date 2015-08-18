@@ -4,8 +4,15 @@ use Pux\RouteRequestMatcher;
 
 class RouteRequest implements RouteRequestMatcher
 {
+
+    /**
+     * @var array $server
+     */
     protected $server = array();
 
+    /**
+     * @var array $headers
+     */
     protected $headers = array();
 
     /**
