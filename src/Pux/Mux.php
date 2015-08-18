@@ -75,6 +75,13 @@ class Mux implements PathDispatcher
         );
     }
 
+    /**
+     * Mount a Mux or a Controller object on a specific path.
+     *
+     * @param string $pattern
+     * @param Mux|Controller $mux
+     * @param array $options
+     */
     public function mount($pattern, $mux, array $options = array())
     {
         if ($mux instanceof Controller) {
