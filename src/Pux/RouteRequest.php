@@ -101,6 +101,15 @@ class RouteRequest implements RouteRequestMatcher
         return preg_match($pattern, $this->server['QUERY_STRING'], $matches) !== FALSE;
     }
 
+
+    public function equalsPort($port)
+    {
+        if (isset($this->server['SERVER_PORT'])) {
+            return intval($this->server['SERVER_PORT']) == intval($port);
+        }
+    }
+
+
     /**
      * Check if the request host is in the list of host.
      *

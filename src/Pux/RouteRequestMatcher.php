@@ -19,6 +19,8 @@ interface RouteRequestMatcher
 
     public function equalsPath($path);
 
+    public function equalsPort($port);
+
     public function matchQueryString($pattern, & $matches = array());
 
 }
