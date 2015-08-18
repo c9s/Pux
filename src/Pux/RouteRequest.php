@@ -90,6 +90,23 @@ class RouteRequest implements RouteRequestMatcher
     }
 
 
+    /**
+     * Check if the request host is in the list of host.
+     *
+     * @param array $hosts
+     * @return boolean
+     */
+    public function isOneOfHosts(array $hosts)
+    {
+        foreach ($hosts as $host) {
+            if ($this->matchHost($host)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public function equalsHost($host)
     {
         if (isset($this->server['HTTP_HOST'])) {
