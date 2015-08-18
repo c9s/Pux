@@ -44,13 +44,13 @@ class RouteRequest implements RouteRequestMatcher
 
     public function matchPath($pattern, & $matches = array())
     {
-        return preg_match($pattern, $this->path, matches);
+        return preg_match($pattern, $this->path, $matches) !== FALSE;
     }
 
     public function matchHost($host, & $matches = array())
     {
         if (isset($this->server['HTTP_HOST'])) {
-            return preg_match($host, $this->server['HTTP_HOST'], $matches);
+            return preg_match($host, $this->server['HTTP_HOST'], $matches) !== FALSE;
         }
     }
 

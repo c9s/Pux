@@ -9,13 +9,19 @@ class RouteRequestTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($request);
     }
 
-    public function createRequestMethodConstraint()
+    public function testRequestUrl()
     {
         $request = RouteRequest::createFromGlobals('GET', '/foo/bar');
         $this->assertNotNull($request);
+        $this->assertTrue($request->matchPath('#^/foo#'));
+    }
 
-        $this->assertTrue($this->useRequestMethod('GET'));
-
+    public function testRequestMethodConstraint()
+    {
+        $request = RouteRequest::createFromGlobals('GET', '/foo/bar');
+        $this->assertNotNull($request);
+        $this->assertTrue($request->matchRequestMethod('GET'));
+        $this->assertFalse($request->matchRequestMethod('POST'));
     }
 }
 
