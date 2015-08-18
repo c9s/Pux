@@ -13,7 +13,9 @@ define('REQUEST_METHOD_PATCH', 5);
 define('REQUEST_METHOD_HEAD', 6);
 define('REQUEST_METHOD_OPTIONS', 7);
 
-class Mux
+use Pux\Dispatcher\PathDispatcher;
+
+class Mux implements PathDispatcher
 {
     public $routes = array();
 
