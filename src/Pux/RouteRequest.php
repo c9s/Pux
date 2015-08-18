@@ -16,7 +16,7 @@ class RouteRequest implements RouteRequestMatcher
     /**
      * @var string request method
      */
-    protected $method;
+    protected $requestMethod;
 
 
     /**
@@ -24,12 +24,45 @@ class RouteRequest implements RouteRequestMatcher
      */
     protected $path;
 
-    public function __construct($method, $path)
+
+    /**
+     *
+     * @param string $requestMethod
+     * @param string $path
+     */
+    public function __construct($requestMethod, $path)
     {
-        $this->method = $method;
+        $this->requestMethod = $requestMethod;
         $this->path = $path;
     }
 
+
+    public function matchConstraints(array $constraints)
+    {
+        return false;
+    }
+
+    public function matchPath($pattern, & $matches = array())
+    {
+        return preg_match($pattern, $this->path, matches);
+    }
+
+    public function matchHost($host, & $matches = array())
+    {
+        if (isset($this->server['HTTP_HOST'])) {
+            return preg_match($host, $this->server['HTTP_HOST'], $matches);
+        }
+    }
+
+    /**
+     * matchRequestMethod does not use PCRE pattern to match request method.
+     *
+     * @param string $requestMethod
+     */
+    public function matchRequestMethod($requestMethod)
+    {
+        return strcasecmp($this->requestMethod, $requestMethod) === 0;
+    }
 
 
     /**
