@@ -37,8 +37,41 @@ class RouteRequest implements RouteRequestMatcher
     }
 
 
+
+    /**
+     *
+     *
+     * @param contraints[]
+     */
     public function matchConstraints(array $constraints)
     {
+        foreach ($constraints as $constraint) {
+            $result = true;
+            if (isset($constraints['host_pattern'])) {
+                $result = $result && $this->matchHost($constraints['host_pattern']);
+            }
+
+            if (isset($constraints['host'])) {
+                $result = $result && $this->equalsHost($constraints['host']);
+            }
+
+            if (isset($constraints['request_method'])) {
+                $result = $result && $this->matchRequestMethod($constraints['request_method']);
+            }
+
+            if (isset($constraints['path_pattern'])) {
+                $result = $result && $this->matchPath($constraints['path_pattern']);
+            }
+
+            if (isset($constraints['path'])) {
+                $result = $result && $this->equalsPath($constraints['path']);
+            }
+
+            // If it matches all constraints, we simply return true and skip other constraints
+            if ($result) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -56,6 +89,18 @@ class RouteRequest implements RouteRequestMatcher
     }
 
 
+    public function equalsHost($host)
+    {
+        if (isset($this->server['HTTP_HOST'])) {
+            return strcasecmp($this->server['HTTP_HOST'], $host) === 0;
+        }
+        return false;
+    }
+
+    public function equalsPath($path)
+    {
+        return strcasecmp($this->path, $path) === 0;
+    }
 
 
     public function matchPath($pattern, & $matches = array())

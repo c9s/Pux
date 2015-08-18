@@ -11,6 +11,10 @@ interface RouteRequestMatcher
 
     public function matchRequestMethod($method);
 
+    public function matchPathSuffix($suffix);
+
+    public function containsPath($path);
+
 }
 
 
