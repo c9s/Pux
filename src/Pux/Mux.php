@@ -273,6 +273,7 @@ class Mux
         }
 
         foreach ($this->routes as $route) {
+            // If the route is using pcre pattern marching...
             if ( $route[0] ) {
                 if ( ! preg_match($route[1], $path , $regs ) ) {
                     continue;
