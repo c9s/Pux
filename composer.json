@@ -9,11 +9,11 @@
     ],
     "require": {
         "corneltek/cliframework": "^2",
-        "corneltek/codegen": "^2.1"
+        "corneltek/codegen": "^2"
     },
     "require-dev": {
         "corneltek/phpunit-testmore": "dev-master",
-        "corneltek/universal": "dev-master"
+        "corneltek/lazyrecord": "dev-master"
     },
     "autoload": {
         "psr-4": {
