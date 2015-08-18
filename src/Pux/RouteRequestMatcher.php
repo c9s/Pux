@@ -15,6 +15,12 @@ interface RouteRequestMatcher
 
     public function containsPath($path);
 
+    public function equalsHost($host);
+
+    public function equalsPath($path);
+
+    public function matchQueryString($pattern, & $matches = array());
+
 }
 
 
