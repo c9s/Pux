@@ -8,17 +8,17 @@ matrix:
     - php: 5.5
     - php: 5.6
 install:
-  - sudo apt-get update
-  - sudo apt-get install php5-dev php-pear
-  - composer install
+- sudo apt-get update
+- sudo apt-get install php5-dev
+- composer install
 before_script:
-  - php-config || true
-  - phpenv rehash
-  - phpenv version-name
-  - bash test/travis-setup.sh
+- php-config || true
+- phpenv rehash
+- phpenv version-name
+- bash tests/travis-setup.sh
 script:
-  - bash test/run-pp-tests
-  # - bash test/run-ext-tests
+- bash tests/run-pp-tests
+# - bash tests/run-ext-tests
 cache:
   apt: true
   directories:
