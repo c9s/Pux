@@ -24,18 +24,32 @@ class RouteRequest implements RouteRequestMatcher
     /**
      * @var array parameters
      */
-    protected $parameters = array();
+    public $parameters = array();
+
+
+
+    /**
+     * @var array query parameter from $_GET
+     */
+    public $queryParameters = array();
+
+
+    /**
+     * @var array body parameter from $_POST
+     */
+    public $bodyParameters = array();
+
 
     /**
      * @var string request method
      */
-    protected $requestMethod;
+    public $requestMethod;
 
 
     /**
      * @var string request path
      */
-    protected $path;
+    public $path;
 
 
     /**
@@ -50,6 +64,30 @@ class RouteRequest implements RouteRequestMatcher
     }
 
 
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    public function getRequestMethod()
+    {
+        return $this->requestMethod;
+    }
+
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    public function getQueryParameters()
+    {
+        return $this->queryParameters;
+    }
+
+    public function getBodyParameters()
+    {
+        return $this->bodyParameters;
+    }
 
     /**
      *
@@ -206,6 +244,8 @@ class RouteRequest implements RouteRequestMatcher
         }
 
         $request->parameters = $_REQUEST;
+        $request->queryParameters = $_GET;
+        $request->bodyParameters = $_POST;
         return $request;
     }
 }
