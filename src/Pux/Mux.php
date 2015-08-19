@@ -188,6 +188,11 @@ class Mux implements PathDispatcher
             $callback = explode(':', $callback);
         }
 
+        // Convert request method constraint to constant if it's passed by string
+        if (isset($options['method']) && is_string($options['method'])) {
+            $options['method'] = Mux::getRequestMethodConstant($options['method']);
+        }
+
         // compile place holder to patterns
         $pcre = strpos($pattern,':') !== false;
         if ( $pcre ) {

@@ -3,8 +3,7 @@ use Pux\Controller\RESTfulController;
 use Pux\Controller;
 use Pux\Mux;
 
-// class ProductResourceController extends RESTfulController
-class ProductResourceController extends Controller
+class ProductResourceController extends RESTfulController
 {
     /**
      * @Method("POST")

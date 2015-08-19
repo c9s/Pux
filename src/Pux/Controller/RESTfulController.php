@@ -53,11 +53,11 @@ abstract class RESTfulController extends Controller
     {
         $mux    = new Mux();
         $class = $this->getClass();
-        $mux->add('/:id', [$class, 'updateAction'], [ 'method' => 'POST' ]);
-        $mux->add('/:id', [$class, 'getAction'], [ 'method' => 'GET' ]);
-        $mux->add('/:id', [$class, 'deleteAction'], [ 'method' => 'DELETE' ]);
-        $mux->add('', [$class, 'createAction'], [ 'method' => 'POST' ]);
-        $mux->add('', [$class, 'getCollectionAction'], [ 'method' => 'GET' ]);
+        $mux->add('/:id', [$class, 'updateAction'], [ 'method' => REQUEST_METHOD_POST ]);
+        $mux->add('/:id', [$class, 'getAction'], [ 'method' => REQUEST_METHOD_GET ]);
+        $mux->add('/:id', [$class, 'deleteAction'], [ 'method' => REQUEST_METHOD_DELETE ]);
+        $mux->add('', [$class, 'createAction'], [ 'method' => REQUEST_METHOD_POST ]);
+        $mux->add('', [$class, 'getCollectionAction'], [ 'method' => REQUEST_METHOD_GET ]);
         return $mux;
     }
 
