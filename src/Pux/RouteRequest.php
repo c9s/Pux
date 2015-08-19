@@ -252,10 +252,18 @@ class RouteRequest implements RouteRequestMatcher
             $request->headers = self::createHeadersFromServerGlobal();
         }
 
-        $request->parameters = $_REQUEST;
-        $request->queryParameters = $_GET;
-        $request->bodyParameters = $_POST;
-        $request->cookies = $_COOKIE;
+        if (isset($_REQUEST)) {
+            $request->parameters = $_REQUEST;
+        }
+        if (isset($_GET)) {
+            $request->queryParameters = $_GET;
+        }
+        if (isset($_POST)) {
+            $request->bodyParameters = $_POST;
+        }
+        if (isset($_COOKIE)) {
+            $request->cookies = $_COOKIE;
+        }
         return $request;
     }
 }
