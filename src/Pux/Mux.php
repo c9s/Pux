@@ -93,8 +93,7 @@ class Mux implements PathDispatcher
         } else if ($mux instanceof Closure) {
 
             // we pass newly created Mux object to the closure to let it initialize it.
-            $ret = $mux($mux = new Mux);
-            if ($ret) {
+            if ($ret = $mux($mux = new Mux)) {
                 if ($ret instanceof Mux) {
                     $mux = $ret;
                 } else {
@@ -418,7 +417,7 @@ class Mux implements PathDispatcher
         $mux->routes = $array['routes'];
         $mux->submux = $array['submux'];
         $mux->expand = $array['expand'];
-        if ( isset($array['routesById']) ) {
+        if (isset($array['routesById'])) {
             $mux->routesById = $array['routesById'];
         }
         $mux->id = $array['id'];
