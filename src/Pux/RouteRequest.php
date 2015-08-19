@@ -11,15 +11,29 @@ use Pux\RouteRequestMatcher;
 class RouteRequest implements RouteRequestMatcher
 {
 
-    /**
-     * @var array $server
-     */
-    protected $server = array();
 
     /**
      * @var array $headers
      */
     protected $headers = array();
+
+
+    /**
+     * @var string request method
+     */
+    public $requestMethod;
+
+
+    /**
+     * @var string request path
+     */
+    public $path;
+
+    /**
+     * @var array $server
+     */
+    public $serverParameters = array();
+
 
     /**
      * @var array parameters
@@ -38,18 +52,6 @@ class RouteRequest implements RouteRequestMatcher
      * @var array body parameter from $_POST
      */
     public $bodyParameters = array();
-
-
-    /**
-     * @var string request method
-     */
-    public $requestMethod;
-
-
-    /**
-     * @var string request path
-     */
-    public $path;
 
 
     /**
@@ -142,14 +144,14 @@ class RouteRequest implements RouteRequestMatcher
 
     public function matchQueryString($pattern, & $matches = array())
     {
-        return preg_match($pattern, $this->server['QUERY_STRING'], $matches) !== FALSE;
+        return preg_match($pattern, $this->serverParameters['QUERY_STRING'], $matches) !== FALSE;
     }
 
 
     public function equalsPort($port)
     {
-        if (isset($this->server['SERVER_PORT'])) {
-            return intval($this->server['SERVER_PORT']) == intval($port);
+        if (isset($this->serverParameters['SERVER_PORT'])) {
+            return intval($this->serverParameters['SERVER_PORT']) == intval($port);
         }
     }
 
@@ -173,8 +175,8 @@ class RouteRequest implements RouteRequestMatcher
 
     public function equalsHost($host)
     {
-        if (isset($this->server['HTTP_HOST'])) {
-            return strcasecmp($this->server['HTTP_HOST'], $host) === 0;
+        if (isset($this->serverParameters['HTTP_HOST'])) {
+            return strcasecmp($this->serverParameters['HTTP_HOST'], $host) === 0;
         }
         return false;
     }
@@ -192,8 +194,8 @@ class RouteRequest implements RouteRequestMatcher
 
     public function matchHost($host, & $matches = array())
     {
-        if (isset($this->server['HTTP_HOST'])) {
-            return preg_match($host, $this->server['HTTP_HOST'], $matches) !== FALSE;
+        if (isset($this->serverParameters['HTTP_HOST'])) {
+            return preg_match($host, $this->serverParameters['HTTP_HOST'], $matches) !== FALSE;
         }
         // the HTTP HOST is not defined.
         return false;
@@ -234,7 +236,7 @@ class RouteRequest implements RouteRequestMatcher
     public static function createFromGlobals($method, $path)
     {
         $request = new self($method, $path);
-        $request->server = $_SERVER;
+        $request->serverParameters = $_SERVER;
 
         if (function_exists('getallheaders')) {
             $request->headers = getallheaders();
