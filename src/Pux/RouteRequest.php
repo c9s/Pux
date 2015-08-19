@@ -1,12 +1,15 @@
 <?php
 namespace Pux;
 use Pux\RouteRequestMatcher;
+use Universal\Http\Request;
 
 /**
  * RouteRequest defines request information for routing.
  *
  * You can use RouteRequest's constraint methods to check if a request matches
  * your logics.
+ *
+ * TODO: extends from Universal\Http\Request
  */
 class RouteRequest implements RouteRequestMatcher
 {
@@ -243,7 +246,6 @@ class RouteRequest implements RouteRequestMatcher
     public static function createFromGlobals($method, $path)
     {
         $request = new self($method, $path);
-        $request->serverParameters = $_SERVER;
 
         if (function_exists('getallheaders')) {
             $request->headers = getallheaders();
@@ -251,7 +253,9 @@ class RouteRequest implements RouteRequestMatcher
             // TODO: filter array keys by their prefix, consider adding an extension function for this.
             $request->headers = self::createHeadersFromServerGlobal();
         }
-
+        if (isset($_SERVER)) {
+            $request->serverParameters = $_SERVER;
+        }
         if (isset($_REQUEST)) {
             $request->parameters = $_REQUEST;
         }
