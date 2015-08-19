@@ -49,15 +49,15 @@ abstract class RESTfulController extends Controller
      *
      * @return Mux
      */
-    public function expand()
+    public function expand($dynamic = false)
     {
-        $mux    = new Mux();
-        $class = $this->getClass();
-        $mux->add('/:id', [$class, 'updateAction'], [ 'method' => REQUEST_METHOD_POST ]);
-        $mux->add('/:id', [$class, 'getAction'], [ 'method' => REQUEST_METHOD_GET ]);
-        $mux->add('/:id', [$class, 'deleteAction'], [ 'method' => REQUEST_METHOD_DELETE ]);
-        $mux->add('', [$class, 'createAction'], [ 'method' => REQUEST_METHOD_POST ]);
-        $mux->add('', [$class, 'getCollectionAction'], [ 'method' => REQUEST_METHOD_GET ]);
+        $mux   = new Mux();
+        $target = $dynamic ? $this : $this->getClass();
+        $mux->add('/:id', [$target, 'updateAction'], [ 'method' => REQUEST_METHOD_POST ]);
+        $mux->add('/:id', [$target, 'getAction'], [ 'method' => REQUEST_METHOD_GET ]);
+        $mux->add('/:id', [$target, 'deleteAction'], [ 'method' => REQUEST_METHOD_DELETE ]);
+        $mux->add('', [$target, 'createAction'], [ 'method' => REQUEST_METHOD_POST ]);
+        $mux->add('', [$target, 'getCollectionAction'], [ 'method' => REQUEST_METHOD_GET ]);
         return $mux;
     }
 
