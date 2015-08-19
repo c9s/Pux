@@ -18,6 +18,7 @@ class RouteRequest implements RouteRequestMatcher
     protected $headers = array();
 
 
+    
     /**
      * @var string request method
      */
@@ -52,6 +53,12 @@ class RouteRequest implements RouteRequestMatcher
      * @var array body parameter from $_POST
      */
     public $bodyParameters = array();
+
+
+    /**
+     * @var array cookie parameters
+     */
+    public $cookies = array();
 
 
     /**
@@ -248,6 +255,7 @@ class RouteRequest implements RouteRequestMatcher
         $request->parameters = $_REQUEST;
         $request->queryParameters = $_GET;
         $request->bodyParameters = $_POST;
+        $request->cookies = $_COOKIE;
         return $request;
     }
 }
