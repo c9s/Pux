@@ -46,7 +46,7 @@ class Mux implements PathDispatcher
      * When expand is disabled, the pattern comparison strategy for
      * strings will match the prefix.
      */
-    public $expand = true;
+    public $expand = false;
 
     public static $id_counter = 0;
 
@@ -105,6 +105,10 @@ class Mux implements PathDispatcher
             $mux($mux = new Mux());
         }
 
+        $muxId = $mux->getId();
+        $this->add($pattern, $muxId, $options);
+        $this->submux[ $muxId ] = $mux;
+        /*
         if ($this->expand) {
             $pcre = strpos($pattern,':') !== false;
 
@@ -125,11 +129,7 @@ class Mux implements PathDispatcher
                     );
                 }
             }
-        } else {
-            $muxId = $mux->getId();
-            $this->add($pattern, $muxId, $options);
-            $this->submux[ $muxId ] = $mux;
-        }
+        */
     }
 
     public function delete($pattern, $callback, array $options = array())
@@ -183,7 +183,7 @@ class Mux implements PathDispatcher
 
     public function add($pattern, $callback, array $options = array())
     {
-        if ( is_string($callback) && strpos($callback,':') !== false ) {
+        if (is_string($callback) && strpos($callback,':') !== false ) {
             $callback = explode(':', $callback);
         }
 
@@ -194,8 +194,11 @@ class Mux implements PathDispatcher
 
         // compile place holder to patterns
         $pcre = strpos($pattern,':') !== false;
-        if ( $pcre ) {
-            $routeArgs = PatternCompiler::compile($pattern, $options);
+        if ($pcre) {
+            $routeArgs = is_integer($callback)
+                ? PatternCompiler::compilePrefix($pattern, $options) 
+                : PatternCompiler::compile($pattern, $options)
+                ;
 
             // generate a pcre pattern route
             $route = array( 
@@ -294,7 +297,15 @@ class Mux implements PathDispatcher
         }
     }
 
-    public function match($path)
+
+    /**
+     * Try to find a matched route.
+     *
+     * @param string $path
+     * @param RouteRequest $request
+     *
+     */
+    public function match($path, RouteRequest $request = null)
     {
         $requestMethod = null;
         if (isset($_SERVER['REQUEST_METHOD'])) {
@@ -303,23 +314,23 @@ class Mux implements PathDispatcher
 
         foreach ($this->routes as $route) {
             // If the route is using pcre pattern marching...
-            if ( $route[0] ) {
-                if ( ! preg_match($route[1], $path , $regs ) ) {
+            if ($route[0]) {
+                if (!preg_match($route[1], $path , $matches)) {
                     continue;
                 }
-                $route[3]['vars'] = $regs;
+                $route[3]['vars'] = $matches;
 
                 // validate request method
-                if ( isset($route[3]['method']) && $route[3]['method'] != $requestMethod )
+                if (isset($route[3]['method']) && $route[3]['method'] != $requestMethod)
                     continue;
-                if ( isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"] )
+                if (isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"])
                     continue;
-                if ( isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"] )
+                if (isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"])
                     continue;
                 return $route;
             } else {
                 // prefix match is used when expanding is not enabled.
-                if (( is_int($route[2]) && strncmp($route[1], $path, strlen($route[1]) ) === 0 ) || $route[1] == $path) {
+                if ((is_int($route[2]) && strncmp($route[1], $path, strlen($route[1]) ) === 0 ) || $route[1] == $path) {
                     // validate request method
                     if ( isset($route[3]['method']) && $route[3]['method'] != $requestMethod )
                         continue;
@@ -328,9 +339,8 @@ class Mux implements PathDispatcher
                     if ( isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"] )
                         continue;
                     return $route;
-                } else {
-                    continue;
                 }
+                continue;
             }
         }
     }
@@ -338,14 +348,15 @@ class Mux implements PathDispatcher
     public function dispatch($path, $request = null)
     {
         if ($route = $this->match($path)) {
-            if (is_int($route[2])) {
-                $submux = $this->submux[ $route[2] ];
+            if (is_integer($route[2])) {
+                $submux = $this->submux[$route[2]];
+
 
                 // sub-path and call submux to dispatch
                 // for pcre pattern?
                 if ($route[0]) { 
                     $matchedString = $route[3]['vars'][0];
-                    return $submux->dispatch( substr($path, strlen($matchedString)) );
+                    return $submux->dispatch(substr($path, strlen($matchedString)));
                 } else {
                     $s = substr($path, strlen($route[1]));
                     return $submux->dispatch(
@@ -416,7 +427,6 @@ class Mux implements PathDispatcher
         $mux = new self;
         $mux->routes = $array['routes'];
         $mux->submux = $array['submux'];
-        $mux->expand = $array['expand'];
         if (isset($array['routesById'])) {
             $mux->routesById = $array['routesById'];
         }

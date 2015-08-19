@@ -6,9 +6,8 @@ class MuxMountTest extends MuxTestCase
 {
 
     public function testMuxMountEmpty() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        $submux = new \Pux\Mux;
+        $mux = new Mux;
+        $submux = new Mux;
         $mux->mount( '/sub' , $submux);
     }
 
@@ -94,42 +93,44 @@ class MuxMountTest extends MuxTestCase
         is(0, $mux->length());
         $mux->mount( '/sub' , $submux);
         $r = $mux->dispatch('/sub/hello/John');
-        ok($r);
-        $this->assertPcreRoute($r, '/sub/hello/:name');
+        $this->assertPcreRoute($r, '/hello/:name');
     }
 
-    public function testSubmuxPcreMount() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        is(0, $mux->length());
+    public function testSubmuxPcreMount()
+    {
+        $mux = new Mux;
+        $this->assertEquals(0, $mux->length());
 
-        $submux = new \Pux\Mux;
+        $submux = new Mux;
         $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
-        ok($submux);
+        $submux->any('/goodbye', array( 'GoodbyeController2','indexAction' ));
+
         ok($routes = $submux->getRoutes());
-        is(1, $submux->length());
-        is(0, $mux->length());
+        $this->assertEquals(2, $submux->length());
+
         $mux->mount( '/sub/:country' , $submux);
-        $r = $mux->dispatch('/sub/UK/hello/John');
-        ok($r);
-        $this->assertPcreRoute($r, '/sub/:country/hello/:name');
+
+        $this->assertEquals(1, $mux->length());
+
+        $route = $mux->dispatch('/sub/UK/goodbye');
+        $this->assertNotNull($route);
+        // $this->assertPcreRoute($r, '/hello/:name');
     }
 
     public function testSubmuxPcreMountStaticSub() {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        is(0, $mux->length());
+        $mux = new Mux;
+        $this->assertEquals(0, $mux->length());
 
         $submux = new \Pux\Mux;
         $submux->any('/hello/there', array('HelloController2', 'indexAction'));
-        ok($submux);
+
         ok($routes = $submux->getRoutes());
-        is(1, $submux->length());
-        is(0, $mux->length());
+        $this->assertEquals(1, $submux->length());
+        $this->assertEquals(0, $mux->length());
+
         $mux->mount('/sub/:country', $submux);
         $r = $mux->dispatch('/sub/UK/hello/there');
-        ok($r);
-        $this->assertPcreRoute($r, '/sub/:country/hello/there');
+        $this->assertNonPcreRoute($r, '/hello/there');
     }
 
     public function testCallableSubMux() {
@@ -139,60 +140,67 @@ class MuxMountTest extends MuxTestCase
             $submux->any('/hello/:name', array('HelloController2', 'indexAction'));
         });
 
-        ok($mux);
-
         ok($routes = $mux->getRoutes());
         ok(is_array($routes));
-        count_ok(2, $routes);
-
-        ok($routes[0][1] == '/test/hello/static');
-        ok($routes[1][1] == '#^    /test/hello
-    /(?P<name>[^/]+?)
-$#xs');
+        $this->assertCount(1, $routes);
+        $this->assertEquals('/test', $routes[0][1]);
 
         $r = $mux->dispatch('/test/hello/John');
-        ok($r);
-        $this->assertPcreRoute($r, '/test/hello/:name');
+        $this->assertNotEmpty($r);
+        $this->assertPcreRoute($r, '/hello/:name');
 
         $r = $mux->dispatch('/test/hello/static');
-        $this->assertNonPcreRoute($r, '/test/hello/static');
+        $this->assertNotEmpty($r);
+        $this->assertNonPcreRoute($r, '/hello/static');
     }
 
     public function testSubmuxMergeOptions()
     {
-        $mux = new \Pux\Mux;
-        ok($mux);
-        is(0, $mux->length());
+        $mux = new Mux;
+        $this->assertEquals(0, $mux->length());
 
-        $submux = new \Pux\Mux;
-        $submux->any('/foo', array( 'HelloController2', 'indexAction' ), array(
-            'default' => array('suffix' => 'csv'),
+        $submux = new Mux;
+        $submux->any('/foo', array( 'FooController', 'indexAction' ), array(
+            'default' => array(
+                'suffix' => 'csv',
+            ),
         ));
-        $submux->any('/hello/:name', array( 'HelloController2', 'indexAction' ), array(
-            'default' => array('suffix' => 'json')
+        $submux->any('/hello/:name', array( 'HelloController', 'indexAction' ), array(
+            'default' => array(
+                'suffix' => 'json',
+                'prefix' => 'v1',
+            ),
         ));
-        ok($submux);
+        $this->assertEquals(2, $submux->length());
+
+
         ok($routes = $submux->getRoutes());
-        is(2, $submux->length());
-        is(0, $mux->length());
-        $mux->mount( '/sub', $submux, array(
+        $this->assertEquals(2, $submux->length());
+        $this->assertEquals(0, $mux->length());
+
+        // XXX: we don't expand routes now, so we won't have the default
+        //      options for the subroutes...
+        /*
+        $mux->mount('/sub', $submux, array(
             'default' => array('suffix' => 'xml', 'prefix' => 'v1'),
             'require' => array('suffix' => '[a-z]{3,4}')
         ));
-        is(2, $mux->length());
+        */
+        $mux->mount('/sub', $submux);
+
+        $this->assertEquals(1, $mux->length());
 
         $r = $mux->dispatch('/sub/hello/John');
-        ok($r);
-        ok($r[3]['default']['suffix'] == 'json');
-        ok($r[3]['default']['prefix'] == 'v1');
-        ok($r[3]['require']['suffix'] == '[a-z]{3,4}');
-        $this->assertPcreRoute($r, '/sub/hello/:name');
+        $this->assertNotNull($r);
+
+        $this->assertEquals('json', $r[3]['default']['suffix']);
+        $this->assertEquals('v1', $r[3]['default']['prefix']);
+        $this->assertPcreRoute($r, '/hello/:name');
 
         $r = $mux->dispatch('/sub/foo');
-        ok($r);
-        ok($r[3]['default']['suffix'] == 'csv');
-        ok($r[3]['default']['prefix'] == 'v1');
-        ok($r[3]['require']['suffix'] == '[a-z]{3,4}');
-        $this->assertNonPcreRoute($r, '/sub/foo');
+        $this->assertNotNull($r);
+        // ok($r[3]['default']['suffix'] == 'csv');
+        // ok($r[3]['require']['suffix'] == '[a-z]{3,4}');
+        $this->assertNonPcreRoute($r, '/foo');
     }
 }

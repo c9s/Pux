@@ -4,6 +4,38 @@ use Pux\PatternCompiler;
 class PatternCompilerTest extends PHPUnit_Framework_TestCase
 {
 
+    public function testCompiledPatternWithPostSeparator()
+    {
+        $route = PatternCompiler::compile('/blog/:year-:month', array());
+        $this->assertNotEmpty($route);
+        $this->assertTrue(is_array($route));
+        $this->assertEquals(1, preg_match($route['compiled'] , '/blog/2013-09', $matches));
+        $this->assertEquals('2013', $matches['year']);
+        $this->assertEquals('09', $matches['month']);
+    }
+
+    public function testRESTfulPatternWithoutFormat()
+    {
+        $route = PatternCompiler::compile('/blog/:id(.:format)', array());
+        $this->assertNotEmpty($route);
+        $this->assertTrue(is_array($route));
+
+        $this->assertEquals(1, preg_match($route['compiled'] , '/blog/3', $matches));
+        $this->assertEquals('3', $matches['id']);
+        $this->assertFalse(isset($matches['json']));
+    }
+
+    public function testRESTfulPatternWithOptionalFormat()
+    {
+        $route = PatternCompiler::compile('/blog/:id(.:format)', array());
+        $this->assertNotEmpty($route);
+        $this->assertTrue(is_array($route));
+        $this->assertEquals(1, preg_match($route['compiled'] , '/blog/3314.json', $matches));
+        $this->assertEquals('3314', $matches['id']);
+        $this->assertEquals('json', $matches['format']);
+    }
+
+
     public function testOptional()
     {
         $route = PatternCompiler::compile('/blog/:id(.:format)', array( 
@@ -12,15 +44,15 @@ class PatternCompilerTest extends PHPUnit_Framework_TestCase
             )
         ));
 
-        ok( is_array($route) );
+        $this->assertTrue( is_array($route) );
 
         ok( $route['variables'] );
-        ok( in_array('format',$route['variables'] ) );
-        ok( in_array('id',$route['variables'] ) );
+        $this->assertTrue( in_array('format',$route['variables'] ) );
+        $this->assertTrue( in_array('id',$route['variables'] ) );
 
         ok( preg_match( $route['compiled'] , '/blog/23.json', $matched ) );
-        is( '23'   , $matched['id'] );
-        is( 'json' , $matched['format'] );
+        $this->assertEquals('23'   , $matched['id']);
+        $this->assertEquals('json' , $matched['format'] );
 
         ok( preg_match( $route['compiled'] , '/blog/31.xml', $matched ) );
         is( '31'  , $matched['id'] );
@@ -62,8 +94,8 @@ class PatternCompilerTest extends PHPUnit_Framework_TestCase
     {
         $route = PatternCompiler::compile('/blog/:year/:month');
         $pattern = '#^    /blog
-    /(?P<year>[^/]+?)
-    /(?P<month>[^/]+?)
+    /(?P<year>[^/]+)
+    /(?P<month>[^/]+)
 $#xs';
         is($pattern,$route['compiled']);
     }
