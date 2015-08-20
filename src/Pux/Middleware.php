@@ -31,10 +31,7 @@ class Middleware
 
     public function __invoke(array $environment, array $response)
     {
-        if ($n = $this->next) {
-            return $n($environment, $response);
-        }
-        return $response;
+        return $this->call($environment, $response);
     }
     
 }

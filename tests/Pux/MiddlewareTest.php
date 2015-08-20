@@ -1,6 +1,7 @@
 <?php
 use Pux\Middleware;
 use Pux\RouteRequest;
+use Pux\Testing\Utils;
 
 class TryCatchMiddleware extends Middleware
 {
@@ -16,28 +17,7 @@ class TryCatchMiddleware extends Middleware
         }
         return $response;
     }
-
 }
-
-/**
- * createGlobals helps you define a global object for testing
- */
-function createGlobals($method, $requestUri, $pathInfo = '')
-{
-    return [  
-        '_SERVER' => [ 
-            'REQUEST_METHOD' => $method,
-            'REQUEST_URI' => $requestUri,
-            'PATH_INFO' => $pathInfo,
-        ],
-        '_REQUEST' => [  ],
-        '_POST' => [  ],
-        '_GET' => [  ],
-        '_ENV' => [  ],
-        '_COOKIE' => [  ],
-    ];
-}
-
 
 class MiddlewareTest extends PHPUnit_Framework_TestCase
 {
@@ -54,7 +34,7 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
         
 
         // $request = RouteRequest::create('GET', '/path');
-        $env = createGlobals('GET', '/foo');
+        $env = Utils::createGlobals('GET', '/foo');
         $response = $middleware2($env, [200, [], []]);
         $this->assertNotEmpty($response);
     }

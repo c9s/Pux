@@ -13,6 +13,7 @@
         "corneltek/codegen": "^2"
     },
     "require-dev": {
+        "willdurand/negotiation": "^1.4",
         "corneltek/phpunit-testmore": "dev-master",
         "corneltek/lazyrecord": "dev-master"
     },
