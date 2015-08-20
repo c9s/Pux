@@ -14,6 +14,16 @@ use Universal\Http\Request;
 class RouteRequest implements RouteRequestMatcher
 {
 
+    static $httpHeaderMapping = array(
+        'HTTP_ACCEPT'          => 'Accept',
+        'HTTP_ACCEPT_CHARSET'  => 'Accept-Charset',
+        'HTTP_ACCEPT_ENCODING' => 'Accept-Encoding',
+        'HTTP_ACCEPT_LANGUAGE' => 'Accept-Language',
+        'HTTP_CONNECTION'      => 'Connection',
+        'HTTP_HOST'            => 'Host',
+        'HTTP_REFERER'         => 'Referer',
+        'HTTP_USER_AGENT'      => 'User-Agent',
+    );
 
     /**
      * @var array $headers
@@ -230,11 +240,10 @@ class RouteRequest implements RouteRequestMatcher
     public static function createHeadersFromServerGlobal($server)
     {
         $headers = array();
-        foreach ($server as $key => $value) { 
-            // we only convert the fields that are with HTTP_ prefix
-            if (substr($key, 0, 5) == 'HTTP_') { 
-                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))))] = $value; 
-            } 
+        foreach (self::$httpHeaderMapping as $serverKey => $headerKey) {
+            if (isset($server[$serverKey])) {
+                $headers[$headerKey] = $server[$serverKey];
+            }
         }
         return $headers;
     }
