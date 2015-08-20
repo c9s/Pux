@@ -5,11 +5,19 @@ CHANGELOG
 
 - Added corneltek/universal package.
 - Added Pux/RouteRequest class for dispatching routes with request constraints.
-- Disabled `Mux->expand` property to enhance submux dispatching.
-- Fixed pattern compiler for post-separators.
 - Added Middleware design
 - Added GeocoderMiddleware
 - Added ContentNegotiationMiddleware
+
+Fixes:
+
+- Fixed pattern compiler for post-separators. e.g. `/:year-:month` or `/blog/:id(.:format)`
+
+Deprecation:
+
+- Disabled `Mux->expand` property to enhance submux dispatching.
+
+
 
 ### Version 1.5.0
 
