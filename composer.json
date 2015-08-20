@@ -15,7 +15,8 @@
     "require-dev": {
         "willdurand/negotiation": "^1.4",
         "corneltek/phpunit-testmore": "dev-master",
-        "corneltek/lazyrecord": "dev-master"
+        "corneltek/lazyrecord": "dev-master",
+        "willdurand/geocoder": "^3.1"
     },
     "autoload": {
         "psr-4": {
