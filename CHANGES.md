@@ -7,6 +7,9 @@ CHANGELOG
 - Added Pux/RouteRequest class for dispatching routes with request constraints.
 - Disabled `Mux->expand` property to enhance submux dispatching.
 - Fixed pattern compiler for post-separators.
+- Added Middleware design
+- Added GeocoderMiddleware
+- Added ContentNegotiationMiddleware
 
 ### Version 1.5.0
 
