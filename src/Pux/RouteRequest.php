@@ -291,6 +291,12 @@ class RouteRequest implements RouteRequestMatcher
      */
     public static function createFromGlobals($path, array $globals)
     {
+        // cache
+        if (isset($globals['__request_object'])) {
+            return $globals['__request_object'];
+        }
+
+
         $request = new self($globals['_SERVER']['REQUEST_METHOD'], $path);
 
         if (function_exists('getallheaders')) {
@@ -305,7 +311,7 @@ class RouteRequest implements RouteRequestMatcher
         $request->queryParameters  = $globals['_GET'];
         $request->bodyParameters   = $globals['_POST'];
         $request->cookies          = $globals['_COOKIE'];
-        return $request;
+        return $globals['__request_object'] = $request;
     }
 }
 
