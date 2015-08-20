@@ -5,7 +5,7 @@ use Geocoder\Geocoder;
 use Geocoder\Provider\FreeGeoIp;
 use Ivory\HttpAdapter\CurlHttpAdapter;
 
-class GeoIPMiddleware extends Middleware
+class GeocoderMiddleware extends Middleware
 {
     protected $geocoder;
 
