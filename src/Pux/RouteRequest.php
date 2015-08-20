@@ -227,10 +227,10 @@ class RouteRequest implements RouteRequestMatcher
      *
      * @return array
      */
-    public static function createHeadersFromServerGlobal()
+    public static function createHeadersFromServerGlobal($server)
     {
         $headers = array();
-        foreach ($_SERVER as $key => $value) { 
+        foreach ($server as $key => $value) { 
             // we only convert the fields that are with HTTP_ prefix
             if (substr($key, 0, 5) == 'HTTP_') { 
                 $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))))] = $value; 
@@ -239,35 +239,72 @@ class RouteRequest implements RouteRequestMatcher
         return $headers;
     }
 
+    /**
+     * @param string $path The path argument is separated from environment
+     *                     because we might want to use specific path from REQUEST_URI or
+     *                     PATH_INFO
+     *
+     * @param array $environment The environment variable
+     */
+    public static function createFromEnvironment($path, array $environment, array $queryParameters = array(), array $bodyParameters = array())
+    {
+        $requestMethod = $environment['REQUEST_METHOD'];
+        // $pathInfo = $environment['PATH_INFO'];
+    }
+
 
     /**
-     * Create global objects
+     * A helper function for creating request object based on request method and request uri
+     *
+     * @param string $method
+     * @param string $path
+     * @param array $headers The headers will be built on $_SERVER if the argument is null.
+     *
+     * @return RouteRequest
      */
-    public static function createFromGlobals($method, $path)
+    public static function create($method, $path, array $headers = null, array $queryParameters = array(), array $bodyParameters = array(), array $cookies = array())
     {
         $request = new self($method, $path);
+
+        if ($headers) {
+            $request->headers = $headers;
+        } else {
+            if (function_exists('getallheaders')) {
+                $request->headers = getallheaders();
+            } else {
+                // TODO: filter array keys by their prefix, consider adding an extension function for this.
+                $request->headers = self::createHeadersFromServerGlobal($_SERVER);
+            }
+        }
+        if (isset($_SERVER)) {
+            $request->serverParameters = $_SERVER;
+        }
+        $request->parameters = array_merge_recursive($queryParameters, $bodyParameters);
+        $request->queryParameters = $queryParameters;
+        $request->bodyParameters = $bodyParameters;
+        $request->cookies = $cookies;
+        return $request;
+    }
+
+    /**
+     * Create request object from global variables
+     */
+    public static function createFromGlobals($path, array $globals)
+    {
+        $request = new self($globals['_SERVER']['REQUEST_METHOD'], $path);
 
         if (function_exists('getallheaders')) {
             $request->headers = getallheaders();
         } else {
             // TODO: filter array keys by their prefix, consider adding an extension function for this.
-            $request->headers = self::createHeadersFromServerGlobal();
+            $request->headers = self::createHeadersFromServerGlobal($globals['_SERVER']);
         }
-        if (isset($_SERVER)) {
-            $request->serverParameters = $_SERVER;
-        }
-        if (isset($_REQUEST)) {
-            $request->parameters = $_REQUEST;
-        }
-        if (isset($_GET)) {
-            $request->queryParameters = $_GET;
-        }
-        if (isset($_POST)) {
-            $request->bodyParameters = $_POST;
-        }
-        if (isset($_COOKIE)) {
-            $request->cookies = $_COOKIE;
-        }
+
+        $request->serverParameters = $globals['_SERVER'];
+        $request->parameters       = $globals['_REQUEST'];
+        $request->queryParameters  = $globals['_GET'];
+        $request->bodyParameters   = $globals['_POST'];
+        $request->cookies          = $globals['_COOKIE'];
         return $request;
     }
 }

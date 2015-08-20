@@ -22,6 +22,9 @@ class MuxDispatchTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/edit/:id', $route[3]['pattern']);
     }
 
+
+
+
     /*
     public function testMiddleware()
     {
