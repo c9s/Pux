@@ -4,9 +4,17 @@ use Pux\RouteRequest;
 
 class TryCatchMiddleware extends Middleware
 {
-    public function call($env, $res)
+    public function call(array $environment, array $response)
     {
-        return $res;
+        try {
+            if ($n = $this->next) {
+                $response = $n($environment, $response);
+            }
+            // $res = $next($env, $res);
+        } catch (Exception $e) {
+
+        }
+        return $response;
     }
 
 }
@@ -42,10 +50,12 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
         };
 
         $middleware = new TryCatchMiddleware($app);
+        $middleware2 = new TryCatchMiddleware($middleware);
+        
 
         // $request = RouteRequest::create('GET', '/path');
         $env = createGlobals('GET', '/foo');
-        $response = $middleware($env, [200, [], []]);
+        $response = $middleware2($env, [200, [], []]);
         $this->assertNotEmpty($response);
     }
 }
