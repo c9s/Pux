@@ -26,6 +26,9 @@ class Middleware
      */
     public function call(array $environment, array $response)
     {
+        if ($n = $this->next) {
+            return $n($environment, $response);
+        }
         return $response;
     }
 
