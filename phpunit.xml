@@ -10,6 +10,10 @@
        <exclude>tests/ExtensionOnly</exclude>
     </testsuite>
 
+    <testsuite name="Middleware">
+       <directory suffix="Test.php">tests/Middleware</directory>
+    </testsuite>
+
     <testsuite name="Mux">
       <file>tests/Pux/MuxTest.php</file>
       <file>tests/Pux/BasicMuxTest.php</file>

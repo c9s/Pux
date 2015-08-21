@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 echo "Basic testing..."
-phpunit --tap --testsuite PP --debug || exit 1
-
+phpunit --tap --testsuite All --debug || exit 1
 # echo "Stress testing..."
 # phpunit --tap --testsuite PP --repeat 100 || exit 1
