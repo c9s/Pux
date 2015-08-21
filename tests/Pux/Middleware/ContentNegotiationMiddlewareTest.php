@@ -12,11 +12,11 @@ class ContentNegotiationMiddlewareTest extends PHPUnit_Framework_TestCase
             $testing->assertEquals('text/html', $environment['request.best_format']->getValue());
         };
 
-        $globals = Utils::createGlobals('GET', '/');
-        $globals['_SERVER']['HTTP_ACCEPT'] = 'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8';
-        $globals['negotiation.priorities'] = array('text/html', 'application/json');
+        $env = Utils::createEnv('GET', '/');
+        $env['HTTP_ACCEPT'] = 'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8';
+        $env['negotiation.priorities'] = array('text/html', 'application/json');
         $m = new ContentNegotiationMiddleware($app, new Negotiator);
-        $response = $m->call($globals, []);
+        $response = $m->call($env, []);
     }
 }
 

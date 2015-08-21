@@ -17,7 +17,7 @@ class ContentNegotiationMiddleware extends Middleware
     public function call(array $environment, array $response)
     {
         $n = $this->next;
-        $accept = isset($environment['_SERVER']['HTTP_ACCEPT']) ? $environment['_SERVER']['HTTP_ACCEPT'] : '';
+        $accept = isset($environment['HTTP_ACCEPT']) ? $environment['HTTP_ACCEPT'] : '';
         $priorities = isset($environment['negotiation.priorities']) ? $environment['negotiation.priorities'] : array();
         $environment['request.best_format'] = $this->negotiator->getBest($accept, $priorities);
         return $n($environment, $response);

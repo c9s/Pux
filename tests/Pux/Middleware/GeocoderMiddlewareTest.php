@@ -22,9 +22,9 @@ class GeocoderMiddlewareTest extends PHPUnit_Framework_TestCase
         $adapter = new FileGetContentsHttpAdapter();
         $geocoder = new FreeGeoIp($adapter);
         $middleware = new GeocoderMiddleware($app, $geocoder);
-        $globals = Utils::createGlobals('GET', '/');
-        $globals['_SERVER']['REMOTE_ADDR'] = '173.194.72.113';
-        $middleware($globals, []);
+        $env = Utils::createEnv('GET', '/');
+        $env['REMOTE_ADDR'] = '173.194.72.113';
+        $middleware($env, []);
     }
 }
 

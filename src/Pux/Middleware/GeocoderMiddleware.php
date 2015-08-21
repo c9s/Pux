@@ -26,8 +26,8 @@ class GeocoderMiddleware extends Middleware
 
     public function call(array $environment, array $response)
     {
-        if (isset($environment['_SERVER']['REMOTE_ADDR'])) {
-            $results = $this->geocoder->geocode($environment['_SERVER']['REMOTE_ADDR']);
+        if (isset($environment['REMOTE_ADDR'])) {
+            $results = $this->geocoder->geocode($environment['REMOTE_ADDR']);
             if ($countryCode = $results->get(0)->getCountryCode()) {
                 $environment['geoip.country_code'] = $countryCode;
             }

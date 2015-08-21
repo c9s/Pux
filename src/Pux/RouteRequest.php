@@ -15,14 +15,16 @@ class RouteRequest implements RouteRequestMatcher
 {
 
     static $httpHeaderMapping = array(
-        'HTTP_ACCEPT'          => 'Accept',
-        'HTTP_ACCEPT_CHARSET'  => 'Accept-Charset',
-        'HTTP_ACCEPT_ENCODING' => 'Accept-Encoding',
-        'HTTP_ACCEPT_LANGUAGE' => 'Accept-Language',
-        'HTTP_CONNECTION'      => 'Connection',
-        'HTTP_HOST'            => 'Host',
-        'HTTP_REFERER'         => 'Referer',
-        'HTTP_USER_AGENT'      => 'User-Agent',
+        'HTTP_ACCEPT'                    => 'Accept',
+        'HTTP_ACCEPT_CHARSET'            => 'Accept-Charset',
+        'HTTP_ACCEPT_ENCODING'           => 'Accept-Encoding',
+        'HTTP_ACCEPT_LANGUAGE'           => 'Accept-Language',
+        'HTTP_CONNECTION'                => 'Connection',
+        'HTTP_CACHE_CONTROL'             => 'Cache-Control',
+        'HTTP_UPGRADE_INSECURE_REQUESTS' => 'Upgrade-Insecure-Requests',
+        'HTTP_HOST'                      => 'Host',
+        'HTTP_REFERER'                   => 'Referer',
+        'HTTP_USER_AGENT'                => 'User-Agent',
     );
 
     /**
@@ -237,7 +239,7 @@ class RouteRequest implements RouteRequestMatcher
      *
      * @return array
      */
-    public static function createHeadersFromServerGlobal($server)
+    public static function createHeadersFromServerGlobal(array $server)
     {
         $headers = array();
         foreach (self::$httpHeaderMapping as $serverKey => $headerKey) {
@@ -245,22 +247,18 @@ class RouteRequest implements RouteRequestMatcher
                 $headers[$headerKey] = $server[$serverKey];
             }
         }
+        // For extra http header fields
+        foreach ($server as $key => $value) {
+            if (isset(self::$httpHeaderMapping[$key])) {
+                continue;
+            }
+            if ('HTTP_' === substr($key,0,5)) {
+                $headerField = join('-',array_map('ucfirst',explode('_', strtolower(substr($key,5)))));
+                $headers[$headerField] = $value;
+            }
+        }
         return $headers;
     }
-
-    /**
-     * @param string $path The path argument is separated from environment
-     *                     because we might want to use specific path from REQUEST_URI or
-     *                     PATH_INFO
-     *
-     * @param array $environment The environment variable
-     */
-    public static function createFromEnvironment($path, array $environment, array $queryParameters = array(), array $bodyParameters = array())
-    {
-        $requestMethod = $environment['REQUEST_METHOD'];
-        // $pathInfo = $environment['PATH_INFO'];
-    }
-
 
     /**
      * A helper function for creating request object based on request method and request uri
@@ -271,27 +269,24 @@ class RouteRequest implements RouteRequestMatcher
      *
      * @return RouteRequest
      */
-    public static function create($method, $path, array $headers = null, array $queryParameters = array(), array $bodyParameters = array(), array $cookies = array())
+    public static function create($method, $path, array $env = array())
     {
         $request = new self($method, $path);
 
-        if ($headers) {
-            $request->headers = $headers;
+        if (function_exists('getallheaders')) {
+            $request->headers = getallheaders();
         } else {
-            if (function_exists('getallheaders')) {
-                $request->headers = getallheaders();
-            } else {
-                // TODO: filter array keys by their prefix, consider adding an extension function for this.
-                $request->headers = self::createHeadersFromServerGlobal($_SERVER);
-            }
+            // TODO: filter array keys by their prefix, consider adding an extension function for this.
+            $request->headers = self::createHeadersFromServerGlobal($env);
         }
-        if (isset($_SERVER)) {
-            $request->serverParameters = $_SERVER;
+
+        if (isset($env)) {
+            $request->serverParameters = $env;
         }
-        $request->parameters = array_merge_recursive($queryParameters, $bodyParameters);
-        $request->queryParameters = $queryParameters;
-        $request->bodyParameters = $bodyParameters;
-        $request->cookies = $cookies;
+        $request->parameters = isset($env['_REQUEST']) ? $env['_REQUEST'] : array();
+        $request->queryParameters = isset($env['_GET']) ? $env['_GET'] : array();
+        $request->bodyParameters = isset($env['_POST']) ? $env['_POST'] : array();
+        $request->cookies = isset($env['_COOKIE']) ? $env['_COOKIE'] : array();
         return $request;
     }
 
@@ -305,14 +300,13 @@ class RouteRequest implements RouteRequestMatcher
             return $globals['__request_object'];
         }
 
-
-        $request = new self($globals['_SERVER']['REQUEST_METHOD'], $path);
+        $request = new self($globals['REQUEST_METHOD'], $path);
 
         if (function_exists('getallheaders')) {
             $request->headers = getallheaders();
         } else {
             // TODO: filter array keys by their prefix, consider adding an extension function for this.
-            $request->headers = self::createHeadersFromServerGlobal($globals['_SERVER']);
+            $request->headers = self::createHeadersFromServerGlobal($globals);
         }
 
         $request->serverParameters = $globals['_SERVER'];
