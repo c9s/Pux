@@ -1,6 +1,7 @@
 <?php
 namespace Pux;
 use ReflectionClass;
+use Closure;
 
 class Compositor
 {
@@ -10,9 +11,13 @@ class Compositor
 
     public function enable($appClass)
     {
-        $args = func_get_args();
-        array_shift($args);
-        $this->stacks[] = [$appClass, $args];
+        if ($appClass instanceof Closure) {
+            $this->stacks[] = $appClass;
+        } else {
+            $args = func_get_args();
+            array_shift($args);
+            $this->stacks[] = [$appClass, $args];
+        }
         return $this;
     }
 
@@ -27,10 +32,19 @@ class Compositor
         $app = $this->app;
 
         for ($i = count($this->stacks) - 1; $i > 0; $i--) {
-            list($appClass, $args) = $this->stacks[$i];
-            $refClass = new ReflectionClass($appClass);
-            array_unshift($args, $app);
-            $app = $refClass->newInstanceArgs($args);
+            $stack = $this->stacks[$i];
+
+
+            // middleware closure
+            if ($stack instanceof Closure) {
+                $app = $stack($app);
+            } else {
+                list($appClass, $args) = $stack;
+                $refClass = new ReflectionClass($appClass);
+                array_unshift($args, $app);
+                $app = $refClass->newInstanceArgs($args);
+            }
+
         }
         return $app;
     }
