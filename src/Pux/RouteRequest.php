@@ -1,6 +1,7 @@
 <?php
+
 namespace Pux;
-use Pux\RouteRequestMatcher;
+
 use Universal\Http\HttpRequest;
 
 /**
@@ -14,17 +15,14 @@ use Universal\Http\HttpRequest;
 class RouteRequest extends HttpRequest implements RouteRequestMatcher
 {
     /**
-     * @var array $headers
+     * @var array
      */
     protected $headers = array();
 
-
-    
     /**
      * @var string request method
      */
     public $requestMethod;
-
 
     /**
      * @var string request path
@@ -32,7 +30,6 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     public $path;
 
     /**
-     *
      * @param string $requestMethod
      * @param string $path
      */
@@ -53,8 +50,6 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     }
 
     /**
-     *
-     *
      * @param contraints[]
      */
     public function matchConstraints(array $constraints)
@@ -87,15 +82,14 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
             }
             // try next one
         }
+
         return false;
     }
 
-
-    public function queryStringMatch($pattern, array & $matches = array())
+    public function queryStringMatch($pattern, array &$matches = array())
     {
-        return preg_match($pattern, $this->serverParameters['QUERY_STRING'], $matches) !== FALSE;
+        return preg_match($pattern, $this->serverParameters['QUERY_STRING'], $matches) !== false;
     }
-
 
     public function portEqual($port)
     {
@@ -104,12 +98,12 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         }
     }
 
-
     /**
      * Check if the request host is in the list of host.
      *
      * @param array $hosts
-     * @return boolean
+     *
+     * @return bool
      */
     public function isOneOfHosts(array $hosts)
     {
@@ -118,20 +112,20 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
                 return true;
             }
         }
+
         return false;
     }
 
-
-
     public function pathLike($path)
     {
-        $pattern = '#'. preg_quote($path, '#') . '#i';
-        return preg_match($pattern, $this->path) !== FALSE;
+        $pattern = '#'.preg_quote($path, '#').'#i';
+
+        return preg_match($pattern, $this->path) !== false;
     }
 
-    public function pathMatch($pattern, array & $matches = array())
+    public function pathMatch($pattern, array &$matches = array())
     {
-        return preg_match($pattern, $this->path, $matches) !== FALSE;
+        return preg_match($pattern, $this->path, $matches) !== false;
     }
 
     public function pathEqual($path)
@@ -141,7 +135,7 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
 
     public function pathContain($path)
     {
-        return strpos($this->path, $path) !== FALSE;
+        return strpos($this->path, $path) !== false;
     }
 
     public function pathStartWith($path)
@@ -152,14 +146,14 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     public function pathEndWith($suffix)
     {
         $p = strrpos($this->path, $suffix);
+
         return ($p == strlen($this->path) - strlen($suffix));
     }
 
-
-    public function hostMatch($host, array & $matches = array())
+    public function hostMatch($host, array &$matches = array())
     {
         if (isset($this->serverParameters['HTTP_HOST'])) {
-            return preg_match($host, $this->serverParameters['HTTP_HOST'], $matches) !== FALSE;
+            return preg_match($host, $this->serverParameters['HTTP_HOST'], $matches) !== false;
         }
         // the HTTP HOST is not defined.
         return false;
@@ -170,9 +164,9 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         if (isset($this->serverParameters['HTTP_HOST'])) {
             return strcasecmp($this->serverParameters['HTTP_HOST'], $host) === 0;
         }
+
         return false;
     }
-
 
     /**
      * requestMethodEqual does not use PCRE pattern to match request method.
@@ -185,11 +179,11 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     }
 
     /**
-     * A helper function for creating request object based on request method and request uri
+     * A helper function for creating request object based on request method and request uri.
      *
      * @param string $method
      * @param string $path
-     * @param array $headers The headers will be built on $_SERVER if the argument is null.
+     * @param array  $headers The headers will be built on $_SERVER if the argument is null.
      *
      * @return RouteRequest
      */
@@ -214,11 +208,12 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         $request->bodyParameters = isset($env['_POST']) ? $env['_POST'] : array();
         $request->cookieParameters = isset($env['_COOKIE']) ? $env['_COOKIE'] : array();
         $request->sessionParameters = isset($env['_SESSION']) ? $env['_SESSION'] : array();
+
         return $request;
     }
 
     /**
-     * Create request object from global variables
+     * Create request object from global variables.
      */
     public static function createFromEnv(array $env)
     {
@@ -229,11 +224,11 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
 
         if (isset($env['PATH_INFO'])) {
             $path = $env['PATH_INFO'];
-        } else if (isset($env['REQUEST_URI'])) {
+        } elseif (isset($env['REQUEST_URI'])) {
             $path = $env['REQUEST_URI'];
-        } else if (isset($env['_SERVER']['PATH_INFO'])) {
+        } elseif (isset($env['_SERVER']['PATH_INFO'])) {
             $path = $env['_SERVER']['PATH_INFO'];
-        } else if (isset($env['_SERVER']['REQUEST_URI'])) {
+        } elseif (isset($env['_SERVER']['REQUEST_URI'])) {
             $path = $env['_SERVER']['REQUEST_URI'];
         } else {
             // XXX: check path or throw exception
@@ -253,15 +248,13 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
             $request->headers = self::createHeadersFromServerGlobal($env);
         }
 
-        $request->serverParameters  = $env['_SERVER'];
-        $request->parameters        = $env['_REQUEST'];
-        $request->queryParameters   = $env['_GET'];
-        $request->bodyParameters    = $env['_POST'];
-        $request->cookieParameters  = $env['_COOKIE'];
+        $request->serverParameters = $env['_SERVER'];
+        $request->parameters = $env['_REQUEST'];
+        $request->queryParameters = $env['_GET'];
+        $request->bodyParameters = $env['_POST'];
+        $request->cookieParameters = $env['_COOKIE'];
         $request->sessionParameters = $env['_SESSION'];
+
         return $env['__request_object'] = $request;
     }
 }
-
-
-
