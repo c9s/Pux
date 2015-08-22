@@ -61,24 +61,24 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     {
         foreach ($constraints as $constraint) {
             $result = true;
-            if (isset($constraints['host_like'])) {
-                $result = $result && $this->matchHost($constraints['host_like']);
+            if (isset($constraints['host_match'])) {
+                $result = $result && $this->hostMatch($constraints['host_match']);
             }
 
             if (isset($constraints['host'])) {
-                $result = $result && $this->equalsHost($constraints['host']);
+                $result = $result && $this->hostEqual($constraints['host']);
             }
 
             if (isset($constraints['request_method'])) {
-                $result = $result && $this->matchRequestMethod($constraints['request_method']);
+                $result = $result && $this->requestMethodEqual($constraints['request_method']);
             }
 
-            if (isset($constraints['path_like'])) {
-                $result = $result && $this->matchPath($constraints['path_like']);
+            if (isset($constraints['path_match'])) {
+                $result = $result && $this->pathMatch($constraints['path_match']);
             }
 
             if (isset($constraints['path'])) {
-                $result = $result && $this->equalsPath($constraints['path']);
+                $result = $result && $this->pathEqual($constraints['path']);
             }
 
             // If it matches all constraints, we simply return true and skip other constraints
@@ -91,25 +91,13 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     }
 
 
-    public function containsPath($path)
-    {
-        return strpos($this->path, $path) !== FALSE;
-    }
-
-
-    public function matchPathSuffix($suffix)
-    {
-        $p = strrpos($this->path, $suffix);
-        return ($p == strlen($this->path) - strlen($suffix));
-    }
-
-    public function matchQueryString($pattern, & $matches = array())
+    public function queryStringMatch($pattern, array & $matches = array())
     {
         return preg_match($pattern, $this->serverParameters['QUERY_STRING'], $matches) !== FALSE;
     }
 
 
-    public function equalsPort($port)
+    public function portEqual($port)
     {
         if (isset($this->serverParameters['SERVER_PORT'])) {
             return intval($this->serverParameters['SERVER_PORT']) == intval($port);
@@ -134,26 +122,41 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     }
 
 
-    public function equalsHost($host)
+
+    public function pathLike($path)
     {
-        if (isset($this->serverParameters['HTTP_HOST'])) {
-            return strcasecmp($this->serverParameters['HTTP_HOST'], $host) === 0;
-        }
-        return false;
+        $pattern = '#'. preg_quote($path, '#') . '#i';
+        return preg_match($pattern, $this->path) !== FALSE;
     }
 
-    public function equalsPath($path)
-    {
-        return strcasecmp($this->path, $path) === 0;
-    }
-
-
-    public function matchPath($pattern, & $matches = array())
+    public function pathMatch($pattern, array & $matches = array())
     {
         return preg_match($pattern, $this->path, $matches) !== FALSE;
     }
 
-    public function matchHost($host, & $matches = array())
+    public function pathEqual($path)
+    {
+        return strcasecmp($path, $this->path) === 0;
+    }
+
+    public function pathContain($path)
+    {
+        return strpos($this->path, $path) !== FALSE;
+    }
+
+    public function pathStartWith($path)
+    {
+        return strpos($this->path, $path) === 0;
+    }
+
+    public function pathEndWith($suffix)
+    {
+        $p = strrpos($this->path, $suffix);
+        return ($p == strlen($this->path) - strlen($suffix));
+    }
+
+
+    public function hostMatch($host, array & $matches = array())
     {
         if (isset($this->serverParameters['HTTP_HOST'])) {
             return preg_match($host, $this->serverParameters['HTTP_HOST'], $matches) !== FALSE;
@@ -162,17 +165,24 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         return false;
     }
 
-    /**
-     * matchRequestMethod does not use PCRE pattern to match request method.
-     *
-     * @param string $requestMethod
-     */
-    public function matchRequestMethod($requestMethod)
+    public function hostEqual($host)
     {
-        return strcasecmp($this->requestMethod, $requestMethod) === 0;
+        if (isset($this->serverParameters['HTTP_HOST'])) {
+            return strcasecmp($this->serverParameters['HTTP_HOST'], $host) === 0;
+        }
+        return false;
     }
 
 
+    /**
+     * requestMethodEqual does not use PCRE pattern to match request method.
+     *
+     * @param string $requestMethod
+     */
+    public function requestMethodEqual($requestMethod)
+    {
+        return strcasecmp($this->requestMethod, $requestMethod) === 0;
+    }
 
     /**
      * A helper function for creating request object based on request method and request uri

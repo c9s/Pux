@@ -13,32 +13,32 @@ class RouteRequestTest extends PHPUnit_Framework_TestCase
     {
         $request = RouteRequest::create('GET', '/foo/bar');
         $this->assertNotNull($request);
-        $this->assertTrue($request->matchPath('#^/foo#'));
+        $this->assertTrue($request->pathLike('/foo'));
     }
 
     public function testRequestMethodConstraint()
     {
         $request = RouteRequest::create('GET', '/foo/bar');
         $this->assertNotNull($request);
-        $this->assertTrue($request->matchRequestMethod('GET'));
-        $this->assertFalse($request->matchRequestMethod('POST'));
+        $this->assertTrue($request->requestMethodEqual('GET'));
+        $this->assertFalse($request->requestMethodEqual('POST'));
     }
 
-    public function testContainsPath()
+    public function testPathContains()
     {
         $request = RouteRequest::create('GET', '/foo/bar');
         $this->assertNotNull($request);
-        $this->assertTrue( $request->containsPath('/foo') );
-        $this->assertTrue( $request->containsPath('/bar') );
+        $this->assertTrue( $request->pathContain('/foo') );
+        $this->assertTrue( $request->pathContain('/bar') );
     }
 
     public function testMatchPathSuffix()
     {
         $request = RouteRequest::create('GET', '/foo/bar.json');
         $this->assertNotNull($request);
-        $this->assertTrue( $request->matchPathSuffix('.json') );
-        $this->assertFalse( $request->matchPathSuffix('.js') );
-        $this->assertFalse( $request->matchPathSuffix('.xml') );
+        $this->assertTrue( $request->pathEndWith('.json') );
+        $this->assertFalse( $request->pathEndWith('.js') );
+        $this->assertFalse( $request->pathEndWith('.xml') );
     }
 
 

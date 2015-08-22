@@ -15,6 +15,13 @@ class CompositorTest extends PHPUnit_Framework_TestCase
 
         $compositor->app(function(array $environment, array $response) {
             $request = RouteRequest::createFromEnv($environment);
+
+            /*
+            if ($request->matchPath('/foo')) {
+
+            }
+            */
+
             $response[0] = 200;
             return $response;
         });
