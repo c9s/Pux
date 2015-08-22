@@ -22,13 +22,13 @@ class PatternCompiler
      * @param string $pattern
      * @param array $options
      */
-    static function compilePattern($pattern, $options = array() ) 
+    static function compilePattern($pattern, array $options = array())
     {
 
         $len = strlen($pattern);
         /**
          * contains:
-         *   
+         *
          *   array( 'text', $text ),
          *   array( 'variable', $match[0][0][0], $regexp, $var);
          *
@@ -50,13 +50,12 @@ class PatternCompiler
          *          '/:month',   (reg exp token)
          *      ]
          */
-        $matches = self::splitTokens( $pattern );
+        $matches = self::splitTokens($pattern);
 
 
         // build tokens
-        foreach ($matches as $match) {
+        foreach ($matches as $matchIdx => $match) {
             // match[0][1] // matched position for pattern.
-
 
             /*
              * Split tokens from abstract pattern
@@ -67,14 +66,37 @@ class PatternCompiler
             }
 
             // the first char from pattern (which is the seperater)
+            // and the first char from the next match pattern
             $seps = array($pattern[$pos]);
+
+
+            // collect the separator tokens from the next matched pattern
+            if (isset($matches[$matchIdx + 1])) {
+                $nextMatch = $matches[$matchIdx + 1];
+
+                // check if the next pattern is an optional pattern
+                if ($nextMatch[0][0][0] === '(') {
+
+                    $r = self::compilePattern($nextMatch[2][0] ,array());
+                    if (isset($r['tokens'][0][1])) {
+                        $seps[] = $r['tokens'][0][1][0];
+                    }
+
+                } else if ($nextMatch[0][0][0] === ':') { // variable token
+
+                } else {
+                    $seps[] = $nextMatch[0][0][0];
+                }
+            }
+
+
             $pos = $match[0][1] + strlen($match[0][0]);
 
 
             // generate optional pattern recursively
-            if( $match[0][0][0] == '(' ) {
+            if ($match[0][0][0] == '(' ){
                 $optional = $match[2][0];
-                $subroute = self::compilePattern($optional,array(
+                $subroute = self::compilePattern($optional ,array(
                     'default'   => isset($options['default']) ? $options['default'] : null,
                     'require'   => isset($options['require']) ? $options['require'] : null,
                     'variables' => isset($options['variables']) ? $options['variables'] : null,
@@ -100,7 +122,7 @@ class PatternCompiler
                         $seps[] = $pattern[$pos];
                     }
                     // use the default pattern (which is based on the separater charactors we got)
-                    $regexp = sprintf('[^%s]+?', preg_quote(implode('', array_unique($seps)), '#'));
+                    $regexp = sprintf('[^%s]+', preg_quote(implode('', array_unique($seps)), '#'));
                 }
 
                 // append token item
@@ -220,7 +242,7 @@ class PatternCompiler
      *
      * @return array compiled route info, with newly added 'compiled' key.
      */
-    static function compile($pattern, $options = array())
+    static function compile($pattern, array $options = array())
     {
         $route = self::compilePattern($pattern, $options);
 
@@ -228,6 +250,17 @@ class PatternCompiler
         $route['compiled'] = sprintf("#^%s$#xs", $route['regex']);
         $route['pattern'] = $pattern; // save pattern
         return $route;
+    }
+
+    static function compilePrefix($pattern, array $options = array())
+    {
+        $route = self::compilePattern($pattern, $options);
+
+        // save compiled pattern
+        $route['compiled'] = sprintf("#^%s#xs", $route['regex']);
+        $route['pattern'] = $pattern; // save pattern
+        return $route;
+
     }
 }
 

@@ -1,11 +1,10 @@
 <?php
-use Pux\Mux;
-use Pux\Executor;
+use Pux\Controller\RESTfulController;
 use Pux\Controller;
+use Pux\Mux;
 
-class ProductResourceController extends Controller { 
-
-
+class ProductResourceController extends RESTfulController
+{
     /**
      * @Method("POST")
      * @Route("");
@@ -42,33 +41,33 @@ class ProductResourceController extends Controller {
 
 class RESTfulControllerTest extends PHPUnit_Framework_TestCase
 {
-    public function test()
+    public function testRESTfulDispatch()
     {
         $con = new ProductResourceController;
-        ok($con);
         $routes = $con->getActionRoutes();
-        ok($routes);
+        $this->assertNotEmpty($routes);
+        $this->assertTrue(is_array($routes));
 
         $methods = $con->getActionMethods();
-        ok($methods);
+        $this->assertNotEmpty($methods);
         $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.
-        ok($productMux);
+        $this->assertNotEmpty($productMux);
 
         $root = new Mux;
-        ok($root);
-        $root->mount('/product', $con->expand() );
+        $root->mount('/product', $con->expand());
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        ok( $root->dispatch('/product/10') );
+        $this->assertNotNull($root->dispatch('/product/10'));
 
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        ok( $root->dispatch('/product/10') );
+        $this->assertNotNull( $root->dispatch('/product/10') );
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        ok( $root->dispatch('/product') ); // create
+        $this->assertNotNull( $root->dispatch('/product') ); // create
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        ok( $root->dispatch('/product/10') ); // update
+        $this->assertNotNull( $root->dispatch('/product/10') ); // update
+        
     }
 }
 

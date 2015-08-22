@@ -1,6 +1,6 @@
 Pux
 =============
-Pux is a high performance PHP router.
+Pux is a simple & fast PHP router.
 
 Pux is 48.5x faster than symfony router in static route dispatching, 31x faster in regular expression dispatching. (with pux extension installed)
 
@@ -11,9 +11,16 @@ Symfony/Routing, although the RouteCompiler of Symfony/Routing caches the
 compiled patterns, but there are still a lot of function call and class
 loading from your application code. however, function calls are pretty slow in PHP). 
 
-<!--
-[![Build Status](https://travis-ci.org/c9s/Pux.png?branch=master)](https://travis-ci.org/c9s/Pux)
--->
+[![Build Status](https://travis-ci.org/c9s/Pux.svg?branch=master)](https://travis-ci.org/c9s/Pux)
+
+[![Latest Stable Version](https://poser.pugx.org/corneltek/pux/v/stable)](https://packagist.org/packages/corneltek/pux) 
+
+[![Total Downloads](https://poser.pugx.org/corneltek/pux/downloads)](https://packagist.org/packages/corneltek/pux) 
+
+[![Latest Unstable Version](https://poser.pugx.org/corneltek/pux/v/unstable)](https://packagist.org/packages/corneltek/pux) 
+
+[![License](https://poser.pugx.org/corneltek/pux/license)](https://packagist.org/packages/corneltek/pux)
+
 
 Why It's Faster
 ---------------

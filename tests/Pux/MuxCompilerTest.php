@@ -26,31 +26,29 @@ class MuxCompilerTest extends MuxTestCase
 
         $compiler->compileReflectionParameters();
 
-        ok( $compiler->compile("merged_mux.php") );
-
+        $compiler->compile("merged_mux.php");
 
         path_ok( "merged_mux.php" );
 
         $mux = require "merged_mux.php";
-        ok($mux);
+        $this->assertNotNull($mux);
 
         $routes = $mux->getRoutes();
-        ok($routes);
+        $this->assertNotNull($routes);
 
+        $this->assertCount(2, $routes);
 
-        count_ok(2, $routes);
-
-        ok( $mux->dispatch('/hello/John') );
-        ok( $mux->dispatch('/bye/John') );
+        $this->assertNotNull($mux->dispatch('/hello/John'));
+        $this->assertNotNull( $mux->dispatch('/bye/John') );
 
         unlink("merged_mux.php");
         unlink("hello_mux.php");
         unlink("bye_mux.php");
     }
 
-    public function testMuxCompile() {
-        $mux = new \Pux\Mux;
-        ok($mux);
+    public function testMuxCompile()
+    {
+        $mux = new Mux;
         $mux->add('/product/:id', array( 'ProductController','itemAction' ));
         $mux->add('/product', array( 'ProductController','listAction' ));
         $mux->add('/foo', array( 'ProductController','fooAction' ));
@@ -61,21 +59,21 @@ class MuxCompilerTest extends MuxTestCase
         ok($ret, "compile successfully");
 
         $newMux = require "_test_mux.php";
-        ok($newMux);
+        $this->assertNotNull($newMux);
 
-        ok( $r = $newMux->dispatch("/foo") );
+        $this->assertNotNull( $r = $newMux->dispatch("/foo") );
         $this->assertNonPcreRoute($r, "/foo");
 
-        ok( $r = $newMux->dispatch("/product") );
+        $this->assertNotNull( $r = $newMux->dispatch("/product") );
         $this->assertNonPcreRoute($r, "/product");
 
-        ok( $r = $newMux->dispatch('/') );
+        $this->assertNotNull( $r = $newMux->dispatch('/') );
         $this->assertNonPcreRoute($r, '/');
 
-        ok( $r = $newMux->dispatch('/bar') );
+        $this->assertNotNull( $r = $newMux->dispatch('/bar') );
         $this->assertNonPcreRoute($r, '/bar');
 
-        ok( $r = $newMux->dispatch('/product/10') );
+        $this->assertNotNull( $r = $newMux->dispatch('/product/10') );
         $this->assertPcreRoute($r, '/product/:id');
     }
 

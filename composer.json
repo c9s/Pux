@@ -1,5 +1,5 @@
 {
-    "name": "corneltek\/pux",
+    "name": "corneltek/pux",
     "description": "Fast PHP router",
     "authors": [
         {
@@ -7,15 +7,18 @@
             "email": "cornelius.howl@gmail.com"
         }
     ],
+    "require": {
+        "corneltek/cliframework": "^2",
+        "corneltek/universal": "^1.5",
+        "corneltek/codegen": "^2"
+    },
     "require-dev": {
-        "corneltek\/phpunit-testmore": "dev-master",
-        "corneltek\/cliframework": "dev-master",
-        "corneltek\/universal": "dev-master"
+        "corneltek/phpunit-testmore": "dev-master",
+        "corneltek/lazyrecord": "dev-master"
     },
     "autoload": {
-        "psr-0": {
-            "Pux": "src"
+        "psr-4": {
+            "Pux\\": "src/Pux/"
         }
-    },
-    "version": "1.5.2"
+    }
 }

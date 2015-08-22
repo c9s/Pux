@@ -5,9 +5,14 @@ use ReflectionObject;
 use ReflectionMethod;
 use Pux\Mux;
 
-class Controller {
+class Controller
+{
 
-    protected function parseMethodAnnotation($method) {
+    /**
+     * @return array Annotation info
+     */
+    protected function parseMethodAnnotation($method)
+    {
 
         $annotations = array();
         $doc = $method->getDocComment();
@@ -22,7 +27,8 @@ class Controller {
         return $annotations;
     }
 
-    protected function parseMethods($refObject, & $args, $parent = 0) {
+    protected function parseMethods(ReflectionClass $refObject, & $args, $parent = 0)
+    {
         if ($pClassRef = $refObject->getParentClass()) {
             $this->parseMethods($pClassRef, $args, 1);
         }
@@ -47,15 +53,26 @@ class Controller {
     }
 
 
-
-    public function getActionMethods() {
-        $refObject = new ReflectionObject($this);
+    public function getActionMethods()
+    {
+        $refObject = new ReflectionClass($this);
         $args = array();
         $this->parseMethods($refObject, $args, 0);
         return $args;
     }
 
-    protected function translatePath($methodName) {
+    /**
+     * Translate action method name into route path
+     *
+     * Upper case letters will be translated into slash + lower letter, e.g.
+     *
+     *      pageUpdateAction => /page/update
+     *      fooAction => /foo
+     *
+     * @return string path
+     */
+    protected function translatePath($methodName)
+    {
         $methodName = preg_replace('/Action$/', '', $methodName);
         return '/' . preg_replace_callback('/[A-Z]/', function($matches) {
             return '/' . strtolower($matches[0]);
@@ -66,8 +83,10 @@ class Controller {
     /**
      * Return [["/path", "testAction", [ "method" => ... ] ],...]
      *
+     * @return array returns routes array
      */
-    public function getActionRoutes() {
+    public function getActionRoutes()
+    {
         $pairs          = array();
         $actions    = $this->getActionMethods();
 
@@ -96,19 +115,24 @@ class Controller {
         return $pairs;
     }
 
-    public function expand() {
+    /**
+     * Expand controller actions into Mux object
+     *
+     * @return Mux
+     */
+    public function expand()
+    {
         $mux    = new Mux();
         $paths  = $this->getActionRoutes();
-        
         foreach ($paths as $path) {
             $mux->add($path[0], array(get_class($this), $path[1]), $path[2]);
         }
-
         $mux->sort();
         return $mux;
     }
 
-    public function toJson($data) {
+    public function toJson($data)
+    {
         return json_encode($data);
     }
 
