@@ -14,6 +14,9 @@ class Utils
         $env['_REQUEST'] = array();
         $env['_GET']     = array();
         $env['_COOKIE']     = array();
+        $env['_SESSION']     = array();
+        // fallback (backware compatible for $GLOBALS)
+        $env['_SERVER']     = array();
         return $env;
     }
 
@@ -25,6 +28,7 @@ class Utils
         $env['_POST']    = $env['pux.body_parameters']  = $globals['_POST'];
         $env['_GET']     = $env['pux.query_parameters'] = $globals['_GET'];
         $env['_COOKIE']  = $env['pux.cookies'] = $globals['_COOKIE'];
+        $env['_SESSION']  = $env['pux.session'] = $globals['_SESSION'];
         return $env;
     }
 
@@ -43,7 +47,8 @@ class Utils
             '_POST' => [  ],
             '_GET' => [  ],
             '_ENV' => [  ],
-            '_COOKIE' => [  ],
+            '_COOKIE' => [],
+            '_SESSION' => [],
         ];
     }
 }

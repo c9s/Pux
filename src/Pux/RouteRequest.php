@@ -210,28 +210,46 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     /**
      * Create request object from global variables
      */
-    public static function createFromGlobals($path, array $globals)
+    public static function createFromEnv(array $env)
     {
         // cache
-        if (isset($globals['__request_object'])) {
-            return $globals['__request_object'];
+        if (isset($env['__request_object'])) {
+            return $env['__request_object'];
         }
 
-        $request = new self($globals['REQUEST_METHOD'], $path);
+        if (isset($env['PATH_INFO'])) {
+            $path = $env['PATH_INFO'];
+        } else if (isset($env['REQUEST_URI'])) {
+            $path = $env['REQUEST_URI'];
+        } else if (isset($env['_SERVER']['PATH_INFO'])) {
+            $path = $env['_SERVER']['PATH_INFO'];
+        } else if (isset($env['_SERVER']['REQUEST_URI'])) {
+            $path = $env['_SERVER']['REQUEST_URI'];
+        } else {
+            // XXX: check path or throw exception
+            $path = '/';
+        }
+
+        $requestMethod = 'GET';
+        if (isset($env['REQUEST_METHOD'])) {
+            $requestMethod = $env['REQUEST_METHOD'];
+        }
+
+        $request = new self($requestMethod, $path);
         if (function_exists('getallheaders')) {
             $request->headers = getallheaders();
         } else {
             // TODO: filter array keys by their prefix, consider adding an extension function for this.
-            $request->headers = self::createHeadersFromServerGlobal($globals);
+            $request->headers = self::createHeadersFromServerGlobal($env);
         }
 
-        $request->serverParameters  = $globals['_SERVER'];
-        $request->parameters        = $globals['_REQUEST'];
-        $request->queryParameters   = $globals['_GET'];
-        $request->bodyParameters    = $globals['_POST'];
-        $request->cookieParameters  = $globals['_COOKIE'];
-        $request->sessionParameters = $globals['_SESSION'];
-        return $globals['__request_object'] = $request;
+        $request->serverParameters  = $env['_SERVER'];
+        $request->parameters        = $env['_REQUEST'];
+        $request->queryParameters   = $env['_GET'];
+        $request->bodyParameters    = $env['_POST'];
+        $request->cookieParameters  = $env['_COOKIE'];
+        $request->sessionParameters = $env['_SESSION'];
+        return $env['__request_object'] = $request;
     }
 }
 
