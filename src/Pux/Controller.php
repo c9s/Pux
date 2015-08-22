@@ -1,4 +1,5 @@
 <?php
+
 namespace Pux;
 
 use ReflectionClass;
@@ -13,8 +14,7 @@ class Controller
     protected function parseMethodAnnotation($method)
     {
         $annotations = array();
-        $doc = $method->getDocComment();
-        if ($doc) {
+        if ($doc = $method->getDocComment()) {
             if (preg_match('/^[\s*]*\@Method\("(get|put|post|delete|head|patch|options)"\)/im', $doc, $regs)) {
                 $annotations['Method'] = $regs[1];
             }
@@ -56,6 +56,7 @@ class Controller
         $refObject = new ReflectionClass($this);
         $args = array();
         $this->parseMethods($refObject, $args, 0);
+
         return $args;
     }
 
@@ -85,7 +86,7 @@ class Controller
      */
     public function getActionRoutes()
     {
-        $pairs = array();
+        $routes = array();
         $actions = $this->getActionMethods();
 
         foreach ($actions as $actionName => $actionInfo) {
@@ -101,21 +102,21 @@ class Controller
                 }
             }
 
-            $pair = array($path, $actionName);
+            $route = array($path, $actionName);
 
             if (isset($annotations['Method'])) {
-                $pair[] = array('method' => Mux::getRequestMethodConstant($annotations['Method']));
+                $route[] = array('method' => Mux::getRequestMethodConstant($annotations['Method']));
             } else {
-                $pair[] = array();
+                $route[] = array();
             }
-            $pairs[] = $pair;
+            $routes[] = $route;
         }
 
-        return $pairs;
+        return $routes;
     }
 
     /**
-     * Expand controller actions into Mux object.
+     * Expand controller actions to Mux object.
      *
      * @return Mux
      */
