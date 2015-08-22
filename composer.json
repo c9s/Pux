@@ -9,7 +9,7 @@
     ],
     "require": {
         "corneltek/cliframework": "^2",
-        "corneltek/universal": "^1.5",
+        "corneltek/universal": "dev-master as 1.5",
         "corneltek/codegen": "^2"
     },
     "require-dev": {

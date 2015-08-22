@@ -1,7 +1,7 @@
 <?php
 namespace Pux;
 use Pux\RouteRequestMatcher;
-use Universal\Http\Request;
+use Universal\Http\HttpRequest;
 
 /**
  * RouteRequest defines request information for routing.
@@ -11,22 +11,8 @@ use Universal\Http\Request;
  *
  * TODO: extends from Universal\Http\Request
  */
-class RouteRequest implements RouteRequestMatcher
+class RouteRequest extends HttpRequest implements RouteRequestMatcher
 {
-
-    static $httpHeaderMapping = array(
-        'HTTP_ACCEPT'                    => 'Accept',
-        'HTTP_ACCEPT_CHARSET'            => 'Accept-Charset',
-        'HTTP_ACCEPT_ENCODING'           => 'Accept-Encoding',
-        'HTTP_ACCEPT_LANGUAGE'           => 'Accept-Language',
-        'HTTP_CONNECTION'                => 'Connection',
-        'HTTP_CACHE_CONTROL'             => 'Cache-Control',
-        'HTTP_UPGRADE_INSECURE_REQUESTS' => 'Upgrade-Insecure-Requests',
-        'HTTP_HOST'                      => 'Host',
-        'HTTP_REFERER'                   => 'Referer',
-        'HTTP_USER_AGENT'                => 'User-Agent',
-    );
-
     /**
      * @var array $headers
      */
@@ -46,37 +32,6 @@ class RouteRequest implements RouteRequestMatcher
     public $path;
 
     /**
-     * @var array $server
-     */
-    public $serverParameters = array();
-
-
-    /**
-     * @var array parameters
-     */
-    public $parameters = array();
-
-
-
-    /**
-     * @var array query parameter from $_GET
-     */
-    public $queryParameters = array();
-
-
-    /**
-     * @var array body parameter from $_POST
-     */
-    public $bodyParameters = array();
-
-
-    /**
-     * @var array cookie parameters
-     */
-    public $cookies = array();
-
-
-    /**
      *
      * @param string $requestMethod
      * @param string $path
@@ -87,7 +42,6 @@ class RouteRequest implements RouteRequestMatcher
         $this->path = $path;
     }
 
-
     public function getPath()
     {
         return $this->path;
@@ -96,21 +50,6 @@ class RouteRequest implements RouteRequestMatcher
     public function getRequestMethod()
     {
         return $this->requestMethod;
-    }
-
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
-
-    public function getQueryParameters()
-    {
-        return $this->queryParameters;
-    }
-
-    public function getBodyParameters()
-    {
-        return $this->bodyParameters;
     }
 
     /**
@@ -234,31 +173,6 @@ class RouteRequest implements RouteRequestMatcher
     }
 
 
-    /**
-     * Converts global $_SERVER variables to header values.
-     *
-     * @return array
-     */
-    public static function createHeadersFromServerGlobal(array $server)
-    {
-        $headers = array();
-        foreach (self::$httpHeaderMapping as $serverKey => $headerKey) {
-            if (isset($server[$serverKey])) {
-                $headers[$headerKey] = $server[$serverKey];
-            }
-        }
-        // For extra http header fields
-        foreach ($server as $key => $value) {
-            if (isset(self::$httpHeaderMapping[$key])) {
-                continue;
-            }
-            if ('HTTP_' === substr($key,0,5)) {
-                $headerField = join('-',array_map('ucfirst',explode('_', strtolower(substr($key,5)))));
-                $headers[$headerField] = $value;
-            }
-        }
-        return $headers;
-    }
 
     /**
      * A helper function for creating request object based on request method and request uri
@@ -280,13 +194,16 @@ class RouteRequest implements RouteRequestMatcher
             $request->headers = self::createHeadersFromServerGlobal($env);
         }
 
-        if (isset($env)) {
+        if (isset($env['_SERVER'])) {
+            $request->serverParameters = $env['_SERVER'];
+        } else {
             $request->serverParameters = $env;
         }
         $request->parameters = isset($env['_REQUEST']) ? $env['_REQUEST'] : array();
         $request->queryParameters = isset($env['_GET']) ? $env['_GET'] : array();
         $request->bodyParameters = isset($env['_POST']) ? $env['_POST'] : array();
-        $request->cookies = isset($env['_COOKIE']) ? $env['_COOKIE'] : array();
+        $request->cookieParameters = isset($env['_COOKIE']) ? $env['_COOKIE'] : array();
+        $request->sessionParameters = isset($env['_SESSION']) ? $env['_SESSION'] : array();
         return $request;
     }
 
@@ -301,7 +218,6 @@ class RouteRequest implements RouteRequestMatcher
         }
 
         $request = new self($globals['REQUEST_METHOD'], $path);
-
         if (function_exists('getallheaders')) {
             $request->headers = getallheaders();
         } else {
@@ -309,11 +225,12 @@ class RouteRequest implements RouteRequestMatcher
             $request->headers = self::createHeadersFromServerGlobal($globals);
         }
 
-        $request->serverParameters = $globals['_SERVER'];
-        $request->parameters       = $globals['_REQUEST'];
-        $request->queryParameters  = $globals['_GET'];
-        $request->bodyParameters   = $globals['_POST'];
-        $request->cookies          = $globals['_COOKIE'];
+        $request->serverParameters  = $globals['_SERVER'];
+        $request->parameters        = $globals['_REQUEST'];
+        $request->queryParameters   = $globals['_GET'];
+        $request->bodyParameters    = $globals['_POST'];
+        $request->cookieParameters  = $globals['_COOKIE'];
+        $request->sessionParameters = $globals['_SESSION'];
         return $globals['__request_object'] = $request;
     }
 }
