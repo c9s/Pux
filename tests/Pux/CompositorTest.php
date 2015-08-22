@@ -5,6 +5,37 @@ use Pux\Testing\Utils;
 
 class CompositorTest extends PHPUnit_Framework_TestCase
 {
+
+    public function testCompositorInvoke()
+    {
+        $compositor = new Compositor;
+        $compositor->enable('Pux\\Middleware\\TryCatchMiddleware', [ 'throw' => true ]);
+        $compositor->enable(function($app) {
+            return function(array $environment, array $response) use ($app) { 
+                $environment['middleware.app'] = true;
+                return $app($environment, $response);
+            };
+        });
+
+        $compositor->app(function(array $environment, array $response) {
+            $request = RouteRequest::createFromEnv($environment);
+
+            // $mux = new Mux;
+
+            if ($request->pathStartWith('/foo')) {
+
+            }
+
+            $response[0] = 200;
+            return $response;
+        });
+
+        $env = Utils::createGlobals('GET', '/foo/bar');
+        $response = $compositor($env, []);
+        $this->assertNotEmpty($response);
+    }
+
+
     public function testCompositor()
     {
         $compositor = new Compositor;
@@ -21,7 +52,6 @@ class CompositorTest extends PHPUnit_Framework_TestCase
 
         $compositor->app(function(array $environment, array $response) {
             $request = RouteRequest::createFromEnv($environment);
-
 
             // $mux = new Mux;
 

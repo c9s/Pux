@@ -48,6 +48,14 @@ class Compositor
         }
         return $app;
     }
+
+
+    public function __invoke(array $environment, array $response)
+    {
+        $app = $this->wrap();
+        return $app($environment, $response);
+    }
+
 }
 
 
