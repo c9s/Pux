@@ -8,7 +8,6 @@
         }
     ],
     "require": {
-        "corneltek/cliframework": "^2",
         "corneltek/universal": "^1.6",
         "corneltek/codegen": "^2"
     },
