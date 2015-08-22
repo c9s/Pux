@@ -26,7 +26,7 @@ class Controller
         return $annotations;
     }
 
-    protected function parseMethods(ReflectionClass $refObject, &$args, $parent = 0)
+    protected function parseMethods(ReflectionClass $refObject, array &$args, $parent = 0)
     {
         if ($pClassRef = $refObject->getParentClass()) {
             $this->parseMethods($pClassRef, $args, 1);
@@ -56,7 +56,6 @@ class Controller
         $refObject = new ReflectionClass($this);
         $args = array();
         $this->parseMethods($refObject, $args, 0);
-
         return $args;
     }
 
