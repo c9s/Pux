@@ -12,13 +12,13 @@ class CompositorTest extends PHPUnit_Framework_TestCase
         $compositor = new Compositor;
         $compositor->enable('Pux\\Middleware\\TryCatchMiddleware', [ 'throw' => true ]);
         $compositor->enable(function($app) {
-            return function(array $environment, array $response) use ($app) { 
+            return function(array & $environment, array $response) use ($app) { 
                 $environment['middleware.app'] = true;
                 return $app($environment, $response);
             };
         });
 
-        $compositor->app(function(array $environment, array $response) {
+        $compositor->app(function(array & $environment, array $response) {
             $request = RouteRequest::createFromEnv($environment);
 
             // $mux = new Mux;
@@ -76,7 +76,7 @@ class CompositorTest extends PHPUnit_Framework_TestCase
         $compositor = new Compositor;
         $compositor->enable('Pux\\Middleware\\TryCatchMiddleware', [ 'throw' => true ]);
         $compositor->enable(function($app) {
-            return function(array $environment, array $response) use ($app) { 
+            return function(array & $environment, array $response) use ($app) { 
                 $environment['middleware.app'] = true;
                 return $app($environment, $response);
             };
@@ -85,7 +85,7 @@ class CompositorTest extends PHPUnit_Framework_TestCase
         // TODO
         // $compositor->mount('/foo', function() {  });
 
-        $compositor->app(function(array $environment, array $response) {
+        $compositor->app(function(array & $environment, array $response) {
             $request = RouteRequest::createFromEnv($environment);
 
             // $mux = new Mux;
