@@ -385,7 +385,7 @@ class Mux implements PathDispatcher
         return $this->routes;
     }
 
-    public function setRoutes($routes)
+    public function setRoutes(array $routes)
     {
         $this->routes = $routes;
     }
@@ -436,7 +436,6 @@ class Mux implements PathDispatcher
             $mux->routesById = $array['routesById'];
         }
         $mux->id = $array['id'];
-
         return $mux;
     }
 }
