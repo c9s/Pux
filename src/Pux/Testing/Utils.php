@@ -21,7 +21,7 @@ class Utils
     }
 
 
-    static public function createEnvFromGlobals()
+    static public function createEnvFromGlobals(array $globals)
     {
         $env = $globals['_SERVER'];
         $env['_REQUEST'] = $env['pux.parameters']       = $globals['_REQUEST'];
