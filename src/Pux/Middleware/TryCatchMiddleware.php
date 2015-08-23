@@ -6,7 +6,8 @@ class TryCatchMiddleware extends Middleware
 {
     protected $options = array();
 
-    public function __construct(callable $app, array $options = array()) {
+    public function __construct(callable $app, array $options = array())
+    {
         parent::__construct($app);
         $this->options = $options;
     }
