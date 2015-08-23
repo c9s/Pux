@@ -214,6 +214,9 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
 
     /**
      * Create request object from global variables.
+     *
+     * @param array $env
+     * @return RouteRequest
      */
     public static function createFromEnv(array $env)
     {
