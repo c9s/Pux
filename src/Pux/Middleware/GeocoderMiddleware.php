@@ -24,7 +24,7 @@ class GeocoderMiddleware extends Middleware
     }
 
 
-    public function call(array $environment, array $response)
+    public function call(array & $environment, array $response)
     {
         if (isset($environment['REMOTE_ADDR'])) {
             $results = $this->geocoder->geocode($environment['REMOTE_ADDR']);

@@ -9,6 +9,8 @@ class Compositor
 
     protected $app;
 
+    protected $mapApp;
+
     public function enable($appClass)
     {
         if ($appClass instanceof Closure) {

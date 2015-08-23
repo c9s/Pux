@@ -12,7 +12,7 @@ class TryCatchMiddleware extends Middleware
     }
 
 
-    public function call(array $environment, array $response)
+    public function call(array & $environment, array $response)
     {
         try {
             return parent::call($environment, $response);

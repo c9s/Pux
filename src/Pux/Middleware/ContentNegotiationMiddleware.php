@@ -14,7 +14,7 @@ class ContentNegotiationMiddleware extends Middleware
         $this->negotiator = $negotiator ?: new Negotiator();
     }
 
-    public function call(array $environment, array $response)
+    public function call(array & $environment, array $response)
     {
         $n = $this->next;
         $accept = isset($environment['HTTP_ACCEPT']) ? $environment['HTTP_ACCEPT'] : '';

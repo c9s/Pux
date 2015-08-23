@@ -24,7 +24,7 @@ class Middleware
      * @param array $response
      * @return array Response array
      */
-    public function call(array $environment, array $response)
+    public function call(array & $environment, array $response)
     {
         if ($n = $this->next) {
             return $n($environment, $response);
@@ -32,7 +32,7 @@ class Middleware
         return $response;
     }
 
-    public function __invoke(array $environment, array $response)
+    public function __invoke(array & $environment, array $response)
     {
         return $this->call($environment, $response);
     }
