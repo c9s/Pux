@@ -479,35 +479,6 @@ $route = $mux->dispatch('/product/1');
 $result = RouteExecutor::execute($route); // returns "Product 1"
 ```
 
-MuxCompiler
---------------------
-
-In your route definition file `hello_routes.php`, you simply return the Mux object at the end of file:
-
-```php
-<?php
-// load your composer autoload if it's needed
-// require '../vendor/autoload.php';
-use Pux\Mux;
-$mux = new Mux;
-$mux->get('/hello', ['HelloController','helloAction']);
-return $mux;
-```
-
-Pux provides a command-line tool for you to compile your route definitions.
-
-    pux compile -o hello_mux.php hello_routes.php
-
-In your application, you may load the compiled mux (router) through only one line:
-
-```php
-<?php
-$mux = require "hello_mux.php";
-$route = $mux->dispatch('/hello');
-```
-
-This can be very very fast if you have pux extension installed.
-
 Dispatching Strategy
 --------------------
 
