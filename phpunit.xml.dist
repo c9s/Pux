@@ -3,8 +3,8 @@
          backupGlobals="true"
          colors="true"
          verbose="true">
-
   <testsuites>
+
     <testsuite name="All">
        <directory suffix="Test.php">tests/Pux</directory>
        <exclude>tests/ExtensionOnly</exclude>
@@ -13,6 +13,25 @@
     <testsuite name="Middleware">
        <directory suffix="Test.php">tests/Middleware</directory>
     </testsuite>
+
+    <testsuite name="Mux">
+      <file>tests/Pux/MuxTest.php</file>
+      <file>tests/Pux/BasicMuxTest.php</file>
+      <file>tests/Pux/MuxExportTest.php</file>
+      <file>tests/Pux/MuxSetStateTest.php</file>
+      <file>tests/Pux/MuxCompilerTest.php</file>
+    </testsuite>
+
+    <testsuite name="SubMux">
+      <file>tests/Pux/MuxMountTest.php</file>
+      <file>tests/Pux/MuxNoExpandMountTest.php</file>
+    </testsuite>
+
+    <testsuite name="Controller">
+      <file>tests/Pux/ControllerAnnotationTest.php</file>
+      <file>tests/Pux/ControllerTest.php</file>
+    </testsuite>
+
   </testsuites>
 
   <logging>
