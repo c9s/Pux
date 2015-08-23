@@ -1,6 +1,6 @@
 <?php
 namespace Pux\App;
-use Pux\Executor;
+use Pux\RouteExecutor;
 use Pux\Mux;
 use Pux\Middleware;
 use Pux\App;
@@ -15,7 +15,14 @@ class MuxApp implements App
         $this->mux = $mux ?: new Mux;
     }
 
-    public function mount($path, $app)
+    /**
+     * Mount app on a specific path
+     *
+     * @param string $path
+     * @param App $app
+     * @return MuxApp
+     */
+    public function mount($path, App $app)
     {
         $this->mux->any($path, $app);
         return $this;
@@ -46,7 +53,7 @@ class MuxApp implements App
 
             } else {
 
-                return Executor::execute($route);
+                return RouteExecutor::execute($route);
 
             }
         }

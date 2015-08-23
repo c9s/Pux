@@ -1,7 +1,7 @@
 <?php
 use Pux\Dispatcher\APCDispatcher;
 use Pux\Mux;
-use Pux\Executor;
+use Pux\RouteExecutor;
 use Pux\Controller;
 
 class ProductResource2Controller extends Controller {

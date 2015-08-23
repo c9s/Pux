@@ -1,7 +1,7 @@
 <?php
 // vim:fdm=marker:
 use Pux\Mux;
-use Pux\Executor;
+use Pux\RouteExecutor;
 use Pux\Controller;
 
 

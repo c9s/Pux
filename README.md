@@ -180,7 +180,7 @@ The routing usage is dead simple:
 
 ```php
 require 'vendor/autoload.php'; // use PCRE patterns you need Pux\PatternCompiler class.
-use Pux\Executor;
+use Pux\RouteExecutor;
 
 class ProductController {
     public function listAction() {
@@ -205,7 +205,7 @@ $mux->delete('/product/:id', ['ProductController','deleteAction'] , [
     'default' => [ 'id' => '1', ]
 ]);
 $route = $mux->dispatch('/product/1');
-Executor::execute($route);
+RouteExecutor::execute($route);
 ```
 
 
@@ -217,7 +217,7 @@ Examples
 ```php
 require 'vendor/autoload.php';
 use Pux\Mux;
-use Pux\Executor;
+use Pux\RouteExecutor;
 $mux = new Mux;
 $mux->get('/get', ['HelloController','helloAction']);
 $mux->post('/post', ['HelloController','helloAction']);
@@ -226,7 +226,7 @@ $mux->put('/put', ['HelloController','helloAction']);
 $mux->mount('/hello', new HelloController);
 
 $route = $mux->dispatch( $_SERVER['PATH_INFO'] );
-echo Executor::execute($route);
+echo RouteExecutor::execute($route);
 ```
 
 ### Through Compiled Mux
@@ -255,7 +255,7 @@ Load the mux object from your application code:
 require 'vendor/autoload.php';
 $mux = require 'mux.php';
 $route = $mux->dispatch( $_SERVER['PATH_INFO'] );
-echo Executor::execute($route);
+echo RouteExecutor::execute($route);
 ```
 
 > Please note that if you need PCRE pattern support for route, you must load `Pux/PatternCompiler.php` before you use.
@@ -441,9 +441,9 @@ will restrict it to the provided method.
   in another instance of `\Pux\Mux`.
 
 
-Route Executor
+Route RouteExecutor
 --------------------
-`Pux\Executor` executes your route by creating the controller object, and
+`Pux\RouteExecutor` executes your route by creating the controller object, and
 calling the controller action method.
 
 Route executor take the returned route as its parameter, you simply pass the
@@ -452,11 +452,11 @@ route to executor the controller and get the execution result.
 Here the simplest example of the usage:
 
 ```php
-use Pux\Executor;
+use Pux\RouteExecutor;
 $mux = new Pux\Mux;
 $mux->any('/product/:id', ['ProductController','itemAction']);
 $route = $mux->dispatch('/product/1');
-$result = Executor::execute($route);
+$result = RouteExecutor::execute($route);
 ```
 
 You can also define the arguments to the controller's constructor method:
@@ -472,13 +472,13 @@ class ProductController extends Pux\Controller {
     }
 }
 
-use Pux\Executor;
+use Pux\RouteExecutor;
 $mux = new Pux\Mux;
 $mux->any('/product/:id', ['ProductController','itemAction'], [ 
     'constructor_args' => [ 'param1', 'param2' ],
 ]);
 $route = $mux->dispatch('/product/1');
-$result = Executor::execute($route); // returns "Product 1"
+$result = RouteExecutor::execute($route); // returns "Product 1"
 ```
 
 MuxCompiler

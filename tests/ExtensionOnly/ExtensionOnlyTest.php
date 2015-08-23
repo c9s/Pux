@@ -1,6 +1,6 @@
 <?php
 use Pux\Mux;
-use Pux\Executor;
+use Pux\RouteExecutor;
 
 class ExtensionOnlyMuxTest extends PHPUnit_Framework_TestCase
 {

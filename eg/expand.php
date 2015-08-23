@@ -3,7 +3,7 @@
 require '../vendor/autoload.php';
 
 use Pux\Controller;
-use Pux\Executor;
+use Pux\RouteExecutor;
 use Pux\Mux;
 use Pux\Router;
 
@@ -31,4 +31,4 @@ $mux = new Mux();
 $mux->mount('/', $controller->expand());
 
 $route = $mux->dispatch($_SERVER['REQUEST_URI']);
-printf("Response: %s\n", Executor::execute($route));
+printf("Response: %s\n", RouteExecutor::execute($route));

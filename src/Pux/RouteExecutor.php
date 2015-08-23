@@ -6,7 +6,7 @@ use Exception;
 use LogicException;
 use ReflectionClass;
 
-class Executor
+class RouteExecutor
 {
     /**
      * Execute the matched route.

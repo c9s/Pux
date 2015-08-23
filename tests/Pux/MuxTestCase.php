@@ -1,6 +1,6 @@
 <?php
 use Pux\Mux;
-use Pux\Executor;
+use Pux\RouteExecutor;
 
 abstract class MuxTestCase extends PHPUnit_Framework_TestCase
 {

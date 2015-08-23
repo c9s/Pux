@@ -3,9 +3,9 @@ require 'PHPUnit/Framework/ExtensionTestCase.php';
 require 'PHPUnit/TestMore.php';
 require '../src/Pux/PatternCompiler.php';
 require '../src/Pux/MuxCompiler.php';
-require '../src/Pux/Executor.php';
+require '../src/Pux/RouteExecutor.php';
 use Pux\Mux;
-use Pux\Executor;
+use Pux\RouteExecutor;
 
 class HelloController
 {

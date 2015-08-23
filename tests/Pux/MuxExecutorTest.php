@@ -1,11 +1,11 @@
 <?php
 use Pux\Mux;
-use Pux\Executor;
+use Pux\RouteExecutor;
 
-class MuxExecutorTest extends MuxTestCase
+class MuxRouteExecutorTest extends MuxTestCase
 {
 
-    public function testExecutor() {
+    public function testRouteExecutor() {
         $mux = new \Pux\Mux;
         ok($mux);
         $mux->add('/hello/:name', array( 'HelloController2','helloAction' ), array(
@@ -18,13 +18,13 @@ class MuxExecutorTest extends MuxTestCase
         $mux->add('/', array( 'ProductController','indexAction' ));
 
         ok( $r = $mux->dispatch('/') );
-        is('index',Executor::execute($r));
+        is('index',RouteExecutor::execute($r));
 
         ok( $r = $mux->dispatch('/foo') );
-        is('foo', Executor::execute($r));
+        is('foo', RouteExecutor::execute($r));
 
         ok( $r = $mux->dispatch('/bar') );
-        is('bar', Executor::execute($r));
+        is('bar', RouteExecutor::execute($r));
 
 
         // XXX: seems like a gc bug here
@@ -33,7 +33,7 @@ class MuxExecutorTest extends MuxTestCase
 
         $cb = function() use ($mux) {
             $r = $mux->dispatch('/product/23');
-            Executor::execute($r);
+            RouteExecutor::execute($r);
         };
         for ( $i = 0 ; $i < 100 ; $i++ ) {
             call_user_func($cb);
@@ -41,11 +41,11 @@ class MuxExecutorTest extends MuxTestCase
 
         for ( $i = 0 ; $i < 100 ; $i++ ) {
             ok( $r = $mux->dispatch('/product/23') );
-            is('product item 23', Executor::execute($r));
+            is('product item 23', RouteExecutor::execute($r));
         }
 
 
         ok( $r = $mux->dispatch('/hello/john') );
-        is('hello john', Executor::execute($r));
+        is('hello john', RouteExecutor::execute($r));
     }
 }

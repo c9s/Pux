@@ -1,6 +1,6 @@
 <?php
 use Pux\Mux;
-use Pux\Executor;
+use Pux\RouteExecutor;
 
 class MuxBasicTest extends PHPUnit_Framework_TestCase
 {
@@ -88,7 +88,7 @@ class MuxBasicTest extends PHPUnit_Framework_TestCase
 
         $route = $mux->dispatch('/hello/show');
         ok($route, 'Found route');
-        $response = Executor::execute($route);
+        $response = RouteExecutor::execute($route);
         is("response", $response);
     }
 
@@ -127,7 +127,7 @@ class MuxBasicTest extends PHPUnit_Framework_TestCase
         ok($route[3]['vars'], 'vars');
         ok($route[3]['vars']['name'], 'vars.name');
 
-        $response = Executor::execute($route);
+        $response = RouteExecutor::execute($route);
         is("Hello John", $response);
 
         if ( file_exists("_cache.php") ) {

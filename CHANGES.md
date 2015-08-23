@@ -9,6 +9,11 @@ CHANGELOG
 - Added GeocoderMiddleware
 - Added ContentNegotiationMiddleware
 
+Incompatible changes:
+
+- Renamed Executor => RouteExecutor
+- Removed expand property
+
 Fixes:
 
 - Fixed pattern compiler for post-separators. e.g. `/:year-:month` or `/blog/:id(.:format)`
