@@ -472,6 +472,34 @@ routes to cache.
 
 Pux uses indexed array as the data structure for storing route information so it's faster.
 
+## Middleware
+
+You can use middleware to wrap your application or your mux logics, here is an
+example of using GeocoderMiddleware to locate the country of an IP address:
+
+```php
+use Pux\Middleware\GeocoderMiddleware;
+
+$app = function(array & $env, array $res) {
+    // $env['geoip.country_code'] == 'US'
+    return $res;
+};
+
+$adapter = new FileGetContentsHttpAdapter();
+$geocoder = new FreeGeoIp($adapter);
+
+// wrap the app with our middleware
+$middleware = new GeocoderMiddleware($app, $geocoder);
+$env = Utils::createEnvFromGlobals();
+
+// write the remote IP address 
+$env['REMOTE_ADDR'] = '173.194.72.113';
+$response = $middleware($env, []);
+```
+
+
+
+
 
 ## Contributing
 
