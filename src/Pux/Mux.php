@@ -1,12 +1,9 @@
 <?php
+
 // vim:et:sw=4:ts=4:sts=4:
 namespace Pux;
-use Pux\PatternCompiler;
-use Pux\Controller;
-use Pux\App;
-use Pux\RouteRequest;
+
 use Closure;
-use Exception;
 use LogicException;
 
 define('REQUEST_METHOD_GET', 1);
@@ -27,7 +24,6 @@ class Mux implements PathDispatcher
 
     public $routesById = array();
 
-
     /**
      * @var Mux[id]
      */
@@ -35,9 +31,8 @@ class Mux implements PathDispatcher
 
     public $id;
 
-
     /**
-     * @var boolean expand routes to parent mux.
+     * @var bool expand routes to parent mux.
      *
      * When expand is enabled, all mounted Mux will expand the routes to the parent mux.
      * This improves the dispatch performance when you have a lot of sub mux to dispatch.
@@ -52,21 +47,23 @@ class Mux implements PathDispatcher
 
     public static $id_counter = 0;
 
-
-    public static function generate_id() {
+    public static function generate_id()
+    {
         return ++static::$id_counter;
     }
 
-    public function getId() {
-        if ( $this->id ) {
+    public function getId()
+    {
+        if ($this->id) {
             return $this->id;
         }
+
         return $this->id = self::generate_id();
     }
 
     public function appendRoute($pattern, $callback, array $options = array())
     {
-        $this->routes[] = array( false, $pattern, $callback, $options );
+        $this->routes[] = array(false, $pattern, $callback, $options);
     }
 
     public function appendPCRERoute(array $routeArgs, $callback)
@@ -82,29 +79,26 @@ class Mux implements PathDispatcher
     /**
      * Mount a Mux or a Controller object on a specific path.
      *
-     * @param string $pattern
+     * @param string         $pattern
      * @param Mux|Controller $mux
-     * @param array $options
+     * @param array          $options
      */
     public function mount($pattern, $mux, array $options = array())
     {
         if ($mux instanceof Controller) {
-
             $mux = $mux->expand();
-
-        } else if ($mux instanceof Closure) {
+        } elseif ($mux instanceof Closure) {
 
             // we pass newly created Mux object to the closure to let it initialize it.
-            if ($ret = $mux($mux = new Mux)) {
-                if ($ret instanceof Mux) {
+            if ($ret = $mux($mux = new self())) {
+                if ($ret instanceof self) {
                     $mux = $ret;
                 } else {
-                    throw new LogicException("Invalid object returned from Closure.");
+                    throw new LogicException('Invalid object returned from Closure.');
                 }
             }
-
-        } else if ((!is_object($mux) || !($mux instanceof Mux)) && is_callable($mux)) {
-            $mux($mux = new Mux());
+        } elseif ((!is_object($mux) || !($mux instanceof self)) && is_callable($mux)) {
+            $mux($mux = new self());
         }
 
         $muxId = $mux->getId();
@@ -164,13 +158,11 @@ class Mux implements PathDispatcher
         $this->add($pattern, $callback, $options);
     }
 
-
     public function head($pattern, $callback, array $options = array())
     {
         $options['method'] = REQUEST_METHOD_HEAD;
         $this->add($pattern, $callback, $options);
     }
-
 
     public function options($pattern, $callback, array $options = array())
     {
@@ -185,33 +177,34 @@ class Mux implements PathDispatcher
 
     public function add($pattern, $callback, array $options = array())
     {
-        if (is_string($callback) && strpos($callback,':') !== false ) {
+        if (is_string($callback) && strpos($callback, ':') !== false) {
             $callback = explode(':', $callback);
         }
 
         // Convert request method constraint to constant if it's passed by string
         if (isset($options['method']) && is_string($options['method'])) {
-            $options['method'] = Mux::getRequestMethodConstant($options['method']);
+            $options['method'] = self::getRequestMethodConstant($options['method']);
         }
 
         // compile place holder to patterns
-        $pcre = strpos($pattern,':') !== false;
+        $pcre = strpos($pattern, ':') !== false;
         if ($pcre) {
             $routeArgs = is_integer($callback)
-                ? PatternCompiler::compilePrefix($pattern, $options) 
+                ? PatternCompiler::compilePrefix($pattern, $options)
                 : PatternCompiler::compile($pattern, $options)
                 ;
 
             // generate a pcre pattern route
-            $route = array( 
+            $route = array(
                 true, // PCRE
                 $routeArgs['compiled'],
                 $callback,
                 $routeArgs,
             );
-            if ( isset($options['id']) ) {
+            if (isset($options['id'])) {
                 $this->routesById[ $options['id'] ] = $route;
             }
+
             return $this->routes[] = $route;
         } else {
             $route = array(
@@ -220,7 +213,7 @@ class Mux implements PathDispatcher
                 $callback,
                 $options,
             );
-            if ( isset($options['id']) ) {
+            if (isset($options['id'])) {
                 $this->routesById[ $options['id'] ] = $route;
             }
             // generate a simple string route.
@@ -228,36 +221,35 @@ class Mux implements PathDispatcher
         }
     }
 
-    public function getRoute($id) {
-        if ( isset($this->routesById[$id]) ) {
+    public function getRoute($id)
+    {
+        if (isset($this->routesById[$id])) {
             return $this->routesById[$id];
         }
-
     }
 
     public function sort()
     {
-        usort($this->routes, array('Pux\\MuxCompiler','sort_routes'));
+        usort($this->routes, array('Pux\\MuxCompiler', 'sort_routes'));
     }
 
-    static public function sort_routes($a, $b)
+    public static function sort_routes($a, $b)
     {
-        if ( $a[0] && $b[0] ) {
+        if ($a[0] && $b[0]) {
             return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
-        } elseif ( $a[0] ) {
+        } elseif ($a[0]) {
             return 1;
-        } elseif ( $b[0] ) {
+        } elseif ($b[0]) {
             return -1;
         }
-        if ( strlen($a[1]) > strlen($b[1]) ) {
+        if (strlen($a[1]) > strlen($b[1])) {
             return 1;
-        } elseif ( strlen($a[1]) == strlen($b[1]) ) {
+        } elseif (strlen($a[1]) == strlen($b[1])) {
             return 0;
         } else {
             return -1;
         }
     }
-
 
     public function compile($outFile, $sortBeforeCompile = true)
     {
@@ -266,13 +258,14 @@ class Mux implements PathDispatcher
             $this->sort();
         }
 
-        $code = '<?php return ' . $this->export() . ';';
+        $code = '<?php return '.$this->export().';';
+
         return file_put_contents($outFile, $code);
     }
 
     public function getSubMux($id)
     {
-        if ( isset($this->submux[ $id ] ) ) {
+        if (isset($this->submux[ $id ])) {
             return $this->submux[ $id ];
         }
     }
@@ -280,32 +273,30 @@ class Mux implements PathDispatcher
     public static function getRequestMethodConstant($method)
     {
         switch (strtoupper($method)) {
-            case "POST":
+            case 'POST':
                 return REQUEST_METHOD_POST;
-            case "GET":
+            case 'GET':
                 return REQUEST_METHOD_GET;
-            case "PUT":
+            case 'PUT':
                 return REQUEST_METHOD_PUT;
-            case "DELETE":
+            case 'DELETE':
                 return REQUEST_METHOD_DELETE;
-            case "PATCH":
+            case 'PATCH':
                 return REQUEST_METHOD_PATCH;
-            case "HEAD":
+            case 'HEAD':
                 return REQUEST_METHOD_HEAD;
-            case "OPTIONS":
+            case 'OPTIONS':
                 return REQUEST_METHOD_OPTIONS;
             default:
                 return 0;
         }
     }
 
-
     /**
      * Try to find a matched route.
      *
-     * @param string $path
+     * @param string       $path
      * @param RouteRequest $request
-     *
      */
     public function match($path, RouteRequest $request = null)
     {
@@ -317,32 +308,40 @@ class Mux implements PathDispatcher
         foreach ($this->routes as $route) {
             // If the route is using pcre pattern marching...
             if ($route[0]) {
-                if (!preg_match($route[1], $path , $matches)) {
+                if (!preg_match($route[1], $path, $matches)) {
                     continue;
                 }
                 $route[3]['vars'] = $matches;
 
                 // validate request method
-                if (isset($route[3]['method']) && $route[3]['method'] != $requestMethod)
+                if (isset($route[3]['method']) && $route[3]['method'] != $requestMethod) {
                     continue;
-                if (isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"])
+                }
+                if (isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER['HTTP_HOST']) {
                     continue;
-                if (isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"])
+                }
+                if (isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER['HTTPS']) {
                     continue;
+                }
+
                 return $route;
             } else {
                 // prefix match is used when expanding is not enabled.
                 if ((
                         (is_int($route[2]) || $route[2] instanceof App)
-                        && strncmp($route[1], $path, strlen($route[1]) ) === 0
+                        && strncmp($route[1], $path, strlen($route[1])) === 0
                     ) || $route[1] == $path) {
                     // validate request method
-                    if ( isset($route[3]['method']) && $route[3]['method'] != $requestMethod )
+                    if (isset($route[3]['method']) && $route[3]['method'] != $requestMethod) {
                         continue;
-                    if ( isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"] )
+                    }
+                    if (isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER['HTTP_HOST']) {
                         continue;
-                    if ( isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"] )
+                    }
+                    if (isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER['HTTPS']) {
                         continue;
+                    }
+
                     return $route;
                 }
                 continue;
@@ -359,16 +358,19 @@ class Mux implements PathDispatcher
 
                 // sub-path and call submux to dispatch
                 // for pcre pattern?
-                if ($route[0]) { 
+                if ($route[0]) {
                     $matchedString = $route[3]['vars'][0];
+
                     return $submux->dispatch(substr($path, strlen($matchedString)));
                 } else {
                     $s = substr($path, strlen($route[1]));
+
                     return $submux->dispatch(
                         substr($path, strlen($route[1])) ?: ''
                     );
                 }
             }
+
             return $route;
         }
     }
@@ -393,16 +395,15 @@ class Mux implements PathDispatcher
         return var_export($this, true);
     }
 
-
     /**
-     * url method generates the related URL for a route
+     * url method generates the related URL for a route.
      *
      * XXX: Untested
      *
      * @see https://github.com/c9s/Pux/issues/4
      *
-     * @param string $id route id
-     * @param array $params the parameters for an url
+     * @param string $id     route id
+     * @param array  $params the parameters for an url
      *
      * @return string
      */
@@ -410,14 +411,14 @@ class Mux implements PathDispatcher
     {
         $route = $this->getRoute($id);
 
-        if (! isset($route)) {
-            throw new \RuntimeException('Named route not found for id: ' . $id);
+        if (!isset($route)) {
+            throw new \RuntimeException('Named route not found for id: '.$id);
         }
 
         $search = array();
         foreach ($params as $key => $value) {
             // try to match ':{key}' fragments and replace it with value
-            $search[] = '#:' . preg_quote($key, '#') . '\+?(?!\w)#';
+            $search[] = '#:'.preg_quote($key, '#').'\+?(?!\w)#';
         }
 
         $pattern = preg_replace($search, $params, $route[3]['pattern']);
@@ -426,19 +427,16 @@ class Mux implements PathDispatcher
         return preg_replace('#\(/?:.+\)|\(|\)|\\\\#', '', $pattern);
     }
 
-
     public static function __set_state($array)
     {
-        $mux = new self;
+        $mux = new self();
         $mux->routes = $array['routes'];
         $mux->submux = $array['submux'];
         if (isset($array['routesById'])) {
             $mux->routesById = $array['routesById'];
         }
         $mux->id = $array['id'];
+
         return $mux;
     }
-
 }
-
-
