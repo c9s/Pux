@@ -4,11 +4,11 @@ namespace Pux\Testing;
 class Utils
 {
 
-    static public function createEnv($method, $requestUri)
+    static public function createEnv($method, $pathInfo)
     {
         $env = [
             'REQUEST_METHOD' => $method,
-            'REQUEST_URI'    => $requestUri,
+            'PATH_INFO'    => $pathInfo,
         ];
         $env['_POST']    = array();
         $env['_REQUEST'] = array();
@@ -35,12 +35,11 @@ class Utils
     /**
     * createGlobals helps you define a global object for testing
     */
-    static public function createGlobals($method, $requestUri, $pathInfo = '')
+    static public function createGlobals($method, $pathInfo)
     {
         return [  
             '_SERVER' => [ 
                 'REQUEST_METHOD' => $method,
-                'REQUEST_URI' => $requestUri,
                 'PATH_INFO' => $pathInfo,
             ],
             '_REQUEST' => [  ],

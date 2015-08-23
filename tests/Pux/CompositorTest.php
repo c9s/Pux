@@ -2,6 +2,7 @@
 use Pux\Compositor;
 use Pux\RouteRequest;
 use Pux\Testing\Utils;
+use Pux\App\MuxApp;
 
 class CompositorTest extends PHPUnit_Framework_TestCase
 {
@@ -30,10 +31,28 @@ class CompositorTest extends PHPUnit_Framework_TestCase
             return $response;
         });
 
-        $env = Utils::createGlobals('GET', '/foo/bar');
+        $env = Utils::createEnv('GET', '/foo/bar');
         $response = $compositor($env, []);
         $this->assertNotEmpty($response);
     }
+
+
+    public function testCompositorWithUrlMap()
+    {
+        $compositor = new Compositor;
+        $compositor->app(MuxApp::mountWithUrlMap([ 
+            "/foo" => ['ProductController', 'fooAction'],
+            "/bar" => ['ProductController', 'barAction'],
+        ]));
+        $app = $compositor->wrap();
+        $this->assertInstanceOf('Pux\\App\\MuxApp', $app,
+            'When there is only one app and no middleware, the returned type should be just MuxApp');
+        $env = Utils::createEnv('GET', '/foo');
+        $response = $app($env, []);
+        $this->assertNotEmpty($response);
+        $this->assertEquals('foo',$response);
+    }
+
 
 
     public function testCompositor()
@@ -64,7 +83,7 @@ class CompositorTest extends PHPUnit_Framework_TestCase
         });
         $app = $compositor->wrap();
 
-        $env = Utils::createGlobals('GET', '/foo');
+        $env = Utils::createEnv('GET', '/foo');
         $res = [  ];
         $res = $app($env, $res);
         $this->assertNotEmpty($res);

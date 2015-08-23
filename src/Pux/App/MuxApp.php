@@ -2,6 +2,7 @@
 namespace Pux\App;
 use Pux\Executor;
 use Pux\Mux;
+use Pux\Middleware;
 
 class MuxApp
 {
@@ -26,11 +27,11 @@ class MuxApp
     public function call(array & $environment, array $response)
     {
         if ($route = $this->mux->dispatch($environment['PATH_INFO'])) {
-            list($pcre, $pattern, $app, $options) = $route;
+            $app = $route[2];
             if ($app instanceof Middleware) { 
                 return $app($environment, $response);
             } else {
-                return Executor::execute($app);
+                return Executor::execute($route);
             }
         }
         return $response;
@@ -41,10 +42,10 @@ class MuxApp
         return $this->call($environment, $response);
     }
 
-    static public function mountWithMap(array $maps)
+    static public function mountWithUrlMap(array $map)
     {
         $mux = new Mux;
-        foreach ($maps as $path => $app) {
+        foreach ($map as $path => $app) {
             $mux->any($path, $app);
         }
         return new self($mux);
