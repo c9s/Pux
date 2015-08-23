@@ -3,6 +3,8 @@
 namespace Pux;
 use Pux\PatternCompiler;
 use Pux\Controller;
+use Pux\App;
+use Pux\RouteRequest;
 use Closure;
 use Exception;
 use LogicException;
@@ -330,7 +332,10 @@ class Mux implements PathDispatcher
                 return $route;
             } else {
                 // prefix match is used when expanding is not enabled.
-                if ((is_int($route[2]) && strncmp($route[1], $path, strlen($route[1]) ) === 0 ) || $route[1] == $path) {
+                if ((
+                        (is_int($route[2]) || $route[2] instanceof App)
+                        && strncmp($route[1], $path, strlen($route[1]) ) === 0
+                    ) || $route[1] == $path) {
                     // validate request method
                     if ( isset($route[3]['method']) && $route[3]['method'] != $requestMethod )
                         continue;
@@ -345,12 +350,12 @@ class Mux implements PathDispatcher
         }
     }
 
-    public function dispatch($path, $request = null)
+    public function dispatch($path, RouteRequest $request = null)
     {
         if ($route = $this->match($path)) {
+            // When the callback is an integer, it's refereing to a submux object.
             if (is_integer($route[2])) {
                 $submux = $this->submux[$route[2]];
-
 
                 // sub-path and call submux to dispatch
                 // for pcre pattern?

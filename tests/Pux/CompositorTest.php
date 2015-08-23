@@ -36,6 +36,22 @@ class CompositorTest extends PHPUnit_Framework_TestCase
         $this->assertNotEmpty($response);
     }
 
+    public function testCompositorWithRecursiveUrlMap()
+    {
+        $appcomp = new Compositor;
+        $appcomp->app(MuxApp::mountWithUrlMap([
+            "/hack" => new Compositor(MuxApp::mountWithUrlMap([ 
+                "/foo" => ['ProductController', 'fooAction'],
+                "/bar" => ['ProductController', 'barAction'],
+            ])),
+        ]));
+        $app = $appcomp->wrap();
+
+        $env = Utils::createEnv('GET', '/hack/foo');
+        $response = $app($env, []);
+        $this->assertNotEmpty($response);
+        $this->assertEquals('foo',$response);
+    }
 
     public function testCompositorWithUrlMap()
     {

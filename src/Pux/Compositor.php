@@ -11,6 +11,11 @@ class Compositor
 
     protected $mapApp;
 
+    public function __construct(callable $app = null)
+    {
+        $this->app = $app;
+    }
+
     public function enable($appClass)
     {
         if ($appClass instanceof Closure) {

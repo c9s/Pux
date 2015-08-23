@@ -3,8 +3,10 @@ namespace Pux\App;
 use Pux\Executor;
 use Pux\Mux;
 use Pux\Middleware;
+use Pux\App;
+use Pux\Compositor;
 
-class MuxApp
+class MuxApp implements App
 {
     protected $mux;
 
@@ -38,12 +40,14 @@ class MuxApp
             }
             $environment['PATH_INFO'] = substr($environment['PATH_INFO'], strlen($path));
 
-            if ($app instanceof Middleware) { 
-
+            if ($app instanceof App || $app instanceof Middleware) { 
 
                 return $app($environment, $response);
+
             } else {
+
                 return Executor::execute($route);
+
             }
         }
         return $response;
@@ -58,6 +62,9 @@ class MuxApp
     {
         $mux = new Mux;
         foreach ($map as $path => $app) {
+            if ($app instanceof Compositor) {
+                $app = $app->wrap();
+            }
             $mux->any($path, $app);
         }
         return new self($mux);
