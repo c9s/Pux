@@ -503,7 +503,22 @@ $response = $middleware($env, []);
 
 ## Contributing
 
-Hacking Pux C extension:
+### Testing XHProf Middleware
+
+
+Define your XHPROF_ROOT in your `phpunit.xml`, you can copy `phpunit.xml.dist` to `phpunit.xml`,
+for example:
+
+```xml
+  <php>
+    <env name="XHPROF_ROOT" value="/Users/c9s/src/php/xhprof"/>
+  </php>
+```
+
+
+
+
+### Hacking Pux C extension
 
 1. Discuss your main idea on GitHub issue page.
 
