@@ -227,37 +227,6 @@ $route = $mux->dispatch( $_SERVER['PATH_INFO'] );
 echo RouteExecutor::execute($route);
 ```
 
-### Through Compiled Mux
-
-Define your routing definition in `routes.php`:
-
-```php
-require 'vendor/autoload.php';
-use Pux\Mux;
-$mux = new Mux;
-$mux->get('/get', ['HelloController','helloAction']);
-return $mux;
-```
-
-Run pux command to compile your routing definition:
-
-```sh
-curl -O https://raw.github.com/c9s/Pux/master/pux
-chmod +x pux
-pux compile -o mux.php routes.php
-```
-
-Load the mux object from your application code:
-
-```php
-require 'vendor/autoload.php';
-$mux = require 'mux.php';
-$route = $mux->dispatch( $_SERVER['PATH_INFO'] );
-echo RouteExecutor::execute($route);
-```
-
-> Please note that if you need PCRE pattern support for route, you must load `Pux/PatternCompiler.php` before you use.
-
 Mux
 -----
 Mux is where you define your routes, and you can mount multiple mux to a parent one.
