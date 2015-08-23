@@ -8,7 +8,7 @@ class ContentNegotiationMiddlewareTest extends PHPUnit_Framework_TestCase
     public function testContentNegotiationMiddleware()
     {
         $testing = $this;
-        $app = function(array $environment, array $response) use ($testing) {
+        $app = function(array & $environment, array $response) use ($testing) {
             $testing->assertEquals('text/html', $environment['request.best_format']->getValue());
         };
 

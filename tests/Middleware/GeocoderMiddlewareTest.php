@@ -13,7 +13,7 @@ class GeocoderMiddlewareTest extends PHPUnit_Framework_TestCase
     public function testGeocoderMiddleware()
     {
         $testing = $this;
-        $app = function($env, $res) use ($testing) {
+        $app = function(array & $env, array $res) use ($testing) {
             $testing->assertEquals('US', $env['geoip.country_code']);
             return $res;
         };
