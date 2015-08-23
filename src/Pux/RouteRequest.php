@@ -10,7 +10,6 @@ use Universal\Http\HttpRequest;
  * You can use RouteRequest's constraint methods to check if a request matches
  * your logics.
  *
- * TODO: extends from Universal\Http\Request
  */
 class RouteRequest extends HttpRequest implements RouteRequestMatcher
 {
