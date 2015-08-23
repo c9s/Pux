@@ -1,7 +1,17 @@
 <?php
 namespace Pux;
+use Pux\App;
 
-class Middleware
+/**
+ *
+ * Middleware is a PHPSGI application (a code reference) and a Server. Middleware
+ * looks like an application when called from a server, and it in turn can call
+ * other applications. It can be thought of a plugin to extend a PHPSGI
+ * application.
+ *
+ *
+ */
+class Middleware implements App
 {
     /**
      * @var Middleware
