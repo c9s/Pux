@@ -49,16 +49,13 @@ Why It's Faster
 
 Why It's Here
 --------------------
-Most of us use a lot of machines to run our applications, however, it uses too much energy and too many resources.
-
-By using Pux, you can also decrease your expense of servers on cloud.
-
-Also we believe that running softwares on slower machines should be easy as possible.
+Most of us use a lot of machines to run our applications, however, it uses too
+much energy and too many resources.
 
 Some people thinks routing is not the bottleneck, the truth is this project
 does not claim routing is the bottleneck.
 
-Actually the bottleneck is always different in different applications, if you
+Actually the "bottleneck" is always different in different applications, if you
 have a lot of heavy db requests, then your bottleneck is your db; if you have a
 lot of complex computation, then the bottleneck should be your algorithm.
 
@@ -68,10 +65,11 @@ pure PHP routing component with some empty callbacks and use apache benchmark
 tool to see how many requests you can handle per second, you will find out the
 routing component consumes a lot of computation time and the request number
 will decrease quite a few. (and it does nothing, all it does is ... just
-routing!)
+routing)
 
-So Pux reduces the overheads of loading PHP classes and the runtime
-method/function calls, and you can run your application faster without the overheads.
+Pux tries to reduce the overheads of loading PHP classes and the runtime
+method/function calls, and you can run your application faster without the
+overheads.
 
 
 Features
@@ -141,7 +139,7 @@ You can install Pux with composer by defining the following requirement in your 
 ```json
 {
     "require": {
-        "corneltek/pux": "~1.5"
+        "corneltek/pux": "^2.0"
     }
 }
 ```
@@ -533,116 +531,6 @@ matching so it sorts patterns by pattern length in descending order before compi
 routes to cache.
 
 Pux uses indexed array as the data structure for storing route information so it's faster.
-
-
-
-## Benchmarks
-
-Testing with route dispatch only. (no controller)
-
-Hardware:
-
-- iMac Mid 2011
-- Processor  2.5 GHz Intel Core i5
-- Memory  12 GB 1333 MHz DDR3
-- Software  OS X 10.9.1 (13B42)
-
-Environment:
-
-- PHP 5.5.6 + APC
-
-
-### Dispatch Speed
-
-With one static route:
-
-    n=10000
-    Running pux extension (dispatch) - . 97487.768426386/s
-    Running symfony/routing (dispatch) - . 2456.3512428418/s
-    
-                                    Rate   Mem pux extension (dispatch) symfony/routing (dispatch)
-      pux extension (dispatch)  97.49K/s    0B                       --                        -2%
-    symfony/routing (dispatch)   2.46K/s  524K                    3968%                         --
-    
-    
-    ================================== Bar Chart ==================================
-    
-        pux extension (dispatch)  97.49K/s | ████████████████████████████████████████████████████████████  |
-      symfony/routing (dispatch)   2.46K/s | █                                                             |
-    
-    
-    ============================== System Information ==============================
-    
-    PHP Version: 5.5.6
-    CPU Brand String: Intel(R) Core(TM) i5-3427U CPU @ 1.80GHz
-    
-    With XDebug Extension.
-
-With one pcre route:
-
-    n=5000
-    Running pux extension (dispatch) - . 68264.888935184/s
-    Running symfony/routing (dispatch) - . 2245.5539220463/s
-    
-                                    Rate   Mem pux extension (dispatch) symfony/routing (dispatch)
-      pux extension (dispatch)  68.26K/s    3M                       --                        -3%
-    symfony/routing (dispatch)   2.25K/s  786K                    3040%                         --
-    
-    
-    ================================== Bar Chart ==================================
-    
-        pux extension (dispatch)  68.26K/s | ████████████████████████████████████████████████████████████  |
-      symfony/routing (dispatch)   2.25K/s | █                                                             |
-    
-    
-    ============================== System Information ==============================
-    
-    PHP Version: 5.5.6
-    CPU Brand String: Intel(R) Core(TM) i5-3427U CPU @ 1.80GHz
-
-
-Compare to other PHP routers (test code: <https://github.com/c9s/router-benchmark/blob/master/code/dispatch.php> ):
-
-<pre>
-n=10000
-Runing php array - . 138796.45654569/s
-Runing pux - . 124982.98519026/s
-Runing klein - . 1801.5070399717/s
-Runing ham - . 13566.734991391/s
-Runing aura - . 39657.986477172/s
-Runing symfony/routing - . 1934.2415677861/s
-
-                     Rate   Mem php array pux aura ham symfony/routing klein
-      php array  138.8K/s    0B        ---90% -28% -9%             -1%   -1%
-            pux 124.98K/s    0B      111%  -- -31%-10%             -1%   -1%
-           aura  39.66K/s    0B      349%315%   ---34%             -4%   -4%
-            ham  13.57K/s    0B     1023%921% 292%  --            -14%  -13%
-symfony/routing   1.93K/s  786K     7175%6461%2050%701%              --  -93%
-          klein    1.8K/s  262K     7704%6937%2201%753%            107%    --
-
-
-================================== Bar Chart ==================================
-
-        php array  138.8K/s | ████████████████████████████████████████████████████████████  |
-              pux 124.98K/s | ██████████████████████████████████████████████████████        |
-             aura  39.66K/s | █████████████████                                             |
-              ham  13.57K/s | █████                                                         |
-  symfony/routing   1.93K/s |                                                               |
-            klein    1.8K/s |                                                               |
-
-
-============================== System Information ==============================
-
-PHP Version: 5.5.6
-CPU Brand String: Intel(R) Core(TM) i5-3427U CPU @ 1.80GHz
-
-With XDebug Extension.
-</pre>
-
-
-### Through Apache
-
-Please see benchmark details here: <https://github.com/c9s/router-benchmark>
 
 
 ## Contributing
