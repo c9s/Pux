@@ -268,7 +268,10 @@ class Mux
     public function match($path)
     {
         $requestMethod = null;
-        if (isset($_SERVER['REQUEST_METHOD'])) {
+
+        if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+            $requestMethod = self::getRequestMethodConstant($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
+        } else if (isset($_SERVER['REQUEST_METHOD'])) {
             $requestMethod = self::getRequestMethodConstant($_SERVER['REQUEST_METHOD']);
         }
 
