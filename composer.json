@@ -1,6 +1,15 @@
 {
     "name": "corneltek/pux",
-    "description": "Fast PHP router",
+    "description": "The fast PHP router",
+    "homepage": "https://github.com/c9s/Pux",
+    "keywords": [
+        "pux",
+        "router",
+        "http",
+        "middleware",
+        "server",
+        "fast"
+    ],
     "authors": [
         {
             "name": "c9s",
@@ -11,6 +20,7 @@
         "corneltek/universal": "^1.6",
         "corneltek/codegen": "^2"
     },
+    "license": "MIT",
     "require-dev": {
         "willdurand/negotiation": "^1.4",
         "corneltek/phpunit-testmore": "dev-master",
