@@ -6,6 +6,20 @@ use ReflectionClass;
 
 class Controller
 {
+    protected $environment = array();
+
+    public function __construct(array $environemnt)
+    {
+        $this->environment = $environemnt;
+    }
+
+    public function getRequest()
+    {
+        if (isset($this->environment['_REQUEST'])) {
+
+        }
+    }
+
     /**
      * @param strign $method request method
      *

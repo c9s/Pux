@@ -250,7 +250,11 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
             $request->headers = self::createHeadersFromServerGlobal($env);
         }
 
-        $request->serverParameters = $env['_SERVER'];
+        if (isset($env['_SERVER'])) {
+            $request->serverParameters = $env['_SERVER'];
+        } else {
+            $request->serverParameters = $env;
+        }
         $request->parameters = $env['_REQUEST'];
         $request->queryParameters = $env['_GET'];
         $request->bodyParameters = $env['_POST'];

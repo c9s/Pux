@@ -9,6 +9,12 @@ namespace Pux;
 class Environment
 {
 
+    /**
+     * Create from globals array
+     *
+     * @param array $array
+     * @return array
+     */
     static public function createFromArray(array $array)
     {
         $env = $array['_SERVER'];
