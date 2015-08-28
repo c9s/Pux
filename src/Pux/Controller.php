@@ -1,24 +1,36 @@
 <?php
-
 namespace Pux;
-
 use ReflectionClass;
+use Universal\Http\HttpRequest;
 
 class Controller
 {
     protected $environment = array();
 
-    public function __construct(array $environemnt)
+    protected $_request;
+
+    /**
+     * 
+     * @param array $environment
+     */
+    public function __construct(array $environment)
     {
         $this->environment = $environemnt;
     }
 
-    public function getRequest()
+    /**
+     * Create and Return HttpRequest object from the environment
+     *
+     * @param boolean $recreate
+     */
+    public function getRequest($recreate = false)
     {
-        if (isset($this->environment['_REQUEST'])) {
-
+        if (!$recreate && $this->_request) {
+            return $this->_request;
         }
+        return $this->_request = HttpRequest::createFromGlobals($this->environment);
     }
+
 
     /**
      * @param strign $method request method
