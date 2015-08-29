@@ -51,12 +51,10 @@ class APCDispatcherRESTfulTest extends PHPUnit_Framework_TestCase
         }
 
         $con = new ProductResource2Controller;
-        ok($con);
         $routes = $con->getActionRoutes();
         ok($routes);
 
         $methods = $con->getActionMethods();
-        ok($methods);
         $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.
         ok($productMux);
 

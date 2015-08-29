@@ -1,5 +1,7 @@
 <?php
-
+use Pux\Controller\RESTfulController;
+use Pux\Controller\ExpandableController;
+use Pux\Controller\Controller;
 
 class HelloController
 {
@@ -31,7 +33,6 @@ class ProductController
     }
 }
 
-use Pux\Controller\ExpandableController;
 
 class ExpandableProductController extends ExpandableController
 {
@@ -70,6 +71,42 @@ class ExpandableProductController extends ExpandableController
     public function fooBarAction() { }
 }
 
+
+class ProductResourceController extends RESTfulController
+{
+    /**
+     * @Method("POST")
+     * @Route("");
+     */
+    public function createAction() {
+
+    }
+
+    /**
+     * @Route("/:id")
+     * @Method("POST")
+     */
+    public function updateAction() {
+
+    }
+
+    /**
+     * @Route("/:id")
+     * @Method("GET")
+     */
+    public function getAction() {
+
+    }
+
+    /**
+     * @Route("/:id");
+     * @Method("DELETE")
+     */
+    public function deleteAction() {
+
+    }
+
+}
 
 
 class PageController {

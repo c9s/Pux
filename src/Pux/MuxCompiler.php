@@ -79,9 +79,9 @@ class MuxCompiler
      * validate controller classes and controller methods before compiling to 
      * route cache.
      */
-    public function validateRouteCallback($routes) 
+    public function validateRouteCallback(array $routes) 
     {
-        foreach( $routes as $route ) {
+        foreach ($routes as $route) {
             $callback = $route[2];
             if ( is_array($callback) ) {
                 $class = $callback[0];

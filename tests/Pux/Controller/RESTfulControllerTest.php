@@ -1,43 +1,6 @@
 <?php
-use Pux\Controller\RESTfulController;
 use Pux\Controller\ExpandableController;
 use Pux\Mux;
-
-class ProductResourceController extends RESTfulController
-{
-    /**
-     * @Method("POST")
-     * @Route("");
-     */
-    public function createAction() {
-
-    }
-
-    /**
-     * @Route("/:id")
-     * @Method("POST")
-     */
-    public function updateAction() {
-
-    }
-
-    /**
-     * @Route("/:id")
-     * @Method("GET")
-     */
-    public function getAction() {
-
-    }
-
-    /**
-     * @Route("/:id");
-     * @Method("DELETE")
-     */
-    public function deleteAction() {
-
-    }
-
-}
 
 class RESTfulControllerTest extends PHPUnit_Framework_TestCase
 {

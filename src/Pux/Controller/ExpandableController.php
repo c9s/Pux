@@ -1,17 +1,19 @@
 <?php
 namespace Pux\Controller;
 use ReflectionClass;
+use ReflectionMethod;
 use Universal\Http\HttpRequest;
 use Pux\Mux;
+use Pux\Expandable;
 
-class ExpandableController extends Controller
+class ExpandableController extends Controller implements Expandable
 {
     /**
-     * @param strign $method request method
+     * @param string $method request method
      *
      * @return array Annotation info
      */
-    protected function parseMethodAnnotation($method)
+    protected function parseMethodAnnotation(ReflectionMethod $method)
     {
         $annotations = array();
         if ($doc = $method->getDocComment()) {
@@ -26,10 +28,10 @@ class ExpandableController extends Controller
         return $annotations;
     }
 
-    protected function parseMethods(ReflectionClass $refObject, array &$args, $parent = 0)
+    protected function parseClassMethodAnnotation(ReflectionClass $refObject, array &$args, $parent = 0)
     {
         if ($pClassRef = $refObject->getParentClass()) {
-            $this->parseMethods($pClassRef, $args, 1);
+            $this->parseClassMethodAnnotation($pClassRef, $args, 1);
         }
 
         $methods = $refObject->getMethods();
@@ -55,8 +57,7 @@ class ExpandableController extends Controller
     {
         $refObject = new ReflectionClass($this);
         $args = array();
-        $this->parseMethods($refObject, $args, 0);
-
+        $this->parseClassMethodAnnotation($refObject, $args, 0);
         return $args;
     }
 
