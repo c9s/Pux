@@ -26,6 +26,19 @@ use Pux\Controller\Controller;
  */
 class Mux implements Dispatchable
 {
+
+    /**
+     * @var array contains route array
+     *
+     * the route information is stored in the following format:
+     *
+     * [
+     *    [ pcre (boolean), path (string), callback (callable), options (array) ],
+     *    ....
+     * ]
+     *
+     * The fields are in public scope because they are needed to be accessed by MuxCompiler.
+     */
     public $routes = array();
 
     public $staticRoutes = array();
@@ -67,6 +80,11 @@ class Mux implements Dispatchable
         }
 
         return $this->id = self::generate_id();
+    }
+
+    public function appendRouteArray(array $route)
+    {
+        $this->routes[] = $route;
     }
 
     public function appendRoute($pattern, $callback, array $options = array())
