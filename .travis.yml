@@ -1,12 +1,14 @@
 language: php
 php:
-  - 5.4
-  - 5.5
-  - 5.6
+- 5.4
+- 5.5
+- 5.6
+env:
+- TEST_MIDDLEWARE=1
+- TEST_MIDDLEWARE=0
 matrix:
   allow_failures:
-    - php: 5.5
-    - php: 5.6
+  - env: TEST_MIDDLEWARE=1
 install:
 - sudo apt-get update
 - sudo apt-get install php5-dev
@@ -19,7 +21,8 @@ before_script:
 - phpenv version-name
 - bash tests/travis-setup.sh
 script:
-- bash tests/run-pp-tests
+- phpunit --testsuite All
+- $TEST_MIDDLEWARE && phpunit --testsuite Middleware
 after_success:
 - php vendor/bin/coveralls -v
 # - bash tests/run-ext-tests
