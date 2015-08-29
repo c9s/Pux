@@ -22,6 +22,7 @@ class Controller
      * Create and Return HttpRequest object from the environment
      *
      * @param boolean $recreate
+     * @return Universal\Http\HttpRequest
      */
     public function getRequest($recreate = false)
     {
