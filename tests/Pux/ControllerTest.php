@@ -2,7 +2,7 @@
 // vim:fdm=marker:
 use Pux\Mux;
 use Pux\RouteExecutor;
-use Pux\Controller;
+use Pux\Controller\Controller;
 
 
 // /* CRUDProductController {{{*/

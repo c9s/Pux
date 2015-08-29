@@ -15,6 +15,7 @@ define('REQUEST_METHOD_HEAD', 6);
 define('REQUEST_METHOD_OPTIONS', 7);
 
 use Pux\Dispatcher\Dispatchable;
+use Pux\Controller\Controller;
 
 /**
  * Mux class provides a built-in dispatch method that can dispatch routes,

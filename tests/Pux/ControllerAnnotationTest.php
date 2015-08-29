@@ -1,7 +1,7 @@
 <?php
 use Pux\Mux;
 use Pux\RouteExecutor;
-use Pux\Controller;
+use Pux\Controller\Controller;
 
 class ParentController extends Controller {
 

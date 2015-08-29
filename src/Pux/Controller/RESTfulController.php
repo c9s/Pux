@@ -1,6 +1,6 @@
 <?php
 namespace Pux\Controller;
-use Pux\Controller;
+use Pux\Controller\Controller;
 use Pux\Mux;
 
 abstract class RESTfulController extends Controller
