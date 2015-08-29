@@ -3,20 +3,23 @@ CHANGELOG
 
 ### Version 2.0
 
+Newly added features:
+
 - Added corneltek/universal package.
 - Added Pux/RouteRequest class for dispatching routes with request constraints.
 - Added Middleware design (see `Pux\Middleware\*` for more detials)
 - Added GeocoderMiddleware
+- Added HeadMiddleware
 - Added ContentNegotiationMiddleware
 
-- Moved `Pux\Controller` to `Pux\Controller\Controller`.
-- Moved mux expanding logics `expand()` from `Pux\Controller` to `Pux\Controller\ExpandableController`.
 - Added `Pux\Dispatchable` interface.
 
 Incompatible changes:
 
 - Renamed Executor => RouteExecutor
 - Removed expand property
+- Moved `Pux\Controller` to `Pux\Controller\Controller`.
+- Moved mux expanding logics `expand()` from `Pux\Controller` to `Pux\Controller\ExpandableController`.
 
 Fixes:
 

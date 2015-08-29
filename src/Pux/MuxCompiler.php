@@ -37,7 +37,7 @@ class MuxCompiler
                 $route[2] = $newId;
                 $this->mux->submux[ $newId ] = $submux;
             }
-            $this->mux->routes[] = $route;
+            $this->mux->appendRouteArray($route);
         }
         return true;
     }
@@ -100,7 +100,7 @@ class MuxCompiler
 
     public function compileReflectionParameters() 
     {
-        foreach( $this->mux->routes as $route ) {
+        foreach ($this->mux->routes as $route ) {
             $callback = $route[2];
             list($class, $method) = $callback;
 
