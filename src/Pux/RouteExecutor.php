@@ -42,17 +42,17 @@ class RouteExecutor
      */
     public static function execute(array $route, array $environment = array())
     {
-        list($pcre, $pattern, $cb, $options) = $route;
+        list($pcre, $pattern, $callback, $options) = $route;
 
-        if ($cb instanceof Closure) {
-            return $cb($environment);
+        if ($callback instanceof Closure) {
+            return $callback($environment);
         }
 
 
         // Start handing controller dispatch from here
 
         // create the reflection class
-        $rc = new ReflectionClass($cb[0]);
+        $rc = new ReflectionClass($callback[0]);
 
         // If users define the constructor arguments in options array.
         $constructArgs = null;
@@ -62,33 +62,33 @@ class RouteExecutor
 
         // If the first argument is a class name string,
         // then create the controller object.
-        if (is_string($cb[0])) {
-            if (is_a($cb[0],'Pux\\Controller')) {
+        if (is_string($callback[0])) {
+            if (is_a($callback[0],'Pux\\Controller')) {
 
-                $cb[0] = $controller = $rc->newInstanceArgs([$environment]);
+                $callback[0] = $controller = $rc->newInstanceArgs([$environment]);
 
             } else {
-                $cb[0] = $controller = $constructArgs 
+                $callback[0] = $controller = $constructArgs 
                     ? $rc->newInstanceArgs($constructArgs) 
                     : $rc->newInstance();
             }
-        } else if (is_object($cb[0])) {
+        } else if (is_object($callback[0])) {
             // If it's a dynamic controller object
-            $controller = $cb[0];
+            $controller = $callback[0];
         } else {
             // unsupported callable type
         }
 
         // check controller action method
-        if ($controller && !method_exists($controller, $cb[1])) {
-            throw new LogicException("Controller action method '{$cb[1]}' doesn't exist.");
+        if ($controller && !method_exists($controller, $callback[1])) {
+            throw new LogicException("Controller action method '{$callback[1]}' doesn't exist.");
             /*
             throw new Exception('Method ' .
-                get_class($controller) . "->{$cb[1]} does not exist.", $route );
+                get_class($controller) . "->{$callback[1]} does not exist.", $route );
             */
         }
 
-        $reflParameters = $rc->getMethod($cb[1])->getParameters();
+        $reflParameters = $rc->getMethod($callback[1])->getParameters();
         $vars = isset($options['vars'])
                 ? $options['vars']
                 : array()
@@ -107,6 +107,6 @@ class RouteExecutor
             }
         }
 
-        return call_user_func_array($cb, $arguments);
+        return call_user_func_array($callback, $arguments);
     }
 }
