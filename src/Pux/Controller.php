@@ -11,11 +11,11 @@ class Controller
 
     /**
      * 
-     * @param array $environment
+     * @param array $environment the default empty array was kept for backward compatibility.
      */
-    public function __construct(array $environment)
+    public function __construct(array $environment = array())
     {
-        $this->environment = $environemnt;
+        $this->environment = $environment;
     }
 
     /**
