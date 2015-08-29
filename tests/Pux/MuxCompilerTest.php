@@ -1,6 +1,8 @@
 <?php
 use Pux\MuxCompiler;
 use Pux\Mux;
+use Pux\Testing\MuxTestCase;
+
 
 class FooController
 {

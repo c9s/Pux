@@ -14,7 +14,6 @@ define('REQUEST_METHOD_PATCH', 5);
 define('REQUEST_METHOD_HEAD', 6);
 define('REQUEST_METHOD_OPTIONS', 7);
 
-use Pux\Dispatchable;
 use Pux\Controller\ExpandableController;
 use Pux\Controller\Controller;
 use Pux\RouteRequest;
@@ -25,7 +24,7 @@ use Pux\RouteRequest;
  *
  *
  */
-class Mux implements Dispatchable
+class Mux
 {
 
     /**
@@ -385,12 +384,19 @@ class Mux implements Dispatchable
         }
     }
 
+    public function dispatchRequest(RouteRequest $request)
+    {
+        return $this->dispatch($request->getPath(), $request);
+    }
 
     /**
      * Match route in the current Mux and submuxes recursively.
      *
+     * The RouteRequest object is used for serving request method, host name
+     * and other route information.
+     *
      * @param string $path 
-     * @param RouteRequest $request
+     * @param Pux\RouteRequest $request
      *
      * @return array
      */

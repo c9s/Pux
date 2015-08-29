@@ -1,6 +1,6 @@
 <?php
-
 use Pux\Mux;
+use Pux\Testing\MuxTestCase;
 
 class MuxTest extends MuxTestCase
 {

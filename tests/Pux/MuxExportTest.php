@@ -1,6 +1,7 @@
 <?php
 use Pux\Mux;
 use Pux\RouteExecutor;
+use Pux\Testing\MuxTestCase;
 
 class MuxExportTest extends MuxTestCase
 {

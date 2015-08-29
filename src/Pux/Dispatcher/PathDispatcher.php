@@ -1,12 +1,11 @@
 <?php
 namespace Pux\Dispatcher;
 use Pux\Mux;
-use Pux\Dispatchable;
 
 /**
  * Dispath routes by path
  */
-class PathDispatcher implements Dispatchable
+class PathDispatcher
 {
     protected $options = array();
 

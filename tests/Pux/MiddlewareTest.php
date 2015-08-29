@@ -2,8 +2,10 @@
 use Pux\Middleware;
 use Pux\RouteRequest;
 use Pux\Testing\Utils;
+use Pux\Testing\MuxTestCase;
 use Pux\Compositor;
 use Pux\Middleware\TryCatchMiddleware;
+
 
 class MiddlewareTest extends PHPUnit_Framework_TestCase
 {
