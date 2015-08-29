@@ -5,7 +5,7 @@ CHANGELOG
 
 - Added corneltek/universal package.
 - Added Pux/RouteRequest class for dispatching routes with request constraints.
-- Added Middleware design
+- Added Middleware design (see `Pux\Middleware\*` for more detials)
 - Added GeocoderMiddleware
 - Added ContentNegotiationMiddleware
 
