@@ -133,7 +133,7 @@ class Mux implements IteratorAggregate
         // Save the mount path in options array
         $options['mount_path'] = $pattern;
 
-        if ($mux instanceof Controller) {
+        if ($mux instanceof ExpandableController) {
 
             $mux = $mux->expand($options);
 
