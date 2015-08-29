@@ -22,7 +22,7 @@ before_script:
 - bash tests/travis-setup.sh
 script:
 - phpunit --testsuite All
-- $TEST_MIDDLEWARE && phpunit --testsuite Middleware
+- [ $TEST_MIDDLEWARE ] && phpunit --testsuite Middleware
 after_success:
 - php vendor/bin/coveralls -v
 # - bash tests/run-ext-tests
