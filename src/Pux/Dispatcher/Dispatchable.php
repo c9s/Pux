@@ -1,11 +1,9 @@
 <?php
 namespace Pux\Dispatcher;
 
-interface PathDispatcher
+interface Dispatchable
 {
-
     public function dispatch($path);
-
 }
 
 

@@ -14,9 +14,15 @@ define('REQUEST_METHOD_PATCH', 5);
 define('REQUEST_METHOD_HEAD', 6);
 define('REQUEST_METHOD_OPTIONS', 7);
 
-use Pux\Dispatcher\PathDispatcher;
+use Pux\Dispatcher\Dispatchable;
 
-class Mux implements PathDispatcher
+/**
+ * Mux class provides a built-in dispatch method that can dispatch routes,
+ * You can define a Dispatcher to customze the dispatch logic on your own.
+ *
+ *
+ */
+class Mux implements Dispatchable
 {
     public $routes = array();
 

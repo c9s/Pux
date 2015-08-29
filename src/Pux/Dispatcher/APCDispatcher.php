@@ -2,24 +2,24 @@
 namespace Pux\Dispatcher;
 use Pux\Mux;
 
-class APCDispatcher
+class APCDispatcher implements Dispatchable
 {
-    public $options = array();
+    protected $options = array();
 
-    public $mux;
+    protected $mux;
 
-    public $namespace = 'app';
+    protected $namespace = 'app';
 
     public $expiry = 0;
 
-    public function __construct(Mux $mux, $options = array())
+    public function __construct(Mux $mux, array $options = array())
     {
         $this->mux = $mux;
         $this->options = $options;
-        if ( isset($this->options['namespace']) ) {
+        if (isset($this->options['namespace'])) {
             $this->namespace = $this->options['namespace'];
         }
-        if ( isset($this->options['expiry']) ) {
+        if (isset($this->options['expiry'])) {
             $this->expiry = $this->options['expiry'];
         }
     }
@@ -50,7 +50,8 @@ class APCDispatcher
         return false;
     }
 
-    protected function buildKey($path) {
+    protected function buildKey($path)
+    {
         $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
         $host = isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : '';
         $https = isset($_SERVER["HTTPS"]) ? $_SERVER["HTTPS"] : '';
