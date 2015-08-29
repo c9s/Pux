@@ -9,6 +9,10 @@ CHANGELOG
 - Added GeocoderMiddleware
 - Added ContentNegotiationMiddleware
 
+- Moved `Pux\Controller` to `Pux\Controller\Controller`.
+- Moved mux expanding logics `expand()` from `Pux\Controller` to `Pux\Controller\ExpandableController`.
+- Added `Pux\Dispatchable` interface.
+
 Incompatible changes:
 
 - Renamed Executor => RouteExecutor
