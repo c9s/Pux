@@ -21,7 +21,6 @@ define('REQUEST_METHOD_OPTIONS', 7);
  * Mux class provides a built-in dispatch method that can dispatch routes,
  * You can define a Dispatcher to customze the dispatch logic on your own.
  *
- *
  */
 class Mux implements IteratorAggregate
 {
@@ -37,6 +36,16 @@ class Mux implements IteratorAggregate
      * ]
      *
      * The fields are in public scope because they are needed to be accessed by MuxCompiler.
+     *
+     * For each route item, you can define an option array for it, but there are some reserved keys:
+     *
+     *  - 'method': request method constraint
+     *  - 'domain': host constraint
+     *  - 'secure': https constraint
+     *  - 'id'
+     *  - 'requirements'
+     *  - 'mount_path': the mounted path.
+     *
      */
     public $routes = array();
 
@@ -111,8 +120,10 @@ class Mux implements IteratorAggregate
     public function mount($pattern, $mux, array $options = array())
     {
         if ($mux instanceof Controller) {
+
             $mux = $mux->expand();
-        } elseif ($mux instanceof Closure) {
+
+        } else if ($mux instanceof Closure) {
 
             // we pass newly created Mux object to the closure to let it initialize it.
             if ($ret = $mux($mux = new self())) {
@@ -125,6 +136,11 @@ class Mux implements IteratorAggregate
         } elseif ((!is_object($mux) || !($mux instanceof self)) && is_callable($mux)) {
             $mux($mux = new self());
         }
+
+        // Save the constructed mux object in options array, so we can fetch
+        // the expanded mux object in controller object later.
+        $options['mux'] = $mux;
+        $options['mount_path'] = $pattern;
 
         $muxId = $mux->getId();
         $this->add($pattern, $muxId, $options);
@@ -405,13 +421,16 @@ class Mux implements IteratorAggregate
             // When the callback is an integer, it's refereing to a submux object.
             if (is_integer($route[2])) {
                 $submux = $this->submux[$route[2]];
+                $options = $route[3];
 
                 // sub-path and call submux to dispatch
                 // for pcre pattern?
                 if ($route[0]) {
+
                     $matchedString = $route[3]['vars'][0];
 
                     return $submux->dispatch(substr($path, strlen($matchedString)));
+
                 } else {
                     $s = substr($path, strlen($route[1]));
 
