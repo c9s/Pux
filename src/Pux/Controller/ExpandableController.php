@@ -106,7 +106,7 @@ class ExpandableController extends Controller implements Expandable
             $route = array($path, $actionName);
 
             if (isset($annotations['Method'])) {
-                $route[] = array('method' => Mux::getRequestMethodConstant($annotations['Method']));
+                $route[] = array('method' => Mux::convertRequestMethodConstant($annotations['Method']));
             } else {
                 $route[] = array();
             }

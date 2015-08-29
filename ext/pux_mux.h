@@ -42,7 +42,7 @@ PHP_METHOD(Mux, getRoute);
 PHP_METHOD(Mux, match);
 PHP_METHOD(Mux, dispatch);
 PHP_METHOD(Mux, getSubMux);
-PHP_METHOD(Mux, getRequestMethodConstant);
+PHP_METHOD(Mux, convertRequestMethodConstant);
 PHP_METHOD(Mux, export);
 PHP_METHOD(Mux, mount);
 

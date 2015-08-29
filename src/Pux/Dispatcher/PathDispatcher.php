@@ -3,7 +3,10 @@ namespace Pux\Dispatcher;
 use Pux\Mux;
 use Pux\Dispatchable;
 
-class Dispatcher implements Dispatchable
+/**
+ * Dispath routes by path
+ */
+class PathDispatcher implements Dispatchable
 {
     protected $options = array();
 

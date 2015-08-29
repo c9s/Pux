@@ -39,7 +39,7 @@ const zend_function_entry mux_methods[] = {
   PHP_ME(Mux, setRoutes, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getRoute, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, getSubMux, NULL, ZEND_ACC_PUBLIC)
-  PHP_ME(Mux, getRequestMethodConstant, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Mux, convertRequestMethodConstant, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Mux, export, NULL, ZEND_ACC_PUBLIC)
 
   PHP_ME(Mux, get, NULL, ZEND_ACC_PUBLIC)
@@ -627,7 +627,7 @@ PHP_METHOD(Mux, getSubMux) {
 }
 
 
-PHP_METHOD(Mux, getRequestMethodConstant) {
+PHP_METHOD(Mux, convertRequestMethodConstant) {
     char *req_method        = NULL, *mthit, *mthp;
     long req_method_const   = 0;
     long req_method_len;

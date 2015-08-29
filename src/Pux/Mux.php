@@ -210,7 +210,7 @@ class Mux implements Dispatchable
 
         // Convert request method constraint to constant if it's passed by string
         if (isset($options['method']) && is_string($options['method'])) {
-            $options['method'] = self::getRequestMethodConstant($options['method']);
+            $options['method'] = self::convertRequestMethodConstant($options['method']);
         }
 
         // compile place holder to patterns
@@ -297,7 +297,7 @@ class Mux implements Dispatchable
         }
     }
 
-    public static function getRequestMethodConstant($method)
+    public static function convertRequestMethodConstant($method)
     {
         switch (strtoupper($method)) {
             case 'POST':
@@ -320,10 +320,12 @@ class Mux implements Dispatchable
     }
 
     /**
-     * Find a matched route with the path constraint
+     * Find a matched route with the path constraint in the current mux object.
      *
      * @param string       $path
      * @param RouteRequest $request
+     *
+     * @return array
      */
     public function match($path, RouteRequest $request = null)
     {
@@ -331,11 +333,11 @@ class Mux implements Dispatchable
 
         if ($request) {
 
-            $requestMethod = self::getRequestMethodConstant($request->getRequestMethod());
+            $requestMethod = self::convertRequestMethodConstant($request->getRequestMethod());
 
         } else if (isset($_SERVER['REQUEST_METHOD'])) {
 
-            $requestMethod = self::getRequestMethodConstant($_SERVER['REQUEST_METHOD']);
+            $requestMethod = self::convertRequestMethodConstant($_SERVER['REQUEST_METHOD']);
 
         }
 
@@ -383,6 +385,15 @@ class Mux implements Dispatchable
         }
     }
 
+
+    /**
+     * Match route in the current Mux and submuxes recursively.
+     *
+     * @param string $path 
+     * @param RouteRequest $request
+     *
+     * @return array
+     */
     public function dispatch($path, RouteRequest $request = null)
     {
         if ($route = $this->match($path)) {
