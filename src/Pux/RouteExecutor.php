@@ -40,12 +40,12 @@ class RouteExecutor
      *
      * @return string the response
      */
-    public static function execute(array $route, array $environment = array())
+    public static function execute(array $route, array $environment = array(), array $response = array())
     {
         list($pcre, $pattern, $callback, $options) = $route;
 
         if ($callback instanceof Closure) {
-            return $callback($environment);
+            return $callback($environment, $response, $route);
         }
 
 
@@ -63,13 +63,21 @@ class RouteExecutor
         // If the first argument is a class name string,
         // then create the controller object.
         if (is_string($callback[0])) {
+
+            // If the receiver is a Pux controller, we then know how to pass data to the constructor
             if (is_a($callback[0],'Pux\\Controller\\Controller')) {
 
+                // Pux controller accepts ($environment, $matchedRoute) by default
+                // But users may define a controller that accepts
+                // ($environment, $matchedRoute, ... extra constructor
+                // arguments)
                 array_unshift($constructArgs, $environment);
+                array_unshift($constructArgs, $route);
 
                 $callback[0] = $controller = $rc->newInstanceArgs($constructArgs);
 
             } else {
+
                 $callback[0] = $controller = !empty($constructArgs)
                                                 ? $rc->newInstanceArgs($constructArgs) 
                                                 : $rc->newInstance();

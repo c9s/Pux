@@ -47,6 +47,7 @@ class MuxApp implements App
             }
             $environment['PATH_INFO'] = substr($environment['PATH_INFO'], strlen($path));
 
+            // If callback object complies the App call prorotype
             if ($app instanceof App || $app instanceof Middleware) { 
 
                 return $app($environment, $response);

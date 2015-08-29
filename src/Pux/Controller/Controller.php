@@ -11,16 +11,43 @@ class Controller
      */
     protected $environment = array();
 
+
+    /**
+     * @var Universal\Http\HttpRequest object
+     */
     protected $_request;
+
+
+    /**
+     * @var array The matched route array
+     */
+    protected $matchedRoute;
 
     /**
      * 
      * @param array $environment the default empty array was kept for backward compatibility.
      */
-    public function __construct(array $environment = array())
+    public function __construct(array $environment = array(), array $matchedRoute = null)
     {
         $this->environment = $environment;
+        $this->matchedRoute = $matchedRoute;
     }
+
+    public function hasMatchedRoute()
+    {
+        return $this->matchedRoute ? true : false;
+    }
+
+
+    /**
+     * @return array The standard route structure
+     */
+    public function getMatchedRoute()
+    {
+        return $this->matchedRoute;
+    }
+
+
 
     /**
      * Create and Return HttpRequest object from the environment
