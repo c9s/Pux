@@ -10,7 +10,9 @@ matrix:
 install:
 - sudo apt-get update
 - sudo apt-get install php5-dev
-- composer install
+- travis_retry composer self-update
+- travis_retry composer require satooshi/php-coveralls:dev-master --no-update --dev
+- travis_retry composer install
 before_script:
 - php-config || true
 - phpenv rehash
@@ -18,6 +20,8 @@ before_script:
 - bash tests/travis-setup.sh
 script:
 - bash tests/run-pp-tests
+after_success:
+- php vendor/bin/coveralls -v
 # - bash tests/run-ext-tests
 cache:
   apt: true
