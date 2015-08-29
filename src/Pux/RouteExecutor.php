@@ -55,7 +55,7 @@ class RouteExecutor
         $rc = new ReflectionClass($callback[0]);
 
         // If users define the constructor arguments in options array.
-        $constructArgs = null;
+        $constructArgs = [];
         if (isset($options['constructor_args'])) {
             $constructArgs = $options['constructor_args'];
         }
@@ -63,14 +63,16 @@ class RouteExecutor
         // If the first argument is a class name string,
         // then create the controller object.
         if (is_string($callback[0])) {
-            if (is_a($callback[0],'Pux\\Controller')) {
+            if (is_a($callback[0],'Pux\\Controller\\Controller')) {
 
-                $callback[0] = $controller = $rc->newInstanceArgs([$environment]);
+                array_unshift($constructArgs, $environment);
+
+                $callback[0] = $controller = $rc->newInstanceArgs($constructArgs);
 
             } else {
-                $callback[0] = $controller = $constructArgs 
-                    ? $rc->newInstanceArgs($constructArgs) 
-                    : $rc->newInstance();
+                $callback[0] = $controller = !empty($constructArgs)
+                                                ? $rc->newInstanceArgs($constructArgs) 
+                                                : $rc->newInstance();
             }
         } else if (is_object($callback[0])) {
             // If it's a dynamic controller object
