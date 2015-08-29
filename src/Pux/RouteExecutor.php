@@ -83,10 +83,14 @@ class RouteExecutor
                                                 : $rc->newInstance();
             }
         } else if (is_object($callback[0])) {
+
             // If it's a dynamic controller object
             $controller = $callback[0];
+
         } else {
-            // unsupported callable type
+
+            throw new LogicException('Unsupported callback type');
+
         }
 
         // check controller action method
