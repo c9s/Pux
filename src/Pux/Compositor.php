@@ -11,6 +11,8 @@ class Compositor
 
     protected $mapApp;
 
+    private $wrappedApp;
+
     public function __construct(callable $app = null)
     {
         $this->app = $app;
@@ -59,7 +61,10 @@ class Compositor
 
     public function __invoke(array $environment, array $response)
     {
-        $app = $this->wrap();
+        if ($app = $this->wrappedApp) {
+            return $app($environment, $response);
+        }
+        $this->wrappedApp = $app = $this->wrap();
         return $app($environment, $response);
     }
 
