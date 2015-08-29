@@ -80,7 +80,7 @@ class ControllerTest extends MuxTestCase
      */
     public function testMount($controller) {
         $mainMux = new Mux;
-        $mainMux->mount( '/product' , $controller->expand(true) );
+        $mainMux->mount( '/product' , $controller->expand() );
         $this->assertNotEmpty($mainMux->getRoutes());
 
         $this->assertNonPcreRoute($mainMux->dispatch('/product'));
@@ -93,7 +93,7 @@ class ControllerTest extends MuxTestCase
      */
     public function testMountNoExpand($controller) {
         $mainMux = new Mux;
-        $mainMux->mount('/product' , $controller->expand(false));
+        $mainMux->mount('/product' , $controller->expand());
         $mainMux->any( '/' , array('ProductController', 'indexAction') );
 
         ok($mainMux->getRoutes()); 

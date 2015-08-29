@@ -130,9 +130,12 @@ class Mux implements IteratorAggregate
      */
     public function mount($pattern, $mux, array $options = array())
     {
+        // Save the mount path in options array
+        $options['mount_path'] = $pattern;
+
         if ($mux instanceof Controller) {
 
-            $mux = $mux->expand();
+            $mux = $mux->expand($options);
 
         } else if ($mux instanceof Closure) {
 
@@ -152,7 +155,6 @@ class Mux implements IteratorAggregate
         // the expanded mux object in controller object later.
         $mux->setParent($this);
         $options['mux'] = $mux;
-        $options['mount_path'] = $pattern;
 
         $muxId = $mux->getId();
         $this->add($pattern, $muxId, $options);
