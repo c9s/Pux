@@ -157,6 +157,19 @@ class MuxTest extends MuxTestCase
         ok($route[0], 'is a pcre route');
     }
 
+
+
+    public function testMuxIterator()
+    {
+        $mux = new Mux;
+        $mux->add('/foo', 'foo');
+        $mux->add('/bar', 'bar');
+        foreach ($mux as $route) {
+            $this->assertNotEmpty($route);
+        }
+    }
+
+
     /*
     public function testEmptyPathDispatch() 
     {

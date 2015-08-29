@@ -2,9 +2,13 @@
 
 // vim:et:sw=4:ts=4:sts=4:
 namespace Pux;
-
+use Pux\Controller\ExpandableController;
+use Pux\Controller\Controller;
+use Pux\RouteRequest;
 use Closure;
 use LogicException;
+use IteratorAggregate;
+use ArrayIterator;
 
 define('REQUEST_METHOD_GET', 1);
 define('REQUEST_METHOD_POST', 2);
@@ -13,18 +17,13 @@ define('REQUEST_METHOD_DELETE', 4);
 define('REQUEST_METHOD_PATCH', 5);
 define('REQUEST_METHOD_HEAD', 6);
 define('REQUEST_METHOD_OPTIONS', 7);
-
-use Pux\Controller\ExpandableController;
-use Pux\Controller\Controller;
-use Pux\RouteRequest;
-
 /**
  * Mux class provides a built-in dispatch method that can dispatch routes,
  * You can define a Dispatcher to customze the dispatch logic on your own.
  *
  *
  */
-class Mux
+class Mux implements IteratorAggregate
 {
 
     /**
@@ -489,4 +488,11 @@ class Mux
         $mux->id = $array['id'];
         return $mux;
     }
+
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->routes);
+    }
+
 }
