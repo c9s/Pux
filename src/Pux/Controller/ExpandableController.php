@@ -135,7 +135,11 @@ class ExpandableController extends Controller implements Expandable
      */
     public function expand()
     {
-        $this->mux = mux = new Mux();
+        if ($this->mux) {
+            return $this->mux;
+        }
+
+        $this->mux = $mux = new Mux();
         $paths = $this->getActionRoutes();
         foreach ($paths as $path) {
             $mux->add($path[0], array(get_class($this), $path[1]), $path[2]);
