@@ -139,9 +139,9 @@ class Mux implements IteratorAggregate
 
         } else if ($mux instanceof Closure) {
 
-            // we pass newly created Mux object to the closure to let it initialize it.
-            if ($ret = $mux($mux = new self())) {
-                if ($ret instanceof self) {
+            // we pass the newly created Mux object to the builder closure to initialize routes.
+            if ($ret = $mux($mux = new Mux())) {
+                if ($ret instanceof Mux) {
                     $mux = $ret;
                 } else {
                     throw new LogicException('Invalid object returned from Closure.');

@@ -93,7 +93,7 @@ class ControllerTest extends MuxTestCase
      */
     public function testMountNoExpand($controller) {
         $mainMux = new Mux;
-        $mainMux->mount('/product' , $controller->expand());
+        $mainMux->mount('/product' , $controller);
         $mainMux->any( '/' , array('ProductController', 'indexAction') );
 
         ok($mainMux->getRoutes()); 
