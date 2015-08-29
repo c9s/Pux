@@ -299,7 +299,7 @@ class Mux implements Dispatchable
     }
 
     /**
-     * Try to find a matched route.
+     * Find a matched route with the path constraint
      *
      * @param string       $path
      * @param RouteRequest $request

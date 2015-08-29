@@ -16,17 +16,11 @@ class Dispatcher implements Dispatchable
     {
         $this->mux = $mux;
         $this->options = $options;
-        if (isset($this->options['namespace'])) {
-            $this->namespace = $this->options['namespace'];
-        }
-        if (isset($this->options['expiry'])) {
-            $this->expiry = $this->options['expiry'];
-        }
     }
 
     public function dispatch($path) 
     {
-        if ($route = $this->mux->dispatch($path) ) {
+        if ($route = $this->mux->dispatch($path)) {
             return $route;
         }
         return false;
