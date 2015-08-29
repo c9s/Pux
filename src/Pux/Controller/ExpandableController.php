@@ -9,6 +9,12 @@ use Pux\Expandable;
 class ExpandableController extends Controller implements Expandable
 {
     /**
+     * @var Pux\Mux
+     */
+    protected $mux;
+
+
+    /**
      * @param string $method request method
      *
      * @return array Annotation info
@@ -116,6 +122,12 @@ class ExpandableController extends Controller implements Expandable
         return $routes;
     }
 
+    public function getMux()
+    {
+        return $this->mux;
+    }
+
+
     /**
      * Expand controller actions to Mux object.
      *
@@ -123,13 +135,12 @@ class ExpandableController extends Controller implements Expandable
      */
     public function expand()
     {
-        $mux = new Mux();
+        $this->mux = mux = new Mux();
         $paths = $this->getActionRoutes();
         foreach ($paths as $path) {
             $mux->add($path[0], array(get_class($this), $path[1]), $path[2]);
         }
         $mux->sort();
-
         return $mux;
     }
 }
