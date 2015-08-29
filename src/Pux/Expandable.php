@@ -12,6 +12,3 @@ interface Expandable
     public function expand($dynamic = true);
 
 }
-
-
-

@@ -74,6 +74,11 @@ class Mux implements IteratorAggregate
      */
     public $expand = false;
 
+    /**
+     * @param Pux\Mux The parent mux object
+     */
+    protected $parent;
+
     public static $id_counter = 0;
 
     public static function generate_id()
@@ -110,6 +115,12 @@ class Mux implements IteratorAggregate
         );
     }
 
+
+    public function setParent(Mux $parent)
+    {
+        $this->parent = $parent;
+    }
+
     /**
      * Mount a Mux or a Controller object on a specific path.
      *
@@ -139,6 +150,7 @@ class Mux implements IteratorAggregate
 
         // Save the constructed mux object in options array, so we can fetch
         // the expanded mux object in controller object later.
+        $mux->setParent($this);
         $options['mux'] = $mux;
         $options['mount_path'] = $pattern;
 
