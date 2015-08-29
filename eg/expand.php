@@ -2,7 +2,7 @@
 
 require '../vendor/autoload.php';
 
-use Pux\Controller\Controller;
+use Pux\Controller\ExpandableController;
 use Pux\RouteExecutor;
 use Pux\Mux;
 use Pux\Router;

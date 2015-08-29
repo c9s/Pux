@@ -1,9 +1,9 @@
 <?php
 namespace Pux\Controller;
-use Pux\Controller\Controller;
+use Pux\Controller\ExpandableController;
 use Pux\Mux;
 
-abstract class RESTfulController extends Controller
+abstract class RESTfulController extends ExpandableController
 {
 
     /**

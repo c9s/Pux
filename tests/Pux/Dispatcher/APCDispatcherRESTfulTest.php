@@ -2,9 +2,9 @@
 use Pux\Dispatcher\APCDispatcher;
 use Pux\Mux;
 use Pux\RouteExecutor;
-use Pux\Controller\Controller;
+use Pux\Controller\ExpandableController;
 
-class ProductResource2Controller extends Controller {
+class ProductResource2Controller extends ExpandableController {
 
 
     /**

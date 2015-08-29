@@ -1,6 +1,7 @@
 <?php
 namespace Pux\Dispatcher;
 use Pux\Mux;
+use Pux\Dispatchable;
 
 class APCDispatcher implements Dispatchable
 {

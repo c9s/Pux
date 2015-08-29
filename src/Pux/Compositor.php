@@ -2,15 +2,27 @@
 namespace Pux;
 use ReflectionClass;
 use Closure;
+use Pux\Middleware;
 
 class Compositor
 {
+
+    /**
+     * @var Middleware
+     */
     protected $stacks = array();
 
+
+    /**
+     * @var callable
+     */
     protected $app;
 
     protected $mapApp;
 
+    /**
+     * @var Closure
+     */
     private $wrappedApp;
 
     public function __construct(callable $app = null)

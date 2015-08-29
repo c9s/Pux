@@ -2,11 +2,11 @@
 // vim:fdm=marker:
 use Pux\Mux;
 use Pux\RouteExecutor;
-use Pux\Controller\Controller;
+use Pux\Controller\ExpandableController;
 
 
 // /* CRUDProductController {{{*/
-class CRUDProductController extends Controller
+class CRUDProductController extends ExpandableController
 {
     public function indexAction() { }
     public function addAction() { } 

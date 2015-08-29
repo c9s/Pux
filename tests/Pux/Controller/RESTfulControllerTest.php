@@ -1,6 +1,6 @@
 <?php
 use Pux\Controller\RESTfulController;
-use Pux\Controller\Controller;
+use Pux\Controller\ExpandableController;
 use Pux\Mux;
 
 class ProductResourceController extends RESTfulController

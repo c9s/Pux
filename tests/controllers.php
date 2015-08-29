@@ -31,9 +31,9 @@ class ProductController
     }
 }
 
-use Pux\Controller\Controller;
+use Pux\Controller\ExpandableController;
 
-class ExpandableProductController extends Controller
+class ExpandableProductController extends ExpandableController
 {
 
 

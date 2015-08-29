@@ -1,9 +1,9 @@
 <?php
 use Pux\Mux;
 use Pux\RouteExecutor;
-use Pux\Controller\Controller;
+use Pux\Controller\ExpandableController;
 
-class ParentController extends Controller {
+class ParentController extends ExpandableController {
 
     /**
      *
