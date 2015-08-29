@@ -36,13 +36,27 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     {
         $this->requestMethod = $requestMethod;
         $this->path = $path;
+
+        // Note: It's not neccessary to call parent::__construct because we
+        // don't depend on superglobal variables.
     }
 
+    /**
+     * Return the current path for route dispatching.
+     * the path can be PATH_INFO or REQUEST_URI (depends on what the user gives)
+     *
+     * @return string path
+     */
     public function getPath()
     {
         return $this->path;
     }
 
+    /**
+     * Return the request method
+     *
+     * @return string request method.
+     */
     public function getRequestMethod()
     {
         return $this->requestMethod;
@@ -50,6 +64,8 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
 
     /**
      * @param contraints[]
+     *
+     * @return boolean true on match
      */
     public function matchConstraints(array $constraints)
     {
@@ -240,8 +256,12 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         $requestMethod = 'GET';
         if (isset($env['REQUEST_METHOD'])) {
             $requestMethod = $env['REQUEST_METHOD'];
+        } else if (isset($env['_SERVER']['REQUEST_METHOD'])) { // compatibility for superglobal
+            $requestMethod = $env['_SERVER']['REQUEST_METHOD'];
         }
 
+        // create request object with request method and path,
+        // we can assign other parameters later.
         $request = new self($requestMethod, $path);
         if (function_exists('getallheaders')) {
             $request->headers = getallheaders();

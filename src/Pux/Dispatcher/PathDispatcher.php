@@ -21,6 +21,11 @@ class PathDispatcher
         $this->options = $options;
     }
 
+    public function dispatchRequest(RouteRequest $request)
+    {
+        return $this->dispatch($request->getPath(), $request);
+    }
+
     public function dispatch($path) 
     {
         if ($route = $this->mux->dispatch($path)) {
