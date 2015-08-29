@@ -17,6 +17,7 @@ define('REQUEST_METHOD_OPTIONS', 7);
 use Pux\Dispatchable;
 use Pux\Controller\ExpandableController;
 use Pux\Controller\Controller;
+use Pux\RouteRequest;
 
 /**
  * Mux class provides a built-in dispatch method that can dispatch routes,
@@ -327,8 +328,15 @@ class Mux implements Dispatchable
     public function match($path, RouteRequest $request = null)
     {
         $requestMethod = null;
-        if (isset($_SERVER['REQUEST_METHOD'])) {
+
+        if ($request) {
+
+            $requestMethod = self::getRequestMethodConstant($request->getRequestMethod());
+
+        } else if (isset($_SERVER['REQUEST_METHOD'])) {
+
             $requestMethod = self::getRequestMethodConstant($_SERVER['REQUEST_METHOD']);
+
         }
 
         foreach ($this->routes as $route) {
