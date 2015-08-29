@@ -72,6 +72,7 @@ class RouteExecutor
                 // ($environment, $matchedRoute, ... extra constructor
                 // arguments)
                 array_unshift($constructArgs, $environment);
+                array_unshift($constructArgs, $response);
                 array_unshift($constructArgs, $route);
 
                 $callback[0] = $controller = $rc->newInstanceArgs($constructArgs);
