@@ -3,6 +3,7 @@
 use Pux\Mux;
 use Pux\RouteExecutor;
 use Pux\Controller\ExpandableController;
+use Pux\Testing\MuxTestCase;
 
 
 // /* CRUDProductController {{{*/
@@ -14,7 +15,7 @@ class CRUDProductController extends ExpandableController
 }
 /*}}}*/
 
-class ControllerTest extends PHPUnit_Framework_TestCase
+class ControllerTest extends MuxTestCase
 {
     public function testControllerConstructor() {
         $controller = new CRUDProductController;
@@ -78,13 +79,13 @@ class ControllerTest extends PHPUnit_Framework_TestCase
      * @depends testControllerConstructor
      */
     public function testMount($controller) {
-        ok($controller);
         $mainMux = new Mux;
-        $mainMux->mount( '/product' , $controller->expand() );
-        ok( $mainMux->getRoutes() ); 
-        ok( $mainMux->dispatch('/product') );
-        ok( $mainMux->dispatch('/product/add') );
-        ok( $mainMux->dispatch('/product/del') );
+        $mainMux->mount( '/product' , $controller->expand(true) );
+        $this->assertNotEmpty($mainMux->getRoutes());
+
+        $this->assertNonPcreRoute($mainMux->dispatch('/product'));
+        $this->assertNonPcreRoute( $mainMux->dispatch('/product/add') );
+        $this->assertNonPcreRoute( $mainMux->dispatch('/product/del') );
     }
 
     /**
@@ -92,14 +93,13 @@ class ControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testMountNoExpand($controller) {
         $mainMux = new Mux;
-        $mainMux->expand = false;
-        $mainMux->mount( '/product' , $controller);
+        $mainMux->mount('/product' , $controller->expand(false));
         $mainMux->any( '/' , array('ProductController', 'indexAction') );
 
-        ok( $mainMux->getRoutes() ); 
+        ok($mainMux->getRoutes()); 
         count_ok( 2,  $mainMux->getRoutes(), 'route count should be 2' );
         ok( $r = $mainMux->dispatch('/product') , 'matched /product' ); // match indexAction
-        $this->assertSame( array('CRUDProductController','indexAction'), $r[2] );
+        $this->assertSame(array('CRUDProductController','indexAction'), $r[2] );
 
         ok( $r = $mainMux->dispatch('/product/add') );
         $this->assertSame( array('CRUDProductController','addAction'), $r[2] );

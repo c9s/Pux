@@ -133,16 +133,16 @@ class ExpandableController extends Controller implements Expandable
      *
      * @return Mux
      */
-    public function expand()
+    public function expand($dynamic = true)
     {
-        if ($this->mux) {
-            return $this->mux;
-        }
-
         $this->mux = $mux = new Mux();
         $paths = $this->getActionRoutes();
         foreach ($paths as $path) {
-            $mux->add($path[0], array(get_class($this), $path[1]), $path[2]);
+            if ($dynamic) {
+                $mux->add($path[0], array($this, $path[1]), $path[2]);
+            } else {
+                $mux->add($path[0], array(get_class($this), $path[1]), $path[2]);
+            }
         }
         $mux->sort();
         return $mux;
