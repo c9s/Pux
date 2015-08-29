@@ -1,6 +1,5 @@
 <?php
 namespace Pux\Middleware;
-use Pux\Middleware;
 use Negotiation\FormatNegotiator;
 use Negotiation\Negotiator;
 

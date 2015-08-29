@@ -1,5 +1,5 @@
 <?php
-namespace Pux;
+namespace Pux\Middleware;
 use Pux\App;
 
 /**

@@ -2,7 +2,7 @@
 namespace Pux;
 use ReflectionClass;
 use Closure;
-use Pux\Middleware;
+use Pux\Middleware\Middleware;
 
 class Compositor
 {

@@ -1,6 +1,5 @@
 <?php
 namespace Pux\Middleware;
-use Pux\Middleware;
 
 class TryCatchMiddleware extends Middleware
 {

@@ -1,6 +1,5 @@
 <?php
 namespace Pux\Middleware;
-use Pux\Middleware;
 use Geocoder\Geocoder;
 use Geocoder\Provider\FreeGeoIp;
 use Ivory\HttpAdapter\CurlHttpAdapter;

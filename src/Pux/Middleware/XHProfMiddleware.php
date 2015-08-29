@@ -1,7 +1,6 @@
 <?php
 namespace Pux\Middleware;
 use XHProfRuns_Default;
-use Pux\Middleware;
 use LogicException;
 
 class XHProfMiddleware extends Middleware

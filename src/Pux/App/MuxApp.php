@@ -2,7 +2,7 @@
 namespace Pux\App;
 use Pux\RouteExecutor;
 use Pux\Mux;
-use Pux\Middleware;
+use Pux\Middleware\Middleware;
 use Pux\App;
 use Pux\Compositor;
 
