@@ -60,22 +60,29 @@ class RouteExecutor
             $constructArgs = $options['constructor_args'];
         }
 
+        // die('Pux\\Controller\\Controller');
+
         // If the first argument is a class name string,
         // then create the controller object.
         if (is_string($callback[0])) {
 
+
             // If the receiver is a Pux controller, we then know how to pass data to the constructor
-            if (is_a($callback[0],'Pux\\Controller\\Controller')) {
+            if (is_a($callback[0],'Pux\\Controller\\Controller', true)) {
+
 
                 // Pux controller accepts ($environment, $matchedRoute) by default
                 // But users may define a controller that accepts
                 // ($environment, $matchedRoute, ... extra constructor
                 // arguments)
-                array_unshift($constructArgs, $environment);
-                array_unshift($constructArgs, $response);
                 array_unshift($constructArgs, $route);
+                array_unshift($constructArgs, $response);
+                array_unshift($constructArgs, $environment);
 
                 $callback[0] = $controller = $rc->newInstanceArgs($constructArgs);
+
+                // The init method will only be called when an action is going to be executed.
+                $controller->init();
 
             } else {
 

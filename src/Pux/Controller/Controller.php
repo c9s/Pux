@@ -13,6 +13,11 @@ class Controller
 
 
     /**
+     * @var array Response array in [ code, headers, content ]
+     */
+    protected $response = array();
+
+    /**
      * @var Universal\Http\HttpRequest object
      */
     protected $_request;
@@ -27,11 +32,18 @@ class Controller
      * 
      * @param array $environment the default empty array was kept for backward compatibility.
      */
-    public function __construct(array $environment = array(), array $matchedRoute = null)
+    public function __construct(array $environment = array(), array $response = array(), array $matchedRoute = null)
     {
-        $this->environment = $environment;
+        $this->environment  = $environment;
+        $this->response     = $response;
         $this->matchedRoute = $matchedRoute;
     }
+
+    public function init()
+    {
+
+    }
+
 
     public function hasMatchedRoute()
     {

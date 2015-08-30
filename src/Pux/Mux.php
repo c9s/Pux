@@ -5,6 +5,7 @@ namespace Pux;
 use Pux\Controller\ExpandableController;
 use Pux\Controller\Controller;
 use Pux\RouteRequest;
+use Pux\Expandable;
 use Closure;
 use LogicException;
 use IteratorAggregate;
@@ -133,7 +134,7 @@ class Mux implements IteratorAggregate
         // Save the mount path in options array
         $options['mount_path'] = $pattern;
 
-        if ($mux instanceof ExpandableController) {
+        if ($mux instanceof Expandable) {
 
             $mux = $mux->expand($options);
 
