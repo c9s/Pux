@@ -12,12 +12,27 @@ class SAPIResponderTest extends PHPUnit_Framework_TestCase
         fclose($fd);
     }
 
-
     public function testArrayResponse()
     {
         $fd = fopen('php://memory', 'w');
         $responder = new SAPIResponder($fd);
         $responder->respond([ 200, [ 'Content-Type: text/plain' ], 'Hello World' ]);
+        fclose($fd);
+    }
+
+    public function testHeaderListResponse()
+    {
+        $fd = fopen('php://memory', 'w');
+        $responder = new SAPIResponder($fd);
+        $responder->respond([ 200, [ 'Content-Type: text/plain', 'X-Foo: Bar', ['X-Bar' => 'Zoo'] ], 'Hello World' ]);
+        fclose($fd);
+    }
+
+    public function testHeaderAssocArrayResponse()
+    {
+        $fd = fopen('php://memory', 'w');
+        $responder = new SAPIResponder($fd);
+        $responder->respond([ 200, [ 'Content-Type' =>  'text/plain', 'X-Foo' => 'Bar', ['X-Bar' => 'Zoo'] ], 'Hello World' ]);
         fclose($fd);
     }
 }

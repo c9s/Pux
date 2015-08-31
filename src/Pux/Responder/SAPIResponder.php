@@ -3,6 +3,11 @@ namespace Pux\Responder;
 use RuntimeException;
 use LogicException;
 
+
+/**
+ * SAPIResponder interacts your application with the SAPI implementation
+ * server like Apache, FPM, FastCGI... etc
+ */
 class SAPIResponder
 {
     /**
@@ -31,17 +36,21 @@ class SAPIResponder
         } else if (is_array($response)) {
             list($code, $headers, $body) = $response;
             http_response_code($code);
-            foreach ($headers as $header) {
-                if (is_string($header)) {
-                    @header($header);
-                } else if (is_array($header)) {
-                    // support for [ 'Content-Type' => 'text/html' ]
-                    foreach ($header as $field => $fieldValue) {
-                        // TODO: escape field value correctly
-                        @header($field . ':' . $fieldValue);
+            foreach ($headers as $k => $header) {
+                if (is_numeric($k)) {
+                    if (is_string($header)) {
+                        @header($header);
+                    } else if (is_array($header)) {
+                        // support for [ 'Content-Type' => 'text/html' ]
+                        foreach ($header as $field => $fieldValue) {
+                            // TODO: escape field value correctly
+                            @header($field . ':' . $fieldValue);
+                        }
+                    } else {
+                        throw new RuntimeException('Unexpected header value type.');
                     }
                 } else {
-                    throw new RuntimeException('Unexpected header value type.');
+                    @header($k . ':' . $header);
                 }
             }
             fwrite($this->resource, $body);
