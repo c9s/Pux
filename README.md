@@ -3,12 +3,17 @@ Pux
 Pux is a PHPSGI compliant HTTP server implementation. It includes a simple &
 fast router, out-of-box middlewares, simple & mountable controller.
 
-2.0 Branch [![Coverage Status](https://coveralls.io/repos/c9s/Pux/badge.svg?branch=2.0&service=github)](https://coveralls.io/github/c9s/Pux?branch=2.0) [![Build Status](https://travis-ci.org/c9s/Pux.svg?branch=master)](https://travis-ci.org/c9s/Pux)
 
 [![Latest Stable Version](https://poser.pugx.org/corneltek/pux/v/stable)](https://packagist.org/packages/corneltek/pux) 
 [![Total Downloads](https://poser.pugx.org/corneltek/pux/downloads)](https://packagist.org/packages/corneltek/pux) 
 [![Latest Unstable Version](https://poser.pugx.org/corneltek/pux/v/unstable)](https://packagist.org/packages/corneltek/pux) 
 [![License](https://poser.pugx.org/corneltek/pux/license)](https://packagist.org/packages/corneltek/pux)
+
+2.0 Branch Build Status
+
+[![Coverage Status](https://coveralls.io/repos/c9s/Pux/badge.svg?branch=2.0&service=github)](https://coveralls.io/github/c9s/Pux?branch=2.0) [![Build Status](https://travis-ci.org/c9s/Pux.svg?branch=master)](https://travis-ci.org/c9s/Pux)
+
+**This branch is under development**
 
 FEATURES
 --------------------
