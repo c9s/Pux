@@ -91,4 +91,78 @@ class Controller
     {
         return json_encode($data, $encodeFlags);
     }
+
+
+    /**
+     * Run controller action
+     *
+     * @param string $action Action name, the action name should not include "Action" as its suffix.
+     * @param array $vars    Action method parameters, which will be applied to the method parameters by their names.
+     * @return string        Return execution result in string format.
+     */
+    public function runAction($action, $vars = array())
+    {
+        $method = $action . 'Action';
+        if ( ! method_exists($this,$method) ) {
+            throw new Exception("Controller method $method does not exist.");
+        }
+
+        // Trigger the before action
+        $this->before();
+
+        $ro = new ReflectionObject( $this );
+        $rm = $ro->getMethod($method);
+
+        // Map vars to function arguments
+        $parameters = $rm->getParameters();
+        $arguments = array();
+        foreach ($parameters as $param) {
+            if ( isset( $vars[ $param->getName() ] ) ) {
+                $arguments[] = $vars[ $param->getName() ];
+            }
+        }
+        $ret = call_user_func_array( array($this,$method) , $arguments );
+
+        // Trigger the after action
+        $this->after();
+        return $ret;
+    }
+
+
+    /**
+     * Forward to another controller action
+     *
+     * @param string|Controller $controller A controller class name or a controller instance.
+     * @param string            $actionName The action name
+     * @param array             $parameters Parameters for the action method
+     *
+     *
+     *  return $this->forward('\OAuthPlugin\Controller\AuthenticationErrorPage','index',array(
+     *      'vars' => array(
+     *          'message' => $e->lastResponse
+     *      )
+     *  ));
+     */
+    public function forward($controller, $actionName = 'index' , $parameters = array())
+    {
+        if (is_string($controller)) {
+            $controller = new $controller;
+        }
+        return $controller->runAction($actionName, $parameters);
+    }
+
+    /**
+     * Check if the controller action exists
+     *
+     * @param  string  $action action name
+     * @return boolean
+     */
+    public function hasAction($action)
+    {
+        if (method_exists($this, $action . 'Action')) {
+            return $action . 'Action';
+        }
+        return false;
+    }
+
 }
