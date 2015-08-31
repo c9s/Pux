@@ -15,8 +15,11 @@ class SAPIResponder
      */
     protected $resource;
 
-    public function __construct($resource)
+    public function __construct($resource = null)
     {
+        if (!$resource) {
+            $resource = fopen('php://output');
+        }
         $this->resource = $resource;
     }
 

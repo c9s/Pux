@@ -76,7 +76,11 @@ $mux->delete('/product/:id', ['ProductController','deleteAction'] , [
     'default' => [ 'id' => '1', ]
 ]);
 if ($route = $mux->dispatch('/product/1')) {
-    RouteExecutor::execute($route);
+    $response = RouteExecutor::execute($route);
+
+    $responder = new Pux\Responder\SAPIResponder();
+    // $responder->respond([ 200, [ 'Content-Type: text/plain' ], 'Hello World' ]);
+    $responder->respond($response);
 }
 ```
 
