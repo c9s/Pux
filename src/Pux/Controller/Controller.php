@@ -87,8 +87,11 @@ class Controller
         return $this->_request = HttpRequest::createFromGlobals($this->environment);
     }
 
-    public function toJson($data, $encodeFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+    public function toJson($data, $encodeFlags = null)
     {
+        if ($encodeFlags === null) {
+            $encodeFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+        }
         return json_encode($data, $encodeFlags);
     }
 
