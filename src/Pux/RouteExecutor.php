@@ -129,6 +129,22 @@ class RouteExecutor
             }
         }
 
-        return call_user_func_array($callback, $arguments);
+        $return = call_user_func_array($callback, $arguments);
+        if (is_array($return)) {
+            return $return;
+        } else if ($controller && is_string($return)) {
+            $response = $controller->getResponse() ?: array();
+            if (!isset($response[0])) {
+                $response[0] = 200;
+            }
+            if (!isset($response[1])) {
+                $response[1] = [];
+            }
+            if (!isset($response[2])) {
+                $response[2] = $return;
+            }
+            return $response;
+        }
+        return $return;
     }
 }
