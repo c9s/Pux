@@ -2,15 +2,6 @@ Pux
 =============
 Pux is a simple & fast PHP router.
 
-Pux is 48.5x faster than symfony router in static route dispatching, 31x faster in regular expression dispatching. (with pux extension installed)
-
-(Benchmark code and details here https://github.com/c9s/router-benchmark/blob/master/code)
-
-Pux tries not to consume computation time to build all routes dynamically (like
-Symfony/Routing, although the RouteCompiler of Symfony/Routing caches the
-compiled patterns, but there are still a lot of function call and class
-loading from your application code. however, function calls are pretty slow in PHP). 
-
 [![Coverage Status](https://coveralls.io/repos/c9s/Pux/badge.svg?branch=master&service=github)](https://coveralls.io/github/c9s/Pux?branch=master)
 [![Build Status](https://travis-ci.org/c9s/Pux.svg?branch=master)](https://travis-ci.org/c9s/Pux)
 [![Latest Stable Version](https://poser.pugx.org/corneltek/pux/v/stable)](https://packagist.org/packages/corneltek/pux) 
@@ -18,67 +9,11 @@ loading from your application code. however, function calls are pretty slow in P
 [![Latest Unstable Version](https://poser.pugx.org/corneltek/pux/v/unstable)](https://packagist.org/packages/corneltek/pux) 
 [![License](https://poser.pugx.org/corneltek/pux/license)](https://packagist.org/packages/corneltek/pux)
 
-
-Why It's Faster
----------------
-
-- Pux uses simpler data structure (indexed array) to store the patterns and flags.
-    (In PHP internals, `zend_hash_index_find` is faster than `zend_hash_find`).
-
-- When matching routes, symfony uses a lot of function calls for each route:
-
-    https://github.com/symfony/Routing/blob/master/Matcher/UrlMatcher.php#L124
-
-    Pux fetches the pattern from an indexed-array:
-
-    https://github.com/c9s/Pux/blob/master/src/Pux/Mux.php#L189
-
-- Even you enabled APC or other bytecode cache extension, you are still calling
-  methods and functions in the runtime. Pux reduces the route building to one
-  static method call. `__set_state`.
-
-- Pux separates static routes and dynamic routes automatically, Pux uses hash
-  table to look up static routes without looping the whole route array.
-
-- Pux\\Mux is written in C extension, method calls are faster!
-
-- With C extension, there is no class loading overhead.
-
-- Pux compiles your routes to plain PHP array, the compiled routes can be
-  loaded very fast. you don't need to call functions to register your routes before using it.
-
-
-Why It's Here
---------------------
-Most of us use a lot of machines to run our applications, however, it uses too
-much energy and too many resources.
-
-Some people thinks routing is not the bottleneck, the truth is this project
-does not claim routing is the bottleneck.
-
-Actually the "bottleneck" is always different in different applications, if you
-have a lot of heavy db requests, then your bottleneck is your db; if you have a
-lot of complex computation, then the bottleneck should be your algorithm.
-
-You might start wondering since the bottleneck is not routing, why do we
-implement route dispatcher in C extension? The answer is simple, if you put a
-pure PHP routing component with some empty callbacks and use apache benchmark
-tool to see how many requests you can handle per second, you will find out the
-routing component consumes a lot of computation time and the request number
-will decrease quite a few. (and it does nothing, all it does is ... just
-routing)
-
-Pux tries to reduce the overheads of loading PHP classes and the runtime
-method/function calls, and you can run your application faster without the
-overheads.
-
-
 Features
 --------------------
 
-- Zero dependency.
 - Low memory footprint (only 6KB with simple routes and extension installed) .
-- High performance of dispatching routes.
+- Low overhead.
 - PCRE pattern path support. (Sinatra-style syntax)
 - Request method condition support.
 - Domain condition support.
@@ -87,93 +22,21 @@ Features
 - Controller annotation support - you may override the default path from controller through the annotations.
 - Route with optional pattern.
 
-Pros & Cons of Grouped Pattern Matching Strategy
-----------------------------------------
-An idea of matching routes is to combine all patterns into one pattern and
-compare the given path with `pcre_match` in one time.
-
-However this approach does not work if you have optional group or named
-capturing group, the `pcre_match` can not return detailed information about
-what pattern is matched if you use one of them.
-
-And since you compile all patterns into one, you can't compare with other same
-patterns with different conditions, for example:
-
-    /users  # GET
-    /users  # POST
-    /users  # with HTTP_HOST=somedomain
-
-The trade off in Pux is to compare routes in sequence because the same pattern
-might be in different HTTP method or different host name.
-
-The best approach is to merge & compile the regexp patterns into a FSM (Finite
-state machine), complex conditions can also be merged into this FSM, and let
-this FSM to dispatch routes. And this is the long-term target of Pux.
-
-
-Routing Path Format
----------------------
-
-Static route:
-
-    /post
-
-PCRE route:
-
-    /post/:id                  => matches /post/33
-
-PCRE route with optional pattern:
-
-    /post/:id(/:title)         => matches /post/33, /post/33/post%20title
-    /post/:id(\.:format)       => matches /post/33, /post/33.json .. /post/33.xml
-
 Requirement
 --------------
 
-- PHP 5.4.x
-- PHP 5.5.x
+- PHP 5.4+
+
 
 Installation
 --------------------
-You can install Pux with composer by defining the following requirement in your composer.json:
-
-```json
-{
-    "require": {
-        "corneltek/pux": "^2.0"
-    }
-}
-```
-
-
-
-### Install Extension
-
-To install pux extension to boost the performance:
 
 ```sh
-git clone https://github.com/c9s/Pux.git
-cd Pux/ext
-phpize
-./configure
-make && make install
+composer require corneltek/pux "2.0.x-dev"
 ```
 
-Or you can configure the optimization flag to gain more when running `configure` command.:
-
-```sh
-CFLAGS="-O3" ./configure
-```
-
-Then setup your php.ini config to load pux extension:
-
-```ini
-extension=pux.so
-```
-
-
-Synopsis
-------------
+SYNOPSIS
+--------
 
 The routing usage is dead simple:
 
@@ -203,8 +66,9 @@ $mux->delete('/product/:id', ['ProductController','deleteAction'] , [
     'require' => [ 'id' => '\d+', ],
     'default' => [ 'id' => '1', ]
 ]);
-$route = $mux->dispatch('/product/1');
-RouteExecutor::execute($route);
+if ($route = $mux->dispatch('/product/1')) {
+    RouteExecutor::execute($route);
+}
 ```
 
 
@@ -497,6 +361,103 @@ $env = Utils::createEnvFromGlobals();
 $env['REMOTE_ADDR'] = '173.194.72.113';
 $response = $middleware($env, []);
 ```
+
+Routing Path Format
+---------------------
+
+Static route:
+
+    /post
+
+PCRE route:
+
+    /post/:id                  => matches /post/33
+
+PCRE route with optional pattern:
+
+    /post/:id(/:title)         => matches /post/33, /post/33/post%20title
+    /post/:id(\.:format)       => matches /post/33, /post/33.json .. /post/33.xml
+
+
+
+
+## Q & A
+
+### Why It's Faster
+
+- Pux uses simpler data structure (indexed array) to store the patterns and flags.
+    (In PHP internals, `zend_hash_index_find` is faster than `zend_hash_find`).
+
+- When matching routes, symfony uses a lot of function calls for each route:
+
+    https://github.com/symfony/Routing/blob/master/Matcher/UrlMatcher.php#L124
+
+    Pux fetches the pattern from an indexed-array:
+
+    https://github.com/c9s/Pux/blob/master/src/Pux/Mux.php#L189
+
+- Even you enabled APC or other bytecode cache extension, you are still calling
+  methods and functions in the runtime. Pux reduces the route building to one
+  static method call. `__set_state`.
+
+- Pux separates static routes and dynamic routes automatically, Pux uses hash
+  table to look up static routes without looping the whole route array.
+
+- Pux\\Mux is written in C extension, method calls are faster!
+
+- With C extension, there is no class loading overhead.
+
+- Pux compiles your routes to plain PHP array, the compiled routes can be
+  loaded very fast. you don't need to call functions to register your routes before using it.
+
+
+### Why It's Here
+
+Most of us use a lot of machines to run our applications, however, it uses too
+much energy and too many resources.
+
+Some people thinks routing is not the bottleneck, the truth is this project
+does not claim routing is the bottleneck.
+
+Actually the "bottleneck" is always different in different applications, if you
+have a lot of heavy db requests, then your bottleneck is your db; if you have a
+lot of complex computation, then the bottleneck should be your algorithm.
+
+You might start wondering since the bottleneck is not routing, why do we
+implement route dispatcher in C extension? The answer is simple, if you put a
+pure PHP routing component with some empty callbacks and use apache benchmark
+tool to see how many requests you can handle per second, you will find out the
+routing component consumes a lot of computation time and the request number
+will decrease quite a few. (and it does nothing, all it does is ... just
+routing)
+
+Pux tries to reduce the overheads of loading PHP classes and the runtime
+method/function calls, and you can run your application faster without the
+overheads.
+
+### Pros & Cons of Grouped Pattern Matching Strategy
+
+An idea of matching routes is to combine all patterns into one pattern and
+compare the given path with `pcre_match` in one time.
+
+However this approach does not work if you have optional group or named
+capturing group, the `pcre_match` can not return detailed information about
+what pattern is matched if you use one of them.
+
+And since you compile all patterns into one, you can't compare with other same
+patterns with different conditions, for example:
+
+    /users  # GET
+    /users  # POST
+    /users  # with HTTP_HOST=somedomain
+
+The trade off in Pux is to compare routes in sequence because the same pattern
+might be in different HTTP method or different host name.
+
+The best approach is to merge & compile the regexp patterns into a FSM (Finite
+state machine), complex conditions can also be merged into this FSM, and let
+this FSM to dispatch routes. And this is the long-term target of Pux.
+
 
 
 
