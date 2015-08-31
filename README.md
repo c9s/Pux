@@ -75,6 +75,16 @@ $mux->delete('/product/:id', ['ProductController','deleteAction'] , [
     'require' => [ 'id' => '\d+', ],
     'default' => [ 'id' => '1', ]
 ]);
+
+// If you use ExpandableController, it will automatically expands your controller actions into a sub-mux
+$mux->mount('/page', new PageController);
+
+// RESTful Mux Builder
+$builder = new RESTfulMuxBuilder($mux, [ 'prefix' => '/=' ]);
+$builder->addResource('product', new ProductResourceController); // expand RESTful resource point at /=/product
+$mux = $builder->build();
+
+
 if ($route = $mux->dispatch('/product/1')) {
     $response = RouteExecutor::execute($route);
 
