@@ -1,6 +1,7 @@
 Pux
 =============
-Pux is a simple & fast PHP router.
+Pux is a PHPSGI compliant HTTP server implementation. It includes a simple &
+fast router, out-of-box middlewares, simple & mountable controller.
 
 [![Coverage Status](https://coveralls.io/repos/c9s/Pux/badge.svg?branch=master&service=github)](https://coveralls.io/github/c9s/Pux?branch=master)
 [![Build Status](https://travis-ci.org/c9s/Pux.svg?branch=master)](https://travis-ci.org/c9s/Pux)
@@ -15,7 +16,7 @@ FEATURES
 - Low memory footprint (only 6KB with simple routes and extension installed) .
 - Low overhead.
 - PCRE pattern path support. (Sinatra-style syntax)
-- Middleware support
+- Middlewares:
   - ContentNegotiationMiddleware
   - CORSMiddleware
   - GeocoderMiddleware
