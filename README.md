@@ -9,26 +9,35 @@ Pux is a simple & fast PHP router.
 [![Latest Unstable Version](https://poser.pugx.org/corneltek/pux/v/unstable)](https://packagist.org/packages/corneltek/pux) 
 [![License](https://poser.pugx.org/corneltek/pux/license)](https://packagist.org/packages/corneltek/pux)
 
-Features
+FEATURES
 --------------------
 
 - Low memory footprint (only 6KB with simple routes and extension installed) .
 - Low overhead.
 - PCRE pattern path support. (Sinatra-style syntax)
-- Request method condition support.
-- Domain condition support.
-- HTTPS condition support.
+- Middleware support
+  - ContentNegotiationMiddleware
+  - CORSMiddleware
+  - GeocoderMiddleware
+  - HeadMiddleware
+  - TryCatchMiddleware
+  - XHProfMiddleware
+  - XHTTPMiddleware
 - Controller auto-mounting - you mount a controller automatically without specifying paths for each action.
 - Controller annotation support - you may override the default path from controller through the annotations.
 - Route with optional pattern.
+- Request constraints
+  - Request method condition support.
+  - Domain condition support.
+  - HTTPS condition support.
 
-Requirement
+REQUIREMENT
 --------------
 
 - PHP 5.4+
 
 
-Installation
+INSTALLATION
 --------------------
 
 ```sh
