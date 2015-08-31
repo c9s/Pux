@@ -79,6 +79,10 @@ $mux->delete('/product/:id', ['ProductController','deleteAction'] , [
 // If you use ExpandableController, it will automatically expands your controller actions into a sub-mux
 $mux->mount('/page', new PageController);
 
+$submux = new Pux\Mux;
+$submux->any('/bar');
+$mux->mount('/foo',$submux); // mount as /foo/bar
+
 // RESTful Mux Builder
 $builder = new RESTfulMuxBuilder($mux, [ 'prefix' => '/=' ]);
 $builder->addResource('product', new ProductResourceController); // expand RESTful resource point at /=/product
