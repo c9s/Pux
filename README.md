@@ -100,54 +100,29 @@ if ($route = $mux->dispatch('/product/1')) {
 ```
 
 
-Examples
---------------------
-
-### Basic Example
-
-```php
-require 'vendor/autoload.php';
-use Pux\Mux;
-use Pux\RouteExecutor;
-$mux = new Mux;
-$mux->get('/get', ['HelloController','helloAction']);
-$mux->post('/post', ['HelloController','helloAction']);
-$mux->put('/put', ['HelloController','helloAction']);
-
-$mux->mount('/hello', new HelloController);
-
-$route = $mux->dispatch( $_SERVER['PATH_INFO'] );
-echo RouteExecutor::execute($route);
-```
-
 Mux
------
+---
 Mux is where you define your routes, and you can mount multiple mux to a parent one.
 
 ```php
 $mainMux = new Mux;
-$mainMux->expand = true;
 
 $pageMux = new Mux;
-$pageMux->add('/page1', [ 'PageController', 'page1' ]);
-$pageMux->add('/page2', [ 'PageController', 'page2' ]);
+$pageMux->any('/page1', [ 'PageController', 'page1' ]);
+$pageMux->any('/page2', [ 'PageController', 'page2' ]);
 
 // short-hand syntax
-$pageMux->add('/page2', 'PageController:page2'  );
+$pageMux->any('/page2', 'PageController:page2'  );
 
 $mainMux->mount('/sub', $pageMux);
 
 foreach( ['/sub/page1', '/sub/page2'] as $p ) {
-    $r = $mainMux->dispatch($p);
-    ok($r, "Matched route for $p");
+    $route = $mainMux->dispatch($p);
+
+    // The $route contains [ pcre (boolean), path (string), callback (callable), options (array) ]
+    list($pcre, $path, $callback, $options) = $route;
 }
 ```
-
-The `expand` option means whether to expand/merge submux routes to the parent mux.
-
-When expand is enabled, it improves dispatch performance when you
-have a lot of sub mux to dispatch.
-
 
 ### Methods
 
@@ -195,6 +170,36 @@ strings will match the full string.
 When expand is disabled, the pattern comparison strategy for 
 strings will match the prefix.
 
+
+RouteRequest
+-------------------------
+
+RouteRequest maintains the information of the current request environment, it
+also provides some constraint checking methods that helps you to identify a
+request, e.g.:
+
+```php
+if ($request->queryStringMatch(...)) {
+
+}
+if ($request->hostEqual('some.dev')) {
+
+}
+if ($request->pathEqual('/foo/bar')) {
+
+}
+```
+
+
+```php
+use Pux\Environment;
+$env = Environment::createFromGlobals();
+$request = RouteRequest::createFromEnv($env);
+
+if ($route = $mux->dispatchRequest($request)) {
+
+}
+```
 
 
 APCDispatcher

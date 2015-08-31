@@ -45,6 +45,18 @@ class Controller
     }
 
 
+    public function getEnvironment()
+    {
+        return $this->environment;
+    }
+
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+
+
     public function hasMatchedRoute()
     {
         return $this->matchedRoute ? true : false;
