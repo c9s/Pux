@@ -6,6 +6,7 @@ use Exception;
 use LogicException;
 use ReflectionClass;
 use Closure;
+use Pux\Controller\Controller;
 
 class RouteExecutor
 {
@@ -132,7 +133,7 @@ class RouteExecutor
         $return = call_user_func_array($callback, $arguments);
         if (is_array($return)) {
             return $return;
-        } else if ($controller && is_string($return)) {
+        } else if ($controller instanceof Controller && is_string($return)) {
             $response = $controller->getResponse() ?: array();
             if (!isset($response[0])) {
                 $response[0] = 200;
