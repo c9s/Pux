@@ -66,8 +66,8 @@ class ControllerTest extends MuxTestCase
         if (!extension_loaded('json')) {
             $this->markTestSkipped('json extension not found.');
         }
-        $json = $controller->toJson(array('foo' => 1) );
-        $this->assertNotEmpty(json_decode($json));
+        $response = $controller->toJson(array('foo' => 1) );
+        $this->assertNotEmpty(json_decode($response[2]));
     }
 
 

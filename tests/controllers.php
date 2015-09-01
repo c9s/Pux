@@ -78,33 +78,25 @@ class ProductResourceController extends RESTfulController
      * @Method("POST")
      * @Route("");
      */
-    public function createAction() {
-
-    }
+    public function createAction() { }
 
     /**
      * @Route("/:id")
      * @Method("POST")
      */
-    public function updateAction() {
-
-    }
+    public function updateAction($id) { }
 
     /**
      * @Route("/:id")
      * @Method("GET")
      */
-    public function getAction() {
-
-    }
+    public function loadAction($id) { }
 
     /**
      * @Route("/:id");
      * @Method("DELETE")
      */
-    public function deleteAction() {
-
-    }
+    public function deleteAction($id) { }
 
 }
 
