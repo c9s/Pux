@@ -92,7 +92,7 @@ class Controller
         if ($encodeFlags === null) {
             $encodeFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
         }
-        return json_encode($data, $encodeFlags);
+        return [200, ['Content-Type: application/json;'], json_encode($data, $encodeFlags)];
     }
 
 
