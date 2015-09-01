@@ -46,6 +46,11 @@ class RESTfulMuxBuilder
     public function addResource($resourceId, Expandable $controller)
     {
         $this->resources[$resourceId] = $controller;
+
+        $prefix = $this->options['prefix'];
+        $resourceMux = $controller->expand();
+        $path = $prefix . '/' . $resourceId;
+        $this->mux->mount($path, $resourceMux);
     }
 
 
