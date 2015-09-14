@@ -3,7 +3,6 @@ Pux
 Pux is a PHPSGI compliant HTTP server implementation. It includes a simple &
 fast router, out-of-box middlewares, simple & mountable controller.
 
-
 [![Latest Stable Version](https://poser.pugx.org/corneltek/pux/v/stable)](https://packagist.org/packages/corneltek/pux) 
 [![Total Downloads](https://poser.pugx.org/corneltek/pux/downloads)](https://packagist.org/packages/corneltek/pux) 
 [![Latest Unstable Version](https://poser.pugx.org/corneltek/pux/v/unstable)](https://packagist.org/packages/corneltek/pux) 
@@ -20,14 +19,6 @@ FEATURES
 - Low memory footprint (only 6KB with simple routes and extension installed) .
 - Low overhead.
 - PCRE pattern path support. (Sinatra-style syntax)
-- Middlewares:
-  - ContentNegotiationMiddleware
-  - CORSMiddleware
-  - GeocoderMiddleware
-  - HeadMiddleware
-  - TryCatchMiddleware
-  - XHProfMiddleware
-  - XHTTPMiddleware
 - Controller auto-mounting - you mount a controller automatically without specifying paths for each action.
 - Controller annotation support - you may override the default path from controller through the annotations.
 - Route with optional pattern.
@@ -374,30 +365,6 @@ routes to cache.
 
 Pux uses indexed array as the data structure for storing route information so it's faster.
 
-## Middleware
-
-You can use middleware to wrap your application or your mux logics, here is an
-example of using GeocoderMiddleware to locate the country of an IP address:
-
-```php
-use Pux\Middleware\GeocoderMiddleware;
-
-$app = function(array & $env, array $res) {
-    // $env['geoip.country_code'] == 'US'
-    return $res;
-};
-
-$adapter = new FileGetContentsHttpAdapter();
-$geocoder = new FreeGeoIp($adapter);
-
-// wrap the app with our middleware
-$middleware = new GeocoderMiddleware($app, $geocoder);
-$env = Utils::createEnvFromGlobals();
-
-// write the remote IP address 
-$env['REMOTE_ADDR'] = '173.194.72.113';
-$response = $middleware($env, []);
-```
 
 Routing Path Format
 ---------------------
