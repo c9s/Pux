@@ -111,8 +111,8 @@ class ControllerTest extends MuxTestCase
         ok( $r = $mainMux->dispatch('/product/del') );
         $this->assertSame( array('CRUDProductController','delAction'), $r[2] );
 
-        ok( null == $mainMux->dispatch('/foo') );
-        ok( null == $mainMux->dispatch('/bar') );
+        $this->assertNull($mainMux->dispatch('/foo'));
+        $this->assertNull($mainMux->dispatch('/bar'));
     }
 
 
