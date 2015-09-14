@@ -17,6 +17,7 @@
         }
     ],
     "require": {
+        "phpsgi/phpsgi": "dev-master",
         "corneltek/universal": "^1.6",
         "corneltek/codegen": "^2"
     },
