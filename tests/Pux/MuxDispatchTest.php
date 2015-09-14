@@ -23,19 +23,4 @@ class MuxDispatchTest extends PHPUnit_Framework_TestCase
         $this->assertNotEmpty($route);
         $this->assertEquals('/edit/:id', $route[3]['pattern']);
     }
-
-
-
-
-    /*
-    public function testMiddleware()
-    {
-        $mux = new Mux;
-        $mux->mount('/bs/product', function(Mux $x) { 
-            // build mux object
-            $x->enable('JsonMiddleware');
-            $x->enable('TryBlockMiddleware', [ .... ]);
-        });
-    }
-     */
 }
