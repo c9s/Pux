@@ -30,7 +30,6 @@ if test $PHP_PUX != "no"; then
         pux_mux.c \
         php_expandable_mux.c \
         pux_controller.c \
-        pux_persistent.c \
         ct_helper.c \
         pux_functions.c \
         annotation/parser.c \

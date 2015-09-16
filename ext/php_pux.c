@@ -19,9 +19,6 @@
 #include "php_expandable_mux.h"
 #include "pux_controller.h"
 
-ZEND_DECLARE_MODULE_GLOBALS(pux);
-
-
 zend_class_entry *ce_pux_exception;
 
 
@@ -36,15 +33,6 @@ void pux_init_exception(TSRMLS_D) {
   zend_class_entry e;
   INIT_CLASS_ENTRY(e, "PuxException", NULL);
   ce_pux_exception = zend_register_internal_class_ex(&e, (zend_class_entry*)zend_exception_get_default(TSRMLS_C), NULL TSRMLS_CC);
-}
-
-void pux_mux_le_hash_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
-{
-    HashTable *h = (HashTable*) rsrc->ptr;
-    if (h) {
-        // zend_hash_destroy(h);
-        // pefree(h, 1);
-    }
 }
 
 zend_module_entry pux_module_entry = {
@@ -62,7 +50,6 @@ zend_module_entry pux_module_entry = {
 
 PHP_INI_BEGIN()
     PHP_INI_ENTRY("pux.fstat", "0", PHP_INI_ALL, NULL)
-    // STD_PHP_INI_ENTRY("pux.direction", "1", PHP_INI_ALL, OnUpdateBool, direction, zend_hello_globals, hello_globals)
 PHP_INI_END()
 
 #ifdef COMPILE_DL_PUX
