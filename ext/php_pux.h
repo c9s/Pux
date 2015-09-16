@@ -76,8 +76,6 @@ extern zend_module_entry pux_module_entry;
 
 void pux_init_exception(TSRMLS_D);
 
-void pux_mux_le_hash_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC);
-
 #define phpext_pux_ptr &pux_module_entry
 
 #endif
