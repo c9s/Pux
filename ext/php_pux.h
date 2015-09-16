@@ -14,6 +14,14 @@
 #define PHP_PUX_VERSION "1.3.1"
 #define PHP_PUX_EXTNAME "pux"
 
+#define PHP_5_0_X_API_NO		220040412
+#define PHP_5_1_X_API_NO		220051025
+#define PHP_5_2_X_API_NO		220060519
+#define PHP_5_3_X_API_NO		220090626
+#define PHP_5_4_X_API_NO		220100525
+#define PHP_5_5_X_API_NO		220121212
+#define PHP_5_6_X_API_NO		220131226
+
 
 #ifdef ZTS
 #include "TSRM.h"

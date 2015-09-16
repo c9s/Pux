@@ -11,6 +11,7 @@ vim:fdm=marker:et:sw=4:ts=4:sts=4:
 #include "Zend/zend_operators.h"
 #include "Zend/zend_API.h"
 #include "zend_exceptions.h"
+#include "Zend/zend_extensions.h"
 #include "zend_interfaces.h"
 #include "zend_object_handlers.h"
 #include "ext/pcre/php_pcre.h"
@@ -19,6 +20,7 @@ vim:fdm=marker:et:sw=4:ts=4:sts=4:
 #include "pux_functions.h"
 #include "php_expandable_mux.h"
 #include "hash.h"
+
 
 /**
  * new_dst = ht_copy_fun_t(NULL, src);
@@ -75,8 +77,10 @@ zval* my_copy_zval(zval* dst, const zval* src, int persistent TSRMLS_DC)
         }
         break;
 
+#if ZEND_EXTENSION_API_NO < PHP_5_5_X_API_NO
+    case IS_CONSTANT_ARRAY:
+#endif
     case IS_ARRAY:
-    // case IS_CONSTANT_ARRAY:
         dst->value.ht = my_copy_hashtable(NULL, src->value.ht, (ht_copy_fun_t) my_copy_zval_ptr, (void*) &tmp, sizeof(zval *), persistent TSRMLS_CC);
         break;
 
@@ -118,7 +122,9 @@ void my_zval_copy_ctor_func(zval *zvalue ZEND_FILE_LINE_DC)
                 zvalue->value.str.val = (char *) estrndup_rel(zvalue->value.str.val, zvalue->value.str.len);
             }
             break;
-        // case IS_CONSTANT_ARRAY:
+#if ZEND_EXTENSION_API_NO < PHP_5_5_X_API_NO
+        case IS_CONSTANT_ARRAY:
+#endif
         case IS_ARRAY: {
                 zval *tmp;
                 HashTable *original_ht = zvalue->value.ht;
@@ -174,7 +180,10 @@ void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC)
             zvalue->value.str.val = (char *) pestrndup(zvalue->value.str.val, zvalue->value.str.len, 1);
             break;
 
-        // case IS_CONSTANT_ARRAY:
+
+#if ZEND_EXTENSION_API_NO < PHP_5_5_X_API_NO
+        case IS_CONSTANT_ARRAY:
+#endif
         case IS_ARRAY: {
                 zval *tmp;
                 HashTable *original_ht = zvalue->value.ht;
