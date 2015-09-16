@@ -1,7 +1,6 @@
 Pux
 =============
-Pux is a PHPSGI compliant HTTP server implementation. It includes a simple &
-fast router, out-of-box middlewares, simple & mountable controller.
+Pux is a faster PHP router, it also includes out-of-box controller helpers.
 
 [![Latest Stable Version](https://poser.pugx.org/corneltek/pux/v/stable)](https://packagist.org/packages/corneltek/pux) 
 [![Total Downloads](https://poser.pugx.org/corneltek/pux/downloads)](https://packagist.org/packages/corneltek/pux) 
@@ -11,6 +10,10 @@ fast router, out-of-box middlewares, simple & mountable controller.
 **2.0 Branch Build Status** *(This branch is under development)*
 
 [![Coverage Status](https://coveralls.io/repos/c9s/Pux/badge.svg?branch=2.0&service=github)](https://coveralls.io/github/c9s/Pux?branch=2.0) [![Build Status](https://travis-ci.org/c9s/Pux.svg?branch=master)](https://travis-ci.org/c9s/Pux)
+
+Benchmark
+--------------------
+- See <https://github.com/tyler-sommer/php-router-benchmark> for details
 
 
 FEATURES
