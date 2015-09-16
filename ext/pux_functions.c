@@ -17,7 +17,6 @@ vim:fdm=marker:et:sw=4:ts=4:sts=4:
 #include "ext/standard/php_string.h"
 #include "php_pux.h"
 #include "pux_functions.h"
-#include "pux_persistent.h"
 #include "php_expandable_mux.h"
 #include "hash.h"
 
@@ -201,131 +200,6 @@ void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC)
 }
 // }}}
 
-int _pux_store_mux(char *name, zval * mux TSRMLS_DC) 
-{
-    zend_rsrc_list_entry new_le, *le;
-
-    // variables for copying mux object properties
-    char        *id_key, *expand_key;
-    int status, id_key_len, expand_key_len;
-
-    id_key_len = spprintf(&id_key, 0, "mux_id_%s", name);
-    expand_key_len = spprintf(&expand_key, 0, "mux_expand_%s", name);
-
-
-    // Z_ADDREF_P(mux);
-
-    // make the hash table persistent
-    zval *prop, *tmp;
-    HashTable *routes, *static_routes; 
-
-    prop = zend_read_property(ce_pux_mux, mux, "routes", sizeof("routes")-1, 1 TSRMLS_CC);
-
-    routes = zend_hash_clone_persistent( Z_ARRVAL_P(prop) TSRMLS_CC);
-    if ( ! routes ) {
-        php_error(E_ERROR, "Can not clone HashTable");
-        return FAILURE;
-    }
-    // pux_persistent_store( name, "routes", le_mux_hash_table, (void*) routes TSRMLS_CC);
-    return SUCCESS;
-
-
-    prop = zend_read_property(ce_pux_mux, mux, "staticRoutes", sizeof("staticRoutes")-1, 1 TSRMLS_CC);
-    static_routes = zend_hash_clone_persistent( Z_ARRVAL_P(prop)  TSRMLS_CC);
-    if ( ! static_routes ) {
-        php_error(E_ERROR, "Can not clone HashTable");
-        return FAILURE;
-    }
-    // pux_persistent_store(name, "static_routes", le_mux_hash_table, (void *) static_routes TSRMLS_CC) ;
-
-    
-    // copy ID
-    /*
-    prop = zend_read_property(ce_pux_mux, mux, "id", sizeof("id")-1, 1 TSRMLS_CC);
-    tmp = pemalloc(sizeof(zval), 1);
-    INIT_ZVAL(tmp);
-    Z_TYPE_P(tmp) = IS_LONG;
-    Z_LVAL_P(tmp) = Z_LVAL_P(prop);
-    Z_SET_REFCOUNT_P(tmp, 1);
-    pux_persistent_store( name, "id", (void*) tmp TSRMLS_CC);
-    */
-
-    // We cannot copy un-expandable mux object because we don't support recursively copy for Mux object.
-    prop = zend_read_property(ce_pux_mux, mux, "expand", sizeof("expand")-1, 1 TSRMLS_CC);
-    if ( ! Z_BVAL_P(prop) ) {
-        php_error(E_ERROR, "We cannot copy un-expandable mux object because we don't support recursively copy for Mux object.");
-    }
-    efree(id_key);
-    efree(expand_key);
-    return SUCCESS;
-}
-
-
-/**
- * Fetch mux related properties (hash tables) from EG(persistent_list) hash table and 
- * rebless a new Mux object with these properties.
- *
- * @return Mux object
- */
-zval * _pux_fetch_mux(char *name TSRMLS_DC)
-{
-    zval *z_id, *z_routes, *z_static_routes, *z_submux, *z_routes_by_id, *tmp;
-    HashTable *routes_hash;
-    HashTable *static_routes_hash;
-
-    // fetch related hash to this mux object.
-    // routes_hash = (HashTable*) pux_persistent_fetch(name, "routes" TSRMLS_CC);
-    if ( ! routes_hash  ) {
-        return NULL;
-    }
-
-    // static_routes_hash = (HashTable*) pux_persistent_fetch(name, "static_routes" TSRMLS_CC);
-    if ( ! static_routes_hash ) {
-        return NULL;
-    }
-    return NULL;
-
-    // z_id = (zval*) pux_persistent_fetch(name, "id" TSRMLS_CC);
-    MAKE_STD_ZVAL(z_routes);
-    MAKE_STD_ZVAL(z_static_routes);
-    MAKE_STD_ZVAL(z_routes_by_id);
-    MAKE_STD_ZVAL(z_submux);
-
-    Z_TYPE_P(z_routes) = IS_ARRAY;
-    Z_TYPE_P(z_static_routes) = IS_ARRAY;
-    array_init(z_routes_by_id);
-    array_init(z_submux);
-
-    // we need to clone hash table deeply because when Mux object returned to userspace, it will be freed.
-    Z_ARRVAL_P(z_routes)        = zend_hash_clone(routes_hash TSRMLS_CC);
-    Z_ARRVAL_P(z_static_routes) = zend_hash_clone(static_routes_hash TSRMLS_CC);
-
-    // create new object and return to userspace.
-    zval *new_mux = NULL;
-    ALLOC_INIT_ZVAL(new_mux);
-    object_init_ex(new_mux, ce_pux_mux);
-
-    // We don't need __construct because we assign the property by ourself.
-    // CALL_METHOD(Mux, __construct, new_mux, new_mux);
-    Z_SET_REFCOUNT_P(new_mux, 1);
-
-
-
-    if ( z_id ) {
-        Z_ADDREF_P(z_id);
-        zend_update_property_long(ce_pux_mux, new_mux, "id" , sizeof("id")-1, Z_LVAL_P(z_id) TSRMLS_CC);
-    }
-    // persistent mux should always be expanded. (no recursive structure)
-    zend_update_property_bool(ce_pux_mux , new_mux , "expand"       , sizeof("expand")-1       , 1  TSRMLS_CC);
-    zend_update_property(ce_pux_mux      , new_mux , "routes"       , sizeof("routes")-1       , z_routes TSRMLS_CC);
-    zend_update_property(ce_pux_mux      , new_mux , "staticRoutes" , sizeof("staticRoutes")-1 , z_static_routes TSRMLS_CC);
-
-    zend_update_property(ce_pux_mux, new_mux, "routesById", sizeof("routesById")-1, z_routes_by_id TSRMLS_CC);
-    zend_update_property(ce_pux_mux, new_mux, "submux", sizeof("submux")-1, z_submux TSRMLS_CC);
-    return new_mux;
-}
-
-
 int mux_loader(char *path, zval *result TSRMLS_DC) 
 {
     zend_file_handle file_handle;
@@ -343,7 +217,6 @@ int mux_loader(char *path, zval *result TSRMLS_DC)
     file_handle.handle.fp = NULL;
 
     op_array = zend_compile_file(&file_handle, ZEND_INCLUDE TSRMLS_CC);
-
 
     if (op_array && file_handle.handle.stream.handle) {
         int dummy = 1;
@@ -429,96 +302,6 @@ PHP_FUNCTION(pux_store_mux)
     }
     if ( _pux_store_mux(name, mux TSRMLS_CC) == SUCCESS ) {
         RETURN_TRUE;
-    }
-    RETURN_FALSE;
-}
-
-
-PHP_FUNCTION(pux_persistent_dispatch)
-{
-    char *ns, *filename, *path;
-    int  ns_len, filename_len, path_len;
-    zval *mux = NULL;
-    zval *route = NULL;
-    zval *z_path = NULL;
-
-    /* parse parameters */
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sss", &ns, &ns_len, &filename, &filename_len, &path, &path_len) == FAILURE) {
-        RETURN_FALSE;
-    }
-
-    mux = _pux_fetch_mux(ns TSRMLS_CC);
-    if ( mux == NULL ) {
-        ALLOC_INIT_ZVAL(mux);
-        if ( mux_loader(filename, mux TSRMLS_CC) == FAILURE ) {
-            php_error(E_ERROR, "Can not load Mux object from %s", filename);
-        }
-
-        // TODO: compile mux and sort routes
-        if ( _pux_store_mux(ns, mux TSRMLS_CC) == FAILURE ) {
-            php_error(E_ERROR, "Can not store Mux object from %s", filename);
-        }
-    }
-
-    ALLOC_INIT_ZVAL(z_path);
-    ZVAL_STRINGL(z_path, path ,path_len, 1); // no copy
-
-    // XXX: pass return_value to the method call, so we don't need to copy
-    route = call_mux_method(mux, "dispatch" , sizeof("dispatch"), 1 , z_path, NULL, NULL TSRMLS_CC);
-    zval_ptr_dtor(&z_path);
-
-    if ( route ) {
-        *return_value = *route;
-        zval_copy_ctor(return_value);
-        return;
-    }
-    // route not found
-    RETURN_FALSE;
-}
-
-
-
-PHP_FUNCTION(pux_delete_mux)
-{
-    char *name, *persistent_key;
-    int  name_len, persistent_key_len;
-    zend_rsrc_list_entry *le;
-
-    /* parse parameters */
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", 
-                    &name, &name_len) == FAILURE) {
-        RETURN_FALSE;
-    }
-
-    persistent_key_len = spprintf(&persistent_key, 0, "mux_%s", name);
-
-    if ( zend_hash_find(&EG(persistent_list), persistent_key, persistent_key_len + 1, (void**) &le) == SUCCESS ) {
-        zval_ptr_dtor((zval**) &le->ptr);
-        zend_hash_del(&EG(persistent_list), persistent_key, persistent_key_len + 1);
-        efree(persistent_key);
-        RETURN_TRUE;
-    }
-    efree(persistent_key);
-    RETURN_FALSE;
-}
-
-PHP_FUNCTION(pux_fetch_mux)
-{
-    char *name;
-    int  name_len;
-    zval * mux;
-
-    /* parse parameters */
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", 
-                    &name, &name_len) == FAILURE) {
-        RETURN_FALSE;
-    }
-
-    mux = _pux_fetch_mux(name TSRMLS_CC);
-    if ( mux ) {
-        *return_value = *mux;
-        zval_copy_ctor(return_value);
-        return;
     }
     RETURN_FALSE;
 }

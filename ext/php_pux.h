@@ -19,25 +19,6 @@
 #include "TSRM.h"
 #endif
 
-extern int pux_globals_id;
-
-extern int le_mux_hash_table;
-
-// global variable structure
-ZEND_BEGIN_MODULE_GLOBALS(pux)
-    // zval *mux_array;
-    HashTable * persistent_list;
-    // zend_bool direction;
-ZEND_END_MODULE_GLOBALS(pux)
-
-#ifdef ZTS
-#define PUX_G(v) TSRMG(pux_globals_id, zend_pux_globals *, v)
-#else
-#define PUX_G(v) (pux_globals.v)
-#endif
-
-
-
 #define ZEND_HASH_FETCH(hash,key,ret) \
     zend_hash_find(hash, key, sizeof(key), (void**)&ret) == SUCCESS
 
