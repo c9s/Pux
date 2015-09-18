@@ -76,13 +76,11 @@ zval** my_copy_zval_ptr(zval** dst, const zval** src, int persistent TSRMLS_DC);
 
 zval * _pux_fetch_mux(char *name TSRMLS_DC);
 int mux_loader(char *path, zval *result TSRMLS_DC);
-int _pux_store_mux(char *name, zval * mux TSRMLS_DC) ;
 
 void my_zval_copy_ctor_persistent_func(zval *zvalue ZEND_FILE_LINE_DC);
 
 PHP_FUNCTION(pux_match);
 PHP_FUNCTION(pux_sort_routes);
-PHP_FUNCTION(pux_store_mux);
 PHP_FUNCTION(pux_fetch_mux);
 PHP_FUNCTION(pux_delete_mux);
 PHP_FUNCTION(pux_persistent_dispatch);

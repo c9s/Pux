@@ -299,22 +299,6 @@ PHP_FUNCTION(pux_match)
     RETURN_NULL();
 }
 
-PHP_FUNCTION(pux_store_mux)
-{
-    zval *mux;
-    char *name;
-    int  name_len;
-
-    /* parse parameters */
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sz", &name, &name_len, &mux ) == FAILURE) {
-        RETURN_FALSE;
-    }
-    if ( _pux_store_mux(name, mux TSRMLS_CC) == SUCCESS ) {
-        RETURN_TRUE;
-    }
-    RETURN_FALSE;
-}
-
 PHP_FUNCTION(pux_sort_routes)
 {
     zval *a;
