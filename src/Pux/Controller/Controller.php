@@ -39,10 +39,11 @@ class Controller
         $this->matchedRoute = $matchedRoute;
     }
 
-    public function init()
-    {
+    public function init() { }
 
-    }
+    public function prepare() {  }
+
+    public function finalize() {  }
 
 
     public function getEnvironment()
@@ -103,15 +104,14 @@ class Controller
      * @param array $vars    Action method parameters, which will be applied to the method parameters by their names.
      * @return string        Return execution result in string format.
      */
-    public function runAction($action, $vars = array())
+    public function runAction($action, array $vars = array())
     {
         $method = $action . 'Action';
         if ( ! method_exists($this,$method) ) {
             throw new Exception("Controller method $method does not exist.");
         }
 
-        // Trigger the before action
-        $this->before();
+        $this->prepare();
 
         $ro = new ReflectionObject( $this );
         $rm = $ro->getMethod($method);
@@ -127,7 +127,7 @@ class Controller
         $ret = call_user_func_array( array($this,$method) , $arguments );
 
         // Trigger the after action
-        $this->after();
+        $this->finalize();
         return $ret;
     }
 
