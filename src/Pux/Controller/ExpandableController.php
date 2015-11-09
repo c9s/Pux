@@ -16,7 +16,6 @@ class ExpandableController extends Controller implements Expandable
 
     /**
      * @param string $method request method
-     *
      * @return array Annotation info
      */
     protected function parseMethodAnnotation(ReflectionMethod $method)
@@ -30,41 +29,45 @@ class ExpandableController extends Controller implements Expandable
                 $annotations['Route'] = $regs[1];
             }
         }
-
         return $annotations;
-    }
-
-    protected function parseClassMethodAnnotation(ReflectionClass $refObject, array &$args, $parent = 0)
-    {
-        if ($pClassRef = $refObject->getParentClass()) {
-            $this->parseClassMethodAnnotation($pClassRef, $args, 1);
-        }
-
-        $methods = $refObject->getMethods();
-        foreach ($methods as $method) {
-            if (!preg_match('/Action$/', $method->getName())) {
-                return;
-            }
-
-            $meta = array('class' => $refObject->getName());
-            $anns = $this->parseMethodAnnotation($method);
-            if (empty($anns)) {
-                // get parent method annotations
-                if (isset($args[ $method->getName() ])) {
-                    $anns = $args[$method->getName()][0];
-                }
-            }
-            // override
-            $args[ $method->getName() ] = array($anns, $meta);
-        }
     }
 
     public function getActionMethods()
     {
-        $refObject = new ReflectionClass($this);
-        $args = array();
-        $this->parseClassMethodAnnotation($refObject, $args, 0);
-        return $args;
+        $refClass = new ReflectionClass($this);
+        $methodMap = [];
+
+        // build up parent class list
+        $parentClasses = [];
+        $parentClassRef = $refClass;
+        while ($parent = $parentClassRef->getParentClass()) {
+            $parentClasses[] = $parent;
+            $parentClassRef = $parent;
+        }
+
+        // iterate methods from parent class actions
+        foreach (array_reverse($parentClasses) as $class) {
+            foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+                // Ignore class methods that doesn't have Action in suffix
+                if (!preg_match('/Action$/', $method->getName())) {
+                    continue;
+                }
+
+                $meta = array('class' => $class->getName());
+                $annotations = $this->parseMethodAnnotation($method);
+
+                // If it's empty, then fetch annotations from parent methods
+                if (empty($annotations)) {
+                    if (isset($methodMap[$method->getName()])) {
+                        $annotations = $methodMap[$method->getName()][0];
+                    }
+                }
+                // always update method Map
+                $methodMap[$method->getName()] = array($annotations, $meta);
+            }
+        }
+        // TODO: see if we can cache it.
+        return $methodMap;
     }
 
     /**
@@ -80,7 +83,6 @@ class ExpandableController extends Controller implements Expandable
     protected function translatePath($methodName)
     {
         $methodName = preg_replace('/Action$/', '', $methodName);
-
         return '/'.preg_replace_callback('/[A-Z]/', function ($matches) {
             return '/'.strtolower($matches[0]);
         }, $methodName);
