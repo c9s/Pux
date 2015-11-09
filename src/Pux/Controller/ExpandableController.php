@@ -32,6 +32,16 @@ class ExpandableController extends Controller implements Expandable
         return $annotations;
     }
 
+
+    /**
+     * getActionMethods parses the route definition from annotation and return
+     * the "method" => "route meta" data structure
+     *
+     * Should always keep it returns simple array, so that we can cache the
+     * data in somewhere...
+     *
+     * @return array
+     */
     public function getActionMethods()
     {
         $refClass = new ReflectionClass($this);
