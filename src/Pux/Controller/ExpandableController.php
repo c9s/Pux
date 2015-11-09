@@ -49,7 +49,7 @@ class ExpandableController extends Controller implements Expandable
 
         // build up parent class list
         $parentClasses = [];
-        $parentClassRef = $refClass;
+        $parentClasses[] = $parentClassRef = $refClass;
         while ($parent = $parentClassRef->getParentClass()) {
             $parentClasses[] = $parent;
             $parentClassRef = $parent;
@@ -58,8 +58,12 @@ class ExpandableController extends Controller implements Expandable
         // iterate methods from parent class actions
         foreach (array_reverse($parentClasses) as $class) {
             foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+
                 // Ignore class methods that doesn't have Action in suffix
                 if (!preg_match('/Action$/', $method->getName())) {
+                    continue;
+                }
+                if (in_array($method->getName(), [ 'runAction', 'hasAction' ])) {
                     continue;
                 }
 

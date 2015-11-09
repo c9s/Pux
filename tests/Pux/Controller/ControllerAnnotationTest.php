@@ -37,15 +37,15 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
     public function testAnnotationForGetActionMethods()
     {
         $con = new ChildController;
-        ok($con);
-        ok( $map = $con->getActionMethods() );
-        ok( is_array($map) );
+        $map = $con->getActionMethods();
+        $this->assertNotEmpty($map);
+        $this->assertTrue(is_array($map));
 
-        ok( isset($map['postAction']) );
-        ok( isset($map['pageAction']) );
-        ok( isset($map['subpageAction']) );
+        $this->assertTrue( isset($map['postAction']) );
+        $this->assertTrue( isset($map['pageAction']) );
+        $this->assertTrue( isset($map['subpageAction']) );
 
-        is( array(array(
+        is(array(array(
             "Route" => "/post",
             "Method" => "POST"
         ),array(
@@ -53,7 +53,7 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
         )), $map['postAction'] );
 
         $routeMap = $con->getActionRoutes();
-        count_ok( 3, $routeMap );
+        $this->assertCount(3, $routeMap);
 
         list($path, $method, $options) = $routeMap[0];
         is('/page', $path);
@@ -70,14 +70,13 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
         }
 
         $controller = new ExpandableProductController;
-        ok($controller);
-
-        ok( is_array( $map = $controller->getActionMethods() ) );
+        $this->assertTrue(is_array( $map = $controller->getActionMethods() ) );
 
         $routes = $controller->getActionRoutes();
-        is('', $routes[0][0], 'the path');
-        is('indexAction', $routes[0][1], 'the mapping method');
-        ok( is_array($routes) );
+        $this->assertNotEmpty($routes);
+
+        $this->assertEquals('', $routes[0][0], 'the path');
+        $this->assertEquals('indexAction', $routes[0][1], 'the mapping method');
 
         $mux = new Pux\Mux;
 
@@ -87,7 +86,6 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
 
         // gc scan bug
         $mux->mount('/product', $controller->expand() );
-        ok($mux);
 
         $paths = array(
             '/product/delete' => 'DELETE',
@@ -97,14 +95,13 @@ class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
             '/product/item' => 'GET',
             '/product' => null,
         );
-
         foreach( $paths as $path => $method ) {
-            if ( $method ) {
+            if ($method) {
                 $_SERVER['REQUEST_METHOD'] = $method;
             } else {
                 $_SERVER['REQUEST_METHOD'] = 'GET';
             }
-            ok( $mux->dispatch($path) , $path);
+            ok($mux->dispatch($path) , $path);
         }
     }
 }
