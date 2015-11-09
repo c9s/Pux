@@ -24,6 +24,7 @@ Incompatible changes:
 Fixes:
 
 - Fixed pattern compiler for post-separators. e.g. `/:year-:month` or `/blog/:id(.:format)`
+- Fixed action method annotation parser
 
 Deprecation:
 
