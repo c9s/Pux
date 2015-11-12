@@ -73,7 +73,7 @@ class Mux implements IteratorAggregate
      * When expand is disabled, the pattern comparison strategy for
      * strings will match the prefix.
      */
-    public $expand = false;
+    public $expand = true;
 
     /**
      * @param Pux\Mux The parent mux object
@@ -157,17 +157,14 @@ class Mux implements IteratorAggregate
         $mux->setParent($this);
         $options['mux'] = $mux;
 
-        $muxId = $mux->getId();
-        $this->add($pattern, $muxId, $options);
-        $this->submux[ $muxId ] = $mux;
-        /*
+
         if ($this->expand) {
             $pcre = strpos($pattern,':') !== false;
 
             // rewrite submux routes
             foreach ($mux->routes as $route) {
                 // process for pcre
-                if ( $route[0] || $pcre ) {
+                if ($route[0] || $pcre) {
                     $newPattern = $pattern . ( $route[0] ? $route[3]['pattern'] : $route[1] );
                     $routeArgs = PatternCompiler::compile($newPattern, 
                         array_replace_recursive($options, $route[3]) );
@@ -181,7 +178,13 @@ class Mux implements IteratorAggregate
                     );
                 }
             }
-        */
+        } else {
+
+            $muxId = $mux->getId();
+            $this->add($pattern, $muxId, $options);
+            $this->submux[ $muxId ] = $mux;
+
+        }
     }
 
     public function delete($pattern, $callback, array $options = array())
