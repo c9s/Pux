@@ -17,10 +17,10 @@ class MuxDispatchTest extends PHPUnit_Framework_TestCase
 
         $route = $mux->dispatch('/bs/product/create');
         $this->assertNotEmpty($route);
-        $this->assertEquals('/create', $route[1]);
+        $this->assertEquals('/bs/product/create', $route[1]);
 
         $route = $mux->dispatch('/bs/product/edit/30');
         $this->assertNotEmpty($route);
-        $this->assertEquals('/edit/:id', $route[3]['pattern']);
+        $this->assertEquals('/bs/product/edit/:id', $route[3]['pattern']);
     }
 }

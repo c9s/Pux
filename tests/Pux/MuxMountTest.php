@@ -95,7 +95,7 @@ class MuxMountTest extends MuxTestCase
         is(0, $mux->length());
         $mux->mount( '/sub' , $submux);
         $r = $mux->dispatch('/sub/hello/John');
-        $this->assertPcreRoute($r, '/hello/:name');
+        $this->assertPcreRoute($r, '/sub/hello/:name');
     }
 
     public function testSubmuxPcreMount()
@@ -112,7 +112,7 @@ class MuxMountTest extends MuxTestCase
 
         $mux->mount( '/sub/:country' , $submux);
 
-        $this->assertEquals(1, $mux->length());
+        $this->assertEquals(2, $mux->length());
 
         $route = $mux->dispatch('/sub/UK/goodbye');
         $this->assertNotNull($route);
@@ -132,7 +132,7 @@ class MuxMountTest extends MuxTestCase
 
         $mux->mount('/sub/:country', $submux);
         $r = $mux->dispatch('/sub/UK/hello/there');
-        $this->assertNonPcreRoute($r, '/hello/there');
+        $this->assertPcreRoute($r, '/sub/:country/hello/there');
     }
 
     public function testCallableSubMux() {
@@ -144,16 +144,16 @@ class MuxMountTest extends MuxTestCase
 
         ok($routes = $mux->getRoutes());
         ok(is_array($routes));
-        $this->assertCount(1, $routes);
-        $this->assertEquals('/test', $routes[0][1]);
+        $this->assertCount(2, $routes);
+        $this->assertEquals('/test/hello/static', $routes[0][1]);
 
         $r = $mux->dispatch('/test/hello/John');
         $this->assertNotEmpty($r);
-        $this->assertPcreRoute($r, '/hello/:name');
+        $this->assertPcreRoute($r, '/test/hello/:name');
 
         $r = $mux->dispatch('/test/hello/static');
         $this->assertNotEmpty($r);
-        $this->assertNonPcreRoute($r, '/hello/static');
+        $this->assertNonPcreRoute($r, '/test/hello/static');
     }
 
     public function testSubmuxMergeOptions()
@@ -190,19 +190,19 @@ class MuxMountTest extends MuxTestCase
         */
         $mux->mount('/sub', $submux);
 
-        $this->assertEquals(1, $mux->length());
+        $this->assertEquals(2, $mux->length());
 
         $r = $mux->dispatch('/sub/hello/John');
         $this->assertNotNull($r);
 
         $this->assertEquals('json', $r[3]['default']['suffix']);
         $this->assertEquals('v1', $r[3]['default']['prefix']);
-        $this->assertPcreRoute($r, '/hello/:name');
+        $this->assertPcreRoute($r, '/sub/hello/:name');
 
         $r = $mux->dispatch('/sub/foo');
         $this->assertNotNull($r);
         // ok($r[3]['default']['suffix'] == 'csv');
         // ok($r[3]['require']['suffix'] == '[a-z]{3,4}');
-        $this->assertNonPcreRoute($r, '/foo');
+        $this->assertNonPcreRoute($r, '/sub/foo');
     }
 }

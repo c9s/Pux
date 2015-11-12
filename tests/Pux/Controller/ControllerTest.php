@@ -100,9 +100,9 @@ class ControllerTest extends MuxTestCase
         $mainMux->mount('/product' , $controller);
         $mainMux->any( '/' , array('ProductController', 'indexAction') );
 
-        ok($mainMux->getRoutes()); 
-        count_ok( 2,  $mainMux->getRoutes(), 'route count should be 2' );
-        ok( $r = $mainMux->dispatch('/product') , 'matched /product' ); // match indexAction
+        $this->assertNotEmpty($mainMux->getRoutes()); 
+        $this->assertCount(4,  $mainMux->getRoutes(), 'route count should be 2' );
+        ok($r = $mainMux->dispatch('/product') , 'matched /product' ); // match indexAction
         $this->assertSame(array('CRUDProductController','indexAction'), $r[2] );
 
         ok( $r = $mainMux->dispatch('/product/add') );
