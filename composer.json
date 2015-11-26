@@ -32,5 +32,8 @@
         "psr-4": {
             "Pux\\": "src/Pux/"
         }
+    },
+    "extra": {
+        "branch-alias": { "dev-master": "2.0.x-dev" }
     }
 }
