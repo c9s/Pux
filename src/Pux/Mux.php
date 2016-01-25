@@ -89,7 +89,7 @@ class Mux
                 // process for pcre
                 if ( $route[0] || $pcre ) {
                     $newPattern = $pattern . ( $route[0] ? $route[3]['pattern'] : $route[1] );
-                    $routeArgs = PatternCompiler::compile($newPattern, 
+                    $routeArgs = PatternCompiler::compile($newPattern,
                         array_replace_recursive($options, $route[3]) );
                     $this->appendPCRERoute( $routeArgs, $route[2] );
                 } else {
@@ -169,7 +169,7 @@ class Mux
             $routeArgs = PatternCompiler::compile($pattern, $options);
 
             // generate a pcre pattern route
-            $route = array( 
+            $route = array(
                 true, // PCRE
                 $routeArgs['compiled'],
                 $callback,
@@ -287,7 +287,7 @@ class Mux
                     continue;
                 if ( isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"] )
                     continue;
-                if ( isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"] )
+                if ( isset($route[3]['secure']) && $route[3]['secure'] && (!isset($_SERVER["HTTPS"]) || !$_SERVER["HTTPS"]) )
                     continue;
                 return $route;
             } else {
@@ -298,7 +298,7 @@ class Mux
                         continue;
                     if ( isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER["HTTP_HOST"] )
                         continue;
-                    if ( isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER["HTTPS"] )
+                    if ( isset($route[3]['secure']) && $route[3]['secure'] && (!isset($_SERVER["HTTPS"]) || !$_SERVER["HTTPS"]) )
                         continue;
                     return $route;
                 } else {
@@ -316,7 +316,7 @@ class Mux
 
                 // sub-path and call submux to dispatch
                 // for pcre pattern?
-                if ($route[0]) { 
+                if ($route[0]) {
                     $matchedString = $route[3]['vars'][0];
                     return $submux->dispatch( substr($path, strlen($matchedString)) );
                 } else {
@@ -363,5 +363,3 @@ class Mux
     }
 
 }
-
-
