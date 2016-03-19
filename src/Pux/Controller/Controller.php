@@ -1,6 +1,7 @@
 <?php
 namespace Pux\Controller;
 use ReflectionClass;
+use ReflectionObject;
 use Universal\Http\HttpRequest;
 use Pux\Mux;
 
