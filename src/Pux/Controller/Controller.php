@@ -40,6 +40,20 @@ class Controller
         $this->matchedRoute = $matchedRoute;
     }
 
+
+    /**
+     * Create another controller with the current environment array
+     *
+     * NOTE: this is not supported in extension yet.
+     *
+     * @param string $controllerClass
+     */
+    protected function createController($controllerClass)
+    {
+        $cls = new ReflectionClass($controllerClass);
+        return $cls->newInstance($this->environment);
+    }
+
     public function init() { }
 
     public function prepare() {  }
