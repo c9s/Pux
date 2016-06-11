@@ -30,4 +30,3 @@ cache:
   apt: true
   directories:
   - vendor
-  - composer.lock
