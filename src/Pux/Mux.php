@@ -372,6 +372,10 @@ class Mux implements IteratorAggregate
             $requestMethod = self::convertRequestMethodConstant($_SERVER['REQUEST_METHOD']);
 
         }
+        //Allow HTTP method to be overwritten by HTTP_X_HTTP_METHOD_OVERRIDE
+        if ('POST' === $requestMethod) {
+            $requestMethod = isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']) ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] : $requestMethod;
+        }
 
         foreach ($this->routes as $route) {
             // If the route is using pcre pattern marching...
