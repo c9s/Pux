@@ -18,7 +18,7 @@
     ],
     "require": {
         "phpsgi/phpsgi": "dev-master",
-        "corneltek/universal": "^1.8"
+        "universal/universal": "2.0.x-dev"
     },
     "license": "MIT",
     "require-dev": {
