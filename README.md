@@ -4,12 +4,12 @@ Pux is a faster PHP router, it also includes out-of-box controller helpers.
 
 [![Latest Stable Version](https://poser.pugx.org/corneltek/pux/v/stable)](https://packagist.org/packages/corneltek/pux) 
 [![Total Downloads](https://poser.pugx.org/corneltek/pux/downloads)](https://packagist.org/packages/corneltek/pux) 
-[![Latest Unstable Version](https://poser.pugx.org/corneltek/pux/v/unstable)](https://packagist.org/packages/corneltek/pux) 
+[![Latest Unstable Version](https://poser.pugx.org/corneltek/pux/v/unstable)](https://packagist.org/packages/corneltek/pux)
 [![License](https://poser.pugx.org/corneltek/pux/license)](https://packagist.org/packages/corneltek/pux)
+[![Monthly Downloads](https://poser.pugx.org/corneltek/pux/d/monthly)](https://packagist.org/packages/corneltek/pux)
+[![Daily Downloads](https://poser.pugx.org/corneltek/pux/d/daily)](https://packagist.org/packages/corneltek/pux)
 
-**2.0 Branch Build Status** *(This branch is under development)*
-
-[![Coverage Status](https://coveralls.io/repos/c9s/Pux/badge.svg?branch=2.0&service=github)](https://coveralls.io/github/c9s/Pux?branch=2.0) [![Build Status](https://travis-ci.org/c9s/Pux.svg?branch=master)](https://travis-ci.org/c9s/Pux)
+**2.0.x Branch Build Status** *(This branch is under development)*
 
 Benchmark
 --------------------
