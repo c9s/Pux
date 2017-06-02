@@ -28,7 +28,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Pux\\": "src/Pux/"
+            "Pux\\": "src/"
         }
     },
     "extra": {
