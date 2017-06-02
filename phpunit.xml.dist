@@ -4,35 +4,38 @@
          colors="true"
          verbose="true">
   <testsuites>
-
     <testsuite name="All">
-       <directory suffix="Test.php">tests/Pux</directory>
+       <directory suffix="Test.php">src</directory>
        <exclude>tests/ExtensionOnly</exclude>
     </testsuite>
 
-    <testsuite name="Middleware">
-       <directory suffix="Test.php">tests/Middleware</directory>
-    </testsuite>
-
     <testsuite name="Mux">
-      <file>tests/Pux/MuxTest.php</file>
-      <file>tests/Pux/BasicMuxTest.php</file>
-      <file>tests/Pux/MuxExportTest.php</file>
-      <file>tests/Pux/MuxSetStateTest.php</file>
-      <file>tests/Pux/MuxCompilerTest.php</file>
+      <file>src/MuxTest.php</file>
+      <file>src/BasicMuxTest.php</file>
+      <file>src/MuxExportTest.php</file>
+      <file>src/MuxSetStateTest.php</file>
+      <file>src/MuxCompilerTest.php</file>
     </testsuite>
 
     <testsuite name="SubMux">
-      <file>tests/Pux/MuxMountTest.php</file>
-      <file>tests/Pux/MuxNoExpandMountTest.php</file>
+      <file>src/MuxMountTest.php</file>
+      <file>src/MuxNoExpandMountTest.php</file>
     </testsuite>
 
     <testsuite name="Controller">
-      <file>tests/Pux/ControllerAnnotationTest.php</file>
-      <file>tests/Pux/ControllerTest.php</file>
+      <file>src/ControllerAnnotationTest.php</file>
+      <file>src/ControllerTest.php</file>
     </testsuite>
-
   </testsuites>
+
+  <filter>
+    <whitelist>
+      <directory suffix=".php">src</directory>
+      <exclude>
+        <directory suffix="Test.php">src</directory>
+      </exclude>
+    </whitelist>
+  </filter>
 
   <logging>
     <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
