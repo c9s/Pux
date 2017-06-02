@@ -3,28 +3,21 @@
     "description": "The fast PHP router",
     "homepage": "https://github.com/c9s/Pux",
     "keywords": [
-        "pux",
-        "router",
-        "http",
-        "middleware",
-        "server",
-        "fast"
+        "router", "http", "middleware", "server", "fast", "phpsgi"
     ],
     "authors": [
         {
-            "name": "c9s",
-            "email": "cornelius.howl@gmail.com"
+            "name": "Yo-An Lin",
+            "email": "yoanlin93@gmail.com"
         }
     ],
     "require": {
-        "phpsgi/phpsgi": "dev-master",
+        "phpsgi/phpsgi": "1.0.x-dev",
         "universal/universal": "2.0.x-dev"
     },
     "license": "MIT",
     "require-dev": {
-        "willdurand/negotiation": "^1.4",
-        "corneltek/phpunit-testmore": "dev-master",
-        "willdurand/geocoder": "^3.1"
+        "corneltek/phpunit-testmore": "dev-master"
     },
     "autoload": {
         "psr-4": {
