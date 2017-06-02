@@ -3,7 +3,7 @@ use Pux\Mux;
 use Pux\Testing\MuxTestCase;
 
 
-class MuxDispatchTest extends PHPUnit_Framework_TestCase
+class MuxDispatchTest extends \PHPUnit\Framework\TestCase
 {
     public function testMuxCustomDispatch()
     {

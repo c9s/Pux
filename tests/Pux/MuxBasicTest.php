@@ -3,7 +3,7 @@ use Pux\Mux;
 use Pux\RouteExecutor;
 use Pux\Testing\MuxTestCase;
 
-class MuxBasicTest extends PHPUnit_Framework_TestCase
+class MuxBasicTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testCallbackGeneralize() 

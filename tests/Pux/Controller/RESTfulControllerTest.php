@@ -2,7 +2,7 @@
 use Pux\Controller\ExpandableController;
 use Pux\Mux;
 
-class RESTfulControllerTest extends PHPUnit_Framework_TestCase
+class RESTfulControllerTest extends \PHPUnit\Framework\TestCase
 {
     public function testRESTfulDispatch()
     {

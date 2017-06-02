@@ -3,7 +3,7 @@ use Pux\MuxBuilder\RESTfulMuxBuilder;
 use Pux\Mux;
 use Pux\Testing\Utils;
 
-class RESTfulMuxBuilderTest extends PHPUnit_Framework_TestCase
+class RESTfulMuxBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testRESTfulMuxBuilder()
     {

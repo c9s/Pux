@@ -41,7 +41,7 @@ class ProductResource2Controller extends ExpandableController {
 
 }
 
-class APCDispatcherRESTfulTest extends PHPUnit_Framework_TestCase
+class APCDispatcherRESTfulTest extends \PHPUnit\Framework\TestCase
 {
     public function test()
     {

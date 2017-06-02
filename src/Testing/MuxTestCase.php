@@ -2,9 +2,9 @@
 namespace Pux\Testing;
 use Pux\Mux;
 use Pux\RouteExecutor;
-use PHPUnit_Framework_TestCase;
+use \PHPUnit\Framework\TestCase;
 
-abstract class MuxTestCase extends PHPUnit_Framework_TestCase
+abstract class MuxTestCase extends \PHPUnit\Framework\TestCase
 {
 
     public function assertNonPcreRoute($route, $path = null) {

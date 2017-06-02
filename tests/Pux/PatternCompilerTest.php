@@ -1,7 +1,7 @@
 <?php
 use Pux\PatternCompiler;
 
-class PatternCompilerTest extends PHPUnit_Framework_TestCase
+class PatternCompilerTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testCompiledPatternWithPostSeparator()

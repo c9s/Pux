@@ -1,7 +1,7 @@
 <?php
 use Pux\RouteRequest;
 
-class RouteRequestTest extends PHPUnit_Framework_TestCase
+class RouteRequestTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateFromGlobals()
     {

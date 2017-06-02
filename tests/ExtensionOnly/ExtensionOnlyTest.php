@@ -2,7 +2,7 @@
 use Pux\Mux;
 use Pux\RouteExecutor;
 
-class ExtensionOnlyMuxTest extends PHPUnit_Framework_TestCase
+class ExtensionOnlyMuxTest extends \PHPUnit\Framework\TestCase
 {
     public function testFunctions()
     {

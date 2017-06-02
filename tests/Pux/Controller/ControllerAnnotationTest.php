@@ -30,7 +30,7 @@ class ChildController extends ParentController {
 }
 
 
-class ControllerAnnotationTest extends PHPUnit_Framework_TestCase
+class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
 {
 
 
