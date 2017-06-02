@@ -1,5 +1,5 @@
 <?php
-use Pux\Dispatcher\APCDispatcher;
+use Pux\Dispatcher\PathDispatcher;
 use Pux\Mux;
 use Pux\RouteExecutor;
 use Pux\Controller\ExpandableController;
@@ -41,15 +41,10 @@ class ProductResource2Controller extends ExpandableController {
 
 }
 
-class APCDispatcherRESTfulTest extends \PHPUnit\Framework\TestCase
+class DispatcherRESTfulTest extends \PHPUnit\Framework\TestCase
 {
     public function test()
     {
-        if ( ! extension_loaded('apc') && ! extension_loaded('apcu') ) {
-            // echo 'APC or APCu extension is required.';
-            return;
-        }
-
         $con = new ProductResource2Controller;
         $routes = $con->getActionRoutes();
         ok($routes);
@@ -62,10 +57,7 @@ class APCDispatcherRESTfulTest extends \PHPUnit\Framework\TestCase
         ok($root);
         $root->mount('/product', $con->expand() );
 
-        $dispatcher = new APCDispatcher($root, array(
-            'namespace' => 'tests',
-            'expiry' => 10,
-        ));
+        $dispatcher = new PathDispatcher($root);
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         ok( $dispatcher->dispatch('/product/10') == $root->dispatch('/product/10') );
