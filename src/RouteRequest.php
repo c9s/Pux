@@ -49,7 +49,7 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
      */
     public function getPath()
     {
-        return $this->path;
+        return $this->path ?: '/';
     }
 
     /**
