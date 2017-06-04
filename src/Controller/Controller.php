@@ -5,7 +5,9 @@ use ReflectionObject;
 use Universal\Http\HttpRequest;
 use Pux\Mux;
 
-class Controller
+use PHPSGI\App;
+
+class Controller implements App
 {
     /**
      * @var array PHPSGI compatible environment array (derived from $_SERVER)
@@ -40,18 +42,9 @@ class Controller
         $this->matchedRoute = $matchedRoute;
     }
 
-
-    /**
-     * Create another controller with the current environment array
-     *
-     * NOTE: this is not supported in extension yet.
-     *
-     * @param string $controllerClass
-     */
-    protected function createController($controllerClass)
+    public function call(array & $environment, array $response)
     {
-        $cls = new ReflectionClass($controllerClass);
-        return $cls->newInstance($this->environment);
+        return $response;
     }
 
     public function init() { }
@@ -60,18 +53,10 @@ class Controller
 
     public function finalize() {  }
 
-
-    public function getEnvironment()
-    {
-        return $this->environment;
-    }
-
     public function getResponse()
     {
         return $this->response;
     }
-
-
 
     public function hasMatchedRoute()
     {
@@ -121,8 +106,8 @@ class Controller
      */
     public function runAction($action, array $vars = array())
     {
-        $method = $action . 'Action';
-        if ( ! method_exists($this,$method) ) {
+        $method = "{$action}Action";
+        if (! method_exists($this,$method)) {
             throw new Exception("Controller method $method does not exist.");
         }
 
@@ -177,10 +162,10 @@ class Controller
      */
     public function hasAction($action)
     {
-        if (method_exists($this, $action . 'Action')) {
-            return $action . 'Action';
+        $method = "{$action}Action";
+        if (method_exists($this, $method)) {
+            return $method;
         }
         return false;
     }
-
 }
