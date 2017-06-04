@@ -1,8 +1,10 @@
 <?php
+
 use Pux\Dispatcher\PathDispatcher;
 use Pux\Mux;
 use Pux\RouteExecutor;
 use Pux\Controller\ExpandableController;
+use Pux\Builder\ControllerRouteBuilder;
 
 class ProductResource2Controller extends ExpandableController {
 
@@ -47,10 +49,10 @@ class DispatcherRESTfulTest extends \PHPUnit\Framework\TestCase
     {
         $con = new ProductResource2Controller;
 
-        $routes = ExpandableController::buildActionRoutes($con);
+        $routes = ControllerRouteBuilder::buildActionRoutes($con);
         $this->assertNotEmpty($routes);
 
-        $methods = ExpandableController::parseActionMethods($con);
+        $methods = ControllerRouteBuilder::parseActionMethods($con);
         $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.
         ok($productMux);
 

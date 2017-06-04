@@ -4,6 +4,7 @@ namespace Pux\Controller;
 
 use Pux\Mux;
 use Pux\RouteExecutor;
+use Pux\Builder\ControllerRouteBuilder;
 
 class ParentController extends ExpandableController {
 
@@ -20,11 +21,10 @@ class ParentController extends ExpandableController {
      * @Method("POST")
      */
     public function postAction() { }
-
-
 }
 
 class ChildController extends ParentController { 
+
     // we should override this action but use the parent annotations
     public function pageAction() {  }
 
@@ -32,14 +32,12 @@ class ChildController extends ParentController {
 }
 
 
-class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
+class ControllerRouteBuilderTest extends \PHPUnit\Framework\TestCase
 {
-
-
     public function testAnnotationForGetActionMethods()
     {
         $con = new ChildController;
-        $map = ExpandableController::parseActionMethods($con);
+        $map = ControllerRouteBuilder::parseActionMethods($con);
         $this->assertNotEmpty($map);
         $this->assertTrue(is_array($map));
 
@@ -55,7 +53,7 @@ class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
             array("class" => ChildController::class)
         ), $map['postAction'] );
 
-        $routeMap = ExpandableController::buildActionRoutes($con);
+        $routeMap = ControllerRouteBuilder::buildActionRoutes($con);
         $this->assertCount(3, $routeMap);
 
         list($path, $method, $options) = $routeMap[0];
@@ -73,9 +71,9 @@ class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
         }
 
         $controller = new \ExpandableProductController;
-        $this->assertTrue(is_array( $map = ExpandableController::parseActionMethods($controller) ) );
+        $this->assertTrue(is_array( $map = ControllerRouteBuilder::parseActionMethods($controller) ) );
 
-        $routes = ExpandableController::buildActionRoutes($controller);
+        $routes = ControllerRouteBuilder::buildActionRoutes($controller);
         $this->assertNotEmpty($routes);
 
         $this->assertEquals('', $routes[0][0], 'the path');

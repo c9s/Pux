@@ -1,5 +1,7 @@
 <?php
+
 use Pux\Controller\ExpandableController;
+use Pux\Builder\ControllerRouteBuilder;
 use Pux\Mux;
 
 class RESTfulControllerTest extends \PHPUnit\Framework\TestCase
@@ -8,11 +10,11 @@ class RESTfulControllerTest extends \PHPUnit\Framework\TestCase
     {
         $con = new ProductResourceController;
 
-        $routes = ExpandableController::buildActionRoutes($con);
+        $routes = ControllerRouteBuilder::buildActionRoutes($con);
         $this->assertNotEmpty($routes);
         $this->assertTrue(is_array($routes));
 
-        $methods = ExpandableController::parseActionMethods($con);
+        $methods = ControllerRouteBuilder::parseActionMethods($con);
         $this->assertNotEmpty($methods);
         $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.
         $this->assertNotEmpty($productMux);

@@ -3,6 +3,7 @@
 use Pux\Mux;
 use Pux\RouteExecutor;
 use Pux\Controller\ExpandableController;
+use Pux\Builder\ControllerRouteBuilder;
 use Pux\Testing\MuxTestCase;
 
 
@@ -33,7 +34,7 @@ class ControllerTest extends MuxTestCase
      */
     public function testGetActionMethods($controller)
     {
-        $actions = ExpandableController::parseActionMethods($controller);
+        $actions = ControllerRouteBuilder::parseActionMethods($controller);
         $this->assertNotEmpty($actions);
         $this->assertCount(4, $actions);
     }
@@ -42,7 +43,7 @@ class ControllerTest extends MuxTestCase
      * @depends testControllerConstructor
      */
     public function testGetActionRoutes($controller) {
-        $paths = ExpandableController::buildActionRoutes($controller);
+        $paths = ControllerRouteBuilder::buildActionRoutes($controller);
         $this->assertNotEmpty($paths);
         $this->assertCount(4, $paths);
         ok(is_array($paths[0]));
