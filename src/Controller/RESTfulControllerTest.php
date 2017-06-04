@@ -7,11 +7,12 @@ class RESTfulControllerTest extends \PHPUnit\Framework\TestCase
     public function testRESTfulDispatch()
     {
         $con = new ProductResourceController;
+
         $routes = $con->getActionRoutes();
         $this->assertNotEmpty($routes);
         $this->assertTrue(is_array($routes));
 
-        $methods = $con->parseActionMethods();
+        $methods = ExpandableController::parseActionMethods($con);
         $this->assertNotEmpty($methods);
         $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.
         $this->assertNotEmpty($productMux);

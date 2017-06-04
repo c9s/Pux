@@ -42,9 +42,9 @@ class ExpandableController extends Controller implements Expandable
      *
      * @return array
      */
-    public function parseActionMethods()
+    public static function parseActionMethods($con)
     {
-        $refClass = new ReflectionClass($this);
+        $refClass = new ReflectionClass($con);
         $methodMap = [];
 
         // build up parent class list
@@ -94,7 +94,7 @@ class ExpandableController extends Controller implements Expandable
      *
      * @return string path
      */
-    protected function translatePath($methodName)
+    protected static function translatePath($methodName)
     {
         $methodName = preg_replace('/Action$/', '', $methodName);
         return '/'.preg_replace_callback('/[A-Z]/', function ($matches) {
@@ -110,7 +110,7 @@ class ExpandableController extends Controller implements Expandable
     public function getActionRoutes()
     {
         $routes = array();
-        $actions = $this->parseActionMethods($this);
+        $actions = self::parseActionMethods($this);
 
         foreach ($actions as $actionName => $actionInfo) {
             list($annotations, $meta) = $actionInfo;
@@ -121,7 +121,7 @@ class ExpandableController extends Controller implements Expandable
                 if ($actionName === 'indexAction') {
                     $path = '';
                 } else {
-                    $path = $this->translatePath($actionName); // '/' . preg_replace_callback('/[A-Z]/', function($matches) {
+                    $path = self::translatePath($actionName); // '/' . preg_replace_callback('/[A-Z]/', function($matches) {
                 }
             }
 

@@ -29,10 +29,9 @@ class ControllerTest extends MuxTestCase
      */
     public function testGetActionMethods($controller)
     {
-        $actions = $controller->parseActionMethods();
-        ok($actions);
-        ok( is_array($actions), 'is array' );
-        count_ok( 3, $actions);
+        $actions = ExpandableController::parseActionMethods($controller);
+        $this->assertNotEmpty($actions);
+        $this->assertCount(3, $actions);
     }
 
     /**

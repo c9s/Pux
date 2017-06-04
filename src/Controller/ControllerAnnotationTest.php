@@ -1,7 +1,9 @@
 <?php
+
+namespace Pux\Controller;
+
 use Pux\Mux;
 use Pux\RouteExecutor;
-use Pux\Controller\ExpandableController;
 
 class ParentController extends ExpandableController {
 
@@ -37,7 +39,7 @@ class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
     public function testAnnotationForGetActionMethods()
     {
         $con = new ChildController;
-        $map = $con->parseActionMethods();
+        $map = ExpandableController::parseActionMethods($con);
         $this->assertNotEmpty($map);
         $this->assertTrue(is_array($map));
 
@@ -45,12 +47,13 @@ class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue( isset($map['pageAction']) );
         $this->assertTrue( isset($map['subpageAction']) );
 
-        is(array(array(
-            "Route" => "/post",
-            "Method" => "POST"
-        ),array(
-            "class" => "ChildController"
-        )), $map['postAction'] );
+        $this->assertEquals(array(
+            array(
+                "Route" => "/post",
+                "Method" => "POST"
+            ),
+            array("class" => ChildController::class)
+        ), $map['postAction'] );
 
         $routeMap = $con->getActionRoutes();
         $this->assertCount(3, $routeMap);
@@ -69,8 +72,8 @@ class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
             return;
         }
 
-        $controller = new ExpandableProductController;
-        $this->assertTrue(is_array( $map = $controller->parseActionMethods() ) );
+        $controller = new \ExpandableProductController;
+        $this->assertTrue(is_array( $map = ExpandableController::parseActionMethods($controller) ) );
 
         $routes = $controller->getActionRoutes();
         $this->assertNotEmpty($routes);
@@ -78,7 +81,7 @@ class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $routes[0][0], 'the path');
         $this->assertEquals('indexAction', $routes[0][1], 'the mapping method');
 
-        $mux = new Pux\Mux;
+        $mux = new Mux;
 
         // works fine
         // $submux = $controller->expand();
