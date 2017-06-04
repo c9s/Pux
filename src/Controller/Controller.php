@@ -31,20 +31,11 @@ class Controller implements App
      */
     protected $matchedRoute;
 
-    /**
-     */
-    public function __construct()
-    {
-
-    }
-
     public function call(array & $environment, array $response)
     {
         // setup state
         $this->environment  = $environment;
         $this->response     = $response;
-
-
         $this->matchedRoute = $environment['pux.route'];
 
         $action = $environment['pux.controller_action'];
@@ -75,17 +66,6 @@ class Controller implements App
         return call_user_func_array([$this, $action], $arguments);
     }
 
-    public function init() { }
-
-    public function prepare() {  }
-
-    public function finalize() {  }
-
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
     public function hasMatchedRoute()
     {
         return $this->matchedRoute ? true : false;
@@ -100,15 +80,13 @@ class Controller implements App
         return $this->matchedRoute;
     }
 
-
-
     /**
      * Create and Return HttpRequest object from the environment
      *
      * @param boolean $recreate
      * @return Universal\Http\HttpRequest
      */
-    public function getRequest($recreate = false)
+    protected function getRequest($recreate = false)
     {
         if (!$recreate && $this->_request) {
             return $this->_request;
@@ -116,7 +94,7 @@ class Controller implements App
         return $this->_request = HttpRequest::createFromGlobals($this->environment);
     }
 
-    public function toJson($data, $encodeFlags = null)
+    protected function toJson($data, $encodeFlags = null)
     {
         if ($encodeFlags === null) {
             $encodeFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
@@ -139,8 +117,6 @@ class Controller implements App
             throw new Exception("Controller method $method does not exist.");
         }
 
-        $this->prepare();
-
         $ro = new ReflectionObject( $this );
         $rm = $ro->getMethod($method);
 
@@ -148,17 +124,13 @@ class Controller implements App
         $parameters = $rm->getParameters();
         $arguments = array();
         foreach ($parameters as $param) {
-            if ( isset( $vars[ $param->getName() ] ) ) {
+            if (isset($vars[$param->getName()])) {
                 $arguments[] = $vars[ $param->getName() ];
             }
         }
-        $ret = call_user_func_array( array($this,$method) , $arguments );
 
-        // Trigger the after action
-        $this->finalize();
-        return $ret;
+        return call_user_func_array( array($this,$method) , $arguments );
     }
-
 
     /**
      * Forward to another controller action

@@ -12,6 +12,10 @@ class CRUDProductController extends ExpandableController
     public function indexAction() { }
     public function addAction() { } 
     public function delAction() { }
+
+    public function jsonAction() {
+        return $this->toJson(array('foo' => 1));
+    }
 }
 /*}}}*/
 
@@ -31,7 +35,7 @@ class ControllerTest extends MuxTestCase
     {
         $actions = ExpandableController::parseActionMethods($controller);
         $this->assertNotEmpty($actions);
-        $this->assertCount(3, $actions);
+        $this->assertCount(4, $actions);
     }
 
     /**
@@ -40,7 +44,7 @@ class ControllerTest extends MuxTestCase
     public function testGetActionRoutes($controller) {
         $paths = ExpandableController::buildActionRoutes($controller);
         $this->assertNotEmpty($paths);
-        $this->assertCount(3, $paths);
+        $this->assertCount(4, $paths);
         ok(is_array($paths[0]));
         ok(is_array($paths[1]));
         ok(is_array($paths[2]));
@@ -52,9 +56,9 @@ class ControllerTest extends MuxTestCase
     public function testExpand($controller)
     {
         $mux = $controller->expand();
-        ok($mux);
-        ok( $routes = $mux->getRoutes() );
-        count_ok( 3, $routes );
+        $this->assertInstanceOf(\Pux\Mux::class, $mux);
+        $routes = $mux->getRoutes();
+        $this->assertCount(4, $routes);
     }
 
     /**
@@ -65,7 +69,7 @@ class ControllerTest extends MuxTestCase
         if (!extension_loaded('json')) {
             $this->markTestSkipped('json extension not found.');
         }
-        $response = $controller->toJson(array('foo' => 1) );
+        $response = $controller->jsonAction();
         $this->assertNotEmpty(json_decode($response[2]));
     }
 
@@ -100,7 +104,7 @@ class ControllerTest extends MuxTestCase
         $mainMux->any( '/' , array('ProductController', 'indexAction') );
 
         $this->assertNotEmpty($mainMux->getRoutes()); 
-        $this->assertCount(4,  $mainMux->getRoutes(), 'route count should be 2' );
+        $this->assertCount(5,  $mainMux->getRoutes(), 'route count should be 5');
         ok($r = $mainMux->dispatch('/product') , 'matched /product' ); // match indexAction
         $this->assertSame(array('CRUDProductController','indexAction'), $r[2] );
 
