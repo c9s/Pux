@@ -43,7 +43,7 @@ class ControllerTest extends MuxTestCase
      * @depends testControllerConstructor
      */
     public function testGetActionRoutes($controller) {
-        $paths = ControllerRouteBuilder::buildActionRoutes($controller);
+        $paths = ControllerRouteBuilder::build($controller);
         $this->assertNotEmpty($paths);
         $this->assertCount(4, $paths);
         ok(is_array($paths[0]));

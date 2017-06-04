@@ -53,7 +53,7 @@ class ControllerRouteBuilderTest extends \PHPUnit\Framework\TestCase
             array("class" => ChildController::class)
         ), $map['postAction'] );
 
-        $routeMap = ControllerRouteBuilder::buildActionRoutes($con);
+        $routeMap = ControllerRouteBuilder::build($con);
         $this->assertCount(3, $routeMap);
 
         list($path, $method, $options) = $routeMap[0];
@@ -73,7 +73,7 @@ class ControllerRouteBuilderTest extends \PHPUnit\Framework\TestCase
         $controller = new \ExpandableProductController;
         $this->assertTrue(is_array( $map = ControllerRouteBuilder::parseActionMethods($controller) ) );
 
-        $routes = ControllerRouteBuilder::buildActionRoutes($controller);
+        $routes = ControllerRouteBuilder::build($controller);
         $this->assertNotEmpty($routes);
 
         $this->assertEquals('', $routes[0][0], 'the path');

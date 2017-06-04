@@ -100,7 +100,7 @@ class ControllerRouteBuilder
      *
      * @return array returns routes array
      */
-    public static function buildActionRoutes($controller)
+    public static function build($controller)
     {
         $routes = array();
         $actions = self::parseActionMethods($controller);

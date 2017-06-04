@@ -49,7 +49,7 @@ class DispatcherRESTfulTest extends \PHPUnit\Framework\TestCase
     {
         $con = new ProductResource2Controller;
 
-        $routes = ControllerRouteBuilder::buildActionRoutes($con);
+        $routes = ControllerRouteBuilder::build($con);
         $this->assertNotEmpty($routes);
 
         $methods = ControllerRouteBuilder::parseActionMethods($con);

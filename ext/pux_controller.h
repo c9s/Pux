@@ -25,7 +25,7 @@ int strpos(const char *haystack, char *needle);
 PHP_METHOD(Controller, __construct);
 PHP_METHOD(Controller, expand);
 PHP_METHOD(Controller, parseActionMethods);
-PHP_METHOD(Controller, buildActionRoutes);
+PHP_METHOD(Controller, build);
 PHP_METHOD(Controller, before);
 PHP_METHOD(Controller, after);
 PHP_METHOD(Controller, toJson);

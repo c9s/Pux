@@ -30,7 +30,7 @@ class ExpandableController extends Controller implements Expandable
     public function expand(array $options = array(), $dynamic = false)
     {
         $this->mux = $mux = new Mux();
-        $routes = ControllerRouteBuilder::buildActionRoutes($this);
+        $routes = ControllerRouteBuilder::build($this);
         foreach ($routes as $route) {
             if ($dynamic) {
                 $mux->add($route[0], array($this, $route[1]), array_merge($options, $route[2]));
