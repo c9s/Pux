@@ -10,17 +10,6 @@ use Pux\Controller\Controller;
 
 class RouteExecutor
 {
-
-    /**
-     * @var boolean 
-     *
-     * Enable executor to use reflection methods to validate controller action
-     *              parameter prototype.
-     *
-     * FIXME: this is not used yet.
-     */
-    protected $validateControllerAction = false;
-
     /**
      * When creating the controller instance, we don't care about the environment.
      *
@@ -29,7 +18,7 @@ class RouteExecutor
      *
      * @return Closure|PHPSGI\App|Controller
      */
-    protected static function buildCallback($handler)
+    public static function callback($handler)
     {
         if ($handler instanceof Closure) {
             return $handler;
@@ -51,13 +40,7 @@ class RouteExecutor
                 $con = $handler[0] = $rc->newInstance();
             }
 
-            // check controller action method
-            if ($con && !method_exists($con, $handler[1])) {
-                throw new LogicException("Controller action method '{$callback[1]}' is undefined.");
-            }
-
             return $handler;
-
         }
 
         throw new LogicException('Unsupported handler type');
@@ -89,13 +72,17 @@ class RouteExecutor
     {
         list($pcre, $pattern, $callbackArg, $options) = $route;
 
-        $environment['pux.route'] = $route;
+        $callback = self::callback($callbackArg);
 
-        $callback = self::buildCallback($callbackArg);
+        $environment['pux.route'] = $route;
+        if (is_array($callback) && $callback[0] instanceof Controller) {
+            $environment['pux.controller'] = $callback[0];
+            $environment['pux.controller_action'] = $callback[1];
+        }
+
         if ($callback instanceof Closure) {
             $return = $callback($environment, $response);
         } else if ($callback[0] instanceof \PHPSGI\App) {
-            $environment['pux.controller_action'] = $callback[1];
             $return = $callback[0]->call($environment, $response);
         } else if (is_callable($callback)) {
             $return = call_user_func($callback, $environment, $response);
@@ -103,6 +90,7 @@ class RouteExecutor
             throw new \LogicException("Invalid callback type.");
         }
 
+        // Response fix
         if (is_string($return)) {
             if (!isset($response[0])) {
                 $response[0] = 200;
