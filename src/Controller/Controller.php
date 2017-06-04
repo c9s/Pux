@@ -32,20 +32,19 @@ class Controller implements App
     protected $matchedRoute;
 
     /**
-     * 
-     * @param array $environment the default empty array was kept for backward compatibility.
      */
-    public function __construct(array $environment = array(), array $response = array(), array $matchedRoute = null)
+    public function __construct()
     {
-        $this->environment  = $environment;
-        $this->response     = $response;
-        $this->matchedRoute = $matchedRoute;
+
     }
 
     public function call(array & $environment, array $response)
     {
+        // setup state
         $this->environment  = $environment;
         $this->response     = $response;
+
+
         $this->matchedRoute = $environment['pux.route'];
 
         $action = $environment['pux.controller_action'];
