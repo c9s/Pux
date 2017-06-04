@@ -44,7 +44,36 @@ class Controller implements App
 
     public function call(array & $environment, array $response)
     {
-        return $response;
+        $this->environment  = $environment;
+        $this->response     = $response;
+        $this->matchedRoute = $environment['pux.route'];
+
+        $action = $environment['pux.controller_action'];
+
+        list($pcre, $pattern, $callbackArg, $options) = $this->matchedRoute;
+
+        $rc = new ReflectionClass($this);
+
+        $rps = $rc->getMethod($action)->getParameters();
+        $vars = isset($options['vars'])
+                ? $options['vars']
+                : array()
+                ;
+
+        $arguments = [];
+        foreach ($rps as $rp) {
+            $n = $rp->getName();
+            if (isset($vars[ $n ])) {
+                $arguments[] = $vars[ $n ];
+            } else if (isset($route[3]['default'][ $n ])
+                            && $default = $route[3]['default'][ $n ]) {
+                $arguments[] = $default;
+            } else if (!$rp->isOptional() && !$rp->allowsNull()) {
+                throw new Exception('parameter is not defined.');
+            }
+        }
+
+        return call_user_func_array([$this, $action], $arguments);
     }
 
     public function init() { }

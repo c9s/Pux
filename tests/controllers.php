@@ -3,21 +3,23 @@ use Pux\Controller\RESTfulController;
 use Pux\Controller\ExpandableController;
 use Pux\Controller\Controller;
 
-class HelloController
+class HelloController extends Controller
 {
-    public function index($name) {
+    public function index($name)
+    {
         return "Hello $name";
     }
 
-    public function show() {
+    public function show()
+    {
         return "response";
     }
 }
 
-
-class HelloController2
+class HelloController2 extends Controller
 {
-    public function helloAction($name) {
+    public function helloAction($name)
+    {
         return "hello $name";
     }
 }

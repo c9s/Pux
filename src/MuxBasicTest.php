@@ -66,14 +66,12 @@ class MuxBasicTest extends \PHPUnit\Framework\TestCase
     public function testNormalPattern() 
     {
         $mux = new Mux;
-        ok($mux);
-
-        $mux->add('/hello/show', array( 'HelloController', 'show' ));
+        $mux->add('/hello/show', ['HelloController', 'show']);
 
         $route = $mux->dispatch('/hello/show');
         ok($route, 'Found route');
         $response = RouteExecutor::execute($route);
-        is("response", $response);
+        is("response", $response[2]);
     }
 
     public function testDispatchToRoot() 
@@ -100,8 +98,6 @@ class MuxBasicTest extends \PHPUnit\Framework\TestCase
     public function testPCREPattern()
     {
         $mux = new Mux;
-        ok($mux);
-
         $mux->add('/hello/:name', array( 'HelloController', 'index' ));
 
         $mux->compile("_cache.php");
@@ -112,7 +108,7 @@ class MuxBasicTest extends \PHPUnit\Framework\TestCase
         ok($route[3]['vars']['name'], 'vars.name');
 
         $response = RouteExecutor::execute($route);
-        is("Hello John", $response);
+        is("Hello John", $response[2]);
 
         if ( file_exists("_cache.php") ) {
             unlink("_cache.php");

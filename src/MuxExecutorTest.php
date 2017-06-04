@@ -20,13 +20,19 @@ class MuxRouteExecutorTest extends MuxTestCase
         $mux->add('/', array( 'ProductController','indexAction' ));
 
         ok( $r = $mux->dispatch('/') );
-        is('index',RouteExecutor::execute($r));
+
+        $response = RouteExecutor::execute($r);
+        $this->assertEquals('index', $response[2]);
 
         ok( $r = $mux->dispatch('/foo') );
-        is('foo', RouteExecutor::execute($r));
+
+        $response = RouteExecutor::execute($r);
+        $this->assertEquals('foo', $response[2]);
 
         ok( $r = $mux->dispatch('/bar') );
-        is('bar', RouteExecutor::execute($r));
+
+        $response = RouteExecutor::execute($r);
+        $this->assertEquals('bar', $response[2]);
 
 
         // XXX: seems like a gc bug here

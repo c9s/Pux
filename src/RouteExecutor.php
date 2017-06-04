@@ -25,8 +25,57 @@ class RouteExecutor
     }
 
 
+
+    /**
+     * When creating the controller instance, we don't care about the environment.
+     *
+     * The returned object should be a PHPSGI app, so that we can always
+     * execute "call" on the returned object.
+     *
+     * @return Closure|PHPSGI\App|Controller
+     */
+    protected static function buildCallback($handler)
+    {
+        if ($handler instanceof Closure) {
+            return $handler;
+        }
+        if (is_object($handler[0])) {
+            return $handler;
+        }
+
+        // If the first argument is a class name string,
+        // then create the controller object.
+        if (is_string($handler[0])) {
+
+            // If users define the constructor arguments in options array.
+            $constructArgs = [];
+            $rc = new ReflectionClass($handler[0]);
+            if (isset($options['constructor_args'])) {
+                $con = $handler[0] = $rc->newInstanceArgs($constructArgs);
+            } else {
+                $con = $handler[0] = $rc->newInstance();
+            }
+
+            // check controller action method
+            if ($con && !method_exists($con, $handler[1])) {
+                throw new LogicException("Controller action method '{$callback[1]}' is undefined.");
+            }
+
+            return $handler;
+
+        }
+
+        throw new LogicException('Unsupported handler type');
+    }
+
+
     /**
      * Execute the matched route.
+     *
+     * This method currently do two things:
+     *
+     * 1. create the controller from the route arguments.
+     * 2. executet the controller method by the config defined in route arguments.
      *
      * $route: {pcre flag}, {pattern}, {callback}, {options}
      *
@@ -43,98 +92,20 @@ class RouteExecutor
      */
     public static function execute(array $route, array $environment = array(), array $response = array())
     {
-        list($pcre, $pattern, $callback, $options) = $route;
+        list($pcre, $pattern, $callbackArg, $options) = $route;
 
+        $callback = self::buildCallback($callbackArg);
         if ($callback instanceof Closure) {
-            return $callback($environment, $response, $route);
-        }
-
-
-        // Start handing controller dispatch from here
-
-        // create the reflection class
-        $rc = new ReflectionClass($callback[0]);
-
-        // If users define the constructor arguments in options array.
-        $constructArgs = [];
-        if (isset($options['constructor_args'])) {
-            $constructArgs = $options['constructor_args'];
-        }
-
-        // die('Pux\\Controller\\Controller');
-
-        // If the first argument is a class name string,
-        // then create the controller object.
-        if (is_string($callback[0])) {
-
-
-            // If the receiver is a Pux controller, we then know how to pass data to the constructor
-            if (is_a($callback[0],'Pux\\Controller\\Controller', true)) {
-
-
-                // Pux controller accepts ($environment, $matchedRoute) by default
-                // But users may define a controller that accepts
-                // ($environment, $matchedRoute, ... extra constructor
-                // arguments)
-                array_unshift($constructArgs, $route);
-                array_unshift($constructArgs, $response);
-                array_unshift($constructArgs, $environment);
-
-                $callback[0] = $controller = $rc->newInstanceArgs($constructArgs);
-
-                // The init method will only be called when an action is going to be executed.
-                $controller->init();
-
-            } else {
-
-                $callback[0] = $controller = !empty($constructArgs)
-                                                ? $rc->newInstanceArgs($constructArgs) 
-                                                : $rc->newInstance();
-            }
-        } else if (is_object($callback[0])) {
-
-            // If it's a dynamic controller object
-            $controller = $callback[0];
-
+            $return = $callback($environment, $response);
+        } else if ($callback[0] instanceof \PHPSGI\App) {
+            $environment['pux.route'] = $route;
+            $environment['pux.controller_action'] = $callback[1];
+            $return = $callback[0]->call($environment, $response);
         } else {
-
-            throw new LogicException('Unsupported callback type');
-
+            $return = call_user_func($callback, $environment, $response);
         }
 
-        // check controller action method
-        if ($controller && !method_exists($controller, $callback[1])) {
-            throw new LogicException("Controller action method '{$callback[1]}' doesn't exist.");
-            /*
-            throw new Exception('Method ' .
-                get_class($controller) . "->{$callback[1]} does not exist.", $route );
-            */
-        }
-
-        $reflParameters = $rc->getMethod($callback[1])->getParameters();
-        $vars = isset($options['vars'])
-                ? $options['vars']
-                : array()
-                ;
-
-        $arguments = array();
-        foreach ($reflParameters as $reflParameter) {
-            $n = $reflParameter->getName();
-            if (isset($vars[ $n ])) {
-                $arguments[] = $vars[ $n ];
-            } elseif (isset($route[3]['default'][ $n ])
-                            && $default = $route[3]['default'][ $n ]) {
-                $arguments[] = $default;
-            } elseif (!$reflParameter->isOptional() && !$reflParameter->allowsNull()) {
-                throw new Exception('parameter is not defined.');
-            }
-        }
-
-        $return = call_user_func_array($callback, $arguments);
-        if (is_array($return)) {
-            return $return;
-        } else if ($controller instanceof Controller && is_string($return)) {
-            $response = $controller->getResponse() ?: array();
+        if (is_string($return)) {
             if (!isset($response[0])) {
                 $response[0] = 200;
             }
@@ -146,6 +117,7 @@ class RouteExecutor
             }
             return $response;
         }
+
         return $return;
     }
 }
