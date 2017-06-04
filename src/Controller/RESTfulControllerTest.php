@@ -11,7 +11,7 @@ class RESTfulControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($routes);
         $this->assertTrue(is_array($routes));
 
-        $methods = $con->getActionMethods();
+        $methods = $con->parseActionMethods();
         $this->assertNotEmpty($methods);
         $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.
         $this->assertNotEmpty($productMux);

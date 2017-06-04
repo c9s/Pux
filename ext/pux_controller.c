@@ -27,7 +27,7 @@ zend_class_entry *ce_pux_controller;
 const zend_function_entry controller_methods[] = {
   PHP_ME(Controller, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
   PHP_ME(Controller, expand, NULL, ZEND_ACC_PUBLIC)
-  PHP_ME(Controller, getActionMethods, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Controller, parseActionMethods, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Controller, getActionRoutes, NULL, ZEND_ACC_PUBLIC)
 
   PHP_ME(Controller, before, NULL, ZEND_ACC_PUBLIC)
@@ -366,7 +366,7 @@ PHP_METHOD(Controller, __construct) {
  *
  *
  */
-PHP_METHOD(Controller, getActionMethods)
+PHP_METHOD(Controller, parseActionMethods)
 {
     // Get function table hash from the current object.
     zend_class_entry *ce = Z_OBJCE_P(this_ptr);
@@ -386,10 +386,10 @@ PHP_METHOD(Controller, getActionRoutes)
 {
     zend_function *fe;
     if ( zend_hash_quick_find( &ce_pux_controller->function_table, "getactionmethods", sizeof("getactionmethods"), zend_inline_hash_func(ZEND_STRS("getactionmethods")), (void **) &fe) == FAILURE ) {
-        php_error(E_ERROR, "getActionMethods method not found");
+        php_error(E_ERROR, "parseActionMethods method not found");
     }
 
-    // call the getActionMethods to return the array of paths, 
+    // call the parseActionMethods to return the array of paths, 
     //    [ [path, [ annotations...] ], [ path2, [ annotations...] ],..... ]
     //
     zval *rv = NULL;

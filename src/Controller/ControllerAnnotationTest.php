@@ -37,7 +37,7 @@ class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
     public function testAnnotationForGetActionMethods()
     {
         $con = new ChildController;
-        $map = $con->getActionMethods();
+        $map = $con->parseActionMethods();
         $this->assertNotEmpty($map);
         $this->assertTrue(is_array($map));
 
@@ -70,7 +70,7 @@ class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
         }
 
         $controller = new ExpandableProductController;
-        $this->assertTrue(is_array( $map = $controller->getActionMethods() ) );
+        $this->assertTrue(is_array( $map = $controller->parseActionMethods() ) );
 
         $routes = $controller->getActionRoutes();
         $this->assertNotEmpty($routes);

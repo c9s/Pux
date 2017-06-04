@@ -49,7 +49,7 @@ class DispatcherRESTfulTest extends \PHPUnit\Framework\TestCase
         $routes = $con->getActionRoutes();
         ok($routes);
 
-        $methods = $con->getActionMethods();
+        $methods = $con->parseActionMethods();
         $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.
         ok($productMux);
 

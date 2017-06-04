@@ -29,7 +29,7 @@ class ControllerTest extends MuxTestCase
      */
     public function testGetActionMethods($controller)
     {
-        $actions = $controller->getActionMethods();
+        $actions = $controller->parseActionMethods();
         ok($actions);
         ok( is_array($actions), 'is array' );
         count_ok( 3, $actions);

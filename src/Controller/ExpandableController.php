@@ -18,7 +18,7 @@ class ExpandableController extends Controller implements Expandable
      * @param string $method request method
      * @return array Annotation info
      */
-    protected function parseMethodAnnotation(ReflectionMethod $method)
+    static protected function parseMethodAnnotation(ReflectionMethod $method)
     {
         $annotations = array();
         if ($doc = $method->getDocComment()) {
@@ -34,7 +34,7 @@ class ExpandableController extends Controller implements Expandable
 
 
     /**
-     * getActionMethods parses the route definition from annotation and return
+     * parseActionMethods parses the route definition from annotation and return
      * the "method" => "route meta" data structure
      *
      * Should always keep it returns simple array, so that we can cache the
@@ -42,7 +42,7 @@ class ExpandableController extends Controller implements Expandable
      *
      * @return array
      */
-    public function getActionMethods()
+    public function parseActionMethods()
     {
         $refClass = new ReflectionClass($this);
         $methodMap = [];
@@ -68,7 +68,7 @@ class ExpandableController extends Controller implements Expandable
                 }
 
                 $meta = array('class' => $class->getName());
-                $annotations = $this->parseMethodAnnotation($method);
+                $annotations = self::parseMethodAnnotation($method);
 
                 // If it's empty, then fetch annotations from parent methods
                 if (empty($annotations)) {
@@ -110,7 +110,7 @@ class ExpandableController extends Controller implements Expandable
     public function getActionRoutes()
     {
         $routes = array();
-        $actions = $this->getActionMethods();
+        $actions = $this->parseActionMethods($this);
 
         foreach ($actions as $actionName => $actionInfo) {
             list($annotations, $meta) = $actionInfo;
