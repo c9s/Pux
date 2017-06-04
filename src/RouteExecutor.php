@@ -101,8 +101,10 @@ class RouteExecutor
             $environment['pux.route'] = $route;
             $environment['pux.controller_action'] = $callback[1];
             $return = $callback[0]->call($environment, $response);
-        } else {
+        } else if (is_callable($callback)) {
             $return = call_user_func($callback, $environment, $response);
+        } else {
+            throw new \LogicException("Invalid callback type.");
         }
 
         if (is_string($return)) {
