@@ -107,10 +107,10 @@ class ExpandableController extends Controller implements Expandable
      *
      * @return array returns routes array
      */
-    public function getActionRoutes()
+    public static function buildActionRoutes($controller)
     {
         $routes = array();
-        $actions = self::parseActionMethods($this);
+        $actions = self::parseActionMethods($controller);
 
         foreach ($actions as $actionName => $actionInfo) {
             list($annotations, $meta) = $actionInfo;
@@ -152,7 +152,7 @@ class ExpandableController extends Controller implements Expandable
     public function expand(array $options = array(), $dynamic = false)
     {
         $this->mux = $mux = new Mux();
-        $routes = $this->getActionRoutes();
+        $routes = self::buildActionRoutes($this);
         foreach ($routes as $route) {
             if ($dynamic) {
                 $mux->add($route[0], array($this, $route[1]), array_merge($options, $route[2]));

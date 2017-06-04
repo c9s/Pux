@@ -46,8 +46,9 @@ class DispatcherRESTfulTest extends \PHPUnit\Framework\TestCase
     public function test()
     {
         $con = new ProductResource2Controller;
-        $routes = $con->getActionRoutes();
-        ok($routes);
+
+        $routes = ExpandableController::buildActionRoutes($con);
+        $this->assertNotEmpty($routes);
 
         $methods = ExpandableController::parseActionMethods($con);
         $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.

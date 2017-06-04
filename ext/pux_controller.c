@@ -28,7 +28,7 @@ const zend_function_entry controller_methods[] = {
   PHP_ME(Controller, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
   PHP_ME(Controller, expand, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Controller, parseActionMethods, NULL, ZEND_ACC_PUBLIC)
-  PHP_ME(Controller, getActionRoutes, NULL, ZEND_ACC_PUBLIC)
+  PHP_ME(Controller, buildActionRoutes, NULL, ZEND_ACC_PUBLIC)
 
   PHP_ME(Controller, before, NULL, ZEND_ACC_PUBLIC)
   PHP_ME(Controller, after, NULL, ZEND_ACC_PUBLIC)
@@ -382,7 +382,7 @@ PHP_METHOD(Controller, parseActionMethods)
 
 // return path => path pairs
 // structure: [[ path, method name ], [ ... ], [ ... ], ... ]
-PHP_METHOD(Controller, getActionRoutes)
+PHP_METHOD(Controller, buildActionRoutes)
 {
     zend_function *fe;
     if ( zend_hash_quick_find( &ce_pux_controller->function_table, "getactionmethods", sizeof("getactionmethods"), zend_inline_hash_func(ZEND_STRS("getactionmethods")), (void **) &fe) == FAILURE ) {
@@ -482,7 +482,7 @@ PHP_METHOD(Controller, expand)
     zend_call_method_with_0_params( &this_ptr, ce_pux_controller, NULL, "getactionroutes", &path_array );
 
     if ( Z_TYPE_P(path_array) != IS_ARRAY ) {
-        php_error(E_ERROR, "getActionRoutes does not return an array.");
+        php_error(E_ERROR, "buildActionRoutes does not return an array.");
         RETURN_FALSE;
     }
 

@@ -38,12 +38,12 @@ class ControllerTest extends MuxTestCase
      * @depends testControllerConstructor
      */
     public function testGetActionRoutes($controller) {
-        $paths = $controller->getActionRoutes();
-        ok($paths);
-        count_ok(3, $paths);
-        ok( is_array($paths[0]) );
-        ok( is_array($paths[1]) );
-        ok( is_array($paths[2]) );
+        $paths = ExpandableController::buildActionRoutes($controller);
+        $this->assertNotEmpty($paths);
+        $this->assertCount(3, $paths);
+        ok(is_array($paths[0]));
+        ok(is_array($paths[1]));
+        ok(is_array($paths[2]));
     }
 
     /**

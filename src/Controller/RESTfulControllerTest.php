@@ -8,7 +8,7 @@ class RESTfulControllerTest extends \PHPUnit\Framework\TestCase
     {
         $con = new ProductResourceController;
 
-        $routes = $con->getActionRoutes();
+        $routes = ExpandableController::buildActionRoutes($con);
         $this->assertNotEmpty($routes);
         $this->assertTrue(is_array($routes));
 

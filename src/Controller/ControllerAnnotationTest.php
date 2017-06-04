@@ -55,7 +55,7 @@ class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
             array("class" => ChildController::class)
         ), $map['postAction'] );
 
-        $routeMap = $con->getActionRoutes();
+        $routeMap = ExpandableController::buildActionRoutes($con);
         $this->assertCount(3, $routeMap);
 
         list($path, $method, $options) = $routeMap[0];
@@ -75,7 +75,7 @@ class ControllerAnnotationTest extends \PHPUnit\Framework\TestCase
         $controller = new \ExpandableProductController;
         $this->assertTrue(is_array( $map = ExpandableController::parseActionMethods($controller) ) );
 
-        $routes = $controller->getActionRoutes();
+        $routes = ExpandableController::buildActionRoutes($controller);
         $this->assertNotEmpty($routes);
 
         $this->assertEquals('', $routes[0][0], 'the path');
