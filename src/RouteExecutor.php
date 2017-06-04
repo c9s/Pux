@@ -16,15 +16,10 @@ class RouteExecutor
      *
      * Enable executor to use reflection methods to validate controller action
      *              parameter prototype.
+     *
+     * FIXME: this is not used yet.
      */
     protected $validateControllerAction = false;
-
-    public function __construct()
-    {
-
-    }
-
-
 
     /**
      * When creating the controller instance, we don't care about the environment.
@@ -94,11 +89,12 @@ class RouteExecutor
     {
         list($pcre, $pattern, $callbackArg, $options) = $route;
 
+        $environment['pux.route'] = $route;
+
         $callback = self::buildCallback($callbackArg);
         if ($callback instanceof Closure) {
             $return = $callback($environment, $response);
         } else if ($callback[0] instanceof \PHPSGI\App) {
-            $environment['pux.route'] = $route;
             $environment['pux.controller_action'] = $callback[1];
             $return = $callback[0]->call($environment, $response);
         } else if (is_callable($callback)) {

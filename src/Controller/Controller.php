@@ -33,13 +33,9 @@ class Controller implements App
 
     public function call(array & $environment, array $response)
     {
-        // setup state
-        $this->environment  = $environment;
-        $this->response     = $response;
-        $this->matchedRoute = $environment['pux.route'];
+        $this->context($environment, $response);
 
         $action = $environment['pux.controller_action'];
-
         list($pcre, $pattern, $callbackArg, $options) = $this->matchedRoute;
 
         $rc = new ReflectionClass($this);
@@ -64,6 +60,13 @@ class Controller implements App
         }
 
         return call_user_func_array([$this, $action], $arguments);
+    }
+
+    protected function context(array & $environment, array $response)
+    {
+        $this->environment  = $environment;
+        $this->response     = $response;
+        $this->matchedRoute = $environment['pux.route'];
     }
 
     public function hasMatchedRoute()
