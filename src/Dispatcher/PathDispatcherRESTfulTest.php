@@ -47,32 +47,32 @@ class DispatcherRESTfulTest extends \PHPUnit\Framework\TestCase
 {
     public function test()
     {
-        $con = new ProductResource2Controller;
+        $productResource2Controller = new ProductResource2Controller;
 
-        $routes = ControllerRouteBuilder::build($con);
+        $routes = ControllerRouteBuilder::build($productResource2Controller);
         $this->assertNotEmpty($routes);
 
-        $methods = ControllerRouteBuilder::parseActionMethods($con);
-        $productMux = $con->expand();  // there is a sorting bug (fixed), this tests it.
+        ControllerRouteBuilder::parseActionMethods($productResource2Controller);
+        $productMux = $productResource2Controller->expand();  // there is a sorting bug (fixed), this tests it.
         ok($productMux);
 
-        $root = new Mux;
-        ok($root);
-        $root->mount('/product', $con->expand() );
+        $mux = new Mux;
+        ok($mux);
+        $mux->mount('/product', $productResource2Controller->expand() );
 
-        $dispatcher = new PathDispatcher($root);
+        $pathDispatcher = new PathDispatcher($mux);
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        ok( $dispatcher->dispatch('/product/10') == $root->dispatch('/product/10') );
+        ok( $pathDispatcher->dispatch('/product/10') == $mux->dispatch('/product/10') );
 
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        ok( $dispatcher->dispatch('/product/10') == $root->dispatch('/product/10') );
+        ok( $pathDispatcher->dispatch('/product/10') == $mux->dispatch('/product/10') );
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        ok( $dispatcher->dispatch('/product') == $root->dispatch('/product') ); // create
+        ok( $pathDispatcher->dispatch('/product') == $mux->dispatch('/product') ); // create
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        ok( $dispatcher->dispatch('/product/10') == $root->dispatch('/product/10') ); // update
+        ok( $pathDispatcher->dispatch('/product/10') == $mux->dispatch('/product/10') ); // update
     }
 }
 

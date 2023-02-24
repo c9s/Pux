@@ -1,0 +1,156 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "8a576602c1e3bd112260b384c7068424",
+    "packages": [
+        {
+            "name": "phpsgi/phpsgi",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpsgi/phpsgi.git",
+                "reference": "2c4a9dd0e2229ccd4614aaff852497cbd75b947b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpsgi/phpsgi/zipball/2c4a9dd0e2229ccd4614aaff852497cbd75b947b",
+                "reference": "2c4a9dd0e2229ccd4614aaff852497cbd75b947b",
+                "shasum": ""
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPSGI\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "c9s",
+                    "email": "cornelius.howl@gmail.com"
+                }
+            ],
+            "homepage": "https://github.com/phpsgi/phpsgi",
+            "keywords": [
+                "http",
+                "middleware",
+                "phpsgi",
+                "server"
+            ],
+            "support": {
+                "issues": "https://github.com/phpsgi/phpsgi/issues",
+                "source": "https://github.com/phpsgi/phpsgi/tree/master"
+            },
+            "time": "2015-12-03T06:39:11+00:00"
+        },
+        {
+            "name": "universal/universal",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/c9s/universal.git",
+                "reference": "ff116b007faf019a766be0d243261221a4e9c202"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/c9s/universal/zipball/ff116b007faf019a766be0d243261221a4e9c202",
+                "reference": "ff116b007faf019a766be0d243261221a4e9c202",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "replace": {
+                "corneltek/universal": "*"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Universal\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Yo-An Lin",
+                    "email": "yoanlin93@gmail.com"
+                }
+            ],
+            "description": "Universal library for PHP",
+            "homepage": "http://github.com/c9s/universal",
+            "support": {
+                "issues": "https://github.com/c9s/universal/issues",
+                "source": "https://github.com/c9s/universal/tree/master"
+            },
+            "time": "2017-09-10T22:35:20+00:00"
+        }
+    ],
+    "packages-dev": [
+        {
+            "name": "corneltek/phpunit-testmore",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/c9s/PHPUnit_TestMore.git",
+                "reference": "fd8a1aabd471d8850d1bec7a5d133ee05f848e49"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/c9s/PHPUnit_TestMore/zipball/fd8a1aabd471d8850d1bec7a5d133ee05f848e49",
+                "reference": "fd8a1aabd471d8850d1bec7a5d133ee05f848e49",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2.3"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "TestMore.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "support": {
+                "issues": "https://github.com/c9s/PHPUnit_TestMore/issues",
+                "source": "https://github.com/c9s/PHPUnit_TestMore/tree/master"
+            },
+            "time": "2023-02-24T15:35:57+00:00"
+        }
+    ],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "phpsgi/phpsgi": 20,
+        "universal/universal": 20,
+        "corneltek/phpunit-testmore": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=8.2"
+    },
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
+}

@@ -12,17 +12,25 @@ use Exception;
  */
 class PatternCompiler
 {
-    const TOKEN_TYPE_OPTIONAL = 1;
-    const TOKEN_TYPE_VARIABLE = 2;
-    const TOKEN_TYPE_TEXT = 3;
+    /**
+     * @var int
+     */
+    final const TOKEN_TYPE_OPTIONAL = 1;
+    /**
+     * @var int
+     */
+    final const TOKEN_TYPE_VARIABLE = 2;
+    /**
+     * @var int
+     */
+    final const TOKEN_TYPE_TEXT = 3;
 
     /**
      * compile pattern
      *
      * @param string $pattern
-     * @param array $options
      */
-    static function compilePattern($pattern, array $options = array())
+    static function compilePattern($pattern, array $options = [])
     {
 
         $len = strlen($pattern);
@@ -33,8 +41,8 @@ class PatternCompiler
          *   array( 'variable', $match[0][0][0], $regexp, $var);
          *
          */
-        $tokens = array();
-        $variables = array();
+        $tokens = [];
+        $variables = [];
         $pos = 0;
 
         /**
@@ -61,13 +69,13 @@ class PatternCompiler
              * Split tokens from abstract pattern
              * to rebuild regexp pattern.
              */
-            if ($text = substr($pattern, $pos, $match[0][1] - $pos)) {
-                $tokens[] = array( self::TOKEN_TYPE_TEXT, $text);
+            if (($text = substr($pattern, $pos, $match[0][1] - $pos)) !== '' && ($text = substr($pattern, $pos, $match[0][1] - $pos)) !== '0') {
+                $tokens[] = [self::TOKEN_TYPE_TEXT, $text];
             }
 
             // the first char from pattern (which is the seperater)
             // and the first char from the next match pattern
-            $seps = array($pattern[$pos]);
+            $seps = [$pattern[$pos]];
 
 
             // collect the separator tokens from the next matched pattern
@@ -76,37 +84,27 @@ class PatternCompiler
 
                 // check if the next pattern is an optional pattern
                 if ($nextMatch[0][0][0] === '(') {
-
-                    $r = self::compilePattern($nextMatch[2][0] ,array());
+                    $r = self::compilePattern($nextMatch[2][0] ,[]);
                     if (isset($r['tokens'][0][1])) {
                         $seps[] = $r['tokens'][0][1][0];
                     }
-
-                } else if ($nextMatch[0][0][0] === ':') { // variable token
-
+                } elseif ($nextMatch[0][0][0] === ':') {
+                    // variable token
                 } else {
                     $seps[] = $nextMatch[0][0][0];
                 }
             }
 
 
-            $pos = $match[0][1] + strlen($match[0][0]);
+            $pos = $match[0][1] + strlen((string) $match[0][0]);
 
 
             // generate optional pattern recursively
             if ($match[0][0][0] == '(' ){
                 $optional = $match[2][0];
-                $subroute = self::compilePattern($optional ,array(
-                    'default'   => isset($options['default']) ? $options['default'] : null,
-                    'require'   => isset($options['require']) ? $options['require'] : null,
-                    'variables' => isset($options['variables']) ? $options['variables'] : null,
-                ));
+                $subroute = self::compilePattern($optional ,['default'   => $options['default'] ?? null, 'require'   => $options['require'] ?? null, 'variables' => $options['variables'] ?? null]);
 
-                $tokens[] = array( 
-                    self::TOKEN_TYPE_OPTIONAL,
-                    $optional[0],
-                    $subroute['regex'],
-                );
+                $tokens[] = [self::TOKEN_TYPE_OPTIONAL, $optional[0], $subroute['regex']];
                 foreach( $subroute['variables'] as $var ) {
                     $variables[] = $var;
                 }
@@ -121,15 +119,13 @@ class PatternCompiler
                     if ($pos !== $len) {
                         $seps[] = $pattern[$pos];
                     }
+
                     // use the default pattern (which is based on the separater charactors we got)
                     $regexp = sprintf('[^%s]+', preg_quote(implode('', array_unique($seps)), '#'));
                 }
 
                 // append token item
-                $tokens[] = array(self::TOKEN_TYPE_VARIABLE, 
-                    $match[0][0][0], 
-                    $regexp, 
-                    $varName);
+                $tokens[] = [self::TOKEN_TYPE_VARIABLE, $match[0][0][0], $regexp, $varName];
 
                 // append variable name
                 $variables[] = $varName;
@@ -137,12 +133,12 @@ class PatternCompiler
         }
 
         if ($pos < $len) {
-            $tokens[] = array(self::TOKEN_TYPE_TEXT, substr($pattern, $pos));
+            $tokens[] = [self::TOKEN_TYPE_TEXT, substr($pattern, $pos)];
         }
 
         // find the first optional token
         $firstOptional = INF;
-        for ($i = count($tokens) - 1; $i >= 0; $i--) {
+        for ($i = count($tokens) - 1; $i >= 0; --$i) {
             if ( self::TOKEN_TYPE_VARIABLE === $tokens[$i][0] 
                 && isset($options['default'][ $tokens[$i][3] ]) )
             {
@@ -173,7 +169,7 @@ class PatternCompiler
             ++$indent;
 
             // output regexp with separator and
-            $regex .= str_repeat(' ', $indent * 4) . sprintf("%s(?:\n", preg_quote($token[1], '#'));
+            $regex .= str_repeat(' ', $indent * 4) . sprintf("%s(?:\n", preg_quote((string) $token[1], '#'));
 
             // regular expression with place holder name. (?P<name>pattern)
             $regex .= str_repeat(' ', $indent * 4) . sprintf("(?P<%s>%s)\n", $token[3], $token[2]);
@@ -195,7 +191,8 @@ class PatternCompiler
                         $regex .= str_repeat(' ', $indent * 4) . "(?:\n";
                         ++$indent;
                     }
-                    $regex .= str_repeat(' ', $indent * 4). sprintf("%s(?P<%s>%s)\n", preg_quote($token[1], '#'), $token[3], $token[2]);
+
+                    $regex .= str_repeat(' ', $indent * 4). sprintf("%s(?P<%s>%s)\n", preg_quote((string) $token[1], '#'), $token[3], $token[2]);
                     break;
                 }
             }
@@ -224,14 +221,14 @@ class PatternCompiler
     static function splitTokens($string)
     {
         // split with ":variable" and path
-        preg_match_all('/(?:
-            # parse variable token with separator
-            .            # separator
-            :([\w\d_]+)  # variable
+        preg_match_all('#(?:
+            \# parse variable token with separator
+            .            \# separator
+            :([\w\d_]+)  \# variable
             |
-            # optional tokens
+            \# optional tokens
             \((.*)\)
-        )/x', $string, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        )#x', $string, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         return $matches;
     }
 
@@ -242,7 +239,7 @@ class PatternCompiler
      *
      * @return array compiled route info, with newly added 'compiled' key.
      */
-    static function compile($pattern, array $options = array())
+    static function compile($pattern, array $options = [])
     {
         $route = self::compilePattern($pattern, $options);
 
@@ -252,7 +249,7 @@ class PatternCompiler
         return $route;
     }
 
-    static function compilePrefix($pattern, array $options = array())
+    static function compilePrefix($pattern, array $options = [])
     {
         $route = self::compilePattern($pattern, $options);
 

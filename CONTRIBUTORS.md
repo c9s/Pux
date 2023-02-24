@@ -1,4 +1,4 @@
-**Maintainer: [@c9s](https://github.com/c9s)**
+**Maintainer: [@motaword](https://github.com/MotaWord)**
 
 # Pux Contributors
 
@@ -7,3 +7,4 @@
 - **[@mway](https://github.com/mway)**
 - **[@sjinks](https://github.com/sjinks)**
 - **[@zoowii](https://github.com/zoowii)**
+- **[@caferyukseloglu](https://github.com/caferyukseloglu)**

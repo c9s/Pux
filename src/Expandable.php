@@ -9,6 +9,6 @@ interface Expandable
      *                when $dynamic is false, expand method only adds the class
      *                name into mux object.
      */
-    public function expand(array $options = array(), $dynamic = true);
+    public function expand(array $options = [], $dynamic = true);
 
 }

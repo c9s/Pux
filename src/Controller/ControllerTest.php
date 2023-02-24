@@ -11,11 +11,13 @@ use Pux\Testing\MuxTestCase;
 class CRUDProductController extends ExpandableController
 {
     public function indexAction() { }
-    public function addAction() { } 
+
+    public function addAction() { }
+
     public function delAction() { }
 
     public function jsonAction() {
-        return $this->toJson(array('foo' => 1));
+        return $this->toJson(['foo' => 1]);
     }
 }
 /*}}}*/
@@ -23,9 +25,9 @@ class CRUDProductController extends ExpandableController
 class ControllerTest extends MuxTestCase
 {
     public function testControllerConstructor() {
-        $controller = new CRUDProductController;
-        ok($controller);
-        return $controller;
+        $crudProductController = new CRUDProductController;
+        ok($crudProductController);
+        return $crudProductController;
     }
 
 
@@ -70,8 +72,9 @@ class ControllerTest extends MuxTestCase
         if (!extension_loaded('json')) {
             $this->markTestSkipped('json extension not found.');
         }
+
         $response = $controller->jsonAction();
-        $this->assertNotEmpty(json_decode($response[2]));
+        $this->assertNotEmpty(json_decode((string) $response[2], null, 512, JSON_THROW_ON_ERROR));
     }
 
 
@@ -79,8 +82,8 @@ class ControllerTest extends MuxTestCase
      * @depends testControllerConstructor
      */
     public function testMountControllerObject($controller) {
-        $m = new Mux;
-        $m->mount( '/product' , $controller );
+        $mux = new Mux;
+        $mux->mount( '/product' , $controller );
     }
 
     /**
@@ -102,18 +105,18 @@ class ControllerTest extends MuxTestCase
     public function testMountNoExpand($controller) {
         $mainMux = new Mux;
         $mainMux->mount('/product' , $controller);
-        $mainMux->any( '/' , array('ProductController', 'indexAction') );
+        $mainMux->any( '/' , ['ProductController', 'indexAction'] );
 
         $this->assertNotEmpty($mainMux->getRoutes()); 
         $this->assertCount(5,  $mainMux->getRoutes(), 'route count should be 5');
         ok($r = $mainMux->dispatch('/product') , 'matched /product' ); // match indexAction
-        $this->assertSame(array('CRUDProductController','indexAction'), $r[2] );
+        $this->assertSame(['CRUDProductController', 'indexAction'], $r[2] );
 
         ok( $r = $mainMux->dispatch('/product/add') );
-        $this->assertSame( array('CRUDProductController','addAction'), $r[2] );
+        $this->assertSame( ['CRUDProductController', 'addAction'], $r[2] );
 
         ok( $r = $mainMux->dispatch('/product/del') );
-        $this->assertSame( array('CRUDProductController','delAction'), $r[2] );
+        $this->assertSame( ['CRUDProductController', 'delAction'], $r[2] );
 
         $this->assertNull($mainMux->dispatch('/foo'));
         $this->assertNull($mainMux->dispatch('/bar'));

@@ -1,13 +1,13 @@
 <?php
 // require '../vendor/autoload.php';
-require '../src/Pux/PatternCompiler.php';
-require '../src/Pux/Mux.php';
-require '../src/Pux/MuxCompiler.php';
+require __DIR__ . '/../src/Pux/PatternCompiler.php';
+require __DIR__ . '/../src/Pux/Mux.php';
+require __DIR__ . '/../src/Pux/MuxCompiler.php';
 use Pux\MuxCompiler;
 use Pux\Mux;
 
 class HelloController {
-    public function helloAction() {
+    public function helloAction(): string {
         return 'hello';
     }
 }

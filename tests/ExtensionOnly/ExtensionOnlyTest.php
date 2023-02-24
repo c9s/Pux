@@ -6,13 +6,10 @@ class ExtensionOnlyMuxTest extends \PHPUnit\Framework\TestCase
 {
     public function testFunctions()
     {
-        $funcs = array(
-            'pux_match',
-            'pux_sort_routes',
-        );
+        $funcs = ['pux_match', 'pux_sort_routes'];
         if ( extension_loaded('pux') ) {
-            foreach( $funcs as $f ) {
-                ok( function_exists($f) );
+            foreach( $funcs as $func ) {
+                ok( function_exists($func) );
             }
         }
     }
@@ -25,21 +22,7 @@ class ExtensionOnlyMuxTest extends \PHPUnit\Framework\TestCase
 
     public function testPuxMethodDispatch() {
 
-        $routes = array(
-            array(
-                true, '#^ /product /(?P<id>[^/]+?) $#xs',
-                array( 'ProductController', 'itemAction' ),
-                array(
-                    'require' => array ( 'id' => '\\d+',),
-                    'default' => array ( 'id' => '1',),
-                    'variables' => array ( 'id',),
-                    'regex' => '    /product /(?P<id>[^/]+?) ',
-                    'compiled' => '#^ /product /(?P<id>[^/]+?) $#xs',
-                    'pattern' => '/product/:id',
-                    'method'  => 2,  // POST method
-                ),
-            ),
-        );
+        $routes = [[true, '#^ /product /(?P<id>[^/]+?) $#xs', ['ProductController', 'itemAction'], ['require' => ['id' => '\\d+'], 'default' => ['id' => '1'], 'variables' => ['id'], 'regex' => '    /product /(?P<id>[^/]+?) ', 'compiled' => '#^ /product /(?P<id>[^/]+?) $#xs', 'pattern' => '/product/:id', 'method'  => 2]]];
         $_SERVER['REQUEST_METHOD'] = "POST";
 
         $r = pux_match($routes, '/product/10');
@@ -47,41 +30,26 @@ class ExtensionOnlyMuxTest extends \PHPUnit\Framework\TestCase
         ok( $r[3] , "Got route options" );
         ok( $r[3]['vars'] , "Got route vars" );
         ok( $r[3]['vars']['id'] , "Got id" );
-        $this->assertSame(array( 'ProductController', 'itemAction' ) , $r[2], 'Same callback');
+        $this->assertSame(['ProductController', 'itemAction'] , $r[2], 'Same callback');
     }
 
     public function testPcreDispatch() {
         if ( ! extension_loaded('pux') ) {
             return $this->markTestSkipped('require pux extension');
         }
-        $routes = array(
-            array(
-                true, '#^ /product /(?P<id>[^/]+?) $#xs',
-                array( 'ProductController', 'itemAction' ),
-                array(
-                    'require' => array ( 'id' => '\\d+',),
-                    'default' => array ( 'id' => '1',),
-                    'variables' => array ( 'id',),
-                    'regex' => '    /product /(?P<id>[^/]+?) ',
-                    'compiled' => '#^ /product /(?P<id>[^/]+?) $#xs',
-                    'pattern' => '/product/:id',
-                ),
-            ),
-        );
+
+        $routes = [[true, '#^ /product /(?P<id>[^/]+?) $#xs', ['ProductController', 'itemAction'], ['require' => ['id' => '\\d+'], 'default' => ['id' => '1'], 'variables' => ['id'], 'regex' => '    /product /(?P<id>[^/]+?) ', 'compiled' => '#^ /product /(?P<id>[^/]+?) $#xs', 'pattern' => '/product/:id']]];
         $r = pux_match($routes, '/product/10');
         ok($r, "Found route");
         ok( $r[3] , "Got route options" );
         ok( $r[3]['vars'] , "Got route vars" );
         ok( $r[3]['vars']['id'] , "Got id" );
-        $this->assertSame(array( 'ProductController', 'itemAction' ) , $r[2], 'Same callback');
+        $this->assertSame(['ProductController', 'itemAction'] , $r[2], 'Same callback');
     }
 
     public function testStringDispatch() {
 
-        $routes = array(
-            array( false, '/product/item', array('ProductController', 'itemAction'), array() ),
-            array( false, '/product', array('ProductController', 'listAction'), array() ),
-        );
+        $routes = [[false, '/product/item', ['ProductController', 'itemAction'], []], [false, '/product', ['ProductController', 'listAction'], []]];
         $r = pux_match($routes, '/product');
         ok($r, "Found route");
 
@@ -90,16 +58,16 @@ class ExtensionOnlyMuxTest extends \PHPUnit\Framework\TestCase
     }
 
     public function assertNonPcreRoute($route, $path = null) {
-        $this->assertFalse($route[0], "Should be Non PCRE Route, Got: {$route[1]}");
+        $this->assertFalse($route[0], sprintf('Should be Non PCRE Route, Got: %s', $route[1]));
         if ( $path ) {
-            $this->assertSame($path, $route[1], "Should be $path, Got {$route[1]}");
+            $this->assertSame($path, $route[1], sprintf('Should be %s, Got %s', $path, $route[1]));
         }
     }
 
     public function assertPcreRoute($route, $path = null) {
-        $this->assertTrue($route[0], "Should be PCRE Route, Got: {$route[1]}" );
+        $this->assertTrue($route[0], sprintf('Should be PCRE Route, Got: %s', $route[1]) );
         if ( $path ) {
-            $this->assertSame($path, $route[3]['pattern'], "Should be $path, Got {$route[1]}");
+            $this->assertSame($path, $route[3]['pattern'], sprintf('Should be %s, Got %s', $path, $route[1]));
         }
     }
 

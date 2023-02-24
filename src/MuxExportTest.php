@@ -8,8 +8,8 @@ class MuxExportTest extends MuxTestCase
     public function testBasicRoutes() {
         $mux = new \Pux\Mux;
         ok($mux);
-        $mux->add('/product/:id', array( 'ProductController','itemAction' ));
-        $mux->add('/product', array( 'ProductController','listAction' ));
+        $mux->add('/product/:id', ['ProductController', 'itemAction']);
+        $mux->add('/product', ['ProductController', 'listAction']);
         return $mux;
     }
 
@@ -18,6 +18,7 @@ class MuxExportTest extends MuxTestCase
      * @depends testBasicRoutes
      */
     public function testExport($mux) {
+        $newMux = null;
         $code = $mux->export();
         ok($code);
         eval('$newMux = ' . $code . ';');

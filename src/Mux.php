@@ -48,16 +48,16 @@ class Mux implements IteratorAggregate
      *  - 'mount_path': the mounted path.
      *
      */
-    public $routes = array();
+    public $routes = [];
 
-    public $staticRoutes = array();
+    public $staticRoutes = [];
 
-    public $routesById = array();
+    public $routesById = [];
 
     /**
      * @var Mux[id]
      */
-    public $submux = array();
+    public $submux = [];
 
     public $id;
 
@@ -101,45 +101,41 @@ class Mux implements IteratorAggregate
         $this->routes[] = $route;
     }
 
-    public function appendRoute($pattern, $callback, array $options = array())
+    public function appendRoute($pattern, $callback, array $options = [])
     {
-        $this->routes[] = array(false, $pattern, $callback, $options);
+        $this->routes[] = [false, $pattern, $callback, $options];
     }
 
     public function appendPCRERoute(array $routeArgs, $callback)
     {
-        $this->routes[] = array(
-            true, // PCRE
+        $this->routes[] = [
+            true,
+            // PCRE
             $routeArgs['compiled'],
             $callback,
             $routeArgs,
-        );
+        ];
     }
 
 
-    public function setParent(Mux $parent)
+    public function setParent(Mux $mux)
     {
-        $this->parent = $parent;
+        $this->parent = $mux;
     }
 
     /**
      * Mount a Mux or a Controller object on a specific path.
      *
      * @param string         $pattern
-     * @param Mux|Controller $mux
-     * @param array          $options
      */
-    public function mount($pattern, $mux, array $options = array())
+    public function mount($pattern, \Pux\Mux|\Pux\Controller\Controller $mux, array $options = [])
     {
         // Save the mount path in options array
         $options['mount_path'] = $pattern;
 
         if ($mux instanceof Expandable) {
-
             $mux = $mux->expand($options);
-
-        } else if ($mux instanceof Closure) {
-
+        } elseif ($mux instanceof Closure) {
             // we pass the newly created Mux object to the builder closure to initialize routes.
             if ($ret = $mux($mux = new Mux())) {
                 if ($ret instanceof Mux) {
@@ -159,7 +155,7 @@ class Mux implements IteratorAggregate
 
 
         if ($this->expand) {
-            $pcre = strpos($pattern,':') !== false;
+            $pcre = str_contains($pattern,':');
 
             // rewrite submux routes
             foreach ($mux->routes as $route) {
@@ -170,12 +166,7 @@ class Mux implements IteratorAggregate
                         array_replace_recursive($options, $route[3]) );
                     $this->appendPCRERoute( $routeArgs, $route[2] );
                 } else {
-                    $this->routes[] = array(
-                        false,
-                        $pattern . $route[1],
-                        $route[2],
-                        isset($route[3]) ? array_replace_recursive($options, $route[3]) : $options,
-                    );
+                    $this->routes[] = [false, $pattern . $route[1], $route[2], isset($route[3]) ? array_replace_recursive($options, $route[3]) : $options];
                 }
             }
         } else {
@@ -187,56 +178,56 @@ class Mux implements IteratorAggregate
         }
     }
 
-    public function delete($pattern, $callback, array $options = array())
+    public function delete($pattern, $callback, array $options = [])
     {
         $options['method'] = REQUEST_METHOD_DELETE;
         $this->add($pattern, $callback, $options);
     }
 
-    public function put($pattern, $callback, array $options = array())
+    public function put($pattern, $callback, array $options = [])
     {
         $options['method'] = REQUEST_METHOD_PUT;
         $this->add($pattern, $callback, $options);
     }
 
-    public function get($pattern, $callback, array $options = array())
+    public function get($pattern, $callback, array $options = [])
     {
         $options['method'] = REQUEST_METHOD_GET;
         $this->add($pattern, $callback, $options);
     }
 
-    public function post($pattern, $callback, array $options = array())
+    public function post($pattern, $callback, array $options = [])
     {
         $options['method'] = REQUEST_METHOD_POST;
         $this->add($pattern, $callback, $options);
     }
 
-    public function patch($pattern, $callback, array $options = array())
+    public function patch($pattern, $callback, array $options = [])
     {
         $options['method'] = REQUEST_METHOD_PATCH;
         $this->add($pattern, $callback, $options);
     }
 
-    public function head($pattern, $callback, array $options = array())
+    public function head($pattern, $callback, array $options = [])
     {
         $options['method'] = REQUEST_METHOD_HEAD;
         $this->add($pattern, $callback, $options);
     }
 
-    public function options($pattern, $callback, array $options = array())
+    public function options($pattern, $callback, array $options = [])
     {
         $options['method'] = REQUEST_METHOD_OPTIONS;
         $this->add($pattern, $callback, $options);
     }
 
-    public function any($pattern, $callback, array $options = array())
+    public function any($pattern, $callback, array $options = [])
     {
         $this->add($pattern, $callback, $options);
     }
 
-    public function add($pattern, $callback, array $options = array())
+    public function add($pattern, $callback, array $options = [])
     {
-        if (is_string($callback) && strpos($callback, ':') !== false) {
+        if (is_string($callback) && str_contains($callback, ':')) {
             $callback = explode(':', $callback);
         }
 
@@ -246,35 +237,32 @@ class Mux implements IteratorAggregate
         }
 
         // compile place holder to patterns
-        $pcre = strpos($pattern, ':') !== false;
+        $pcre = str_contains((string) $pattern, ':');
         if ($pcre) {
-            $routeArgs = is_integer($callback)
+            $routeArgs = is_int($callback)
                 ? PatternCompiler::compilePrefix($pattern, $options)
                 : PatternCompiler::compile($pattern, $options)
                 ;
 
             // generate a pcre pattern route
-            $route = array(
-                true, // PCRE
+            $route = [
+                true,
+                // PCRE
                 $routeArgs['compiled'],
                 $callback,
                 $routeArgs,
-            );
+            ];
             if (isset($options['id'])) {
                 $this->routesById[ $options['id'] ] = $route;
             }
 
             return $this->routes[] = $route;
         } else {
-            $route = array(
-                false,
-                $pattern,
-                $callback,
-                $options,
-            );
+            $route = [false, $pattern, $callback, $options];
             if (isset($options['id'])) {
                 $this->routesById[ $options['id'] ] = $route;
             }
+
             // generate a simple string route.
             return $this->routes[] = $route;
         }
@@ -289,21 +277,22 @@ class Mux implements IteratorAggregate
 
     public function sort()
     {
-        usort($this->routes, array('Pux\\MuxCompiler', 'sort_routes'));
+        usort($this->routes, \Pux\MuxCompiler::sort_routes(...));
     }
 
     public static function sort_routes($a, $b)
     {
         if ($a[0] && $b[0]) {
-            return strlen($a[3]['compiled']) > strlen($b[3]['compiled']);
+            return strlen((string) $a[3]['compiled']) > strlen((string) $b[3]['compiled']);
         } elseif ($a[0]) {
             return 1;
         } elseif ($b[0]) {
             return -1;
         }
-        if (strlen($a[1]) > strlen($b[1])) {
+
+        if (strlen((string) $a[1]) > strlen((string) $b[1])) {
             return 1;
-        } elseif (strlen($a[1]) == strlen($b[1])) {
+        } elseif (strlen((string) $a[1]) === strlen((string) $b[1])) {
             return 0;
         } else {
             return -1;
@@ -331,46 +320,33 @@ class Mux implements IteratorAggregate
 
     public static function convertRequestMethodConstant($method)
     {
-        switch (strtoupper($method)) {
-            case 'POST':
-                return REQUEST_METHOD_POST;
-            case 'GET':
-                return REQUEST_METHOD_GET;
-            case 'PUT':
-                return REQUEST_METHOD_PUT;
-            case 'DELETE':
-                return REQUEST_METHOD_DELETE;
-            case 'PATCH':
-                return REQUEST_METHOD_PATCH;
-            case 'HEAD':
-                return REQUEST_METHOD_HEAD;
-            case 'OPTIONS':
-                return REQUEST_METHOD_OPTIONS;
-            default:
-                return 0;
-        }
+        return match (strtoupper((string) $method)) {
+            'POST' => REQUEST_METHOD_POST,
+            'GET' => REQUEST_METHOD_GET,
+            'PUT' => REQUEST_METHOD_PUT,
+            'DELETE' => REQUEST_METHOD_DELETE,
+            'PATCH' => REQUEST_METHOD_PATCH,
+            'HEAD' => REQUEST_METHOD_HEAD,
+            'OPTIONS' => REQUEST_METHOD_OPTIONS,
+            default => 0,
+        };
     }
 
     /**
      * Find a matched route with the path constraint in the current mux object.
      *
      * @param string       $path
-     * @param RouteRequest $request
      *
      * @return array
      */
-    public function match($path, RouteRequest $request = null)
+    public function match($path, RouteRequest $routeRequest = null)
     {
         $requestMethod = null;
 
-        if ($request) {
-
-            $requestMethod = self::convertRequestMethodConstant($request->getRequestMethod());
-
-        } else if (isset($_SERVER['REQUEST_METHOD'])) {
-
+        if ($routeRequest !== null) {
+            $requestMethod = self::convertRequestMethodConstant($routeRequest->getRequestMethod());
+        } elseif (isset($_SERVER['REQUEST_METHOD'])) {
             $requestMethod = self::convertRequestMethodConstant($_SERVER['REQUEST_METHOD']);
-
         }
 
         foreach ($this->routes as $route) {
@@ -379,15 +355,18 @@ class Mux implements IteratorAggregate
                 if (!preg_match($route[1], $path, $matches)) {
                     continue;
                 }
+
                 $route[3]['vars'] = $matches;
 
                 // validate request method
                 if (isset($route[3]['method']) && $route[3]['method'] != $requestMethod) {
                     continue;
                 }
+
                 if (isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER['HTTP_HOST']) {
                     continue;
                 }
+
                 if (isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER['HTTPS']) {
                     continue;
                 }
@@ -397,29 +376,32 @@ class Mux implements IteratorAggregate
                 // prefix match is used when expanding is not enabled.
                 if ((
                         (is_int($route[2]) || $route[2] instanceof self || $route[2] instanceof \PHPSGI\App)
-                        && strncmp($route[1], $path, strlen($route[1])) === 0
+                        && strncmp((string) $route[1], $path, strlen((string) $route[1])) === 0
                     ) || $route[1] == $path) {
                     // validate request method
                     if (isset($route[3]['method']) && $route[3]['method'] != $requestMethod) {
                         continue;
                     }
+
                     if (isset($route[3]['domain']) && $route[3]['domain'] != $_SERVER['HTTP_HOST']) {
                         continue;
                     }
+
                     if (isset($route[3]['secure']) && $route[3]['secure'] && $_SERVER['HTTPS']) {
                         continue;
                     }
 
                     return $route;
                 }
+
                 continue;
             }
         }
     }
 
-    public function dispatchRequest(RouteRequest $request)
+    public function dispatchRequest(RouteRequest $routeRequest)
     {
-        return $this->dispatch($request->getPath(), $request);
+        return $this->dispatch($routeRequest->getPath(), $routeRequest);
     }
 
     /**
@@ -428,18 +410,17 @@ class Mux implements IteratorAggregate
      * The RouteRequest object is used for serving request method, host name
      * and other route information.
      *
-     * @param string $path 
-     * @param Pux\RouteRequest $request
+     * @param string $path
+     * @param Pux\RouteRequest $routeRequest
      *
      * @return array
      */
-    public function dispatch($path, RouteRequest $request = null)
+    public function dispatch($path, RouteRequest $routeRequest = null)
     {
         if ($route = $this->match($path)) {
             // When the callback is an integer, it's refereing to a submux object.
-            if (is_integer($route[2])) {
+            if (is_int($route[2])) {
                 $submux = $this->submux[$route[2]];
-                $options = $route[3];
 
                 // sub-path and call submux to dispatch
                 // for pcre pattern?
@@ -447,13 +428,11 @@ class Mux implements IteratorAggregate
 
                     $matchedString = $route[3]['vars'][0];
 
-                    return $submux->dispatch(substr($path, strlen($matchedString)));
+                    return $submux->dispatch(substr($path, strlen((string) $matchedString)));
 
                 } else {
-                    $s = substr($path, strlen($route[1]));
-
                     return $submux->dispatch(
-                        substr($path, strlen($route[1])) ?: ''
+                        substr($path, strlen((string) $route[1])) ?: ''
                     );
                 }
             }
@@ -462,7 +441,7 @@ class Mux implements IteratorAggregate
         }
     }
 
-    public function length()
+    public function length(): int
     {
         return count($this->routes);
     }
@@ -494,7 +473,7 @@ class Mux implements IteratorAggregate
      *
      * @return string
      */
-    public function url($id, array $params = array())
+    public function url($id, array $params = [])
     {
         $route = $this->getRoute($id);
 
@@ -502,13 +481,13 @@ class Mux implements IteratorAggregate
             throw new \RuntimeException('Named route not found for id: '.$id);
         }
 
-        $search = array();
-        foreach ($params as $key => $value) {
+        $search = [];
+        foreach (array_keys($params) as $key) {
             // try to match ':{key}' fragments and replace it with value
             $search[] = '#:'.preg_quote($key, '#').'\+?(?!\w)#';
         }
 
-        $pattern = preg_replace($search, $params, $route[3]['pattern']);
+        $pattern = preg_replace($search, $params, (string) $route[3]['pattern']);
 
         // Remove remnants of unpopulated, trailing optional pattern segments, escaped special characters
         return preg_replace('#\(/?:.+\)|\(|\)|\\\\#', '', $pattern);
@@ -516,14 +495,15 @@ class Mux implements IteratorAggregate
 
     public static function __set_state($array)
     {
-        $mux = new self();
-        $mux->routes = $array['routes'];
-        $mux->submux = $array['submux'];
+        $self = new self();
+        $self->routes = $array['routes'];
+        $self->submux = $array['submux'];
         if (isset($array['routesById'])) {
-            $mux->routesById = $array['routesById'];
+            $self->routesById = $array['routesById'];
         }
-        $mux->id = $array['id'];
-        return $mux;
+
+        $self->id = $array['id'];
+        return $self;
     }
 
 
