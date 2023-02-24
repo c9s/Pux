@@ -506,9 +506,9 @@ class Mux implements IteratorAggregate
         return $self;
     }
 
-
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
+        // return a valid Traversable object
         return new ArrayIterator($this->routes);
     }
 

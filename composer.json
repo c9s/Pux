@@ -1,5 +1,5 @@
 {
-    "name": "motaword/pux",
+    "name": "corneltek/pux",
     "description": "The fast PHP router",
     "homepage": "https://github.com/c9s/Pux",
     "keywords": [
@@ -7,12 +7,12 @@
     ],
     "authors": [
         {
-            "name": "MotaWord",
-            "email": "info@motaword.com"
+            "name": "Yo-An Lin",
+            "email": "yoanlin93@gmail.com"
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.2.3",
         "phpsgi/phpsgi": "1.0.x-dev",
         "universal/universal": "2.0.x-dev"
     },
