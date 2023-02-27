@@ -14,24 +14,24 @@ class MuxMountTest extends MuxTestCase
     }
 
     public function testConstruct() {
-        $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
-        ok($submux);
+        $mux = new \Pux\Mux;
+        $mux->any('/hello/:name', ['HelloController2', 'indexAction']);
+        ok($mux);
     }
 
     public function testLength() {
-        $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
-        ok($submux);
-        is(1, $submux->length());
+        $mux = new \Pux\Mux;
+        $mux->any('/hello/:name', ['HelloController2', 'indexAction']);
+        ok($mux);
+        is(1, $mux->length());
     }
 
     public function testGetRoutes() {
-        $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
-        ok($submux);
+        $mux = new \Pux\Mux;
+        $mux->any('/hello/:name', ['HelloController2', 'indexAction']);
+        ok($mux);
 
-        ok($routes = $submux->getRoutes() );
+        ok($routes = $mux->getRoutes() );
         ok(is_array($routes));
         count_ok(1, $routes);
     }
@@ -50,7 +50,7 @@ class MuxMountTest extends MuxTestCase
         $mux = new \Pux\Mux;
         $submux = new \Pux\Mux;
         ok($submux);
-        $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
+        $submux->any('/hello/:name', ['HelloController2', 'indexAction']);
         $mux->mount( '/sub' , $submux);
     }
 
@@ -58,7 +58,7 @@ class MuxMountTest extends MuxTestCase
         $mux = new \Pux\Mux;
         $submux = new \Pux\Mux;
         ok($submux);
-        $submux->any('/hello/str', array( 'HelloController2','indexAction' ));
+        $submux->any('/hello/str', ['HelloController2', 'indexAction']);
         $mux->mount( '/sub' , $submux);
     }
 
@@ -69,8 +69,8 @@ class MuxMountTest extends MuxTestCase
         is(0, $mux->length());
 
         $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
-        $submux->any('/hello/test', array( 'HelloController2','indexAction' ));
+        $submux->any('/hello/:name', ['HelloController2', 'indexAction']);
+        $submux->any('/hello/test', ['HelloController2', 'indexAction']);
 
         ok($submux);
         ok($routes = $submux->getRoutes());
@@ -88,7 +88,7 @@ class MuxMountTest extends MuxTestCase
         is(0, $mux->length());
 
         $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
+        $submux->any('/hello/:name', ['HelloController2', 'indexAction']);
         ok($submux);
         ok($routes = $submux->getRoutes());
         is(1, $submux->length());
@@ -104,8 +104,8 @@ class MuxMountTest extends MuxTestCase
         $this->assertEquals(0, $mux->length());
 
         $submux = new Mux;
-        $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
-        $submux->any('/goodbye', array( 'GoodbyeController2','indexAction' ));
+        $submux->any('/hello/:name', ['HelloController2', 'indexAction']);
+        $submux->any('/goodbye', ['GoodbyeController2', 'indexAction']);
 
         ok($routes = $submux->getRoutes());
         $this->assertEquals(2, $submux->length());
@@ -124,7 +124,7 @@ class MuxMountTest extends MuxTestCase
         $this->assertEquals(0, $mux->length());
 
         $submux = new \Pux\Mux;
-        $submux->any('/hello/there', array('HelloController2', 'indexAction'));
+        $submux->any('/hello/there', ['HelloController2', 'indexAction']);
 
         ok($routes = $submux->getRoutes());
         $this->assertEquals(1, $submux->length());
@@ -137,9 +137,9 @@ class MuxMountTest extends MuxTestCase
 
     public function testCallableSubMux() {
         $mux = new \Pux\Mux;
-        $mux->mount('/test', function (Mux $submux) {
-            $submux->any('/hello/static', array('HelloController2', 'indexAction'));
-            $submux->any('/hello/:name', array('HelloController2', 'indexAction'));
+        $mux->mount('/test', static function (Mux $mux) {
+            $mux->any('/hello/static', ['HelloController2', 'indexAction']);
+            $mux->any('/hello/:name', ['HelloController2', 'indexAction']);
         });
 
         ok($routes = $mux->getRoutes());
@@ -162,17 +162,8 @@ class MuxMountTest extends MuxTestCase
         $this->assertEquals(0, $mux->length());
 
         $submux = new Mux;
-        $submux->any('/foo', array( 'FooController', 'indexAction' ), array(
-            'default' => array(
-                'suffix' => 'csv',
-            ),
-        ));
-        $submux->any('/hello/:name', array( 'HelloController', 'indexAction' ), array(
-            'default' => array(
-                'suffix' => 'json',
-                'prefix' => 'v1',
-            ),
-        ));
+        $submux->any('/foo', ['FooController', 'indexAction'], ['default' => ['suffix' => 'csv']]);
+        $submux->any('/hello/:name', ['HelloController', 'indexAction'], ['default' => ['suffix' => 'json', 'prefix' => 'v1']]);
         $this->assertEquals(2, $submux->length());
 
 

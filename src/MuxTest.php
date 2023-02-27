@@ -7,40 +7,40 @@ class MuxTest extends MuxTestCase
     public function testMuxRouteRouteDefine()
     {
         $mux = new Mux();
-        $mux->add('/', array('IndexController', 'indexAction'));
+        $mux->add('/', ['IndexController', 'indexAction']);
     }
 
     public function testMuxRoutePCRERouteDefine()
     {
         $mux = new Mux();
-        $mux->add('/hello/:name', array('IndexController', 'indexAction'));
+        $mux->add('/hello/:name', ['IndexController', 'indexAction']);
     }
 
     public function testMuxId()
     {
         $mux = new Mux();
-        $mux->add('/hello/:name', array('IndexController', 'indexAction'));
+        $mux->add('/hello/:name', ['IndexController', 'indexAction']);
         ok($mux->getId());
     }
 
     public function testMuxClass()
     {
-        ok(class_exists('Pux\\Mux'));
+        ok(class_exists(\Pux\Mux::class));
     }
 
     public function testMuxStaticIdGenerator()
     {
         $id = \Pux\Mux::generate_id();
-        ok($id, "got mux ID $id");
-        ok(is_numeric($id), "got mux ID $id");
-        ok(is_integer($id), "got mux ID $id");
+        ok($id, sprintf('got mux ID %s', $id));
+        ok(is_numeric($id), sprintf('got mux ID %s', $id));
+        ok(is_int($id), sprintf('got mux ID %s', $id));
     }
 
     public function testMuxGetId()
     {
         $mux = new \Pux\Mux();
         $id = $mux->getId();
-        ok(is_integer($id));
+        ok(is_int($id));
         is($id, $mux->getId());
     }
 
@@ -48,7 +48,7 @@ class MuxTest extends MuxTestCase
     {
         $mux = new \Pux\Mux();
         ok($mux);
-        $mux->add('/product', array('ProductController', 'listAction'));
+        $mux->add('/product', ['ProductController', 'listAction']);
         $route = $mux->match('/product');
         ok($route);
     }
@@ -57,7 +57,7 @@ class MuxTest extends MuxTestCase
     {
         $mux = new \Pux\Mux();
         ok($mux);
-        $mux->add('/product/:id', array('ProductController', 'itemAction'));
+        $mux->add('/product/:id', ['ProductController', 'itemAction']);
         $route = $mux->match('/product/30');
         ok($route);
     }
@@ -66,7 +66,7 @@ class MuxTest extends MuxTestCase
     {
         $mux = new \Pux\Mux();
         ok($mux);
-        $mux->add('/product', array('ProductController', 'listAction'));
+        $mux->add('/product', ['ProductController', 'listAction']);
         $routes = $mux->getRoutes();
         $mux->setRoutes($routes);
     }
@@ -75,7 +75,7 @@ class MuxTest extends MuxTestCase
     {
         $mux = new \Pux\Mux();
         ok($mux);
-        $mux->add('/product', array('ProductController', 'listAction'));
+        $mux->add('/product', ['ProductController', 'listAction']);
 
         $routes = $mux->getRoutes();
         ok($routes, 'got routes');
@@ -97,8 +97,8 @@ class MuxTest extends MuxTestCase
     {
         $mux = new \Pux\Mux();
         ok($mux);
-        $mux->add('/product/:id', array('ProductController', 'itemAction'));
-        $mux->add('/product', array('ProductController', 'listAction'));
+        $mux->add('/product/:id', ['ProductController', 'itemAction']);
+        $mux->add('/product', ['ProductController', 'listAction']);
 
         return $mux;
     }
@@ -125,8 +125,8 @@ class MuxTest extends MuxTestCase
     public function testRouteWithId()
     {
         $mux = new \Pux\Mux();
-        $mux->add('/hello/:name', array('HelloController2', 'indexAction'), array('id' => 'hello-name'));
-        $mux->add('/foo', array('HelloController2', 'indexAction'), array('id' => 'foo'));
+        $mux->add('/hello/:name', ['HelloController2', 'indexAction'], ['id' => 'hello-name']);
+        $mux->add('/foo', ['HelloController2', 'indexAction'], ['id' => 'foo']);
 
         ok($mux->routesById);
         ok($mux->routesById['foo']);

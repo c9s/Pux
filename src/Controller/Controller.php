@@ -12,13 +12,13 @@ class Controller implements App
     /**
      * @var array PHPSGI compatible environment array (derived from $_SERVER)
      */
-    protected $environment = array();
+    protected $environment = [];
 
 
     /**
      * @var array Response array in [ code, headers, content ]
      */
-    protected $response = array();
+    protected $response = [];
 
     /**
      * @var Universal\Http\HttpRequest object
@@ -29,21 +29,19 @@ class Controller implements App
     /**
      * @var array The matched route array
      */
-    protected $matchedRoute;
+    protected $matchedRoute = [];
 
     public function call(array & $environment, array $response)
     {
         $this->context($environment, $response);
 
         $action = $environment['pux.controller_action'];
-        list($pcre, $pattern, $callbackArg, $options) = $this->matchedRoute;
+        [$pcre, $pattern, $callbackArg, $options] = $this->matchedRoute;
 
-        $rc = new ReflectionClass($this);
+        $reflectionClass = new ReflectionClass($this);
 
-        $rps = $rc->getMethod($action)->getParameters();
-        $vars = isset($options['vars'])
-                ? $options['vars']
-                : array()
+        $rps = $reflectionClass->getMethod($action)->getParameters();
+        $vars = $options['vars'] ?? []
                 ;
 
         $arguments = [];
@@ -51,10 +49,10 @@ class Controller implements App
             $n = $rp->getName();
             if (isset($vars[ $n ])) {
                 $arguments[] = $vars[ $n ];
-            } else if (isset($route[3]['default'][ $n ])
+            } elseif (isset($route[3]['default'][ $n ])
                             && $default = $route[3]['default'][ $n ]) {
                 $arguments[] = $default;
-            } else if (!$rp->isOptional() && !$rp->allowsNull()) {
+            } elseif (!$rp->isOptional() && !$rp->allowsNull()) {
                 throw new Exception('parameter is not defined.');
             }
         }
@@ -71,7 +69,7 @@ class Controller implements App
 
     public function hasMatchedRoute()
     {
-        return $this->matchedRoute ? true : false;
+        return (bool) $this->matchedRoute;
     }
 
 
@@ -94,6 +92,7 @@ class Controller implements App
         if (!$recreate && $this->_request) {
             return $this->_request;
         }
+
         return $this->_request = HttpRequest::createFromGlobals($this->environment);
     }
 
@@ -102,6 +101,7 @@ class Controller implements App
         if ($encodeFlags === null) {
             $encodeFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
         }
+
         return [200, ['Content-Type: application/json'], json_encode($data, $encodeFlags)];
     }
 
@@ -113,26 +113,26 @@ class Controller implements App
      * @param array $vars    Action method parameters, which will be applied to the method parameters by their names.
      * @return string        Return execution result in string format.
      */
-    public function runAction($action, array $vars = array())
+    public function runAction($action, array $vars = [])
     {
-        $method = "{$action}Action";
+        $method = sprintf('%sAction', $action);
         if (! method_exists($this,$method)) {
-            throw new Exception("Controller method $method does not exist.");
+            throw new Exception(sprintf('Controller method %s does not exist.', $method));
         }
 
-        $ro = new ReflectionObject( $this );
-        $rm = $ro->getMethod($method);
+        $reflectionObject = new ReflectionObject( $this );
+        $reflectionMethod = $reflectionObject->getMethod($method);
 
         // Map vars to function arguments
-        $parameters = $rm->getParameters();
-        $arguments = array();
-        foreach ($parameters as $param) {
-            if (isset($vars[$param->getName()])) {
-                $arguments[] = $vars[ $param->getName() ];
+        $parameters = $reflectionMethod->getParameters();
+        $arguments = [];
+        foreach ($parameters as $parameter) {
+            if (isset($vars[$parameter->getName()])) {
+                $arguments[] = $vars[ $parameter->getName() ];
             }
         }
 
-        return call_user_func_array( array($this,$method) , $arguments );
+        return call_user_func_array( [$this, $method] , $arguments );
     }
 
     /**
@@ -149,11 +149,12 @@ class Controller implements App
      *      )
      *  ));
      */
-    public function forward($controller, $actionName = 'index' , $parameters = array())
+    public function forward($controller, $actionName = 'index' , $parameters = [])
     {
         if (is_string($controller)) {
             $controller = new $controller;
         }
+
         return $controller->runAction($actionName, $parameters);
     }
 
@@ -165,10 +166,11 @@ class Controller implements App
      */
     public function hasAction($action)
     {
-        $method = "{$action}Action";
+        $method = sprintf('%sAction', $action);
         if (method_exists($this, $method)) {
             return $method;
         }
+
         return false;
     }
 }

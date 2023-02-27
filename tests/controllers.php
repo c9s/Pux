@@ -5,12 +5,12 @@ use Pux\Controller\Controller;
 
 class HelloController extends Controller
 {
-    public function index($name)
+    public function index($name): string
     {
-        return "Hello $name";
+        return sprintf('Hello %s', $name);
     }
 
-    public function show()
+    public function show(): string
     {
         return "response";
     }
@@ -18,20 +18,22 @@ class HelloController extends Controller
 
 class HelloController2 extends Controller
 {
-    public function helloAction($name)
+    public function helloAction($name): string
     {
-        return "hello $name";
+        return sprintf('hello %s', $name);
     }
 }
 
 class ProductController
 {
-    public function indexAction() { return 'index'; }
-    public function fooAction() { return 'foo'; }
-    public function barAction() { return 'bar'; }
+    public function indexAction(): string { return 'index'; }
 
-    public function itemAction($id)  { 
-        return "product item $id";
+    public function fooAction(): string { return 'foo'; }
+
+    public function barAction(): string { return 'bar'; }
+
+    public function itemAction($id): string  { 
+        return sprintf('product item %s', $id);
     }
 }
 
@@ -105,8 +107,9 @@ class ProductResourceController extends RESTfulController
 
 class PageController {
 
-    public function page1() { return 'page1'; }
-    public function page2() { return 'page2'; }
+    public function page1(): string { return 'page1'; }
+
+    public function page2(): string { return 'page2'; }
 
 }
 

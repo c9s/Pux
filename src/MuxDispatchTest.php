@@ -8,7 +8,7 @@ class MuxDispatchTest extends \PHPUnit\Framework\TestCase
     public function testMuxCustomDispatch()
     {
         $mux = new Mux;
-        $mux->mount('/bs/product', function($x) { 
+        $mux->mount('/bs/product', static function ($x) {
             $x = new Mux;
             $x->any('/create', ['Product', 'createAction']);
             $x->any('/edit/:id', ['Product', 'editAction']);

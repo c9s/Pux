@@ -36,8 +36,8 @@ class ControllerRouteBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testAnnotationForGetActionMethods()
     {
-        $con = new ChildController;
-        $map = ControllerRouteBuilder::parseActionMethods($con);
+        $childController = new ChildController;
+        $map = ControllerRouteBuilder::parseActionMethods($childController);
         $this->assertNotEmpty($map);
         $this->assertTrue(is_array($map));
 
@@ -45,21 +45,15 @@ class ControllerRouteBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue( isset($map['pageAction']) );
         $this->assertTrue( isset($map['subpageAction']) );
 
-        $this->assertEquals(array(
-            array(
-                "Route" => "/post",
-                "Method" => "POST"
-            ),
-            array("class" => ChildController::class)
-        ), $map['postAction'] );
+        $this->assertEquals([["Route" => "/post", "Method" => "POST"], ["class" => ChildController::class]], $map['postAction'] );
 
-        $routeMap = ControllerRouteBuilder::build($con);
+        $routeMap = ControllerRouteBuilder::build($childController);
         $this->assertCount(3, $routeMap);
 
-        list($path, $method, $options) = $routeMap[0];
+        [$path, $method, $options] = $routeMap[0];
         is('/page', $path);
         is('pageAction', $method);
-        is( array( 'method' => REQUEST_METHOD_GET ) , $options);
+        is( ['method' => REQUEST_METHOD_GET] , $options);
     }
 
 
@@ -70,10 +64,10 @@ class ControllerRouteBuilderTest extends \PHPUnit\Framework\TestCase
             return;
         }
 
-        $controller = new \ExpandableProductController;
-        $this->assertTrue(is_array( $map = ControllerRouteBuilder::parseActionMethods($controller) ) );
+        $expandableProductController = new \ExpandableProductController;
+        $this->assertTrue(is_array( $map = ControllerRouteBuilder::parseActionMethods($expandableProductController) ) );
 
-        $routes = ControllerRouteBuilder::build($controller);
+        $routes = ControllerRouteBuilder::build($expandableProductController);
         $this->assertNotEmpty($routes);
 
         $this->assertEquals('', $routes[0][0], 'the path');
@@ -86,22 +80,12 @@ class ControllerRouteBuilderTest extends \PHPUnit\Framework\TestCase
         // $mux->mount('/product', $submux );
 
         // gc scan bug
-        $mux->mount('/product', $controller->expand() );
+        $mux->mount('/product', $expandableProductController->expand() );
 
-        $paths = array(
-            '/product/delete' => 'DELETE',
-            '/product/update' => 'PUT' ,
-            '/product/add'    => 'POST' ,
-            '/product/foo/bar' => null,
-            '/product/item' => 'GET',
-            '/product' => null,
-        );
+        $paths = ['/product/delete' => 'DELETE', '/product/update' => 'PUT', '/product/add'    => 'POST', '/product/foo/bar' => null, '/product/item' => 'GET', '/product' => null];
         foreach( $paths as $path => $method ) {
-            if ($method) {
-                $_SERVER['REQUEST_METHOD'] = $method;
-            } else {
-                $_SERVER['REQUEST_METHOD'] = 'GET';
-            }
+            $_SERVER['REQUEST_METHOD'] = $method ?? 'GET';
+
             ok($mux->dispatch($path) , $path);
         }
     }

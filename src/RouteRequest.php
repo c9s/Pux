@@ -16,27 +16,14 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     /**
      * @var array
      */
-    protected $headers = array();
-
-    /**
-     * @var string request method
-     */
-    public $requestMethod;
-
-    /**
-     * @var string request path
-     */
-    public $path;
+    protected $headers = [];
 
     /**
      * @param string $requestMethod
      * @param string $path
      */
-    public function __construct($requestMethod, $path)
+    public function __construct(public $requestMethod, public $path)
     {
-        $this->requestMethod = $requestMethod;
-        $this->path = $path;
-
         // Note: It's not neccessary to call parent::__construct because we
         // don't depend on superglobal variables.
     }
@@ -67,7 +54,7 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
      *
      * @return boolean true on match
      */
-    public function matchConstraints(array $constraints)
+    public function matchConstraints(array $constraints): bool
     {
         foreach ($constraints as $constraint) {
             $result = true;
@@ -95,32 +82,31 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
             if ($result) {
                 return true;
             }
+
             // try next one
         }
 
         return false;
     }
 
-    public function queryStringMatch($pattern, array &$matches = array())
+    public function queryStringMatch($pattern, array &$matches = [])
     {
-        return preg_match($pattern, $this->serverParameters['QUERY_STRING'], $matches) !== false;
+        return preg_match($pattern, (string) $this->serverParameters['QUERY_STRING'], $matches) !== false;
     }
 
     public function portEqual($port)
     {
         if (isset($this->serverParameters['SERVER_PORT'])) {
-            return intval($this->serverParameters['SERVER_PORT']) == intval($port);
+            return (int) $this->serverParameters['SERVER_PORT'] === (int) $port;
         }
     }
 
     /**
      * Check if the request host is in the list of host.
      *
-     * @param array $hosts
      *
-     * @return bool
      */
-    public function isOneOfHosts(array $hosts)
+    public function isOneOfHosts(array $hosts): bool
     {
         foreach ($hosts as $host) {
             if ($this->matchHost($host)) {
@@ -133,43 +119,44 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
 
     public function pathLike($path)
     {
-        $pattern = '#'.preg_quote($path, '#').'#i';
+        $pattern = '#'.preg_quote((string) $path, '#').'#i';
 
         return preg_match($pattern, $this->path) !== false;
     }
 
-    public function pathMatch($pattern, array &$matches = array())
+    public function pathMatch($pattern, array &$matches = [])
     {
         return preg_match($pattern, $this->path, $matches) !== false;
     }
 
     public function pathEqual($path)
     {
-        return strcasecmp($path, $this->path) === 0;
+        return strcasecmp((string) $path, $this->path) === 0;
     }
 
-    public function pathContain($path)
+    public function pathContain($path): bool
     {
-        return strpos($this->path, $path) !== false;
+        return str_contains($this->path, (string) $path);
     }
 
-    public function pathStartWith($path)
+    public function pathStartWith($path): bool
     {
-        return strpos($this->path, $path) === 0;
+        return str_starts_with($this->path, (string) $path);
     }
 
     public function pathEndWith($suffix)
     {
-        $p = strrpos($this->path, $suffix);
+        $p = strrpos($this->path, (string) $suffix);
 
-        return ($p == strlen($this->path) - strlen($suffix));
+        return ($p == strlen($this->path) - strlen((string) $suffix));
     }
 
-    public function hostMatch($host, array &$matches = array())
+    public function hostMatch($host, array &$matches = [])
     {
         if (isset($this->serverParameters['HTTP_HOST'])) {
-            return preg_match($host, $this->serverParameters['HTTP_HOST'], $matches) !== false;
+            return preg_match($host, (string) $this->serverParameters['HTTP_HOST'], $matches) !== false;
         }
+
         // the HTTP HOST is not defined.
         return false;
     }
@@ -177,7 +164,7 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     public function hostEqual($host)
     {
         if (isset($this->serverParameters['HTTP_HOST'])) {
-            return strcasecmp($this->serverParameters['HTTP_HOST'], $host) === 0;
+            return strcasecmp((string) $this->serverParameters['HTTP_HOST'], (string) $host) === 0;
         }
 
         return false;
@@ -202,35 +189,24 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
      *
      * @return RouteRequest
      */
-    public static function create($method, $path, array $env = array())
+    public static function create($method, $path, array $env = [])
     {
-        $request = new self($method, $path);
+        $self = new self($method, $path);
+        $self->headers = function_exists('getallheaders') ? getallheaders() : self::createHeadersFromServerGlobal($env);
+        $self->serverParameters = $env['_SERVER'] ?? $env;
 
-        if (function_exists('getallheaders')) {
-            $request->headers = getallheaders();
-        } else {
-            // TODO: filter array keys by their prefix, consider adding an extension function for this.
-            $request->headers = self::createHeadersFromServerGlobal($env);
-        }
+        $self->parameters = $env['_REQUEST'] ?? [];
+        $self->queryParameters = $env['_GET'] ?? [];
+        $self->bodyParameters = $env['_POST'] ?? [];
+        $self->cookieParameters = $env['_COOKIE'] ?? [];
+        $self->sessionParameters = $env['_SESSION'] ?? [];
 
-        if (isset($env['_SERVER'])) {
-            $request->serverParameters = $env['_SERVER'];
-        } else {
-            $request->serverParameters = $env;
-        }
-        $request->parameters = isset($env['_REQUEST']) ? $env['_REQUEST'] : array();
-        $request->queryParameters = isset($env['_GET']) ? $env['_GET'] : array();
-        $request->bodyParameters = isset($env['_POST']) ? $env['_POST'] : array();
-        $request->cookieParameters = isset($env['_COOKIE']) ? $env['_COOKIE'] : array();
-        $request->sessionParameters = isset($env['_SESSION']) ? $env['_SESSION'] : array();
-
-        return $request;
+        return $self;
     }
 
     /**
      * Create request object from global variables.
      *
-     * @param array $env
      * @return RouteRequest
      */
     public static function createFromEnv(array $env)
@@ -256,31 +232,25 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         $requestMethod = 'GET';
         if (isset($env['REQUEST_METHOD'])) {
             $requestMethod = $env['REQUEST_METHOD'];
-        } else if (isset($env['_SERVER']['REQUEST_METHOD'])) { // compatibility for superglobal
+        } elseif (isset($env['_SERVER']['REQUEST_METHOD'])) {
+            // compatibility for superglobal
+            // compatibility for superglobal
+            // compatibility for superglobal
             $requestMethod = $env['_SERVER']['REQUEST_METHOD'];
         }
 
         // create request object with request method and path,
         // we can assign other parameters later.
-        $request = new self($requestMethod, $path);
-        if (function_exists('getallheaders')) {
-            $request->headers = getallheaders();
-        } else {
-            // TODO: filter array keys by their prefix, consider adding an extension function for this.
-            $request->headers = self::createHeadersFromServerGlobal($env);
-        }
+        $self = new self($requestMethod, $path);
+        $self->headers = function_exists('getallheaders') ? getallheaders() : self::createHeadersFromServerGlobal($env);
+        $self->serverParameters = $env['_SERVER'] ?? $env;
 
-        if (isset($env['_SERVER'])) {
-            $request->serverParameters = $env['_SERVER'];
-        } else {
-            $request->serverParameters = $env;
-        }
-        $request->parameters = $env['_REQUEST'];
-        $request->queryParameters = $env['_GET'];
-        $request->bodyParameters = $env['_POST'];
-        $request->cookieParameters = $env['_COOKIE'];
-        $request->sessionParameters = $env['_SESSION'];
+        $self->parameters = $env['_REQUEST'];
+        $self->queryParameters = $env['_GET'];
+        $self->bodyParameters = $env['_POST'];
+        $self->cookieParameters = $env['_COOKIE'];
+        $self->sessionParameters = $env['_SESSION'];
 
-        return $env['__request_object'] = $request;
+        return $env['__request_object'] = $self;
     }
 }
