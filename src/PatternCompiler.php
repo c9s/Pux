@@ -69,7 +69,7 @@ class PatternCompiler
              * Split tokens from abstract pattern
              * to rebuild regexp pattern.
              */
-            if (($text = substr($pattern, $pos, $match[0][1] - $pos)) !== '' && ($text = substr($pattern, $pos, $match[0][1] - $pos)) !== '0') {
+            if ($text = substr($pattern, $pos, $match[0][1] - $pos)) {
                 $tokens[] = [self::TOKEN_TYPE_TEXT, $text];
             }
 

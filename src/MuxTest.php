@@ -33,7 +33,7 @@ class MuxTest extends MuxTestCase
         $id = \Pux\Mux::generate_id();
         ok($id, sprintf('got mux ID %s', $id));
         ok(is_numeric($id), sprintf('got mux ID %s', $id));
-        ok(is_int($id), sprintf('got mux ID %s', $id));
+        ok(is_integer($id), sprintf('got mux ID %s', $id));
     }
 
     public function testMuxGetId()

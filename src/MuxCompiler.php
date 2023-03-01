@@ -54,7 +54,8 @@ class MuxCompiler
         if ($a[0] && $b[0]) {
             $a_len = strlen((string) $a[3]['compiled']);
             $b_len = strlen((string) $b[3]['compiled']);
-            if ($a_len === $b_len) {
+            
+            if ($a_len == $b_len) {
                 return 0;
             } elseif ($a_len > $b_len) {
                 return -1;
@@ -69,7 +70,7 @@ class MuxCompiler
 
         if (strlen((string) $a[1]) > strlen((string) $b[1])) {
             return -1;
-        } elseif (strlen((string) $a[1]) === strlen((string) $b[1])) {
+        } elseif (strlen((string) $a[1]) == strlen((string) $b[1])) {
             return 0;
         } else {
             return 1;

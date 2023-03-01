@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b650c97fba2e7dfc02999844571072a0",
+    "content-hash": "b300469efb574371d48d113e46bbc992",
     "packages": [
         {
             "name": "phpsgi/phpsgi",
@@ -148,9 +148,7 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {
-        "php": ">=8.2.3"
-    },
+    "platform": [],
     "platform-dev": [],
     "plugin-api-version": "2.3.0"
 }

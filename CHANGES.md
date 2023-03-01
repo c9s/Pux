@@ -1,8 +1,8 @@
 CHANGELOG
 ==================
 
-### Version 3.0
-- Added support for php 8.2.3
+### Version 2.0.1
+- Php 8.2+ support added.
 
 ### Version 2.0
 

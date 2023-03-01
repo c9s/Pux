@@ -85,7 +85,6 @@ class ControllerRouteBuilderTest extends \PHPUnit\Framework\TestCase
         $paths = ['/product/delete' => 'DELETE', '/product/update' => 'PUT', '/product/add'    => 'POST', '/product/foo/bar' => null, '/product/item' => 'GET', '/product' => null];
         foreach( $paths as $path => $method ) {
             $_SERVER['REQUEST_METHOD'] = $method ?? 'GET';
-
             ok($mux->dispatch($path) , $path);
         }
     }

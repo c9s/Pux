@@ -192,6 +192,7 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     public static function create($method, $path, array $env = [])
     {
         $self = new self($method, $path);
+        // TODO: filter array keys by their prefix, consider adding an extension function for this.
         $self->headers = function_exists('getallheaders') ? getallheaders() : self::createHeadersFromServerGlobal($env);
         $self->serverParameters = $env['_SERVER'] ?? $env;
 
@@ -200,7 +201,6 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         $self->bodyParameters = $env['_POST'] ?? [];
         $self->cookieParameters = $env['_COOKIE'] ?? [];
         $self->sessionParameters = $env['_SESSION'] ?? [];
-
         return $self;
     }
 
@@ -242,6 +242,8 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         // create request object with request method and path,
         // we can assign other parameters later.
         $self = new self($requestMethod, $path);
+
+        // TODO: filter array keys by their prefix, consider adding an extension function for this.
         $self->headers = function_exists('getallheaders') ? getallheaders() : self::createHeadersFromServerGlobal($env);
         $self->serverParameters = $env['_SERVER'] ?? $env;
 
@@ -250,7 +252,6 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         $self->bodyParameters = $env['_POST'];
         $self->cookieParameters = $env['_COOKIE'];
         $self->sessionParameters = $env['_SESSION'];
-
         return $env['__request_object'] = $self;
     }
 }

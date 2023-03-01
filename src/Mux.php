@@ -292,7 +292,7 @@ class Mux implements IteratorAggregate
 
         if (strlen((string) $a[1]) > strlen((string) $b[1])) {
             return 1;
-        } elseif (strlen((string) $a[1]) === strlen((string) $b[1])) {
+        } elseif (strlen((string) $a[1]) == strlen((string) $b[1])) {
             return 0;
         } else {
             return -1;
@@ -345,7 +345,7 @@ class Mux implements IteratorAggregate
 
         if ($routeRequest !== null) {
             $requestMethod = self::convertRequestMethodConstant($routeRequest->getRequestMethod());
-        } elseif (isset($_SERVER['REQUEST_METHOD'])) {
+        } else if (isset($_SERVER['REQUEST_METHOD'])) {
             $requestMethod = self::convertRequestMethodConstant($_SERVER['REQUEST_METHOD']);
         }
 
@@ -482,7 +482,8 @@ class Mux implements IteratorAggregate
         }
 
         $search = [];
-        foreach (array_keys($params) as $key) {
+        
+        foreach ($params as $key => $value) {
             // try to match ':{key}' fragments and replace it with value
             $search[] = '#:'.preg_quote($key, '#').'\+?(?!\w)#';
         }
@@ -505,8 +506,9 @@ class Mux implements IteratorAggregate
         $self->id = $array['id'];
         return $self;
     }
-
-    public function getIterator(): \Traversable
+    
+    #[\ReturnTypeWillChange]
+    public function getIterator()
     {
         // return a valid Traversable object
         return new ArrayIterator($this->routes);

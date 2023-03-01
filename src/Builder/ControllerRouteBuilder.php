@@ -16,11 +16,11 @@ class ControllerRouteBuilder
     {
         $annotations = [];
         if ($docComment = $reflectionMethod->getDocComment()) {
-            if (preg_match('#^[\s*]*\@Method\("(get|put|post|delete|head|patch|options)"\)#im', (string) $docComment, $regs)) {
+            if (preg_match('/^[\s*]*\@Method\("(get|put|post|delete|head|patch|options)"\)/im', (string) $docComment, $regs)) {
                 $annotations['Method'] = $regs[1];
             }
 
-            if (preg_match('#^[\s*]*\@Route\("([^\s]*)"\)#im', (string) $docComment, $regs)) {
+            if (preg_match('/^[\s*]*\@Route\("([^\s]*)"\)/im', (string) $docComment, $regs)) {
                 $annotations['Route'] = $regs[1];
             }
         }
@@ -93,8 +93,8 @@ class ControllerRouteBuilder
      */
     protected static function translatePath($methodName)
     {
-        $methodName = preg_replace('#Action$#', '', (string) $methodName);
-        return '/'.preg_replace_callback('#[A-Z]#', static fn($matches) => '/'.strtolower($matches[0]), $methodName);
+        $methodName = preg_replace('/Action$/', '', (string) $methodName);
+        return '/'.preg_replace_callback('/[A-Z]/', static fn($matches) => '/'.strtolower($matches[0]), $methodName);
     }
 
     /**
