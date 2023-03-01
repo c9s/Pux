@@ -49,10 +49,10 @@ class Controller implements App
             $n = $rp->getName();
             if (isset($vars[ $n ])) {
                 $arguments[] = $vars[ $n ];
-            } elseif (isset($route[3]['default'][ $n ])
+            } else if (isset($route[3]['default'][ $n ])
                             && $default = $route[3]['default'][ $n ]) {
                 $arguments[] = $default;
-            } elseif (!$rp->isOptional() && !$rp->allowsNull()) {
+            } else if (!$rp->isOptional() && !$rp->allowsNull()) {
                 throw new Exception('parameter is not defined.');
             }
         }
@@ -69,7 +69,7 @@ class Controller implements App
 
     public function hasMatchedRoute()
     {
-        return (bool) $this->matchedRoute;
+        return $this->matchedRoute ? true : false;
     }
 
 

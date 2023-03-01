@@ -54,7 +54,7 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
      *
      * @return boolean true on match
      */
-    public function matchConstraints(array $constraints): bool
+    public function matchConstraints(array $constraints)
     {
         foreach ($constraints as $constraint) {
             $result = true;
@@ -97,7 +97,7 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     public function portEqual($port)
     {
         if (isset($this->serverParameters['SERVER_PORT'])) {
-            return (int) $this->serverParameters['SERVER_PORT'] === (int) $port;
+            return intval($this->serverParameters['SERVER_PORT']) == intval($port);
         }
     }
 
@@ -105,8 +105,9 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
      * Check if the request host is in the list of host.
      *
      *
+     * @return bool
      */
-    public function isOneOfHosts(array $hosts): bool
+    public function isOneOfHosts(array $hosts)
     {
         foreach ($hosts as $host) {
             if ($this->matchHost($host)) {
@@ -134,12 +135,12 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         return strcasecmp((string) $path, $this->path) === 0;
     }
 
-    public function pathContain($path): bool
+    public function pathContain($path)
     {
         return str_contains($this->path, (string) $path);
     }
 
-    public function pathStartWith($path): bool
+    public function pathStartWith($path)
     {
         return str_starts_with($this->path, (string) $path);
     }
@@ -192,15 +193,26 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
     public static function create($method, $path, array $env = [])
     {
         $self = new self($method, $path);
-        // TODO: filter array keys by their prefix, consider adding an extension function for this.
-        $self->headers = function_exists('getallheaders') ? getallheaders() : self::createHeadersFromServerGlobal($env);
-        $self->serverParameters = $env['_SERVER'] ?? $env;
+
+        if (function_exists('getallheaders')) {
+            $self->headers = getallheaders();
+        } else {
+            // TODO: filter array keys by their prefix, consider adding an extension function for this.
+            $self->headers = self::createHeadersFromServerGlobal($env);
+        }
+
+        if (isset($env['_SERVER'])) {
+            $self->serverParameters = $env['_SERVER'];
+        } else {
+            $self->serverParameters = $env;
+        }
 
         $self->parameters = $env['_REQUEST'] ?? [];
         $self->queryParameters = $env['_GET'] ?? [];
         $self->bodyParameters = $env['_POST'] ?? [];
         $self->cookieParameters = $env['_COOKIE'] ?? [];
         $self->sessionParameters = $env['_SESSION'] ?? [];
+
         return $self;
     }
 
@@ -232,26 +244,32 @@ class RouteRequest extends HttpRequest implements RouteRequestMatcher
         $requestMethod = 'GET';
         if (isset($env['REQUEST_METHOD'])) {
             $requestMethod = $env['REQUEST_METHOD'];
-        } elseif (isset($env['_SERVER']['REQUEST_METHOD'])) {
-            // compatibility for superglobal
-            // compatibility for superglobal
-            // compatibility for superglobal
+        } else if (isset($env['_SERVER']['REQUEST_METHOD'])) { // compatibility for superglobal
             $requestMethod = $env['_SERVER']['REQUEST_METHOD'];
         }
 
         // create request object with request method and path,
         // we can assign other parameters later.
         $self = new self($requestMethod, $path);
+        if (function_exists('getallheaders')) {
+            $self->headers = getallheaders();
+        } else {
+            // TODO: filter array keys by their prefix, consider adding an extension function for this.
+            $self->headers = self::createHeadersFromServerGlobal($env);
+        }
 
-        // TODO: filter array keys by their prefix, consider adding an extension function for this.
-        $self->headers = function_exists('getallheaders') ? getallheaders() : self::createHeadersFromServerGlobal($env);
-        $self->serverParameters = $env['_SERVER'] ?? $env;
+        if (isset($env['_SERVER'])) {
+            $self->serverParameters = $env['_SERVER'];
+        } else {
+            $self->serverParameters = $env;
+        }
 
         $self->parameters = $env['_REQUEST'];
         $self->queryParameters = $env['_GET'];
         $self->bodyParameters = $env['_POST'];
         $self->cookieParameters = $env['_COOKIE'];
         $self->sessionParameters = $env['_SESSION'];
+
         return $env['__request_object'] = $self;
     }
 }

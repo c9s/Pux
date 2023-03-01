@@ -12,7 +12,6 @@
         }
     ],
     "require": {
-        "php": ">=8.2.3",
         "phpsgi/phpsgi": "1.0.x-dev",
         "universal/universal": "2.0.x-dev"
     },

@@ -56,7 +56,7 @@ class ControllerRouteBuilder
             foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
 
                 // Ignore class methods that doesn't have Action in suffix
-                if (!preg_match('#Action$#', $method->getName())) {
+                if (!preg_match('/Action$/', $method->getName())) {
                     continue;
                 }
 
@@ -68,8 +68,10 @@ class ControllerRouteBuilder
                 $annotations = self::parseMethodAnnotation($method);
 
                 // If it's empty, then fetch annotations from parent methods
-                if ($annotations === [] && isset($methodMap[$method->getName()])) {
-                    $annotations = $methodMap[$method->getName()][0];
+                if (empty($annotations)) {
+                    if (isset($methodMap[$method->getName()])) {
+                        $annotations = $methodMap[$method->getName()][0];
+                    }
                 }
 
                 // always update method Map
@@ -112,11 +114,12 @@ class ControllerRouteBuilder
 
             if (isset($annotations['Route'])) {
                 $path = $annotations['Route'];
-            } elseif ($actionName === 'indexAction') {
-                // '/' . preg_replace_callback('/[A-Z]/', function($matches) {
-                $path = '';
             } else {
-                $path = self::translatePath($actionName); // '/' . preg_replace_callback('/[A-Z]/', function($matches) {
+                if ($actionName === 'indexAction') {
+                    $path = '';
+                } else {
+                    $path = self::translatePath($actionName); // '/' . preg_replace_callback('/[A-Z]/', function($matches) {
+                }
             }
 
             $route = [$path, $actionName];

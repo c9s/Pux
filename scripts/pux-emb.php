@@ -2,7 +2,7 @@
 $console = new Pux\Console;
 try {
     $console->run( $argv );
-} catch ( Exception $exception ) {
-    echo $exception->getMessage(), "\n";
+} catch ( Exception $e ) {
+    echo $e->getMessage(), "\n";
     exit(-1);
 }
