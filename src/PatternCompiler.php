@@ -84,14 +84,12 @@ class PatternCompiler
 
                 // check if the next pattern is an optional pattern
                 if ($nextMatch[0][0][0] === '(') {
-
                     $r = self::compilePattern($nextMatch[2][0] ,[]);
                     if (isset($r['tokens'][0][1])) {
                         $seps[] = $r['tokens'][0][1][0];
                     }
-
-                } else if ($nextMatch[0][0][0] === ':') { // variable token
-
+                } elseif ($nextMatch[0][0][0] === ':') {
+                    // variable token
                 } else {
                     $seps[] = $nextMatch[0][0][0];
                 }
@@ -223,14 +221,14 @@ class PatternCompiler
     static function splitTokens($string)
     {
         // split with ":variable" and path
-        preg_match_all('/(?:
-            # parse variable token with separator
-            .            # separator
-            :([\w\d_]+)  # variable
+        preg_match_all('#(?:
+            \# parse variable token with separator
+            .            \# separator
+            :([\w\d_]+)  \# variable
             |
-            # optional tokens
+            \# optional tokens
             \((.*)\)
-        )/x', $string, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        )#x', $string, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         return $matches;
     }
 

@@ -3,7 +3,7 @@
 // var_dump( $_SERVER ); 
 use Pux\Mux;
 class HelloController {
-    public function helloAction() {
+    public function helloAction(): string {
         return 'hello';
     }
 }

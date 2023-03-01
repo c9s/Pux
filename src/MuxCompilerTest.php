@@ -32,7 +32,7 @@ class MuxCompilerTest extends MuxTestCase
 
         path_ok( "merged_mux.php" );
 
-        $mux = require "merged_mux.php";
+        $mux = require __DIR__ . "/merged_mux.php";
         $this->assertNotNull($mux);
 
         $routes = $mux->getRoutes();
@@ -60,7 +60,7 @@ class MuxCompilerTest extends MuxTestCase
         $ret = $mux->compile("_test_mux.php");
         ok($ret, "compile successfully");
 
-        $newMux = require "_test_mux.php";
+        $newMux = require __DIR__ . "/_test_mux.php";
         $this->assertNotNull($newMux);
 
         $this->assertNotNull( $r = $newMux->dispatch("/foo") );

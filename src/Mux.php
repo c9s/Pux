@@ -134,11 +134,8 @@ class Mux implements IteratorAggregate
         $options['mount_path'] = $pattern;
 
         if ($mux instanceof Expandable) {
-
             $mux = $mux->expand($options);
-
-        } else if ($mux instanceof Closure) {
-
+        } elseif ($mux instanceof Closure) {
             // we pass the newly created Mux object to the builder closure to initialize routes.
             if ($ret = $mux($mux = new Mux())) {
                 if ($ret instanceof Mux) {
@@ -242,7 +239,7 @@ class Mux implements IteratorAggregate
         // compile place holder to patterns
         $pcre = str_contains((string) $pattern, ':');
         if ($pcre) {
-            $routeArgs = is_integer($callback)
+            $routeArgs = is_int($callback)
                 ? PatternCompiler::compilePrefix($pattern, $options)
                 : PatternCompiler::compile($pattern, $options)
                 ;
@@ -347,13 +344,9 @@ class Mux implements IteratorAggregate
         $requestMethod = null;
 
         if ($routeRequest !== null) {
-
             $requestMethod = self::convertRequestMethodConstant($routeRequest->getRequestMethod());
-
         } else if (isset($_SERVER['REQUEST_METHOD'])) {
-
             $requestMethod = self::convertRequestMethodConstant($_SERVER['REQUEST_METHOD']);
-
         }
 
         foreach ($this->routes as $route) {
@@ -426,7 +419,7 @@ class Mux implements IteratorAggregate
     {
         if ($route = $this->match($path)) {
             // When the callback is an integer, it's refereing to a submux object.
-            if (is_integer($route[2])) {
+            if (is_int($route[2])) {
                 $submux = $this->submux[$route[2]];
 
                 // sub-path and call submux to dispatch
@@ -448,7 +441,7 @@ class Mux implements IteratorAggregate
         }
     }
 
-    public function length()
+    public function length(): int
     {
         return count($this->routes);
     }
@@ -489,6 +482,7 @@ class Mux implements IteratorAggregate
         }
 
         $search = [];
+        
         foreach ($params as $key => $value) {
             // try to match ':{key}' fragments and replace it with value
             $search[] = '#:'.preg_quote($key, '#').'\+?(?!\w)#';
@@ -512,10 +506,11 @@ class Mux implements IteratorAggregate
         $self->id = $array['id'];
         return $self;
     }
-
+    
     #[\ReturnTypeWillChange]
     public function getIterator()
     {
+        // return a valid Traversable object
         return new ArrayIterator($this->routes);
     }
 

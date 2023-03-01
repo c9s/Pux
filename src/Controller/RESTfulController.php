@@ -121,7 +121,7 @@ abstract class RESTfulController extends ExpandableController
         header('HTTP/1.1 404 Not Found');
     }
 
-    public function getClass()
+    public function getClass(): string
     {
         return static::class;
     }

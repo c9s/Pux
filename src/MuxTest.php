@@ -40,7 +40,7 @@ class MuxTest extends MuxTestCase
     {
         $mux = new \Pux\Mux();
         $id = $mux->getId();
-        ok(is_integer($id));
+        ok(is_int($id));
         is($id, $mux->getId());
     }
 

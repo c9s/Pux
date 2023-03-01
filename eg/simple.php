@@ -1,5 +1,5 @@
 <?php
-require '../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 use Pux\Router;
 use Pux\Mux;
 
@@ -27,11 +27,12 @@ use Pux\Mux;
  */
 
 class ProductController {
-    public function listAction() {
+    public function listAction(): string {
         return 'product list';
     }
-    public function itemAction($id) { 
-        return "product $id";
+
+    public function itemAction($id): string { 
+        return sprintf('product %s', $id);
     }
 }
 
@@ -53,5 +54,6 @@ if ( false === $router->load() ) {
     // $router->mount('/product', 'ProductController');
     $router->save();
 }
+
 $r = $router->dispatch('/product/1');
 var_dump( $r ); 

@@ -86,9 +86,9 @@ class RouteExecutor
 
         if ($callback instanceof Closure) {
             $return = $callback($environment, $response);
-        } else if ($callback[0] instanceof \PHPSGI\App) {
+        } elseif ($callback[0] instanceof \PHPSGI\App) {
             $return = $callback[0]->call($environment, $response);
-        } else if (is_callable($callback)) {
+        } elseif (is_callable($callback)) {
             $return = call_user_func($callback, $environment, $response);
         } else {
             throw new \LogicException("Invalid callback type.");
