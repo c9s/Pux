@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require '../vendor/autoload.php';
 
 use Pux\Controller\ExpandableController;
 use Pux\RouteExecutor;
@@ -8,18 +8,18 @@ use Pux\Mux;
 use Pux\Router;
 
 class MyController extends Controller {
-    public function indexAction(): string {
+    public function indexAction() {
         return 'MyController::indexAction()!';
     }
 
-    public function helloAction(): string {
+    public function helloAction() {
         return 'MyController::helloAction()!';
     }
 
     /**
      * @uri /foo
      */
-    public function overrideAction(): string {
+    public function overrideAction() {
         return 'MyController::overrideAction(), NOT MyController::fooAction()!';
     }
 }

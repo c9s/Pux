@@ -8,12 +8,13 @@ class MuxCompiler
 {
     public $mux;
 
-    public $idCounter = 0;
+    public $idCounter;
 
     public $callbackValidation = false;
 
     public function __construct()
     {
+        $this->idCounter = 0;
         $this->mux = new Mux();
     }
 
@@ -27,7 +28,7 @@ class MuxCompiler
         $this->mux = $mux;
     }
 
-    public function merge($mux): bool
+    public function merge($mux)
     {
         $routes = $mux->getRoutes();
         if ($this->callbackValidation) {
@@ -54,7 +55,6 @@ class MuxCompiler
         if ($a[0] && $b[0]) {
             $a_len = strlen((string) $a[3]['compiled']);
             $b_len = strlen((string) $b[3]['compiled']);
-            
             if ($a_len == $b_len) {
                 return 0;
             } elseif ($a_len > $b_len) {
