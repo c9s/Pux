@@ -513,7 +513,7 @@ class Mux implements IteratorAggregate
         return $self;
     }
 
-
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->routes);

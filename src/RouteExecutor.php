@@ -16,9 +16,9 @@ class RouteExecutor
      * The returned object should be a PHPSGI app, so that we can always
      * execute "call" on the returned object.
      *
-     * @return Closure|PHPSGI\App|Controller
+     * @return Closure|PHPSGI\App|Controller|array
      */
-    public static function callback($handler): \Closure|\PHPSGI\App|\Pux\Controller\Controller
+    public static function callback($handler): Closure|\PHPSGI\App|Controller|array
     {
         $options = [];
         if ($handler instanceof Closure) {
@@ -70,7 +70,7 @@ class RouteExecutor
      *
      * 'constructor_args': arguments for constructing controller object.
      *
-     * @return string the response
+     * @return array the response
      */
     public static function execute(array $route, array $environment = [], array $response = [])
     {
