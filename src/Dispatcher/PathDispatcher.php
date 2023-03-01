@@ -7,7 +7,7 @@ use Pux\Mux;
  */
 class PathDispatcher
 {
-    protected $options = array();
+    protected $options = [];
 
     protected $mux;
 
@@ -15,15 +15,15 @@ class PathDispatcher
 
     public $expiry = 0;
 
-    public function __construct(Mux $mux, array $options = array())
+    public function __construct(Mux $mux, array $options = [])
     {
         $this->mux = $mux;
         $this->options = $options;
     }
 
-    public function dispatchRequest(RouteRequest $request)
+    public function dispatchRequest(RouteRequest $routeRequest)
     {
-        return $this->dispatch($request->getPath(), $request);
+        return $this->dispatch($routeRequest->getPath());
     }
 
     public function dispatch($path) 
@@ -31,6 +31,7 @@ class PathDispatcher
         if ($route = $this->mux->dispatch($path)) {
             return $route;
         }
+
         return false;
     }
 }

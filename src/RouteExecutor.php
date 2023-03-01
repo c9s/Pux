@@ -18,11 +18,13 @@ class RouteExecutor
      *
      * @return Closure|PHPSGI\App|Controller
      */
-    public static function callback($handler)
+    public static function callback($handler): \Closure|\PHPSGI\App|\Pux\Controller\Controller
     {
+        $options = [];
         if ($handler instanceof Closure) {
             return $handler;
         }
+
         if (is_object($handler[0])) {
             return $handler;
         }
@@ -33,11 +35,13 @@ class RouteExecutor
 
             // If users define the constructor arguments in options array.
             $constructArgs = [];
-            $rc = new ReflectionClass($handler[0]);
+            $reflectionClass = new ReflectionClass($handler[0]);
             if (isset($options['constructor_args'])) {
-                $con = $handler[0] = $rc->newInstanceArgs($constructArgs);
+                $con = $reflectionClass->newInstanceArgs($constructArgs);
+                $handler[0] = $con;
             } else {
-                $con = $handler[0] = $rc->newInstance();
+                $con = $reflectionClass->newInstance();
+                $handler[0] = $con;
             }
 
             return $handler;
@@ -68,9 +72,9 @@ class RouteExecutor
      *
      * @return string the response
      */
-    public static function execute(array $route, array $environment = array(), array $response = array())
+    public static function execute(array $route, array $environment = [], array $response = [])
     {
-        list($pcre, $pattern, $callbackArg, $options) = $route;
+        [$pcre, $pattern, $callbackArg, $options] = $route;
 
         $callback = self::callback($callbackArg);
 
@@ -95,12 +99,15 @@ class RouteExecutor
             if (!isset($response[0])) {
                 $response[0] = 200;
             }
+
             if (!isset($response[1])) {
                 $response[1] = [];
             }
+
             if (!isset($response[2])) {
                 $response[2] = $return;
             }
+
             return $response;
         }
 

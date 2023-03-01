@@ -12,8 +12,9 @@ class MuxNoExpandMountTest extends MuxTestCase
         $mux->expand = false;
         ok($mux, "got mux");
         $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
-        $submux->any('/foo', array( 'HelloController2','indexAction' ));
+        $submux->any('/hello/:name', ['HelloController2', 'indexAction']);
+        $submux->any('/foo', ['HelloController2', 'indexAction']);
+
         $mux->mount( '/sub' , $submux);
     }
 
@@ -32,8 +33,8 @@ class MuxNoExpandMountTest extends MuxTestCase
         ok($mux);
 
         $submux = new \Pux\Mux;
-        $submux->any('/hello/:name', array( 'HelloController2','indexAction' ));
-        $submux->any('/foo', array( 'HelloController2','indexAction' ));
+        $submux->any('/hello/:name', ['HelloController2', 'indexAction']);
+        $submux->any('/foo', ['HelloController2', 'indexAction']);
 
         $mux->mount( '/sub' , $submux);
         ok($submux, 'submux');
@@ -54,9 +55,9 @@ class MuxNoExpandMountTest extends MuxTestCase
     public function testMuxMountNoExpandAndDispatchToCallableSubMux() {
         $mux = new \Pux\Mux;
         $mux->expand = false;
-        $mux->mount('/test', function (Mux $submux) {
-            $submux->any('/hello/static', array('HelloController2', 'indexAction'));
-            $submux->any('/hello/:name', array('HelloController2', 'indexAction'));
+        $mux->mount('/test', static function (Mux $mux) {
+            $mux->any('/hello/static', ['HelloController2', 'indexAction']);
+            $mux->any('/hello/:name', ['HelloController2', 'indexAction']);
         });
 
         ok($mux);

@@ -7,3 +7,4 @@
 - **[@mway](https://github.com/mway)**
 - **[@sjinks](https://github.com/sjinks)**
 - **[@zoowii](https://github.com/zoowii)**
+- **[@caferyukseloglu - MotaWord](https://github.com/caferyukseloglu)**

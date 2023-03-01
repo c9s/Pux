@@ -34,6 +34,7 @@ class MuxCompiler
         if ($this->callbackValidation) {
             $this->validateRouteCallback($routes);
         }
+
         foreach ($routes as $route) {
             if (is_int($route[2])) {
                 // rewrite submux id
@@ -42,6 +43,7 @@ class MuxCompiler
                 $route[2] = $newId;
                 $this->mux->submux[ $newId ] = $submux;
             }
+
             $this->mux->appendRouteArray($route);
         }
 
@@ -51,8 +53,8 @@ class MuxCompiler
     public static function sort_routes($a, $b)
     {
         if ($a[0] && $b[0]) {
-            $a_len = strlen($a[3]['compiled']);
-            $b_len = strlen($b[3]['compiled']);
+            $a_len = strlen((string) $a[3]['compiled']);
+            $b_len = strlen((string) $b[3]['compiled']);
             if ($a_len == $b_len) {
                 return 0;
             } elseif ($a_len > $b_len) {
@@ -65,9 +67,10 @@ class MuxCompiler
         } elseif ($b[0]) {
             return 1;
         }
-        if (strlen($a[1]) > strlen($b[1])) {
+
+        if (strlen((string) $a[1]) > strlen((string) $b[1])) {
             return -1;
-        } elseif (strlen($a[1]) == strlen($b[1])) {
+        } elseif (strlen((string) $a[1]) == strlen((string) $b[1])) {
             return 0;
         } else {
             return 1;
@@ -96,12 +99,13 @@ class MuxCompiler
                 $class = $callback[0];
                 $method = $callback[1];
                 if (!class_exists($class, true)) {
-                    throw new Exception("Controller {$class} does not exist.");
+                    throw new Exception(sprintf('Controller %s does not exist.', $class));
                 }
+
                 // rebless a controller (extract this to common method)
                 $controller = new $class();
                 if (!method_exists($controller, $method)) {
-                    throw new Exception("Method $method not found in controller $class.");
+                    throw new Exception(sprintf('Method %s not found in controller %s.', $method, $class));
                 }
             }
         }
@@ -110,8 +114,7 @@ class MuxCompiler
     public function compileReflectionParameters()
     {
         foreach ($this->mux->routes as $route) {
-            $callback = $route[2];
-            list($class, $method) = $callback;
+            [$class, $method] = $route[2];
 
             $refClass = new ReflectionClass($class);
             $refMethod = $refClass->getMethod($method);
@@ -120,22 +123,21 @@ class MuxCompiler
             // HHVM does not support Reflection currently.
             if (!defined('HHVM_VERSION')) {
                 // when __reflection is defined, we re-use the reflection info.
-                $route[3]['__reflection'] = array();
-                foreach ($refParameters as $refParam) {
+                $route[3]['__reflection'] = [];
+                foreach ($refParameters as $refParameter) {
                     // ReflectionParameter
-                    $param = array(
-                        'name' => $refParam->getName(),
-                        'position' => $refParam->getPosition(),
-                    );
-                    if ($refParam->isDefaultValueAvailable()) {
-                        $param['default'] = $refParam->getDefaultValue();
-                        if (PHP_VERSION_ID >= 50406 && $refParam->isDefaultValueConstant()) {
-                            $param['constant'] = $refParam->getDefaultValueConstantName();
+                    $param = ['name' => $refParameter->getName(), 'position' => $refParameter->getPosition()];
+                    if ($refParameter->isDefaultValueAvailable()) {
+                        $param['default'] = $refParameter->getDefaultValue();
+                        if (PHP_VERSION_ID >= 50406 && $refParameter->isDefaultValueConstant()) {
+                            $param['constant'] = $refParameter->getDefaultValueConstantName();
                         }
                     }
-                    if ($optional = $refParam->isOptional()) {
+
+                    if ($optional = $refParameter->isOptional()) {
                         $param['optional'] = $optional;
                     }
+
                     $route[3]['__reflection']['params'][] = $param;
                 }
             }
@@ -148,7 +150,7 @@ class MuxCompiler
     public function compile($outFile)
     {
         // compile routes to php file as a cache.
-        usort($this->mux->routes, array('Pux\\MuxCompiler', 'sort_routes'));
+        usort($this->mux->routes, \Pux\MuxCompiler::sort_routes(...));
 
         $code = $this->mux->export();
 
