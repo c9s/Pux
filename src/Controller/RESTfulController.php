@@ -58,15 +58,15 @@ abstract class RESTfulController extends ExpandableController
      *
      * @return Mux
      */
-    public function expand(array $options = array(), $dynamic = false)
+    public function expand(array $options = [], $dynamic = false)
     {
         $mux   = new Mux();
         $target = $dynamic ? $this : $this->getClass();
-        $mux->add('/:id', [$target, 'updateAction'], array_merge($options, array('method' => REQUEST_METHOD_POST   )));
-        $mux->add('/:id', [$target, 'loadAction'],   array_merge($options, array('method' => REQUEST_METHOD_GET    )));
-        $mux->add('/:id', [$target, 'deleteAction'], array_merge($options, array('method' => REQUEST_METHOD_DELETE )));
-        $mux->add('', [$target, 'createAction'],     array_merge($options, array('method' => REQUEST_METHOD_POST   )));
-        $mux->add('', [$target, 'collectionAction'], array_merge($options, array('method' => REQUEST_METHOD_GET    )));
+        $mux->add('/:id', [$target, 'updateAction'], array_merge($options, ['method' => REQUEST_METHOD_POST]));
+        $mux->add('/:id', [$target, 'loadAction'],   array_merge($options, ['method' => REQUEST_METHOD_GET]));
+        $mux->add('/:id', [$target, 'deleteAction'], array_merge($options, ['method' => REQUEST_METHOD_DELETE]));
+        $mux->add('', [$target, 'createAction'],     array_merge($options, ['method' => REQUEST_METHOD_POST]));
+        $mux->add('', [$target, 'collectionAction'], array_merge($options, ['method' => REQUEST_METHOD_GET]));
         return $mux;
     }
 
@@ -123,7 +123,7 @@ abstract class RESTfulController extends ExpandableController
 
     public function getClass()
     {
-        return get_class($this);
+        return static::class;
     }
 }
 

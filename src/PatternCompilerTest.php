@@ -6,7 +6,7 @@ class PatternCompilerTest extends \PHPUnit\Framework\TestCase
 
     public function testCompiledPatternWithPostSeparator()
     {
-        $route = PatternCompiler::compile('/blog/:year-:month', array());
+        $route = PatternCompiler::compile('/blog/:year-:month', []);
         $this->assertNotEmpty($route);
         $this->assertTrue(is_array($route));
         $this->assertEquals(1, preg_match($route['compiled'] , '/blog/2013-09', $matches));
@@ -16,7 +16,7 @@ class PatternCompilerTest extends \PHPUnit\Framework\TestCase
 
     public function testRESTfulPatternWithoutFormat()
     {
-        $route = PatternCompiler::compile('/blog/:id(.:format)', array());
+        $route = PatternCompiler::compile('/blog/:id(.:format)', []);
         $this->assertNotEmpty($route);
         $this->assertTrue(is_array($route));
 
@@ -27,7 +27,7 @@ class PatternCompilerTest extends \PHPUnit\Framework\TestCase
 
     public function testRESTfulPatternWithOptionalFormat()
     {
-        $route = PatternCompiler::compile('/blog/:id(.:format)', array());
+        $route = PatternCompiler::compile('/blog/:id(.:format)', []);
         $this->assertNotEmpty($route);
         $this->assertTrue(is_array($route));
         $this->assertEquals(1, preg_match($route['compiled'] , '/blog/3314.json', $matches));
@@ -38,11 +38,7 @@ class PatternCompilerTest extends \PHPUnit\Framework\TestCase
 
     public function testOptional()
     {
-        $route = PatternCompiler::compile('/blog/:id(.:format)', array( 
-            'default' => array(
-                'format' => 'json'
-            )
-        ));
+        $route = PatternCompiler::compile('/blog/:id(.:format)', ['default' => ['format' => 'json']]);
 
         $this->assertTrue( is_array($route) );
 
@@ -77,11 +73,7 @@ class PatternCompilerTest extends \PHPUnit\Framework\TestCase
 
     function testOptionalHolder()
     {
-        $route = PatternCompiler::compile('/blog/:id.:format', array( 
-            'default' => array(
-                'format' => 'json'
-            )
-        ));
+        $route = PatternCompiler::compile('/blog/:id.:format', ['default' => ['format' => 'json']]);
         ok( preg_match( $route['compiled'] , '/blog/23.json', $matched ) );
         is( 23, $matched['id'] );
         is( 'json' , $matched['format'] );

@@ -10,13 +10,13 @@ class Utils
             'REQUEST_METHOD' => $method,
             'PATH_INFO'    => $pathInfo,
         ];
-        $env['_POST']    = array();
-        $env['_REQUEST'] = array();
-        $env['_GET']     = array();
-        $env['_COOKIE']     = array();
-        $env['_SESSION']     = array();
+        $env['_POST']    = [];
+        $env['_REQUEST'] = [];
+        $env['_GET']     = [];
+        $env['_COOKIE']     = [];
+        $env['_SESSION']     = [];
         // fallback (backware compatible for $GLOBALS)
-        $env['_SERVER']     = array();
+        $env['_SERVER']     = [];
         return $env;
     }
 
@@ -24,11 +24,16 @@ class Utils
     static public function createEnvFromGlobals(array $globals)
     {
         $env = $globals['_SERVER'];
-        $env['_REQUEST'] = $env['pux.parameters']       = $globals['_REQUEST'];
-        $env['_POST']    = $env['pux.body_parameters']  = $globals['_POST'];
-        $env['_GET']     = $env['pux.query_parameters'] = $globals['_GET'];
-        $env['_COOKIE']  = $env['pux.cookies'] = $globals['_COOKIE'];
-        $env['_SESSION']  = $env['pux.session'] = $globals['_SESSION'];
+        $env['_REQUEST'] = $globals['_REQUEST'];
+        $env['pux.parameters'] = $globals['_REQUEST'];
+        $env['_POST'] = $globals['_POST'];
+        $env['pux.body_parameters'] = $globals['_POST'];
+        $env['_GET'] = $globals['_GET'];
+        $env['pux.query_parameters'] = $globals['_GET'];
+        $env['_COOKIE'] = $globals['_COOKIE'];
+        $env['pux.cookies'] = $globals['_COOKIE'];
+        $env['_SESSION'] = $globals['_SESSION'];
+        $env['pux.session'] = $globals['_SESSION'];
         return $env;
     }
 

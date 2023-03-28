@@ -7,7 +7,7 @@ interface RouteRequestMatcher
 
     public function pathEqual($path);
 
-    public function pathMatch($pattern, array & $matches = array());
+    public function pathMatch($pattern, array & $matches = []);
 
     public function pathEndWith($suffix);
 
@@ -16,7 +16,7 @@ interface RouteRequestMatcher
     public function matchPath($pattern, & $matches = array());
     */
 
-    public function hostMatch($host, array & $matches = array());
+    public function hostMatch($host, array & $matches = []);
 
     public function requestMethodEqual($method);
 
@@ -27,7 +27,7 @@ interface RouteRequestMatcher
 
     public function portEqual($port);
 
-    public function queryStringMatch($pattern, array & $matches = array());
+    public function queryStringMatch($pattern, array & $matches = []);
 
 }
 

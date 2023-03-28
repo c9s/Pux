@@ -7,27 +7,10 @@ class MuxSetStateTest extends MuxTestCase
 {
 
     public function testNullStaticRoutes() {
-        $mux = Mux::__set_state(array(
-            'id' => NULL,
-            'routes' =>
-            array (
-                0 =>
-                    array (
-                        0 => false,
-                        1 => '/hello',
-                        2 =>
-                        array (
-                            0 => 'HelloController2',
-                            1 => 'helloAction',
-                        ),
-                        3 => array (),
-                ),
-            ),
-            'submux' => array(),
-            'staticRoutes' => array(),
-            'routesById' => array(),
-            'expand' => true,
-        ));
+        $mux = Mux::__set_state(['id' => NULL, 'routes' =>
+        [0 =>
+            [0 => false, 1 => '/hello', 2 =>
+            [0 => 'HelloController2', 1 => 'helloAction'], 3 => []]], 'submux' => [], 'staticRoutes' => [], 'routesById' => [], 'expand' => true]);
         ok($mux);
     }
 

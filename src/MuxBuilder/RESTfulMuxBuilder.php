@@ -16,7 +16,7 @@ class RESTfulMuxBuilder
      *
      * Valid options are: 'prefix'
      */
-    protected $options = array();
+    protected $options = [];
 
 
     /**
@@ -25,14 +25,12 @@ class RESTfulMuxBuilder
      * [ resource Id => expandable controller object ]
      *
      */
-    protected $resources = array();
+    protected $resources = [];
 
-    public function __construct(Mux & $mux = null, array $options = array())
+    public function __construct(Mux & $mux = null, array $options = [])
     {
         $this->mux = $mux ?: new Mux;
-        $this->options = array_merge(array( 
-            'prefix' => '/',
-        ), $options);
+        $this->options = array_merge(['prefix' => '/'], $options);
     }
 
 
@@ -40,15 +38,14 @@ class RESTfulMuxBuilder
      * Register a RESTful resource into the Mux object.
      *
      * @param string $resourceId the RESTful resource ID
-     * @param Expandable $controller a controller object that implements Expandable interface.
-     *
+     * @param Expandable $expandable a controller object that implements Expandable interface.
      */
-    public function addResource($resourceId, Expandable $controller)
+    public function addResource($resourceId, Expandable $expandable)
     {
-        $this->resources[$resourceId] = $controller;
+        $this->resources[$resourceId] = $expandable;
 
         $prefix = $this->options['prefix'];
-        $resourceMux = $controller->expand();
+        $resourceMux = $expandable->expand();
         $path = $prefix . '/' . $resourceId;
         $this->mux->mount($path, $resourceMux);
     }
@@ -67,6 +64,7 @@ class RESTfulMuxBuilder
             $path = $prefix . '/' . $resId;
             $this->mux->mount($path, $resourceMux);
         }
+
         return $this->mux;
     }
 }

@@ -8,11 +8,12 @@ class RESTfulMuxBuilderTest extends \PHPUnit\Framework\TestCase
     public function testRESTfulMuxBuilder()
     {
         $mux = new Mux;
-        $builder = new RESTfulMuxBuilder($mux, [ 'prefix' => '/=' ]);
-        $builder->addResource('product', new ProductResourceController);
-        $mux = $builder->build();
+        $resTfulMuxBuilder = new RESTfulMuxBuilder($mux, [ 'prefix' => '/=' ]);
+        $resTfulMuxBuilder->addResource('product', new ProductResourceController);
 
-        $this->assertInstanceOf('Pux\\Mux', $mux);
+        $mux = $resTfulMuxBuilder->build();
+
+        $this->assertInstanceOf(\Pux\Mux::class, $mux);
 
 
         // $env = Utils::createEnv('GET', '/=/product/10');
